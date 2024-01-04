@@ -1,6 +1,5 @@
 import { ReactNode, useState } from "react";
 import "../../src/global.css";
-import Head from "next/head";
 import Link from "next/link";
 
 export default function Html({ children }: { children: ReactNode }) {
