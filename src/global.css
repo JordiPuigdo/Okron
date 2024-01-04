@@ -10,17 +10,4 @@
   /* ... */
   
 
-  .sidebar {
-  width: 40vw;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  background: white;
-  transition: width 0.5s;
-    overflow: hidden;
-}
-.sidebar.open {
-  width: 35vw;
-}
+ 
