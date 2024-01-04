@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import WorkOrder, {
   CreateWorkOrderRequest,
   stateWorkOrder,
-} from "../../interfaces/workOrder";
+} from "../../../interfaces/workOrder";
 import InspectionPoint from "interfaces/inspectionPoint";
 import InspectionPointService from "services/inspectionPointService";
 import OperatorService from "services/operatorService";

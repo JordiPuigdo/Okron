@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import Machine from "../../interfaces/machine";
+import Machine from "../../../interfaces/machine";
 import WorkOrder, {
   CreateWorkOrderRequest,
   stateWorkOrder,
-} from "../../interfaces/workOrder";
+} from "../../../interfaces/workOrder";
 import Layout from "components/Layout";
-import MachineService from "../../services/machineService";
+import MachineService from "../../../services/machineService";
 import WorkOrderService from "services/workOrderService";
 import { triggerAsyncId } from "async_hooks";
 import WorkOrdersPerMachine from "./WorkOrdersPerMachine";

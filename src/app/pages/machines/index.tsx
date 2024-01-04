@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import MachineService from "../../services/machineService";
-import Machine from "../../interfaces/machine";
+import MachineService from "../../../services/machineService";
+import Machine from "../../../interfaces/machine";
 import Link from "next/link";
-import Layout from "../../components/Layout";
+import Layout from "../../../components/Layout";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 export default function HomePage() {

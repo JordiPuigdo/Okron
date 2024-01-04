@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [subMenuOpen, setSubMenuOpen] = useState(false);
   const [preventiusSubMenuOpen, setPreventiusSubMenuOpen] = useState(false);
@@ -24,7 +24,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const togglePreventiusSubMenu = () => {
     setPreventiusSubMenuOpen(!preventiusSubMenuOpen);
   };
-
   return (
     <main className="min-h-screen h-100 bg-slate-300 flex">
       <div className="relative w-full max-w-full overflow-hidden">
@@ -289,7 +288,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               )}
             </button>
           </header>
-          {children}
         </div>
       </div>
     </main>

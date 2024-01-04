@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
 import { GetStaticProps } from "next";
-import Layout from "../../components/Layout";
-import MachineForm from "../../components/MachineForm"; // Create a MachineForm component for editing
-import Machine from "../../interfaces/machine";
-import MachineService from "../../services/machineService"; // Import your MachineService
+import Layout from "../../../components/Layout";
+import MachineForm from "../../../components/MachineForm"; // Create a MachineForm component for editing
+import Machine from "../../../interfaces/machine";
+import MachineService from "../../../services/machineService"; // Import your MachineService
 import { useEffect, useState } from "react";
 
 type Props = {

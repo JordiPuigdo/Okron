@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import OperatorForm from "../../components/OperatorForm";
+import OperatorForm from "../../../components/OperatorForm";
 import OperatorService from "services/operatorService";
 import Operator from "interfaces/Operator";
 import Layout from "components/Layout";
