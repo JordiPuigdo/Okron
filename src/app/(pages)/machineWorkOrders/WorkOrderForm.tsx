@@ -29,7 +29,9 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
   const inspectionPointService = new InspectionPointService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
-  const sparePartService = new SparePartService("http://localhost:5254");
+  const sparePartService = new SparePartService(
+    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  );
   const [availableSpareParts, setAvailableSpareParts] = useState<SparePart[]>(
     []
   );
@@ -45,7 +47,9 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
     setSparePartsLimit((prevLimit) => prevLimit + 10);
   };
 
-  const operatorService = new OperatorService("http://localhost:5254/");
+  const operatorService = new OperatorService(
+    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  );
   const [availableInspectionPoints, setAvailableInspectionPoints] = useState<
     InspectionPoint[]
   >([]);

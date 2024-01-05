@@ -8,7 +8,9 @@ import SparePartService from "services/sparePartService";
 const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50];
 
 function SparePartsPage() {
-  const sparePartService = new SparePartService("http://localhost:5254");
+  const sparePartService = new SparePartService(
+    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  );
   const [spareParts, setSpareParts] = useState<SparePart[]>([]);
   const [filteredSpareParts, setFilteredSpareParts] = useState<SparePart[]>([]);
   const [filters, setFilters] = useState({

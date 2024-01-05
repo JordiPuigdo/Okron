@@ -22,7 +22,9 @@ const MachineWorkOrdersPage: React.FC = () => {
   const [createWorkOrderVisibility, setCreateWorkOrderVisibility] = useState<{
     [machineId: string]: boolean;
   }>({});
-  const workOrderService = new WorkOrderService("http://localhost:5254/api/");
+  const workOrderService = new WorkOrderService(
+    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  );
   const [WorkOrders, setWorkOrders] = useState<WorkOrder[] | []>([]);
   const [WorkOrder, setWorkOrder] = useState<WorkOrder | undefined>(undefined);
   const [showDetailWorkOrder, setShowDetailWorkOrder] = useState<

@@ -11,7 +11,9 @@ interface SidebarProps {
 }
 
 const WorkOrderSideBar: React.FC<SidebarProps> = ({ close, id }) => {
-  const workOrderService = new WorkOrderService("http://localhost:5254/api/");
+  const workOrderService = new WorkOrderService(
+    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  );
   const [WorkOrder, setWorkOrder] = useState<WorkOrder | undefined>(undefined);
   const { handleSubmit, control, setValue } = useForm<WorkOrder>({
     defaultValues: WorkOrder,

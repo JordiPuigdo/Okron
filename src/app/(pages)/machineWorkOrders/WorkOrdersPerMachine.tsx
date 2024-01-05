@@ -16,7 +16,9 @@ const WorkOrdersPerMachine: React.FC<WorkOrdersPerMachineProps> = ({
   onDetailClick,
 }) => {
   const router = useRouter();
-  const workOrderService = new WorkOrderService("http://localhost:5254/api/");
+  const workOrderService = new WorkOrderService(
+    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  );
   const [WorkOrders, setWorkOrders] = useState<WorkOrder[] | []>([]);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editedWorkOrder, setEditedWorkOrder] = useState<WorkOrder | null>(

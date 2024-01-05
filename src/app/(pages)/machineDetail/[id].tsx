@@ -18,7 +18,9 @@ const MachineDetailsPage = () => {
   const machineService = new MachineService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
-  const workOrderService = new WorkOrderService("http://localhost:5254/api/");
+  const workOrderService = new WorkOrderService(
+    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  );
   const [selectedWorkOrderId, setSelectedWorkOrderId] = useState<
     string | null
   >();
