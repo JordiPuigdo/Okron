@@ -1,4 +1,5 @@
 "use client";
+
 import Layout from "components/Layout";
 import SparePart from "interfaces/SparePart";
 import { useEffect, useState } from "react";

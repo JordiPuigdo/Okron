@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import OperatorForm from "../../../components/OperatorForm";
 import OperatorService from "services/operatorService";
