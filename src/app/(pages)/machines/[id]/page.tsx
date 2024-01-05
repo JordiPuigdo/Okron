@@ -1,26 +1,25 @@
+"use client";
+
 import { useRouter } from "next/router";
-import { GetStaticProps } from "next";
-import Layout from "../../../components/Layout";
-import MachineForm from "../../../components/MachineForm"; // Create a MachineForm component for editing
-import Machine from "../../../interfaces/machine";
-import MachineService from "../../../services/machineService"; // Import your MachineService
+import Layout from "../../../../components/Layout";
+import MachineForm from "../../../../components/MachineForm";
+import Machine from "../../../../interfaces/machine";
+import MachineService from "../../../../services/machineService";
 import { useEffect, useState } from "react";
 
-type Props = {
-  item?: Machine;
-  errors?: string;
-};
-
-const EditMachinePage = ({ item, errors }: Props) => {
-  const router = useRouter();
-  const { id } = router.query;
-
+export default function EditMachinePage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const fetchMachineData = async () => {
     try {
       const machineService = new MachineService(
         process.env.NEXT_PUBLIC_API_BASE_URL || ""
       );
-      const machineData = await machineService.getMachineById(id as string);
+      const machineData = await machineService.getMachineById(
+        params.id as string
+      );
       return machineData;
     } catch (error) {
       console.error("Error fetching machine data:", error);
@@ -31,27 +30,17 @@ const EditMachinePage = ({ item, errors }: Props) => {
   const [machineData, setMachineData] = useState<Machine | null>(null);
 
   useEffect(() => {
-    if (id) {
+    if (params.id) {
       fetchMachineData().then((data) => {
         if (data) {
           setMachineData(data);
         }
       });
     }
-  }, [id]);
+  }, [params.id]);
 
   function onCancel() {
     history.back();
-  }
-
-  if (errors) {
-    return (
-      <Layout>
-        <p>
-          <span style={{ color: "red" }}>Error:</span> {errors}
-        </p>
-      </Layout>
-    );
   }
 
   return (
@@ -67,6 +56,4 @@ const EditMachinePage = ({ item, errors }: Props) => {
       )}
     </Layout>
   );
-};
-
-export default EditMachinePage;
+}

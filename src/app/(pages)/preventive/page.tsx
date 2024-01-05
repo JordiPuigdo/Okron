@@ -1,3 +1,4 @@
+"use client";
 import Layout from "components/Layout";
 import { Preventive } from "interfaces/Preventive";
 import SparePart from "interfaces/SparePart";
