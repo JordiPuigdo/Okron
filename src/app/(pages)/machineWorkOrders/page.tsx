@@ -13,7 +13,7 @@ import { triggerAsyncId } from "async_hooks";
 import WorkOrdersPerMachine from "./WorkOrdersPerMachine";
 import WorkOrderForm from "./WorkOrderForm";
 
-const MachineWorkOrdersPage: React.FC = () => {
+export default function MachineWorkOrdersPage() {
   const [machines, setMachines] = useState<Machine[] | []>([]);
   const machineService = new MachineService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
@@ -198,87 +198,7 @@ const MachineWorkOrdersPage: React.FC = () => {
       <h1 className="text-3xl font-semibold mb-4">
         Històric Ordres de treball
       </h1>
-      <div className="flex">
-        <div id="left" className="w-1/4 p-4">
-          {machines.map((machine) => (
-            <div
-              key={machine.id}
-              className={`${
-                WorkOrderVisibility[machine.id] ||
-                createWorkOrderVisibility[machine.id]
-                  ? "bg-red-200"
-                  : ""
-              } mb-4 p-4 border rounded-lg shadow-md`}
-            >
-              <h2 className="text-xl font-semibold mb-2">{machine.name}</h2>
-              <button
-                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 mx-2 rounded-md w-24 h-10"
-                onClick={() => toggleWorkOrderVisibility(machine.id)}
-              >
-                {WorkOrderVisibility[machine.id] ? "Ocultar" : "Històric"}
-              </button>
-              <button
-                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 mx-2 rounded-md w-24 h-10 mt-2"
-                onClick={() => toggleCreationVisibility(machine.id)}
-              >
-                {createWorkOrderVisibility[machine.id] ? "Cancelar" : "Crear"}
-              </button>
-            </div>
-          ))}
-        </div>
-        <div id="center" className="w-1/2 p-4">
-          {WorkOrderVisibility[currentMachineId] && (
-            <div>
-              <WorkOrdersPerMachine
-                id={currentMachineId}
-                machineName="test"
-                onDetailClick={handleDetailClick}
-              ></WorkOrdersPerMachine>
-            </div>
-          )}
-          {createWorkOrderVisibility[currentMachineId] && (
-            <WorkOrderForm
-              onSubmit={(WorkOrderRequest) =>
-                handleWorkOrderSubmit(
-                  WorkOrderRequest,
-                  machines.find((machine) => machine.id === currentMachineId) ||
-                    null
-                )
-              }
-              machineName={currenMachineName}
-            />
-          )}
-        </div>
-        <div id="right" className="w-1/3 p-4">
-          {showDetailWorkOrder && WorkOrder?.description && (
-            <div>
-              <div className="flex font-bold mb-2">
-                <div className="w-1/3">Inici</div>
-                <div className="w-1/3">Final</div>
-                <div className="w-1/3">Temps Total</div>
-                <div className="w-1/3">Operari</div>
-              </div>
-
-              {WorkOrder?.WorkOrderTimes.map((WorkOrderTime) => (
-                <div key={WorkOrderTime.id} className="flex items-center mb-2">
-                  <div className="w-1/3">
-                    {formatDate(WorkOrderTime.startTime)}
-                  </div>
-                  <div className="w-1/3">
-                    {formatDate(WorkOrderTime.endTime)}
-                  </div>
-                  <div className="w-1/3">
-                    {formatTime(WorkOrderTime.totalTime)}
-                  </div>
-                  <div className="w-1/3">{WorkOrderTime.name}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+      <div className="flex"></div>
     </Layout>
   );
-};
-
-export default MachineWorkOrdersPage;
+}
