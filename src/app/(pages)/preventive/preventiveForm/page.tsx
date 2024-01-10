@@ -429,7 +429,7 @@ const PreventiveForm = () => {
                 </h3>
 
                 {selectedInspectionPoints.map((selectedPoint) => (
-                  <div key={selectedPoint} className="mb-2">
+                  <div key={selectedPoint} className="mb-2 text-black">
                     {
                       availableInspectionPoints.find(
                         (point) => point.id === selectedPoint
@@ -490,7 +490,7 @@ const PreventiveForm = () => {
                 Màquines seleccionades
               </h3>
               {selectedMachines.map((selectedMachine) => (
-                <div key={selectedMachine} className="mb-2">
+                <div key={selectedMachine} className="mb-2 text-black">
                   {
                     aviableMachines.find(
                       (point) => point.id === selectedMachine

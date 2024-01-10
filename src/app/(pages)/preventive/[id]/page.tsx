@@ -1,9 +1,11 @@
+"use client";
+
 import Layout from "components/Layout";
 import { Preventive, UpdatePreventiveRequest } from "interfaces/Preventive";
 import SparePart from "interfaces/SparePart";
 import InspectionPoint from "interfaces/inspectionPoint";
 import Machine from "interfaces/machine";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import InspectionPointService from "services/inspectionPointService";
@@ -11,14 +13,8 @@ import MachineService from "services/machineService";
 import PreventiveService from "services/preventiveService";
 import SparePartService from "services/sparePartService";
 
-type Props = {
-  item?: Preventive;
-  errors?: string;
-};
-
-const EditPreventive = ({ item, errors }: Props) => {
+export default function EditPreventive({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const { id } = router.query;
   const [preventiveData, setPreventiveData] = useState<Preventive | null>(null);
   const sparePartService = new SparePartService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
@@ -60,7 +56,7 @@ const EditPreventive = ({ item, errors }: Props) => {
   const fetchPreventiveData = async () => {
     try {
       const preventiveData = await preventiveService.getPreventive(
-        id as string
+        params.id as string
       );
       return preventiveData;
     } catch (error) {
@@ -97,7 +93,7 @@ const EditPreventive = ({ item, errors }: Props) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (id) {
+      if (params.id) {
         const data = await fetchPreventiveData();
         if (data) {
           setPreventiveData(data);
@@ -112,7 +108,7 @@ const EditPreventive = ({ item, errors }: Props) => {
       }
     };
     fetchData();
-  }, [id]);
+  }, [params.id]);
 
   const handleCancel = () => {
     router.back();
@@ -173,6 +169,7 @@ const EditPreventive = ({ item, errors }: Props) => {
 
   const onSubmit: SubmitHandler<Preventive> = async (data: any) => {
     try {
+      debugger;
       const dateParts = data.startExecution.split("/");
       const jsDate = new Date(
         `${dateParts[1]}/${dateParts[0]}/${dateParts[2]}`
@@ -207,7 +204,7 @@ const EditPreventive = ({ item, errors }: Props) => {
     preventive: Preventive
   ): UpdatePreventiveRequest {
     const updatePreventiveRequest: UpdatePreventiveRequest = {
-      id: id as string,
+      id: params.id as string,
       code: preventive.code,
       description: preventive.description,
       startExecution: preventive.startExecution,
@@ -429,7 +426,7 @@ const EditPreventive = ({ item, errors }: Props) => {
                   </h3>
 
                   {selectedInspectionPoints.map((selectedPoint) => (
-                    <div key={selectedPoint} className="mb-2">
+                    <div key={selectedPoint} className="mb-2 text-black">
                       {
                         availableInspectionPoints.find(
                           (point) => point.id === selectedPoint
@@ -440,7 +437,9 @@ const EditPreventive = ({ item, errors }: Props) => {
                 </div>
               </div>
             </div>
-            <div className="flex">Màquina assignada: {machine?.name}</div>
+            <div className="flex text-black">
+              Màquina assignada: {machine?.name}
+            </div>
             <button
               type="submit"
               className={`${
@@ -482,6 +481,4 @@ const EditPreventive = ({ item, errors }: Props) => {
       </div>
     </Layout>
   );
-};
-
-export default EditPreventive;
+}

@@ -1,18 +1,16 @@
+"use client";
+
 import Layout from "components/Layout";
 import OperatorForm from "components/OperatorForm";
 import Operator from "interfaces/Operator";
-import { useRouter } from "next/router";
 import { BaseSyntheticEvent, useEffect, useState } from "react";
 import OperatorService from "services/operatorService";
 
-type Props = {
-  item?: Operator;
-  errors?: string;
-};
-
-const EditOperatorPage = ({ item, errors }: Props) => {
-  const router = useRouter();
-  const { id } = router.query;
+export default function EditOperatorPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const operatorService = new OperatorService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
@@ -20,7 +18,9 @@ const EditOperatorPage = ({ item, errors }: Props) => {
 
   const fetchOperatorData = async () => {
     try {
-      const operatorData = await operatorService.getOperator(id as string);
+      const operatorData = await operatorService.getOperator(
+        params.id as string
+      );
       return operatorData;
     } catch (error) {
       console.error("Error fetching operator data:", error);
@@ -38,24 +38,14 @@ const EditOperatorPage = ({ item, errors }: Props) => {
   const [operatorData, setOperatorData] = useState<Operator | null>(null);
 
   useEffect(() => {
-    if (id) {
+    if (params.id) {
       fetchOperatorData().then((data) => {
         if (data) {
           setOperatorData(data);
         }
       });
     }
-  }, [id]);
-
-  if (errors) {
-    return (
-      <Layout>
-        <p>
-          <span style={{ color: "red" }}>Error:</span> {errors}
-        </p>
-      </Layout>
-    );
-  }
+  }, [params.id]);
 
   return (
     <Layout>
@@ -76,6 +66,4 @@ const EditOperatorPage = ({ item, errors }: Props) => {
       )}
     </Layout>
   );
-};
-
-export default EditOperatorPage;
+}

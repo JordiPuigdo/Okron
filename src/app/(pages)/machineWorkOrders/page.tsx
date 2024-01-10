@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import Machine from "../../../interfaces/machine";
 import WorkOrder, {

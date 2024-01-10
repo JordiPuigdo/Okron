@@ -25,3 +25,7 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+h1, td, label, span, input, textarea {
+  color: black; /* Set text color to black for h1 and td */
+}
