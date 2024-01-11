@@ -90,7 +90,7 @@ function SparePartsPage() {
           <p>Carregant dades...</p>
         ) : (
           <>
-            <div className="mb-4 flex space-x-4">
+            <div className="mb-4 flex space-x-4 text-black">
               <input
                 type="text"
                 placeholder="Codi"
@@ -132,7 +132,7 @@ function SparePartsPage() {
                 onChange={(e) =>
                   handleItemsPerPageChange(Number(e.target.value))
                 }
-                className="border p-2"
+                className="border p-2 text-black"
               >
                 {ITEMS_PER_PAGE_OPTIONS.map((option) => (
                   <option key={option} value={option}>
@@ -143,7 +143,7 @@ function SparePartsPage() {
               <span>recanvis per pàgina</span>
             </div>
 
-            <table className="min-w-full bg-white border border-gray-300">
+            <table className="min-w-full bg-white border border-gray-300 text-black">
               <thead>
                 <tr>
                   <th className="py-2 px-4 border-b">Codi</th>

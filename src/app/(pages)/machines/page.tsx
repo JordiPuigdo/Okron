@@ -74,7 +74,7 @@ export default function MachinesPage() {
   );
 
   if (isLoading) {
-    return <div className="container mx-auto py-8">Loading...</div>;
+    return <div className="container mx-auto py-8">Carregant...</div>;
   }
 
   return (

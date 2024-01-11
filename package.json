@@ -8,8 +8,10 @@
   },
   "dependencies": {
     "css-loader": "^6.8.1",
+    "dayjs": "^1.11.10",
     "next": "latest",
     "react": "^18.2.0",
+    "react-datepicker": "^4.25.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.47.0",
     "react-router-dom": "^6.17.0",
@@ -19,6 +21,7 @@
   "devDependencies": {
     "@types/node": "^12.12.21",
     "@types/react": "^17.0.2",
+    "@types/react-datepicker": "^4.19.5",
     "@types/react-dom": "^17.0.1",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.32",

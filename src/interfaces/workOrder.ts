@@ -59,3 +59,9 @@ export interface FinishWorkOrderTimes {
   finishTime: Date;
   operatorId: string
 }
+
+export interface SearchWorkOrderFilters {
+  machineId : string;
+  startTime? : string;
+  endTime? : string;
+}

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Machine from "../../../interfaces/machine";
 import WorkOrder, {
   CreateWorkOrderRequest,
+  SearchWorkOrderFilters,
   stateWorkOrder,
 } from "../../../interfaces/workOrder";
 import Layout from "components/Layout";
@@ -12,6 +13,11 @@ import WorkOrderService from "services/workOrderService";
 import { triggerAsyncId } from "async_hooks";
 import WorkOrdersPerMachine from "./WorkOrdersPerMachine";
 import WorkOrderForm from "./WorkOrderForm";
+import dayjs from "dayjs";
+
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ca from "date-fns/locale/ca";
 
 export default function MachineWorkOrdersPage() {
   const [machines, setMachines] = useState<Machine[] | []>([]);
@@ -27,8 +33,8 @@ export default function MachineWorkOrdersPage() {
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
-  const [WorkOrders, setWorkOrders] = useState<WorkOrder[] | []>([]);
-  const [WorkOrder, setWorkOrder] = useState<WorkOrder | undefined>(undefined);
+  const [workOrders, setWorkOrders] = useState<WorkOrder[] | []>([]);
+  const [workOrder, setWorkOrder] = useState<WorkOrder | undefined>(undefined);
   const [showDetailWorkOrder, setShowDetailWorkOrder] = useState<
     boolean | undefined
   >(false);
@@ -193,12 +199,170 @@ export default function MachineWorkOrdersPage() {
     }
   };
 
+  const [startDate, setStartDate] = useState<Date | null>(new Date());
+  const [endDate, setEndDate] = useState<Date | null>(new Date());
+
+  const searchWorkOrders = async () => {
+    const startDateTime = startDate ? new Date(startDate) : null;
+    const endDateTime = endDate ? new Date(endDate) : null;
+    const machineId = currentMachineId;
+    if (!machineId) {
+      alert("Selecciona una màquina.");
+      return;
+    }
+    if (startDateTime) {
+      startDateTime.setHours(0, 0, 0, 0);
+    }
+
+    if (endDateTime) {
+      endDateTime.setHours(23, 59, 59, 999);
+    }
+    const search: SearchWorkOrderFilters = {
+      machineId: machineId,
+      startTime: startDateTime ? startDateTime.toISOString() : "",
+      endTime: endDateTime ? endDateTime.toISOString() : "",
+    };
+
+    const workOrders = await workOrderService.getWorkOrdersWithFilters(search);
+    setWorkOrders(workOrders);
+  };
+
+  const translateState = (state: stateWorkOrder): string => {
+    switch (state) {
+      case stateWorkOrder.Waiting:
+        return "Esperant";
+      case stateWorkOrder.OnGoing:
+        return "En curs";
+      case stateWorkOrder.Paused:
+        return "Pausada";
+      case stateWorkOrder.Finished:
+        return "Finalitzada";
+      default:
+        return "";
+    }
+  };
+
+  const handleEditOrder = (orderId: string) => {
+    // Placeholder: Open a modal or navigate to an edit page
+    console.log(`Editing work order with ID ${orderId}`);
+    // Implement your logic here to open an edit modal or navigate to an edit page
+  };
+
+  const handleDeleteOrder = (orderId: string) => {
+    // Placeholder: Show a confirmation dialog and delete the order if confirmed
+    const isConfirmed = window.confirm(
+      `Are you sure you want to delete the work order with ID ${orderId}?`
+    );
+
+    if (isConfirmed) {
+      // Placeholder: Implement your logic to delete the work order
+      console.log(`Deleting work order with ID ${orderId}`);
+    } else {
+      // User canceled deletion
+      console.log(`Deletion of work order with ID ${orderId} canceled`);
+    }
+  };
+
   return (
     <Layout>
       <h1 className="text-3xl font-semibold mb-4">
         Històric Ordres de treball
       </h1>
-      <div className="flex"></div>
+      <div className="flex items-center text-black mb-4">
+        <label htmlFor="machineSelect" className="mr-2">
+          Màquina:
+        </label>
+        <select
+          id="machineSelect"
+          value={currentMachineId}
+          onChange={(e) => setCurrentMachineId(e.target.value)}
+          className="border border-gray-300 p-2 rounded-md mr-4"
+        >
+          <option value="" disabled>
+            Selecciona la màquina
+          </option>
+          {machines.map((machine) => (
+            <option key={machine.id} value={machine.id}>
+              {machine.name}
+            </option>
+          ))}
+        </select>
+        <div className="flex items-center">
+          <label htmlFor="startDate" className="mr-2">
+            Data Inicial:
+          </label>
+          <DatePicker
+            id="startDate"
+            selected={startDate}
+            onChange={(date: Date) => setStartDate(date)}
+            dateFormat="dd/MM/yyyy"
+            locale={ca}
+            className="border border-gray-300 p-2 rounded-md mr-4"
+          />
+        </div>
+        <div className="flex items-center">
+          <label htmlFor="endDate" className="mr-2">
+            Data Final:
+          </label>
+          <DatePicker
+            id="endDate"
+            selected={endDate}
+            onChange={(date: Date) => setEndDate(date)}
+            dateFormat="dd/MM/yyyy"
+            locale={ca}
+            className="border border-gray-300 p-2 rounded-md mr-4"
+          />
+        </div>
+        <button
+          className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+          onClick={(e) => searchWorkOrders()}
+        >
+          Buscar
+        </button>
+      </div>
+      <div className="overflow-x-auto text-black">
+        <table className="min-w-full table-auto border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border p-3 text-left">Descripció</th>
+              <th className="border p-3 text-left">Data Inici</th>
+              <th className="border p-3 text-left">Estat</th>
+              <th className="border p-3 text-left">Accions</th>
+              {/* Add more headers as needed */}
+            </tr>
+          </thead>
+          <tbody>
+            {workOrders.map((order, index) => (
+              <tr
+                key={order.id}
+                className={
+                  index % 2 === 0 ? "bg-gray-100" : "bg-white hover:bg-gray-50"
+                }
+              >
+                <td className="border p-3">{order.description}</td>
+                <td className="border p-3">{order.initialDateTime}</td>
+                <td className="border p-3">
+                  {translateState(order.stateWorkOrder)}
+                </td>
+                <td className="border p-3 flex space-x-2 items-center">
+                  <button
+                    onClick={() => handleEditOrder(order.id)}
+                    className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteOrder(order.id)}
+                    className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </Layout>
   );
 }

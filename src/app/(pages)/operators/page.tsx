@@ -53,12 +53,12 @@ function OperatorsPage() {
           <OperatorForm
             onSubmit={createOperator}
             onCancel={function (): void {
-              //TODO
+              setIsFormVisible(false);
             }}
             onUpdatedSuccesfully={false}
           />
         )}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto text-black">
           <table className="min-w-full border rounded-lg">
             <thead>
               <tr className="bg-gray-100">

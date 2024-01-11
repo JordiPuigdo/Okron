@@ -1,4 +1,4 @@
-import WorkOrder, { AddWorkOrderTimes, FinishWorkOrderTimes } from 'interfaces/workOrder';
+import WorkOrder, { AddWorkOrderTimes, FinishWorkOrderTimes, SearchWorkOrderFilters } from 'interfaces/workOrder';
 
 class WorkOrderService {
   private baseUrl: string;
@@ -121,6 +121,25 @@ class WorkOrderService {
       return response.json();
     } catch (error) {
       console.error('Error updating WorkOrder:', error);
+      throw error;
+    }
+  }
+
+
+  async getWorkOrdersWithFilters(searchWorkOrderFilters: SearchWorkOrderFilters): Promise<WorkOrder[]> {
+    try {
+      const url = `${this.baseUrl}/getWorkOrderWithFilters?MachineId=${searchWorkOrderFilters.machineId}` 
+        +`&StartDateTime=${searchWorkOrderFilters.startTime}&EndDateTime=${searchWorkOrderFilters.endTime}`  
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch WorkOrders-machines');
+      }
+      if (response.status === 204) {
+        return [];
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching WorkOrders by machines:', error);
       throw error;
     }
   }
