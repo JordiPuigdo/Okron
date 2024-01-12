@@ -108,13 +108,7 @@ const WorkOrderSideBar: React.FC<SidebarProps> = ({ close, id }) => {
               Cancelar
             </button>
           </form>*/
-          <WorkOrderForm
-            onSubmit={(WorkOrderRequest) =>
-              handleWorkOrderSubmit(WorkOrderRequest, WorkOrder.machineId)
-            }
-            machineName={""}
-            WorkOrderCreated={WorkOrder}
-          />
+          <></>
         ) : (
           <>Loading</>
         )}
