@@ -152,8 +152,8 @@ const MachineDetailsPage = () => {
               {selectedWorkOrderId !== null &&
                 WorkOrder.find(
                   (op) => op.id === selectedWorkOrderId
-                )?.WorkOrderInspectionPoint.map((point) => (
-                  <div key={point.id} className="p-1">
+                )?.workOrderInspectionPoint.map((point) => (
+                  <div key={point.inspectionPointId} className="p-1">
                     <div className="flex items-center mb-2">
                       <input
                         type="checkbox"
