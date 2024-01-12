@@ -1,27 +1,32 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import WorkOrder, {
   CreateWorkOrderRequest,
   stateWorkOrder,
-} from "../../../interfaces/workOrder";
+} from "../../../../interfaces/workOrder";
 import InspectionPoint from "interfaces/inspectionPoint";
 import InspectionPointService from "services/inspectionPointService";
 import OperatorService from "services/operatorService";
 import Operator from "interfaces/Operator";
 import SparePartService from "services/sparePartService";
 import SparePart from "interfaces/SparePart";
+import WorkOrderService from "services/workOrderService";
 
 type WorkOrderFormProps = {
   WorkOrder?: CreateWorkOrderRequest;
   onSubmit: SubmitHandler<CreateWorkOrderRequest>;
   machineName: string;
   WorkOrderCreated?: WorkOrder;
+  id: string;
 };
 
 const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
   WorkOrder,
   onSubmit,
   machineName,
+  id,
 }) => {
   const { register, handleSubmit, setValue } = useForm<WorkOrder>({
     defaultValues: WorkOrder,
@@ -32,11 +37,14 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
   const sparePartService = new SparePartService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
+  const workOrderService = new WorkOrderService(
+    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  );
   const [availableSpareParts, setAvailableSpareParts] = useState<SparePart[]>(
     []
   );
   const [filteredSpareParts, setFilteredSpareParts] = useState<SparePart[]>([]);
-
+  const [date, setDate] = useState<string>("");
   const [selectedSpareParts, setSelectedSpareParts] = useState<string[]>([]);
   const [filterSparePartsText, setFilterSparePartsText] = useState<string>("");
   const [showMoreSpareParts, setShowMoreSpareParts] = useState(false);
@@ -62,7 +70,7 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
   const [selectSparePartsIds, setSelectedSparePartsIds] = useState<string[]>(
     []
   );
-
+  const [error, setError] = useState<string | null>(null);
   const [filterText, setFilterText] = useState<string>("");
   const stateWorkOrderStrings: Record<stateWorkOrder, string> = {
     [stateWorkOrder.Waiting]: "En Espera",
@@ -73,6 +81,49 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
   const filteredInspectionPoints = availableInspectionPoints.filter((point) =>
     point.description.toLowerCase().includes(filterText.toLowerCase())
   );
+
+  useEffect(() => {
+    const fetchWorkOrderById = async () => {
+      try {
+        if (id != undefined) {
+          await workOrderService
+            .getWorkOrderById(id)
+            .then((workOrderData) => {
+              debugger;
+              setValue("description", workOrderData!.description);
+              setValue("initialDateTime", workOrderData!.initialDateTime);
+              setValue("stateWorkOrder", workOrderData!.stateWorkOrder);
+
+              const selectedInspectionPoints =
+                workOrderData!.workOrderInspectionPoint.map(
+                  (point) => point.inspectionPointId
+                );
+              setSelectedInspectionPoints(selectedInspectionPoints);
+
+              const selectedSpareParts = workOrderData!.spareParts.map(
+                (sparePart) => sparePart.id
+              );
+              setSelectedSpareParts(selectedSpareParts);
+
+              /*  const selectedOperators = workOrderData.operators.map(
+                (operator) => operator.id
+              );*/
+              //setSelectedOperator(selectedOperators);
+            })
+            .catch((error) => {
+              console.error("Error loading WorkOrder:", error);
+            });
+        }
+      } catch (error) {
+        console.error("Error fetching work order:", error);
+        // Handle error fetching work order, e.g., show an error message
+      }
+    };
+
+    if (id) {
+      fetchWorkOrderById();
+    }
+  }, [id]);
 
   const handleAddPoints = () => {
     console.log("Selected Inspection Points:", selectedInspectionPoints);
@@ -127,7 +178,7 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
         stock: sparePartData.stock,
       })
     );
-    data.WorkOrderInspectionPoint = selectedPointsWithData;
+    //data.workOrderInspectionPoint = selectedPointsWithData;
     data.operatorId = selectedWorkersIds;
     /*if (selectedSparePartsData) {
       data.sparePart = selectedSparePartsArray;
@@ -148,8 +199,8 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
       stateWorkOrder: 0,
       machineId: WorkOrder.machineId,
       operatorId: WorkOrder.operatorId,
-      inspectionPointId: WorkOrder.WorkOrderInspectionPoint.map(
-        (point) => point.id
+      inspectionPointId: WorkOrder.workOrderInspectionPoint.map(
+        (point) => point.inspectionPointId
       ),
       sparePartId: WorkOrder.spareParts.map((sparePart) => sparePart.id),
     };
@@ -224,6 +275,34 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
     }
   };
 
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value;
+    setDate(inputValue);
+
+    const dateRegex = /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
+
+    if (!dateRegex.test(inputValue)) {
+      setError("El format de la data ha de ser: DD/MM/YYYY");
+    } else {
+      setError(null);
+      const [day, month, year] = inputValue.split("/");
+      const parsedDate = new Date(
+        parseInt(year, 10),
+        parseInt(month, 10) - 1,
+        parseInt(day, 10)
+      );
+      setValue("initialDateTime", parsedDate);
+    }
+  };
+  useEffect(() => {
+    if (WorkOrder?.initialDateTime) {
+      debugger;
+      const formattedDate = new Date(
+        WorkOrder.initialDateTime
+      ).toLocaleDateString("es-ES");
+      setDate(formattedDate);
+    }
+  }, [WorkOrder]);
   return (
     <>
       {machineName}
@@ -255,12 +334,14 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
               Data Inici
             </label>
             <input
-              type="datetime-local"
               {...register("initialDateTime")}
-              id="initialDateTime"
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-              placeholder="Initial Date and Time"
+              placeholder="dd/mm/yyyy"
+              type="text"
+              value={date}
+              onChange={handleInputChange}
+              className="form-input border border-gray-300 rounded-md w-full"
             />
+            {error && <p style={{ color: "red" }}>{error}</p>}
           </div>
 
           <div className="mb-4">
@@ -273,7 +354,7 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
             <select
               {...register("stateWorkOrder")}
               id="stateWorkOrder"
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500 text-black"
             >
               {Object.keys(stateWorkOrder).map((state) => (
                 <option key={state} value={state}>
@@ -319,7 +400,7 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
             </div>
           </div>
 
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1 }} className="text-black">
             <h3 className="text-lg font-medium text-gray-600 mb-2">
               Punts d'inspecció seleccionats
             </h3>
@@ -403,7 +484,7 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
           </div>
         </div>
 
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1 }} className="text-black">
           <h3 className="text-lg font-medium text-gray-600 mb-2">
             Peces de recanvi seleccionades
           </h3>

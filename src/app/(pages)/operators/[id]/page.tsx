@@ -14,10 +14,13 @@ export default function EditOperatorPage({
   const operatorService = new OperatorService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
-  const [isUpdateSuccessful, setIsUpdateSuccessful] = useState(false);
+  const [isUpdateSuccessful, setIsUpdateSuccessful] = useState<boolean | null>(
+    null
+  );
 
   const fetchOperatorData = async () => {
     try {
+      setIsUpdateSuccessful(null);
       const operatorData = await operatorService.getOperator(
         params.id as string
       );
@@ -32,12 +35,22 @@ export default function EditOperatorPage({
     await operatorService.updateOperator(operator).then((data) => {
       if (data) {
         setIsUpdateSuccessful(true);
+        setTimeout(() => {
+          history.back();
+        }, 2000);
+      } else {
+        setIsUpdateSuccessful(false);
       }
+
+      setTimeout(() => {
+        setIsUpdateSuccessful(null);
+      }, 3000);
     });
   };
   const [operatorData, setOperatorData] = useState<Operator | null>(null);
 
   useEffect(() => {
+    setIsUpdateSuccessful(null);
     if (params.id) {
       fetchOperatorData().then((data) => {
         if (data) {

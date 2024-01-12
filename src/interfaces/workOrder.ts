@@ -7,8 +7,8 @@ export interface WorkOrder {
   finalDateTime: Date;
   stateWorkOrder: stateWorkOrder;
   machineId: string
-  WorkOrderInspectionPoint: WorkOrderInspectionPoint[];
-  WorkOrderTimes: WorkOrderTimes[]
+  workOrderInspectionPoint: WorkOrderInspectionPoint[];
+  workOrderTimes: WorkOrderTimes[]
   operatorId: string[];
   spareParts: SparePart[]
 }
@@ -22,7 +22,7 @@ export enum stateWorkOrder {
 export default WorkOrder;
 
 interface WorkOrderInspectionPoint {
-  id: string;
+  inspectionPointId: string;
   description: string;
   check: boolean;
 }

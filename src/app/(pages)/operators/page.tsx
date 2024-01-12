@@ -13,6 +13,9 @@ function OperatorsPage() {
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isOperatorCreated, setIsOperatorCreated] = useState<boolean | null>(
+    null
+  );
 
   useEffect(() => {
     async function fetchOperators() {
@@ -25,18 +28,29 @@ function OperatorsPage() {
     }
 
     fetchOperators();
-  }, []);
+  }, [isOperatorCreated]);
 
   const toggleFormVisibility = () => {
     setIsFormVisible(!isFormVisible);
   };
 
   async function createOperator(operator: Operator) {
-    const data = await operatorService.createOperator(operator);
+    const existingOperator = operators.find((op) => op.code === operator.code);
+
+    if (existingOperator) {
+      alert(`Operari amb codi ${operator.code} ja existeix.`);
+    } else {
+      const data = await operatorService.createOperator(operator);
+      setIsOperatorCreated(true);
+      setIsFormVisible(false);
+    }
   }
 
   async function deleteOperator(id: string) {
     const data = await operatorService.deleteOperator(id);
+    setOperators((prevOperators) =>
+      prevOperators.filter((prevOperators) => prevOperators.id !== id)
+    );
   }
 
   return (
@@ -55,7 +69,7 @@ function OperatorsPage() {
             onCancel={function (): void {
               setIsFormVisible(false);
             }}
-            onUpdatedSuccesfully={false}
+            onUpdatedSuccesfully={null}
           />
         )}
         <div className="overflow-x-auto text-black">
@@ -73,18 +87,21 @@ function OperatorsPage() {
                   <td className="border py-2 px-4">{operator.name}</td>
                   <td className="border py-2 px-4">{operator.code}</td>
                   <td className="border py-2 px-4">
-                    <Link
-                      href="/operators/[id]"
-                      as={`/operators/${operator.id}`}
-                    >
-                      Editar
-                    </Link>
-                    <a
-                      className="pl-4"
+                    <button className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
+                      <Link
+                        href="/operators/[id]"
+                        as={`/operators/${operator.id}`}
+                      >
+                        Editar
+                      </Link>
+                    </button>
+
+                    <button
                       onClick={() => deleteOperator(operator.id)}
+                      className="bg-red-500 text-white px-3 py-1 ml-2 rounded-md cursor-pointer"
                     >
                       Eliminar
-                    </a>
+                    </button>
                   </td>
                 </tr>
               ))}

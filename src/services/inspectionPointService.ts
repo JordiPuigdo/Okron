@@ -8,7 +8,7 @@ class InspectionPointService {
   }
 
   async getAllInspectionPoints(): Promise<InspectionPoint[]> {
-    const response = await fetch(`${this.baseUrl}/inspectionpoints`);
+    const response = await fetch(`${this.baseUrl}inspectionpoints`);
     if (!response.ok) {
       throw new Error('Failed to fetch inspection points');
     }
@@ -16,7 +16,7 @@ class InspectionPointService {
   }
 
   async getInspectionPointById(id: string): Promise<InspectionPoint | null> {
-    const response = await fetch(`${this.baseUrl}/inspectionpoints/${id}`);
+    const response = await fetch(`${this.baseUrl}inspectionpoints/${id}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch inspection point with ID ${id}`);
     }
@@ -24,7 +24,7 @@ class InspectionPointService {
   }
 
   async createInspectionPoint(inspectionPoint: InspectionPoint): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/inspectionpoints`, {
+    const response = await fetch(`${this.baseUrl}inspectionpoints`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ class InspectionPointService {
   }
 
   async updateInspectionPoint(id: string, inspectionPoint: InspectionPoint): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/inspectionpoints/${id}`, {
+    const response = await fetch(`${this.baseUrl}inspectionpoints/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ class InspectionPointService {
   }
 
   async deleteInspectionPoint(id: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/inspectionpoints/${id}`, {
+    const response = await fetch(`${this.baseUrl}inspectionpoints/${id}`, {
       method: 'DELETE',
     });
     if (!response.ok) {

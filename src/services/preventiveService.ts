@@ -8,7 +8,7 @@ class PreventiveService {
   }
 
   async getPreventives(): Promise<Preventive[]> {
-    const response = await fetch(`${this.baseUrl}/preventive`);
+    const response = await fetch(`${this.baseUrl}preventive`);
     if (!response.ok) {
       throw new Error('Failed to fetch inspection points');
     }
@@ -18,7 +18,7 @@ class PreventiveService {
     async createPreventive(createPreventiveRequest: CreatePreventiveRequest | null): Promise<boolean> {
     try {
       console.log(createPreventiveRequest);
-      const url = `${this.baseUrl}/preventive`
+      const url = `${this.baseUrl}preventive`
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -38,7 +38,7 @@ class PreventiveService {
 
   async getPreventive(id: string | null): Promise<Preventive> {
     try {
-      const url = `${this.baseUrl}/preventive/${id}`;
+      const url = `${this.baseUrl}preventive/${id}`;
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -60,7 +60,7 @@ class PreventiveService {
 
   async updatePreventive(updatePreventiveRequest : UpdatePreventiveRequest ): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}/preventive`;
+      const url = `${this.baseUrl}preventive`;
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -82,7 +82,7 @@ class PreventiveService {
 
   async deletePreventive(id : string ): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}/preventive/${id}`;
+      const url = `${this.baseUrl}preventive/${id}`;
       const response = await fetch(url, {
         method: 'DELETE',
         headers: {
@@ -103,7 +103,7 @@ class PreventiveService {
 
 
   async CreateWorkOrderPreventivePerDay(): Promise<Preventive[] | null> {
-    const response = await fetch(`${this.baseUrl}/preventive/CreateWorkOrderPreventivePerDay`);
+    const response = await fetch(`${this.baseUrl}preventive/CreateWorkOrderPreventivePerDay`);
     if (!response.ok) {
       throw new Error('Failed to fetch inspection points');
     }

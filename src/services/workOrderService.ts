@@ -128,7 +128,7 @@ class WorkOrderService {
 
   async getWorkOrdersWithFilters(searchWorkOrderFilters: SearchWorkOrderFilters): Promise<WorkOrder[]> {
     try {
-      const url = `${this.baseUrl}/getWorkOrderWithFilters?MachineId=${searchWorkOrderFilters.machineId}` 
+      const url = `${this.baseUrl}getWorkOrderWithFilters?MachineId=${searchWorkOrderFilters.machineId}` 
         +`&StartDateTime=${searchWorkOrderFilters.startTime}&EndDateTime=${searchWorkOrderFilters.endTime}`  
       const response = await fetch(url);
       if (!response.ok) {
@@ -140,6 +140,27 @@ class WorkOrderService {
       return response.json();
     } catch (error) {
       console.error('Error fetching WorkOrders by machines:', error);
+      throw error;
+    }
+  }
+
+  async deleteWorkOrder(id : string ): Promise<boolean> {
+    try {
+      const url = `${this.baseUrl}machine-WorkOrder/${id}`;
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete work order`);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error delete work order:', error);
       throw error;
     }
   }

@@ -10,7 +10,7 @@ class MachineService {
 
   async getAllMachines(): Promise<Machine[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/machines`);
+      const response = await fetch(`${this.baseUrl}machines`);
       if (!response.ok) {
         throw new Error('Failed to fetch machines');
       }
@@ -21,7 +21,7 @@ class MachineService {
     }
   }
   async getMachineById(id: string): Promise<Machine | null> {
-    const response = await fetch(`${this.baseUrl}/machines/${id}`);
+    const response = await fetch(`${this.baseUrl}machines/${id}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch machine with ID ${id}`);
     }
@@ -29,7 +29,7 @@ class MachineService {
   }
 
   async createMachine(machine: Machine): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/machines`, {
+    const response = await fetch(`${this.baseUrl}machines`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ class MachineService {
   }
 
   async updateMachine(id: string, machine: Machine): Promise<boolean> {
-    const response = await fetch(`${this.baseUrl}/machines/${id}`, {
+    const response = await fetch(`${this.baseUrl}machines/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ class MachineService {
   }
 
   async deleteMachine(id: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/machines/${id}`, {
+    const response = await fetch(`${this.baseUrl}machines/${id}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -66,7 +66,7 @@ class MachineService {
   }
 
   async createMachineWorkOrder(WorkOrder: CreateWorkOrderRequest, machineId : string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/machine-WorkOrder?machineId=${machineId}`, {
+    const response = await fetch(`${this.baseUrl}machine-WorkOrder?machineId=${machineId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

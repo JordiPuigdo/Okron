@@ -8,7 +8,7 @@ class SparePartService {
   }
 
   async getSpareParts(): Promise<SparePart[]> {
-    const response = await fetch(`${this.baseUrl}/SparePart`);
+    const response = await fetch(`${this.baseUrl}SparePart`);
     if (!response.ok) {
       throw new Error('Failed to fetch inspection points');
     }

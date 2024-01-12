@@ -12,12 +12,13 @@ import MachineService from "../../../services/machineService";
 import WorkOrderService from "services/workOrderService";
 import { triggerAsyncId } from "async_hooks";
 import WorkOrdersPerMachine from "./WorkOrdersPerMachine";
-import WorkOrderForm from "./WorkOrderForm";
+import WorkOrderForm from "./[id]/WorkOrderForm";
 import dayjs from "dayjs";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
+import Link from "next/link";
 
 export default function MachineWorkOrdersPage() {
   const [machines, setMachines] = useState<Machine[] | []>([]);
@@ -255,8 +256,7 @@ export default function MachineWorkOrdersPage() {
     );
 
     if (isConfirmed) {
-      // Placeholder: Implement your logic to delete the work order
-      console.log(`Deleting work order with ID ${orderId}`);
+      workOrderService.deleteWorkOrder(orderId);
     } else {
       // User canceled deletion
       console.log(`Deletion of work order with ID ${orderId} canceled`);
@@ -345,17 +345,19 @@ export default function MachineWorkOrdersPage() {
                   {translateState(order.stateWorkOrder)}
                 </td>
                 <td className="border p-3 flex space-x-2 items-center">
-                  <button
-                    onClick={() => handleEditOrder(order.id)}
-                    className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
-                  >
-                    Edit
+                  <button className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
+                    <Link
+                      href="/machineWorkOrders/[id]"
+                      as={`/machineWorkOrders/${order.id}`}
+                    >
+                      Editar
+                    </Link>
                   </button>
                   <button
                     onClick={() => handleDeleteOrder(order.id)}
                     className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600"
                   >
-                    Delete
+                    Eliminar
                   </button>
                 </td>
               </tr>

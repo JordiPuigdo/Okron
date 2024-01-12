@@ -7,7 +7,7 @@ type OperatorFormProps = {
   onSubmit: SubmitHandler<Operator>;
   onCancel: () => void;
   onDelete?: () => void;
-  onUpdatedSuccesfully?: boolean;
+  onUpdatedSuccesfully?: boolean | null;
 };
 
 const OperatorForm: React.FC<OperatorFormProps> = ({
@@ -116,9 +116,16 @@ const OperatorForm: React.FC<OperatorFormProps> = ({
             Eliminar
           </button>
         )}
-        {onUpdatedSuccesfully && (
-          <div className="mb-4 text-green-500 text-center">
-            Operari actualitzat correctament!
+
+        {onUpdatedSuccesfully !== null && (
+          <div
+            className={`mb-4 ${
+              onUpdatedSuccesfully ? "text-green-600" : "text-red-600"
+            } text-center`}
+          >
+            {onUpdatedSuccesfully
+              ? "Operari actualitzat correctament!"
+              : "Error actualitzant operari!"}
           </div>
         )}
       </div>
