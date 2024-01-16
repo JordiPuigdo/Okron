@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import InspectionPointService from "../../../services/inspectionPointService"; // Import your InspectionPointService
-import InspectionPoint from "../../../interfaces/inspectionPoint"; // Import your InspectionPoint interface
+import InspectionPointService from "../../../services/inspectionPointService";
+import InspectionPoint from "../../../interfaces/inspectionPoint";
 import Layout from "../../../components/Layout";
 
 export default function InspectionPointsPage() {

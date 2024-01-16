@@ -64,7 +64,10 @@ function PreventivePage() {
         <h1 className="text-2xl font-bold mb-4">Preventius</h1>
 
         <Link
-          href="/preventive/preventiveForm"
+          href={{
+            pathname: "/preventive/preventiveForm",
+            query: { counter: preventives.length },
+          }}
           className="text-blue-500 underline mb-2 block"
         >
           Crear

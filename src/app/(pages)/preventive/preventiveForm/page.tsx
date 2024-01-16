@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { CreatePreventiveRequest, Preventive } from "interfaces/Preventive";
+import { useRouter } from "next/navigation";
 import PreventiveService from "services/preventiveService";
 import SparePartService from "services/sparePartService";
 import InspectionPointService from "services/inspectionPointService";
@@ -15,6 +16,7 @@ import MachineService from "services/machineService";
 import Machine from "interfaces/machine";
 
 const PreventiveForm = () => {
+  const router = useRouter();
   const apiURL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
   const [selectedSpareParts, setSelectedSpareParts] = useState<string[]>([]);
   const [selectedMachines, setSelectedMachines] = useState<string[]>([]);
@@ -63,7 +65,7 @@ const PreventiveForm = () => {
     const fetchInspectionPoints = async () => {
       try {
         const points = await inspectionPointService.getAllInspectionPoints();
-        setAvailableInspectionPoints(points);
+        setAvailableInspectionPoints(points.filter((x) => x.active == true));
       } catch (error) {
         console.error("Error fetching inspection points:", error);
       }
@@ -78,7 +80,7 @@ const PreventiveForm = () => {
     const fetchMachines = async () => {
       try {
         const machines = await machineService.getAllMachines();
-        setAviableMachines(machines);
+        setAviableMachines(machines.filter((x) => x.active == true));
       } catch (error) {
         console.error("Error fetching spare parts:", error);
       }
@@ -88,6 +90,19 @@ const PreventiveForm = () => {
     fetchInspectionPoints();
     fetchOperators();
     fetchMachines();
+    let counter = 1;
+    const params = new URLSearchParams(window.location.search);
+    const numberPreventive = params.get("counter");
+    if (numberPreventive || 0 > 0) {
+      counter = 1;
+    }
+
+    const paddedCounter = counter
+      ? counter.toString().padStart(4, "0")
+      : "0000";
+    const serialNumber = "PREV" + paddedCounter;
+
+    setValue("serialNumber", serialNumber);
   }, []);
 
   useEffect(() => {
@@ -120,13 +135,16 @@ const PreventiveForm = () => {
     preventive: Preventive
   ): CreatePreventiveRequest {
     const createPreventiveRequest: CreatePreventiveRequest = {
+      serialNumber: preventive.serialNumber,
       code: preventive.code,
       description: preventive.description,
       startExecution: preventive.startExecution,
       hours: preventive.hours,
+      counter: 0,
       machineId: selectedMachines.map((machine) => machine),
       inspectionPointId: selectedInspectionPoints.map((point) => point),
       sparePartId: selectedSpareParts.map((sparePart) => sparePart),
+      operatorId: selectedOperator.map((operator) => operator),
     };
     return createPreventiveRequest;
   }
@@ -237,19 +255,39 @@ const PreventiveForm = () => {
     }
   };
 
+  const handleCancel = () => {
+    router.back();
+  };
+
   return (
     <Layout>
-      <div className="container mx-auto">
+      <div className="mx-auto w-full">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="mx-auto bg-white p-8 rounded shadow-md"
           style={{ display: "flex", flexDirection: "column", width: "100%" }}
         >
-          <h2 className="text-2xl font-bold mb-6">Configurar Preventiu</h2>
+          <h2 className="text-2xl font-bold mb-6 text-black">
+            Configurar Preventiu
+          </h2>
           <div
             className="grid grid-cols-1 md:grid-cols-2 gap-4"
             style={{ flex: "1" }}
           >
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="serialNumber"
+              >
+                Número de Sèrie
+              </label>
+              <input
+                {...register("serialNumber")}
+                id="serialNumber"
+                type="text"
+                className="form-input border border-gray-300 rounded-md w-full"
+              />
+            </div>
             <div className="mb-4">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
@@ -264,7 +302,6 @@ const PreventiveForm = () => {
                 className="form-input border border-gray-300 rounded-md w-full"
               />
             </div>
-
             <div className="mb-4">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
@@ -523,6 +560,13 @@ const PreventiveForm = () => {
               Preventiu creat correctament
             </div>
           )}
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6"
+          >
+            Cancelar
+          </button>
 
           {showErrorMessage && (
             <div className="bg-red-200 text-red-800 p-4 rounded mb-4">

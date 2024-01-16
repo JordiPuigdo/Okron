@@ -8,6 +8,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [subMenuOpen, setSubMenuOpen] = useState(false);
   const [preventiusSubMenuOpen, setPreventiusSubMenuOpen] = useState(false);
   const [historicSubMenuOpen, setHistoricSubMenuOpen] = useState(false);
+  const [correctiveSubMenuOpen, setCorrectiveSubMenuOpen] = useState(false);
 
   const toggleHistoricSubMenu = () => {
     setHistoricSubMenuOpen(!historicSubMenuOpen);
@@ -23,6 +24,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const togglePreventiusSubMenu = () => {
     setPreventiusSubMenuOpen(!preventiusSubMenuOpen);
+  };
+
+  const toggleCorrectiveSubMenu = () => {
+    setCorrectiveSubMenuOpen(!correctiveSubMenuOpen);
   };
 
   return (
@@ -153,6 +158,52 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               )}
 
               <div
+                onClick={toggleCorrectiveSubMenu}
+                className="flex items-center cursor-pointer px-4 py-2 hover:bg-gray-700"
+              >
+                <svg
+                  className="h-5 w-5 mr-2"
+                  xmlns="https://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+                Correctius
+                <svg
+                  className={`h-4 w-4 ml-auto transform ${
+                    historicSubMenuOpen ? "rotate-90" : "rotate-0"
+                  }`}
+                  xmlns="https://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+
+              {correctiveSubMenuOpen && (
+                <div className="ml-4">
+                  <Link
+                    className="block px-4 py-2 hover:bg-gray-700"
+                    href="/machineWorkOrders"
+                  >
+                    Crear
+                  </Link>
+                </div>
+              )}
+
+              <div
                 onClick={toggleHistoricSubMenu}
                 className="flex items-center cursor-pointer px-4 py-2 hover:bg-gray-700"
               >
@@ -188,12 +239,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </div>
               {historicSubMenuOpen && (
                 <div className="ml-4">
-                  <Link
-                    className="block px-4 py-2 hover:bg-gray-700"
-                    href="/historic"
-                  >
-                    Configuració
-                  </Link>
                   <Link
                     className="block px-4 py-2 hover:bg-gray-700"
                     href="/machineWorkOrders"

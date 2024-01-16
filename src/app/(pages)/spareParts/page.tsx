@@ -2,6 +2,7 @@
 
 import Layout from "components/Layout";
 import SparePart from "interfaces/SparePart";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import SparePartService from "services/sparePartService";
 
@@ -18,6 +19,7 @@ function SparePartsPage() {
     description: "",
     refProvider: "",
     family: "",
+    ubication: "",
   });
   const [loading, setLoading] = useState(true);
   const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE_OPTIONS[0]);
@@ -57,7 +59,11 @@ function SparePartsPage() {
           .toLowerCase()
           .includes(filters.refProvider.toLowerCase()) &&
         sparePart.family &&
-        sparePart.family.toLowerCase().includes(filters.family.toLowerCase())
+        sparePart.family.toLowerCase().includes(filters.family.toLowerCase()) &&
+        sparePart.ubication &&
+        sparePart.ubication
+          .toLowerCase()
+          .includes(filters.ubication.toLowerCase())
       );
     });
     setFinalIndex(filtered.length);
@@ -123,6 +129,15 @@ function SparePartsPage() {
                 onChange={(e) => handleFilterChange("family", e.target.value)}
                 className="border p-2"
               />
+              <input
+                type="text"
+                placeholder="Ubicació"
+                value={filters.ubication}
+                onChange={(e) =>
+                  handleFilterChange("ubication", e.target.value)
+                }
+                className="border p-2"
+              />
             </div>
 
             <div className="mb-4 flex items-center space-x-4">
@@ -148,9 +163,11 @@ function SparePartsPage() {
                 <tr>
                   <th className="py-2 px-4 border-b">Codi</th>
                   <th className="py-2 px-4 border-b">Descripció</th>
+                  <th className="py-2 px-4 border-b">Ubicació</th>
                   <th className="py-2 px-4 border-b">Referència</th>
                   <th className="py-2 px-4 border-b">Familia</th>
                   <th className="py-2 px-4 border-b">Stock</th>
+                  <th className="py-2 px-4 border-b">Accions</th>
                 </tr>
               </thead>
               <tbody>
@@ -161,10 +178,21 @@ function SparePartsPage() {
                       {sparePart.description}
                     </td>
                     <td className="py-2 px-4 border-b">
+                      {sparePart.ubication}
+                    </td>
+                    <td className="py-2 px-4 border-b">
                       {sparePart.refProvider}
                     </td>
                     <td className="py-2 px-4 border-b">{sparePart.family}</td>
                     <td className="py-2 px-4 border-b">{sparePart.stock}</td>
+                    <td>
+                      <Link
+                        href="/spareParts/[id]"
+                        as={`/spareParts/${sparePart.id}`}
+                      >
+                        Editar
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -6,6 +6,7 @@ import Machine from "../../../interfaces/machine";
 import Link from "next/link";
 import Layout from "../../../components/Layout";
 import { useForm, SubmitHandler } from "react-hook-form";
+import sections from "interfaces/sections";
 
 export default function MachinesPage() {
   const [machines, setMachines] = useState<Machine[]>([]);
@@ -19,6 +20,8 @@ export default function MachinesPage() {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [createSuccess, setCreateSuccess] = useState(false);
+  const [filterActive, setFilterActive] = useState(true);
+  const [selectedSection, setSelectedSection] = useState("");
 
   const toggleFormVisibility = () => {
     setIsFormVisible(!isFormVisible);
@@ -69,9 +72,16 @@ export default function MachinesPage() {
     }
   };
 
-  const filteredMachines = machines.filter((machine) =>
-    machine.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredMachines = machines
+    .filter(
+      (machine) =>
+        machine.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        machine.serialNumber.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .filter((machine) => (filterActive ? machine.active : true))
+    .filter((machine) =>
+      selectedSection ? machine.section?.id === selectedSection : true
+    );
 
   if (isLoading) {
     return <div className="container mx-auto py-8">Carregant...</div>;
@@ -90,11 +100,31 @@ export default function MachinesPage() {
         <div className="mb-4">
           <input
             type="text"
-            placeholder="Buscar màquina per nom"
+            placeholder="Buscar màquina per nom o número de sèrie"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="border rounded-md w-1/2 px-3 py-2 mt-1 text-gray-700 focus:outline-none focus:border-indigo-500"
           />
+          <select
+            onChange={(e) => setSelectedSection(e.target.value)}
+            className="border rounded-md px-3 ml-3 py-2 mt-1 text-gray-700 focus:outline-none focus:border-indigo-500"
+          >
+            <option value="">Totes les seccions</option>
+            {sections.map((section) => (
+              <option key={section.id} value={section.id}>
+                {section.description}
+              </option>
+            ))}
+          </select>
+          <label className="ml-6">
+            Veure màquines actives
+            <input
+              type="checkbox"
+              checked={filterActive}
+              onChange={() => setFilterActive(!filterActive)}
+              className="ml-2"
+            />
+          </label>
         </div>
         {isFormVisible && (
           <form onSubmit={handleSubmit(onSubmit)} className="mb-4">

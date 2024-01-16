@@ -252,13 +252,15 @@ export default function MachineWorkOrdersPage() {
   const handleDeleteOrder = (orderId: string) => {
     // Placeholder: Show a confirmation dialog and delete the order if confirmed
     const isConfirmed = window.confirm(
-      `Are you sure you want to delete the work order with ID ${orderId}?`
+      `Esteu segurs que voleu eliminar l'ordre de treball?`
     );
 
     if (isConfirmed) {
       workOrderService.deleteWorkOrder(orderId);
+      setWorkOrders((prevWorkOrders) =>
+        prevWorkOrders.filter((prevWorkOrders) => prevWorkOrders.id !== orderId)
+      );
     } else {
-      // User canceled deletion
       console.log(`Deletion of work order with ID ${orderId} canceled`);
     }
   };

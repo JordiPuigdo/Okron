@@ -4,7 +4,9 @@ interface SparePart {
     description: string;
     refProvider: string;
     family: string;
+    ubication : string;
     stock: number;
+    brand: string;
 }
 
 export default SparePart;
