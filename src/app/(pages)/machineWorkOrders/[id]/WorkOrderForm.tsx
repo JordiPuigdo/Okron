@@ -89,7 +89,6 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
           await workOrderService
             .getWorkOrderById(id)
             .then((workOrderData) => {
-              debugger;
               setValue("description", workOrderData!.description);
               setValue("initialDateTime", workOrderData!.initialDateTime);
               setValue("stateWorkOrder", workOrderData!.stateWorkOrder);
@@ -176,6 +175,8 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
         refProvider: sparePartData.refProvideer,
         family: sparePartData.family,
         stock: sparePartData.stock,
+        brand: "",
+        ubication: "",
       })
     );
     //data.workOrderInspectionPoint = selectedPointsWithData;
@@ -296,7 +297,6 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
   };
   useEffect(() => {
     if (WorkOrder?.initialDateTime) {
-      debugger;
       const formattedDate = new Date(
         WorkOrder.initialDateTime
       ).toLocaleDateString("es-ES");
