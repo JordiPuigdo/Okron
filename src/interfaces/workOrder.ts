@@ -3,22 +3,24 @@ import SparePart from "./SparePart";
 export interface WorkOrder {
   id: string;
   description: string;
-  initialDateTime: Date;
-  finalDateTime: Date;
-  stateWorkOrder: stateWorkOrder;
+  startTime: Date;
+  endTime: Date;
+  stateWorkOrder: StateWorkOrder;
+  workOrderType : WorkOrderType;
   machineId: string
-  workOrderInspectionPoint: WorkOrderInspectionPoint[];
-  workOrderTimes: WorkOrderTimes[]
-  operatorId: string[];
-  spareParts: SparePart[]
+  workOrderInspectionPoint?: WorkOrderInspectionPoint[];
+  workOrderTimes?: WorkOrderTimes[]
+  operatorId?: string[];
+  spareParts?: SparePart[]
 }
 
-export enum stateWorkOrder {
+export enum StateWorkOrder {
   Waiting = 0,
   OnGoing = 1,
   Paused = 2,
   Finished = 3,
 }
+
 export default WorkOrder;
 
 interface WorkOrderInspectionPoint {
@@ -38,14 +40,17 @@ interface WorkOrderTimes {
 
 
 export interface CreateWorkOrderRequest {
-  id: string;
+  id?: string;
+  serialNumber : string;
+  code? : string;
   description: string;
   initialDateTime: Date;
-  stateWorkOrder: stateWorkOrder;
+  stateWorkOrder: StateWorkOrder;
+  workOrderType: WorkOrderType;
   machineId: string
   operatorId: string[];
-  inspectionPointId: string[];
-  sparePartId: string[]
+  inspectionPointId?: string[];
+  sparePartId?: string[]
 }
 
 export interface AddWorkOrderTimes {
@@ -64,4 +69,10 @@ export interface SearchWorkOrderFilters {
   machineId : string;
   startTime? : string;
   endTime? : string;
+}
+
+export enum WorkOrderType {
+  Corrective = 0,
+  Preventive = 1,
+  Predicitve = 2,
 }

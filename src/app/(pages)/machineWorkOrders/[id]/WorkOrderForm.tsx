@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import WorkOrder, {
   CreateWorkOrderRequest,
-  stateWorkOrder,
+  StateWorkOrder,
 } from "../../../../interfaces/workOrder";
 import InspectionPoint from "interfaces/inspectionPoint";
 import InspectionPointService from "services/inspectionPointService";
@@ -72,11 +72,11 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
   );
   const [error, setError] = useState<string | null>(null);
   const [filterText, setFilterText] = useState<string>("");
-  const stateWorkOrderStrings: Record<stateWorkOrder, string> = {
-    [stateWorkOrder.Waiting]: "En Espera",
-    [stateWorkOrder.OnGoing]: "En Curs",
-    [stateWorkOrder.Paused]: "Pausada",
-    [stateWorkOrder.Finished]: "Acabada",
+  const stateWorkOrderStrings: Record<StateWorkOrder, string> = {
+    [StateWorkOrder.Waiting]: "En Espera",
+    [StateWorkOrder.OnGoing]: "En Curs",
+    [StateWorkOrder.Paused]: "Pausada",
+    [StateWorkOrder.Finished]: "Acabada",
   };
   const filteredInspectionPoints = availableInspectionPoints.filter((point) =>
     point.description.toLowerCase().includes(filterText.toLowerCase())
@@ -90,18 +90,18 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
             .getWorkOrderById(id)
             .then((workOrderData) => {
               setValue("description", workOrderData!.description);
-              setValue("initialDateTime", workOrderData!.initialDateTime);
+              setValue("startTime", workOrderData!.startTime);
               setValue("stateWorkOrder", workOrderData!.stateWorkOrder);
 
               const selectedInspectionPoints =
-                workOrderData!.workOrderInspectionPoint.map(
+                workOrderData!.workOrderInspectionPoint?.map(
                   (point) => point.inspectionPointId
                 );
-              setSelectedInspectionPoints(selectedInspectionPoints);
+              //   setSelectedInspectionPoints(selectedInspectionPoints);
 
-              const selectedSpareParts = workOrderData!.spareParts.map(
+              /* const selectedSpareParts = workOrderData!.spareParts.map(
                 (sparePart) => sparePart.id
-              );
+              );*/
               setSelectedSpareParts(selectedSpareParts);
 
               /*  const selectedOperators = workOrderData.operators.map(
@@ -185,12 +185,12 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
       data.sparePart = selectedSparePartsArray;
     }*/
 
-    const finalData = convertToCreateWorkOrderRequest(data);
+    //const finalData = convertToCreateWorkOrderRequest(data);
 
-    onSubmit(finalData);
+    //onSubmit(finalData);
   };
 
-  function convertToCreateWorkOrderRequest(
+  /*function convertToCreateWorkOrderRequest(
     WorkOrder: WorkOrder
   ): CreateWorkOrderRequest {
     const createWorkOrderRequest: CreateWorkOrderRequest = {
@@ -206,7 +206,7 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
       sparePartId: WorkOrder.spareParts.map((sparePart) => sparePart.id),
     };
     return createWorkOrderRequest;
-  }
+  }*/
 
   useEffect(() => {
     inspectionPointService.getAllInspectionPoints().then((points) => {
@@ -292,7 +292,7 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
         parseInt(month, 10) - 1,
         parseInt(day, 10)
       );
-      setValue("initialDateTime", parsedDate);
+      setValue("startTime", parsedDate);
     }
   };
   useEffect(() => {
@@ -334,7 +334,7 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
               Data Inici
             </label>
             <input
-              {...register("initialDateTime")}
+              {...register("endTime")}
               placeholder="dd/mm/yyyy"
               type="text"
               value={date}
@@ -356,11 +356,11 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
               id="stateWorkOrder"
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500 text-black"
             >
-              {Object.keys(stateWorkOrder).map((state) => (
+              {/*Object.keys(stateWorkOrder).map((state) => (
                 <option key={state} value={state}>
                   {stateWorkOrderStrings[state as unknown as stateWorkOrder]}
                 </option>
-              ))}
+              ))*/}
             </select>
           </div>
         </div>

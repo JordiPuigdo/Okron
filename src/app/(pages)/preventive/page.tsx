@@ -1,11 +1,9 @@
 "use client";
 import Layout from "components/Layout";
 import { Preventive } from "interfaces/Preventive";
-import SparePart from "interfaces/SparePart";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import PreventiveService from "services/preventiveService";
-import SparePartService from "services/sparePartService";
 
 const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50];
 

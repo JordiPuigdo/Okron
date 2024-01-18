@@ -5,7 +5,8 @@ import Machine from "../../../interfaces/machine";
 import WorkOrder, {
   CreateWorkOrderRequest,
   SearchWorkOrderFilters,
-  stateWorkOrder,
+  StateWorkOrder,
+  WorkOrderType,
 } from "../../../interfaces/workOrder";
 import Layout from "components/Layout";
 import MachineService from "../../../services/machineService";
@@ -228,18 +229,31 @@ export default function MachineWorkOrdersPage() {
     setWorkOrders(workOrders);
   };
 
-  const translateState = (state: stateWorkOrder): string => {
+  const translateState = (state: StateWorkOrder): string => {
     switch (state) {
-      case stateWorkOrder.Waiting:
+      case StateWorkOrder.Waiting:
         return "Esperant";
-      case stateWorkOrder.OnGoing:
+      case StateWorkOrder.OnGoing:
         return "En curs";
-      case stateWorkOrder.Paused:
+      case StateWorkOrder.Paused:
         return "Pausada";
-      case stateWorkOrder.Finished:
+      case StateWorkOrder.Finished:
         return "Finalitzada";
       default:
-        return "";
+        return "Error";
+    }
+  };
+
+  const translateWorkOrderType = (type: WorkOrderType): string => {
+    switch (type) {
+      case WorkOrderType.Corrective:
+        return "Correctiu";
+      case WorkOrderType.Preventive:
+        return "Preventiu";
+      case WorkOrderType.Predicitve:
+        return "Predictiu";
+      default:
+        return "Error";
     }
   };
 
@@ -329,6 +343,7 @@ export default function MachineWorkOrdersPage() {
               <th className="border p-3 text-left">Descripció</th>
               <th className="border p-3 text-left">Data Inici</th>
               <th className="border p-3 text-left">Estat</th>
+              <th className="border p-3 text-left">Tipus</th>
               <th className="border p-3 text-left">Accions</th>
               {/* Add more headers as needed */}
             </tr>
@@ -342,9 +357,12 @@ export default function MachineWorkOrdersPage() {
                 }
               >
                 <td className="border p-3">{order.description}</td>
-                <td className="border p-3">{order.initialDateTime}</td>
+                <td className="border p-3">{formatDate(order.startTime)}</td>
                 <td className="border p-3">
                   {translateState(order.stateWorkOrder)}
+                </td>
+                <td className="border p-3">
+                  {translateWorkOrderType(order.workOrderType)}
                 </td>
                 <td className="border p-3 flex space-x-2 items-center">
                   <button className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">

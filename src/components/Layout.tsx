@@ -31,7 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <main className="min-h-screen h-100 bg-slate-300 flex">
+    <main className="min-h-screen h-100 bg-slate-300 flex text-black">
       <div className="relative w-full max-w-full overflow-hidden">
         <div
           className={`absolute inset-0 bg-gray-800 text-white w-48 transition-all duration-300 ease-in-out z-50 transform ${
@@ -196,7 +196,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <div className="ml-4">
                   <Link
                     className="block px-4 py-2 hover:bg-gray-700"
-                    href="/machineWorkOrders"
+                    href="/corrective"
                   >
                     Crear
                   </Link>

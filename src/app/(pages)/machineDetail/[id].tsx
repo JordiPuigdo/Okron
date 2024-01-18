@@ -2,7 +2,7 @@ import Layout from "components/Layout";
 import WorkOrder, {
   AddWorkOrderTimes,
   FinishWorkOrderTimes,
-  stateWorkOrder,
+  StateWorkOrder,
 } from "interfaces/workOrder";
 import Machine from "interfaces/machine";
 import { useRouter } from "next/router";
@@ -29,11 +29,11 @@ const MachineDetailsPage = () => {
   );
   const [showPreventive, setShowPreventive] = useState(false);
 
-  const stateTranslations: Record<stateWorkOrder, string> = {
-    [stateWorkOrder.Waiting]: "Pendent",
-    [stateWorkOrder.OnGoing]: "En Curs",
-    [stateWorkOrder.Paused]: "Pausada",
-    [stateWorkOrder.Finished]: "Acabada",
+  const stateTranslations: Record<StateWorkOrder, string> = {
+    [StateWorkOrder.Waiting]: "Pendent",
+    [StateWorkOrder.OnGoing]: "En Curs",
+    [StateWorkOrder.Paused]: "Pausada",
+    [StateWorkOrder.Finished]: "Acabada",
   };
 
   useEffect(() => {
@@ -149,7 +149,7 @@ const MachineDetailsPage = () => {
                   Final
                 </button>
               </div>
-              {selectedWorkOrderId !== null &&
+              {/*selectedWorkOrderId !== null &&
                 WorkOrder.find(
                   (op) => op.id === selectedWorkOrderId
                 )?.workOrderInspectionPoint.map((point) => (
@@ -165,7 +165,7 @@ const MachineDetailsPage = () => {
                       </h4>
                     </div>
                   </div>
-                ))}
+                ))*/}
               <div>
                 <p className="text-xl font-bold mb-4">Recanvis</p>
                 <div>

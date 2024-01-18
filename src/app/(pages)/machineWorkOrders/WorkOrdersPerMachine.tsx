@@ -1,4 +1,4 @@
-import WorkOrder, { stateWorkOrder } from "interfaces/workOrder";
+import WorkOrder, { StateWorkOrder } from "interfaces/workOrder";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import WorkOrderService from "services/workOrderService";
@@ -38,11 +38,11 @@ const WorkOrdersPerMachine: React.FC<WorkOrdersPerMachineProps> = ({
     return new Date(isoDateTime).toLocaleString("es-ES", options);
   };
 
-  const stateWorkOrderStrings: Record<stateWorkOrder, string> = {
-    [stateWorkOrder.Waiting]: "En Espera",
-    [stateWorkOrder.OnGoing]: "En Curs",
-    [stateWorkOrder.Paused]: "Pausada",
-    [stateWorkOrder.Finished]: "Acabada",
+  const stateWorkOrderStrings: Record<StateWorkOrder, string> = {
+    [StateWorkOrder.Waiting]: "En Espera",
+    [StateWorkOrder.OnGoing]: "En Curs",
+    [StateWorkOrder.Paused]: "Pausada",
+    [StateWorkOrder.Finished]: "Acabada",
   };
 
   useEffect(() => {
@@ -86,9 +86,7 @@ const WorkOrdersPerMachine: React.FC<WorkOrdersPerMachineProps> = ({
           {WorkOrders.map((op) => (
             <tr key={op.id}>
               <td className="border p-2">{op.description}</td>
-              <td className="border p-2">
-                {formatDateTime(op.initialDateTime)}
-              </td>
+              <td className="border p-2">{formatDateTime(op.startTime)}</td>
               <td className="border p-2">
                 {stateWorkOrderStrings[op.stateWorkOrder]}
               </td>

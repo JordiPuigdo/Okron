@@ -1,4 +1,4 @@
-import WorkOrder, { AddWorkOrderTimes, FinishWorkOrderTimes, SearchWorkOrderFilters } from 'interfaces/workOrder';
+import WorkOrder, { AddWorkOrderTimes, FinishWorkOrderTimes, SearchWorkOrderFilters, WorkOrderType } from 'interfaces/workOrder';
 
 class WorkOrderService {
   private baseUrl: string;
@@ -165,6 +165,27 @@ class WorkOrderService {
     }
   }
 
+
+  async countByWorkOrderType(workOrderType : WorkOrderType ): Promise<number> {
+    try {
+      const url = `${this.baseUrl}CountByWorkOrderType?workOrderTypeDto=${workOrderType}`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to CountByWorkOrderType`);
+      }
+
+      return parseInt(await response.text(), 10);
+    } catch (error) {
+      console.error('Error CountByWorkOrderType:', error);
+      throw error;
+    }
+  }
 }
 
 export default WorkOrderService;
