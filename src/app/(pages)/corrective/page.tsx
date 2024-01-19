@@ -236,6 +236,12 @@ function CorrectivePage() {
                   id="machine"
                   name="machine"
                   className="p-3 border border-gray-300 rounded-md w-full"
+                  onChange={(e) => {
+                    setValue("machineId", e.target.value, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    });
+                  }}
                 >
                   {machines.map((machine) => (
                     <option key={machine.id} value={machine.id}>
