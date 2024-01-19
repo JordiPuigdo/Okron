@@ -139,7 +139,7 @@ function CorrectivePage() {
       .then((aviableMachines) => {
         setShowSuccessMessage(true);
         setTimeout(() => {
-          history.back();
+          router.refresh();
         }, 2000);
       })
       .catch((error) => {
@@ -252,7 +252,7 @@ function CorrectivePage() {
                   Estat
                 </label>
                 <select
-                  {...register("stateWorkOrder")}
+                  {...register("stateWorkOrder", { valueAsNumber: true })}
                   id="stateWorkOrder"
                   name="stateWorkOrder"
                   className="p-3 border border-gray-300 rounded-md w-full"
