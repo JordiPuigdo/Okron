@@ -49,20 +49,20 @@ function CorrectivePage() {
   async function fetchFormData() {
     await fetchOperators();
     await fetchMachines();
-    await createSerialNumber();
+    await createCode();
 
     setIsLoading(false);
   }
 
-  async function createSerialNumber() {
+  async function createCode() {
     await workOrderService
       .countByWorkOrderType(WorkOrderType.Corrective)
       .then((numberCorrectives) => {
         const paddedCounter = numberCorrectives
           ? numberCorrectives.toString().padStart(4, "0")
           : "0000";
-        const serialNumber = "COR" + paddedCounter;
-        setValue("serialNumber", serialNumber);
+        const code = "COR" + paddedCounter;
+        setValue("code", code);
       })
       .catch((error) => {
         setErrorMessage("Error Operaris: " + error);
@@ -99,7 +99,7 @@ function CorrectivePage() {
     corrective: Corrective
   ): CreateWorkOrderRequest {
     const createWorkOrderRequest: CreateWorkOrderRequest = {
-      serialNumber: corrective.serialNumber,
+      code: corrective.code,
       description: corrective.description,
       initialDateTime: corrective.startTime,
       machineId: corrective.machineId,
@@ -191,16 +191,16 @@ function CorrectivePage() {
             <div className="flex flex-col sm:flex-row">
               <div className="mb-6 sm:w-1/2">
                 <label
-                  htmlFor="serialNumber"
+                  htmlFor="code"
                   className="block text-xl font-medium text-gray-700 mb-2"
                 >
-                  Número de Sèrie
+                  Codi
                 </label>
                 <input
-                  {...register("serialNumber")}
+                  {...register("code")}
                   type="text"
-                  id="serialNumber"
-                  name="serialNumber"
+                  id="code"
+                  name="code"
                   readOnly
                   className="p-3 border border-gray-300 rounded-md w-full"
                 />

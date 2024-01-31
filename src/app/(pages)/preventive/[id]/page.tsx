@@ -15,6 +15,10 @@ import OperatorService from "services/operatorService";
 import PreventiveService from "services/preventiveService";
 import SparePartService from "services/sparePartService";
 
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ca from "date-fns/locale/ca";
+
 export default function EditPreventive({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [preventiveData, setPreventiveData] = useState<Preventive | null>(null);
@@ -53,12 +57,11 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
   const operatorService = new OperatorService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
-  const [formattedDate, setFormattedDate] = useState<string | null>(null);
 
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
-  const [date, setDate] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(new Date());
 
   const fetchPreventiveData = async () => {
     try {
@@ -118,7 +121,8 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
           setValue("description", data.description);
           setValue("hours", data.hours);
           setValue("startExecution", data.startExecution);
-          setValue("serialNumber", data.serialNumber);
+          const finalData = new Date(data.startExecution);
+          setStartDate(finalData);
           await fetchSpareParts(data);
           await fetchInspectionPoints(data);
           await fetchMachine(data);
@@ -148,54 +152,8 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
     setFilteredSpareParts(filtered);
   }, [filterSparePartsText]);
 
-  useEffect(() => {
-    const parseDate = new Date(preventiveData?.startExecution!);
-
-    // Check if the date is valid
-    if (!isNaN(parseDate.getTime())) {
-      const day = String(parseDate.getDate()).padStart(2, "0");
-      const month = String(parseDate.getMonth() + 1).padStart(2, "0");
-      const year = parseDate.getFullYear();
-
-      const formatted = `${day}/${month}/${year}`;
-      setFormattedDate(formatted);
-      setDate(formatted);
-    } else {
-      // Handle invalid date
-      setFormattedDate("Invalid date");
-    }
-  }, [preventiveData]);
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
-    setDate(inputValue);
-
-    const dateRegex = /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
-
-    if (!dateRegex.test(inputValue)) {
-      setError("El format de la data ha de ser: DD/MM/YYYY");
-    } else {
-      setError(null);
-      const [day, month, year] = inputValue.split("/");
-      const parsedDate = new Date(
-        parseInt(year, 10),
-        parseInt(month, 10) - 1,
-        parseInt(day, 10)
-      );
-      setValue("startExecution", parsedDate);
-    }
-  };
-
   const onSubmit: SubmitHandler<Preventive> = async (data: any) => {
     try {
-      const dateParts = data.startExecution.split("/");
-      const jsDate = new Date(
-        `${dateParts[1]}/${dateParts[0]}/${dateParts[2]}`
-      );
-
-      // Convert the JavaScript Date object to an ISO string
-      const isoDateString = jsDate.toISOString();
-      data.startExecution = isoDateString;
       const response = await preventiveService.updatePreventive(
         convertToUpdateWorkOrderRequest(data)
       );
@@ -223,10 +181,9 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
   ): UpdatePreventiveRequest {
     const updatePreventiveRequest: UpdatePreventiveRequest = {
       id: params.id as string,
-      serialNumber: preventive.serialNumber,
       code: preventive.code,
       description: preventive.description,
-      startExecution: preventive.startExecution,
+      startExecution: startDate!,
       hours: preventive.hours,
       counter: preventive.counter,
       machineId: [machine?.id || ""],
@@ -290,20 +247,6 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
             <div className="mb-4">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
-                htmlFor="serialNumber"
-              >
-                Número de Sèrie
-              </label>
-              <input
-                {...register("serialNumber")}
-                id="serialNumber"
-                type="text"
-                className="form-input border border-gray-300 rounded-md w-full"
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                className="block text-gray-700 text-sm font-bold mb-2"
                 htmlFor="code"
               >
                 Codi
@@ -352,90 +295,19 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
               >
                 Inici Preventiu
               </label>
-              <input
-                {...register("startExecution")}
-                placeholder="dd/mm/yyyy"
-                type="text"
-                value={date}
-                onChange={handleInputChange}
-                className="form-input border border-gray-300 rounded-md w-full"
+              <DatePicker
+                id="startExecution"
+                selected={startDate}
+                onChange={(date: Date) => setStartDate(date)}
+                dateFormat="dd/MM/yyyy"
+                locale={ca}
+                className="border border-gray-300 p-2 rounded-md mr-4"
               />
+
               {error && <p style={{ color: "red" }}>{error}</p>}
             </div>
           </div>
           <div style={{ display: "flex", flex: "1" }}>
-            <div style={{ flex: "1", marginRight: "20px" }}>
-              <h3 className="text-lg font-medium text-gray-600 mb-2">
-                Selecciona les peces de recanvi
-              </h3>
-              <input
-                type="text"
-                placeholder="Filtrar per descripció"
-                value={filterSparePartsText}
-                onChange={(e) => setFilterSparePartsText(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500 mb-4"
-              />
-              {filteredSpareParts.slice(0, 5).map((sparePart) => (
-                <div
-                  key={sparePart.id}
-                  className="mb-2 border p-4 rounded-md flex justify-between items-center hover:bg-gray-100"
-                >
-                  <div>
-                    <h4 className="text-lg font-medium text-gray-700">
-                      {sparePart.code}
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      Stock: {sparePart.stock}
-                    </p>
-                  </div>
-                  <button
-                    disabled={selectedSpareParts.includes(sparePart.id)}
-                    className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${
-                      selectedSpareParts.includes(sparePart.id)
-                        ? "opacity-50 cursor-not-allowed"
-                        : ""
-                    }`}
-                    onClick={() => handleSparePartChange(sparePart.id, true)}
-                  >
-                    +
-                  </button>
-                </div>
-              ))}
-            </div>
-            <div style={{ flex: "1" }}>
-              <h3 className="text-lg font-medium text-gray-600 mb-2">
-                Peces de recanvi seleccionades
-              </h3>
-              {selectedSpareParts.map((selectedPart) => (
-                <div
-                  key={selectedPart}
-                  className="mb-2 border p-4 rounded-md flex justify-between items-center hover:bg-gray-100"
-                >
-                  <div>
-                    <h4 className="text-lg font-medium text-gray-700">
-                      {
-                        availableSpareParts.find(
-                          (part) => part.id === selectedPart
-                        )?.code
-                      }
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      {
-                        availableSpareParts.find(
-                          (part) => part.id === selectedPart
-                        )?.stock
-                      }
-                    </p>
-                  </div>
-                  <button
-                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={() => handleSparePartChange(selectedPart, false)}
-                  >
-                    -
-                  </button>
-                </div>
-              ))}
-            </div>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <div style={{ flex: 1 }}>
                 <h3 className="text-lg font-medium text-gray-600 mb-2">

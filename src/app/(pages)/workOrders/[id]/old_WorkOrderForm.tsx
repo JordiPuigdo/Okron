@@ -11,8 +11,9 @@ import InspectionPointService from "services/inspectionPointService";
 import OperatorService from "services/operatorService";
 import Operator from "interfaces/Operator";
 import SparePartService from "services/sparePartService";
-import SparePart from "interfaces/SparePart";
+import SparePart, { ConsumeSparePart } from "interfaces/SparePart";
 import WorkOrderService from "services/workOrderService";
+import { stringifyCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 type WorkOrderFormProps = {
   WorkOrder?: CreateWorkOrderRequest;
@@ -82,6 +83,14 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
     point.description.toLowerCase().includes(filterText.toLowerCase())
   );
 
+  const [unitsPerSparePart, setUnitsPerSparePart] = useState<{
+    [key: string]: number;
+  }>({});
+
+  const [workOrderSelected, setWorkOrderSelected] = useState<
+    WorkOrder | undefined
+  >(undefined);
+
   useEffect(() => {
     const fetchWorkOrderById = async () => {
       try {
@@ -89,6 +98,8 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
           await workOrderService
             .getWorkOrderById(id)
             .then((workOrderData) => {
+              setWorkOrderSelected(workOrderData);
+              setValue("code", workOrderData!.code);
               setValue("description", workOrderData!.description);
               setValue("startTime", workOrderData!.startTime);
               setValue("stateWorkOrder", workOrderData!.stateWorkOrder);
@@ -185,28 +196,28 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
       data.sparePart = selectedSparePartsArray;
     }*/
 
-    //const finalData = convertToCreateWorkOrderRequest(data);
+    const finalData = convertToCreateWorkOrderRequest(data);
 
-    //onSubmit(finalData);
+    onSubmit(finalData);
   };
 
-  /*function convertToCreateWorkOrderRequest(
+  function convertToCreateWorkOrderRequest(
     WorkOrder: WorkOrder
   ): CreateWorkOrderRequest {
     const createWorkOrderRequest: CreateWorkOrderRequest = {
       id: WorkOrder.id,
       description: WorkOrder.description,
-      initialDateTime: WorkOrder.initialDateTime,
-      stateWorkOrder: 0,
+      initialDateTime: WorkOrder.startTime,
+      stateWorkOrder: WorkOrder.stateWorkOrder,
       machineId: WorkOrder.machineId,
       operatorId: WorkOrder.operatorId,
-      inspectionPointId: WorkOrder.workOrderInspectionPoint.map(
+      /*inspectionPointId: WorkOrder.workOrderInspectionPoint.map(
         (point) => point.inspectionPointId
-      ),
-      sparePartId: WorkOrder.spareParts.map((sparePart) => sparePart.id),
+      ),*/
+      //sparePartId: WorkOrder.spareParts.map((sparePart) => sparePart.id),
     };
     return createWorkOrderRequest;
-  }*/
+  }
 
   useEffect(() => {
     inspectionPointService.getAllInspectionPoints().then((points) => {
@@ -303,230 +314,307 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
       setDate(formattedDate);
     }
   }, [WorkOrder]);
+
+  const translateStateWorkOrder = (state: any): string => {
+    switch (state) {
+      case StateWorkOrder.Waiting:
+        return "Pendent";
+      case StateWorkOrder.OnGoing:
+        return "En curs";
+      case StateWorkOrder.Paused:
+        return "En pausa";
+      case StateWorkOrder.Finished:
+        return "Finalitzada";
+      default:
+        return "";
+    }
+  };
+
+  async function consumeSparePart(sparePart: SparePart) {
+    console.log(`Consuming spare part with ID: ${sparePart.id}`);
+    const currentUnits = unitsPerSparePart[sparePart.id] || 0;
+    if (
+      sparePart.stock < currentUnits ||
+      currentUnits == null ||
+      currentUnits <= 0
+    ) {
+      alert("No tens tant stock!");
+      return;
+    }
+    if (sparePart) {
+      setUnitsPerSparePart((prevUnits) => ({
+        ...prevUnits,
+        [sparePart.id]: 0,
+      }));
+      sparePart.stock = sparePart.stock - currentUnits;
+      sparePart.unitsConsum = currentUnits;
+      setSelectedSpareParts((prevSelected) => [...prevSelected, sparePart.id]);
+
+      const consRequest: ConsumeSparePart = {
+        sparePartId: sparePart.id,
+        unitsSparePart: currentUnits,
+        workOrderId: workOrderSelected!.id,
+      };
+      await sparePartService.consumeSparePart(consRequest);
+    } else {
+      console.log("Spare part not found in the available parts list.");
+    }
+  }
+
+  async function cancelSparePartConsumption(
+    sparePartId: string,
+    units: number
+  ) {
+    const sparePart = availableSpareParts.find((x) => x.id === sparePartId);
+    if (sparePart) {
+      sparePart.stock += units;
+    }
+    setSelectedSpareParts((prevSelected) =>
+      prevSelected.filter((id) => id !== sparePartId)
+    );
+  }
+
   return (
     <>
       {machineName}
       <form
-        onSubmit={handleSubmit(handleFormSubmit)}
         className="bg-white p-4 rounded-lg shadow-md"
+        onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="mb-4">
-          <label
-            htmlFor="description"
-            className="block text-gray-600 font-medium mb-2"
-          >
-            Descripció
-          </label>
-          <input
-            type="text"
-            {...register("description")}
-            id="description"
-            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-            placeholder="Descripció"
-          />
-        </div>
-        <div className="flex">
-          <div className="mb-4 mr-4">
-            <label
-              htmlFor="initialDateTime"
-              className="block text-gray-600 font-medium mb-2"
-            >
-              Data Inici
-            </label>
-            <input
-              {...register("endTime")}
-              placeholder="dd/mm/yyyy"
-              type="text"
-              value={date}
-              onChange={handleInputChange}
-              className="form-input border border-gray-300 rounded-md w-full"
-            />
-            {error && <p style={{ color: "red" }}>{error}</p>}
-          </div>
-
+        <div className=" flex p-16">
           <div className="mb-4">
             <label
-              htmlFor="state"
-              className="block text-gray-600 font-medium mb-2"
+              htmlFor="code"
+              className="block text-xl text-gray-600 font-medium mb-2"
             >
-              Estat Inicial
+              Codi
+            </label>
+            <input
+              type="text"
+              {...register("code")}
+              id="code"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+              placeholder="Número de Sèrie"
+            />
+          </div>
+          <div className="mb-4 ml-4">
+            <label
+              htmlFor="description"
+              className="block text-xl text-gray-600 font-medium mb-2"
+            >
+              Descripció
+            </label>
+            <input
+              type="text"
+              {...register("description")}
+              id="description"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+              placeholder="Descripció"
+            />
+          </div>
+          <div className="ml-4">
+            <label
+              htmlFor="stateWorkOrder"
+              className="block text-xl font-medium text-gray-700 mb-2"
+            >
+              Estat
             </label>
             <select
-              {...register("stateWorkOrder")}
+              {...register("stateWorkOrder", { valueAsNumber: true })}
               id="stateWorkOrder"
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500 text-black"
+              name="stateWorkOrder"
+              className="p-3 border border-gray-300 rounded-md w-full"
             >
-              {/*Object.keys(stateWorkOrder).map((state) => (
-                <option key={state} value={state}>
-                  {stateWorkOrderStrings[state as unknown as stateWorkOrder]}
-                </option>
-              ))*/}
+              {Object.values(StateWorkOrder)
+                .filter((value) => typeof value === "number")
+                .map((state) => (
+                  <option
+                    key={state}
+                    value={
+                      typeof state === "string" ? parseInt(state, 10) : state
+                    }
+                  >
+                    {translateStateWorkOrder(state)}
+                  </option>
+                ))}
             </select>
           </div>
+          <div className="ml-4">
+            <p className="block text-xl font-medium text-gray-700 mb-2">
+              Màquina
+            </p>
+            <p>{workOrderSelected?.machine?.name}</p>
+          </div>
         </div>
-
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div style={{ flex: 1 }}>
+        <div className="flex p-16 w-3/2">
+          <div>
             <h3 className="text-lg font-medium text-gray-600 mb-2">
-              Selecciona els punts d'inspecció
+              Selecciona les peces de recanvi
             </h3>
 
             <div className="mb-4">
               <input
                 type="text"
                 placeholder="Filtrar per descripció"
-                value={filterText}
-                onChange={(e) => setFilterText(e.target.value)}
+                value={filterSparePartsText}
+                onChange={(e) => setFilterSparePartsText(e.target.value)}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
               />
 
-              {filteredInspectionPoints.map((point) => (
-                <div key={point.id} className="mb-2">
+              {filteredSpareParts.slice(0, sparePartsLimit).map((sparePart) => (
+                <div key={sparePart.id} className="mb-2 border p-4 rounded-md">
                   <label
-                    htmlFor={`inspectionPoint-${point.id}`}
+                    htmlFor={`sparePart-${sparePart.id}`}
                     className="block text-gray-600 font-medium"
                   >
-                    <input
-                      type="checkbox"
-                      id={`inspectionPoint-${point.id}`}
-                      value={point.id}
-                      onChange={handleCheckboxChange}
-                      checked={selectedInspectionPoints.includes(point.id)}
-                    />
-                    {point.description}
+                    <table className="mt-2 w-full">
+                      <tbody>
+                        <tr>
+                          <td className="font-bold">Codi:</td>
+                          <td>{sparePart.code}</td>
+                        </tr>
+                        <tr>
+                          <td className="font-bold">Descripció:</td>
+                          <td>{sparePart.description}</td>
+                        </tr>
+                        <tr>
+                          <td className="font-bold">Proveïdor:</td>
+                          <td>{sparePart.refProvider}</td>
+                        </tr>
+                        <tr>
+                          <td className="font-bold">Stock:</td>
+                          <td>{sparePart.stock}</td>
+                        </tr>
+                        <tr>
+                          <td className="font-bold">Família:</td>
+                          <td>{sparePart.family}</td>
+                        </tr>
+                        <tr>
+                          <td className="font-bold">Ubicació:</td>
+                          <td>{sparePart.ubication}</td>
+                        </tr>
+                        <tr>
+                          <td className="font-bold">Unitats:</td>
+                          <input
+                            type="text"
+                            className="p-3 border border-gray-300 rounded-md"
+                            value={unitsPerSparePart[sparePart.id] || ""}
+                            onChange={(e) => {
+                              const value = parseInt(e.target.value, 10);
+                              setUnitsPerSparePart((prevUnits) => ({
+                                ...prevUnits,
+                                [sparePart.id]: value,
+                              }));
+                            }}
+                          />
+                          <button
+                            disabled={selectedSpareParts.includes(sparePart.id)}
+                            type="button"
+                            className={`ml-4 bg-orange-400 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-md ${
+                              selectedSpareParts.includes(sparePart.id)
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
+                            onClick={(e) => consumeSparePart(sparePart)}
+                          >
+                            Consumir
+                          </button>
+                        </tr>
+                      </tbody>
+                    </table>
                   </label>
                 </div>
               ))}
+
+              {!showMoreSpareParts && (
+                <button
+                  type="button"
+                  onClick={handleShowMoreSpareParts}
+                  className="text-blue-500 hover:underline"
+                >
+                  Veure més
+                </button>
+              )}
             </div>
           </div>
-
-          <div style={{ flex: 1 }} className="text-black">
+          <div className="text-black ml-4">
             <h3 className="text-lg font-medium text-gray-600 mb-2">
-              Punts d'inspecció seleccionats
+              Peces de recanvi consumides
             </h3>
 
-            {selectedInspectionPoints.map((selectedPoint) => (
-              <div key={selectedPoint} className="mb-2">
+            {selectedSpareParts.map((selectedPart) => (
+              <div key={selectedPart} className="mb-2 text-black">
                 {
-                  availableInspectionPoints.find(
-                    (point) => point.id === selectedPoint
+                  availableSpareParts.find(
+                    (sparePart) => sparePart.id === selectedPart
                   )?.description
                 }
+                <span className="font-bold">{" Unitats Consumides:"} </span>
+                {
+                  availableSpareParts.find(
+                    (sparePart) => sparePart.id === selectedPart
+                  )?.unitsConsum
+                }
+                <button
+                  type="button"
+                  className="ml-4 bg-red-600 hover:bg-red-400 text-white font-semibold py-2 px-4 rounded-md"
+                  onClick={(e) =>
+                    cancelSparePartConsumption(
+                      selectedPart,
+                      availableSpareParts.find(
+                        (sparePart) => sparePart.id === selectedPart
+                      )!.unitsConsum!
+                    )
+                  }
+                >
+                  X
+                </button>
               </div>
             ))}
           </div>
         </div>
-
-        <div style={{ flex: 1 }}>
-          <h3 className="text-lg font-medium text-gray-600 mb-2">
-            Selecciona les peces de recanvi
-          </h3>
-
-          <div className="mb-4">
-            <input
-              type="text"
-              placeholder="Filtrar per descripció"
-              value={filterSparePartsText}
-              onChange={(e) => setFilterSparePartsText(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-            />
-
-            {filteredSpareParts.slice(0, sparePartsLimit).map((sparePart) => (
-              <div key={sparePart.id} className="mb-2 border p-4 rounded-md">
-                <label
-                  htmlFor={`sparePart-${sparePart.id}`}
-                  className="block text-gray-600 font-medium"
-                >
-                  <input
-                    type="checkbox"
-                    id={`sparePart-${sparePart.id}`}
-                    value={sparePart.id}
-                    onChange={handleCheckboxSparePartChange}
-                    checked={selectedSpareParts.includes(sparePart.id)}
-                  />
-                  <table className="mt-2 w-full">
-                    <tbody>
-                      <tr>
-                        <td className="font-bold">Code:</td>
-                        <td>{sparePart.code}</td>
-                      </tr>
-                      <tr>
-                        <td className="font-bold">Description:</td>
-                        <td>{sparePart.description}</td>
-                      </tr>
-                      <tr>
-                        <td className="font-bold">Ref Provider:</td>
-                        <td>{sparePart.refProvider}</td>
-                      </tr>
-                      <tr>
-                        <td className="font-bold">Stock:</td>
-                        <td>{sparePart.stock}</td>
-                      </tr>
-                      <tr>
-                        <td className="font-bold">Family:</td>
-                        <td>{sparePart.family}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </label>
-              </div>
-            ))}
-
-            {!showMoreSpareParts && (
+        <div className="flex p-16 w-3/2">
+          <div>
+            <h3 className="text-lg font-medium text-gray-600 mb-2">
+              Operaris Assignats
+            </h3>
+            <div className="mb-4">
+              {workOrderSelected?.operator?.map((oper) => (
+                <p key={oper.id} className="font-bold mr-4">
+                  {oper.name}
+                </p>
+              ))}
+            </div>
+            <h3 className="text-lg font-medium text-gray-600 mb-2">
+              Fitxar Operari a la ordre de treball
+            </h3>
+            <div className="mb-4 flex gap-4">
+              <input
+                type="text"
+                placeholder="Codi Operari"
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+              />
               <button
                 type="button"
-                onClick={handleShowMoreSpareParts}
-                className="text-blue-500 hover:underline"
+                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 ml-4 rounded-md"
               >
-                Show More
+                Entrar
               </button>
-            )}
+            </div>
           </div>
         </div>
 
-        <div style={{ flex: 1 }} className="text-black">
-          <h3 className="text-lg font-medium text-gray-600 mb-2">
-            Peces de recanvi seleccionades
-          </h3>
-
-          {selectedSpareParts.map((selectedPart) => (
-            <div key={selectedPart} className="mb-2">
-              {
-                availableSpareParts.find(
-                  (sparePart) => sparePart.id === selectedPart
-                )?.description
-              }
-            </div>
-          ))}
-        </div>
-
-        <h3 className="text-lg font-medium text-gray-600 mb-2">
-          Selecciona els operaris
-        </h3>
-        <div className="mb-4">
-          {operators.map((worker) => (
-            <div key={worker.id} className="mb-2">
-              <label
-                htmlFor={`operator-${worker.id}`}
-                className="block text-gray-600 font-medium"
-              >
-                <input
-                  type="checkbox"
-                  id={`operator-${worker.id}`}
-                  value={worker.id}
-                  onChange={handleCheckboxOperatorChange}
-                  checked={selectedOperator.includes(worker.id)}
-                />
-                {worker.name}
-              </label>
-            </div>
-          ))}
-        </div>
         <button
           type="submit"
           className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md"
         >
-          Crear
+          Guardar
+        </button>
+        <button
+          type="button"
+          className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 ml-4 rounded-md"
+        >
+          Cancelar
         </button>
       </form>
     </>

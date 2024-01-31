@@ -1,17 +1,29 @@
+import Operator from "./Operator";
 import SparePart from "./SparePart";
+import Machine from "./machine";
 
 export interface WorkOrder {
   id: string;
+  code : string;
   description: string;
   startTime: Date;
   endTime: Date;
   stateWorkOrder: StateWorkOrder;
   workOrderType : WorkOrderType;
   machineId: string
+  machine? : Machine;
   workOrderInspectionPoint?: WorkOrderInspectionPoint[];
   workOrderTimes?: WorkOrderTimes[]
+  operator?: Operator[];
   operatorId?: string[];
-  spareParts?: SparePart[]
+  workOrderSpareParts?: WorkOrderSparePart[]
+}
+
+export default WorkOrder;
+
+export interface WorkOrderSparePart extends SparePart
+{
+  Quantity : number;
 }
 
 export enum StateWorkOrder {
@@ -21,7 +33,6 @@ export enum StateWorkOrder {
   Finished = 3,
 }
 
-export default WorkOrder;
 
 interface WorkOrderInspectionPoint {
   inspectionPointId: string;
@@ -38,17 +49,19 @@ interface WorkOrderTimes {
   name: string;
 }
 
+export interface UpdateWorkOrderRequest extends CreateWorkOrderRequest {
+  startTime?: Date;
+}
 
 export interface CreateWorkOrderRequest {
   id?: string;
-  serialNumber : string;
-  code? : string;
+  code?: string;
   description: string;
-  initialDateTime: Date;
+  initialDateTime?: Date;
   stateWorkOrder: StateWorkOrder;
-  workOrderType: WorkOrderType;
-  machineId: string
-  operatorId: string[];
+  workOrderType?: WorkOrderType;
+  machineId?: string
+  operatorId?: string[];
   inspectionPointId?: string[];
   sparePartId?: string[]
 }

@@ -4,7 +4,7 @@ import { WorkOrderType, StateWorkOrder } from "./workOrder";
 
 export interface Corrective {
     id?: string
-    serialNumber : string;
+    code : string;
     description : string,
     machineId : string,
     stateWorkOrder: StateWorkOrder;

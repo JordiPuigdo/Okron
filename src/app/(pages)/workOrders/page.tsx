@@ -13,7 +13,7 @@ import MachineService from "../../../services/machineService";
 import WorkOrderService from "services/workOrderService";
 import { triggerAsyncId } from "async_hooks";
 import WorkOrdersPerMachine from "./WorkOrdersPerMachine";
-import WorkOrderForm from "./[id]/WorkOrderForm";
+import WorkOrderForm from "./[id]/old_WorkOrderForm";
 import dayjs from "dayjs";
 
 import DatePicker from "react-datepicker";
@@ -21,7 +21,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
 import Link from "next/link";
 
-export default function MachineWorkOrdersPage() {
+export default function WorkOrdersPage() {
   const [machines, setMachines] = useState<Machine[] | []>([]);
   const machineService = new MachineService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
@@ -49,7 +49,7 @@ export default function MachineWorkOrdersPage() {
     }
     const options: any = {
       day: "numeric",
-      month: "numeric",
+      month: "2-digit",
       year: "numeric",
       hour: "numeric",
       minute: "numeric",
@@ -221,8 +221,16 @@ export default function MachineWorkOrdersPage() {
     }
     const search: SearchWorkOrderFilters = {
       machineId: machineId,
-      startTime: startDateTime ? startDateTime.toISOString() : "",
-      endTime: endDateTime ? endDateTime.toISOString() : "",
+      startTime: startDateTime
+        ? new Date(
+            startDateTime.getTime() - startDateTime.getTimezoneOffset() * 60000
+          ).toISOString()
+        : "",
+      endTime: endDateTime
+        ? new Date(
+            endDateTime.getTime() - endDateTime.getTimezoneOffset() * 60000
+          ).toISOString()
+        : "",
     };
 
     const workOrders = await workOrderService.getWorkOrdersWithFilters(search);
@@ -305,7 +313,7 @@ export default function MachineWorkOrdersPage() {
         </select>
         <div className="flex items-center">
           <label htmlFor="startDate" className="mr-2">
-            Data Inicial:
+            Data inici entre:
           </label>
           <DatePicker
             id="startDate"
@@ -318,7 +326,7 @@ export default function MachineWorkOrdersPage() {
         </div>
         <div className="flex items-center">
           <label htmlFor="endDate" className="mr-2">
-            Data Final:
+            i el
           </label>
           <DatePicker
             id="endDate"
@@ -340,6 +348,7 @@ export default function MachineWorkOrdersPage() {
         <table className="min-w-full table-auto border-collapse border border-gray-300">
           <thead>
             <tr className="bg-gray-200">
+              <th className="border p-3 text-left">Codi</th>
               <th className="border p-3 text-left">Descripció</th>
               <th className="border p-3 text-left">Data Inici</th>
               <th className="border p-3 text-left">Estat</th>
@@ -356,6 +365,7 @@ export default function MachineWorkOrdersPage() {
                   index % 2 === 0 ? "bg-gray-100" : "bg-white hover:bg-gray-50"
                 }
               >
+                <td className="border p-3">{order.code}</td>
                 <td className="border p-3">{order.description}</td>
                 <td className="border p-3">{formatDate(order.startTime)}</td>
                 <td className="border p-3">
@@ -365,14 +375,11 @@ export default function MachineWorkOrdersPage() {
                   {translateWorkOrderType(order.workOrderType)}
                 </td>
                 <td className="border p-3 flex space-x-2 items-center">
-                  <button className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
-                    <Link
-                      href="/machineWorkOrders/[id]"
-                      as={`/machineWorkOrders/${order.id}`}
-                    >
+                  <Link href="/workOrders/[id]" as={`/workOrders/${order.id}`}>
+                    <button className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
                       Editar
-                    </Link>
-                  </button>
+                    </button>
+                  </Link>
                   <button
                     onClick={() => handleDeleteOrder(order.id)}
                     className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600"

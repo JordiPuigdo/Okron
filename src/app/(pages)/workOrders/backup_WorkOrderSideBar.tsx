@@ -2,7 +2,7 @@ import WorkOrder, { CreateWorkOrderRequest } from "interfaces/workOrder";
 import { useEffect, useState } from "react";
 import WorkOrderService from "services/workOrderService";
 import { useForm, Controller } from "react-hook-form";
-import WorkOrderForm from "./[id]/WorkOrderForm";
+import WorkOrderForm from "./[id]/old_WorkOrderForm";
 import Machine from "interfaces/machine";
 
 interface SidebarProps {

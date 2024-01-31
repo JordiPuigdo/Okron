@@ -77,7 +77,10 @@ function PreventivePage() {
         >
           Generar Preventius d'avui
         </button>
-        {preventivesCreated!.length > 0 ?? "Preventius creats per avui:"}
+        <p className="text-black font-bold">
+          {(preventivesCreated?.length || 0 > 0) &&
+            "Preventius creats per avui:"}
+        </p>
         {preventivesCreated?.map((preventive, index) => (
           <div key={index}>
             {preventive.code} - {preventive.description}
@@ -96,6 +99,7 @@ function PreventivePage() {
           <div key={preventive.id} className="border p-4 my-4">
             <h2 className="text-lg font-semibold">{preventive.code}</h2>
             <p className="text-sm text-gray-600">{preventive.description}</p>
+            <p className="text-sm text-gray-600">{preventive.machine.name}</p>
             <Link href="/preventive/[id]" as={`/preventive/${preventive.id}`}>
               Editar
             </Link>

@@ -241,7 +241,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <div className="ml-4">
                   <Link
                     className="block px-4 py-2 hover:bg-gray-700"
-                    href="/machineWorkOrders"
+                    href="/workOrders"
                   >
                     Històric
                   </Link>

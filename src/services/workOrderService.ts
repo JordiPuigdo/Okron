@@ -1,4 +1,4 @@
-import WorkOrder, { AddWorkOrderTimes, FinishWorkOrderTimes, SearchWorkOrderFilters, WorkOrderType } from 'interfaces/workOrder';
+import WorkOrder, { AddWorkOrderTimes, CreateWorkOrderRequest, FinishWorkOrderTimes, SearchWorkOrderFilters, WorkOrderType } from 'interfaces/workOrder';
 
 class WorkOrderService {
   private baseUrl: string;
@@ -99,7 +99,7 @@ class WorkOrderService {
     }
   }
 
-  async updateWorkOrder(updateWorkOrder: WorkOrder): Promise<boolean> {
+  async updateWorkOrder(updateWorkOrder: CreateWorkOrderRequest): Promise<boolean> {
     try {
       const url = `${this.baseUrl}machine-WorkOrder`;
       const response = await fetch(url, {
@@ -128,9 +128,18 @@ class WorkOrderService {
 
   async getWorkOrdersWithFilters(searchWorkOrderFilters: SearchWorkOrderFilters): Promise<WorkOrder[]> {
     try {
-      const url = `${this.baseUrl}getWorkOrderWithFilters?MachineId=${searchWorkOrderFilters.machineId}` 
-        +`&StartDateTime=${searchWorkOrderFilters.startTime}&EndDateTime=${searchWorkOrderFilters.endTime}`  
-      const response = await fetch(url);
+      const url = `${this.baseUrl}GetWorkOrderWithFilters?` +
+      `machineId=${searchWorkOrderFilters.machineId}` +
+      `&startDateTime=${searchWorkOrderFilters.startTime || ''}` +
+      `&endDateTime=${searchWorkOrderFilters.endTime || ''}`;
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
       if (!response.ok) {
         throw new Error('Failed to fetch WorkOrders-machines');
       }

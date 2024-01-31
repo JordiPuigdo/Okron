@@ -5,7 +5,6 @@ import Operator from "./Operator";
 
 export interface Preventive {
     id: string
-    serialNumber : string;
     code : string,
     description : string,
     machine : Machine,
@@ -20,7 +19,6 @@ export interface Preventive {
 
 
 export interface CreatePreventiveRequest {
-    serialNumber : string,
     code : string,
     description : string,
     machineId : string[],

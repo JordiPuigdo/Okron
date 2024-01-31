@@ -15,6 +15,10 @@ import Operator from "interfaces/Operator";
 import MachineService from "services/machineService";
 import Machine from "interfaces/machine";
 
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ca from "date-fns/locale/ca";
+
 const PreventiveForm = () => {
   const router = useRouter();
   const apiURL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
@@ -50,6 +54,7 @@ const PreventiveForm = () => {
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [date, setDate] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(new Date());
 
   useEffect(() => {
     const fetchSpareParts = async () => {
@@ -96,13 +101,6 @@ const PreventiveForm = () => {
     if (numberPreventive || 0 > 0) {
       counter = 1;
     }
-
-    const paddedCounter = counter
-      ? counter.toString().padStart(4, "0")
-      : "0000";
-    const serialNumber = "PREV" + paddedCounter;
-
-    setValue("serialNumber", serialNumber);
   }, []);
 
   useEffect(() => {
@@ -135,10 +133,9 @@ const PreventiveForm = () => {
     preventive: Preventive
   ): CreatePreventiveRequest {
     const createPreventiveRequest: CreatePreventiveRequest = {
-      serialNumber: preventive.serialNumber,
       code: preventive.code,
       description: preventive.description,
-      startExecution: preventive.startExecution,
+      startExecution: startDate!,
       hours: preventive.hours,
       counter: 0,
       machineId: selectedMachines.map((machine) => machine),
@@ -151,15 +148,9 @@ const PreventiveForm = () => {
 
   const onSubmit = async (data: any) => {
     try {
-      const dateParts = date.split("/");
-      const jsDate = new Date(
-        `${dateParts[1]}/${dateParts[0]}/${dateParts[2]}`
-      );
-      jsDate.setHours(12, 0, 0, 0);
-      // Convert the JavaScript Date object to an ISO string
-      const isoDateString = jsDate.toISOString();
-
-      data.startExecution = isoDateString;
+      if (!notValidForm(data)) {
+        return;
+      }
       const response = await preventiveService.createPreventive(
         convertToCreateWorkOrderRequest(data)
       );
@@ -181,6 +172,22 @@ const PreventiveForm = () => {
       }, 2000);
     }
   };
+
+  function notValidForm(preventive: Preventive) {
+    if (
+      !preventive.code ||
+      !preventive.description ||
+      !preventive.hours ||
+      !startDate ||
+      !selectedInspectionPoints ||
+      !selectedOperator ||
+      !selectedMachines
+    ) {
+      alert("Falten dades per assignar al preventiu");
+      return false;
+    }
+    return true;
+  }
 
   const handleCheckboxOperatorChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -277,20 +284,6 @@ const PreventiveForm = () => {
             <div className="mb-4">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
-                htmlFor="serialNumber"
-              >
-                Número de Sèrie
-              </label>
-              <input
-                {...register("serialNumber")}
-                id="serialNumber"
-                type="text"
-                className="form-input border border-gray-300 rounded-md w-full"
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                className="block text-gray-700 text-sm font-bold mb-2"
                 htmlFor="code"
               >
                 Codi
@@ -338,12 +331,13 @@ const PreventiveForm = () => {
               >
                 Inici Preventiu
               </label>
-              <input
-                placeholder="dd/mm/yyyy"
-                type="text"
-                value={date}
-                onChange={handleInputChange}
-                className="form-input border border-gray-300 rounded-md w-full"
+              <DatePicker
+                id="startDate"
+                selected={startDate}
+                onChange={(date: Date) => setStartDate(date)}
+                dateFormat="dd/MM/yyyy"
+                locale={ca}
+                className="border border-gray-300 p-2 rounded-md mr-4"
               />
 
               {error && <p style={{ color: "red" }}>{error}</p>}
@@ -351,80 +345,6 @@ const PreventiveForm = () => {
           </div>
 
           <div style={{ display: "flex", flex: "1" }}>
-            <div style={{ flex: "1", marginRight: "20px" }}>
-              <h3 className="text-lg font-medium text-gray-600 mb-2">
-                Selecciona les peces de recanvi
-              </h3>
-              <input
-                type="text"
-                placeholder="Filtrar per descripció"
-                value={filterSparePartsText}
-                onChange={(e) => setFilterSparePartsText(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500 mb-4"
-              />
-              {filteredSpareParts.slice(0, sparePartsLimit).map((sparePart) => (
-                <div
-                  key={sparePart.id}
-                  className="mb-2 border p-4 rounded-md flex justify-between items-center"
-                >
-                  <div>
-                    <h4 className="text-lg font-medium text-gray-700">
-                      {sparePart.code}
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      Stock: {sparePart.stock}
-                    </p>
-                  </div>
-                  <button
-                    disabled={selectedSpareParts.includes(sparePart.id)}
-                    className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${
-                      selectedSpareParts.includes(sparePart.id)
-                        ? "opacity-50 cursor-not-allowed"
-                        : ""
-                    }`}
-                    onClick={() => handleSparePartChange(sparePart.id, true)}
-                  >
-                    +
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <div style={{ flex: "1" }}>
-              <h3 className="text-lg font-medium text-gray-600 mb-2">
-                Peces de recanvi seleccionades
-              </h3>
-              {selectedSpareParts.map((selectedPart) => (
-                <div
-                  key={selectedPart}
-                  className="mb-2 border p-4 rounded-md flex justify-between items-center"
-                >
-                  <div>
-                    <h4 className="text-lg font-medium text-gray-700">
-                      {
-                        availableSpareParts.find(
-                          (part) => part.id === selectedPart
-                        )?.code
-                      }
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      {
-                        availableSpareParts.find(
-                          (part) => part.id === selectedPart
-                        )?.stock
-                      }
-                    </p>
-                  </div>
-                  <button
-                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={() => handleSparePartChange(selectedPart, false)}
-                  >
-                    -
-                  </button>
-                </div>
-              ))}
-            </div>
-
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <div style={{ flex: 1 }}>
                 <h3 className="text-lg font-medium text-gray-600 mb-2">

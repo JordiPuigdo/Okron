@@ -7,6 +7,16 @@ interface SparePart {
     ubication : string;
     stock: number;
     brand: string;
+    unitsConsum? : number;
 }
 
 export default SparePart;
+
+export interface RestoreSparePart extends ConsumeSparePart{
+}
+
+export interface ConsumeSparePart {
+    workOrderId : string;
+    sparePartId : string;
+    unitsSparePart : number;
+}

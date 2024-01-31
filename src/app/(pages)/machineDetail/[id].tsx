@@ -172,7 +172,7 @@ const MachineDetailsPage = () => {
                   {selectedWorkOrderId !== null &&
                     WorkOrder.find(
                       (op) => op.id === selectedWorkOrderId
-                    )?.spareParts?.map((sparePart) => (
+                    )?.workOrderSpareParts?.map((sparePart) => (
                       <div
                         key={sparePart.id}
                         className="bg-white rounded-md shadow-md p-4 mb-4"
