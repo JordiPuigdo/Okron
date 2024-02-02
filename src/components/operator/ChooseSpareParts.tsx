@@ -112,8 +112,15 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
     if (sparePartModify) {
       sparePartModify.stock += quantity;
     }
-    setFilteredSpareParts((prevSelected) =>
-      prevSelected.filter((id) => id !== sparePartModify)
+    const sparePartfinded = filteredSpareParts.find(
+      (x) => x.id === sparePart.id
+    );
+    if (sparePartfinded) {
+      sparePartfinded.stock += quantity;
+    }
+
+    setSelectedSpareParts((prevSelected) =>
+      prevSelected.filter((x) => x.sparePart.id !== sparePart.id)
     );
 
     const consRequest: RestoreSparePart = {
