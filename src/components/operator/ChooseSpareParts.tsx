@@ -106,15 +106,12 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
       alert("Quantitat negativa!");
     }
 
-    // Find the spare part in the availableSpareParts array by its ID
-    const foundSparePartIndex = availableSpareParts.findIndex(
+    const foundSparePartIndex = filteredSpareParts.findIndex(
       (sparePart) => sparePart.id === sparePart.id
     );
 
-    // Check if the spare part is found
     if (foundSparePartIndex !== -1) {
-      // Update the stock of the found spare part
-      availableSpareParts[foundSparePartIndex].stock += quantity;
+      filteredSpareParts[foundSparePartIndex].stock += quantity;
     } else {
       console.log("Spare part not found in the available parts list.");
     }
