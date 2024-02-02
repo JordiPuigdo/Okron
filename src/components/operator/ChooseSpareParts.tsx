@@ -106,12 +106,6 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
       alert("Quantitat negativa!");
     }
 
-    const sparePartModify = availableSpareParts.find(
-      (x) => x.id === sparePart.id
-    );
-    if (sparePartModify) {
-      sparePartModify.stock += quantity;
-    }
     const sparePartfinded = filteredSpareParts.find(
       (x) => x.id === sparePart.id
     );
