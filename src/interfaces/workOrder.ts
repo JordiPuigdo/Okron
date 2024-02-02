@@ -21,9 +21,11 @@ export interface WorkOrder {
 
 export default WorkOrder;
 
-export interface WorkOrderSparePart extends SparePart
+export interface WorkOrderSparePart
 {
-  Quantity : number;
+  id : string;
+  quantity : number;
+  sparePart : SparePart;
 }
 
 export enum StateWorkOrder {

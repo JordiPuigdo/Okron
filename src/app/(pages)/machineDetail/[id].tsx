@@ -179,10 +179,10 @@ const MachineDetailsPage = () => {
                       >
                         <div className="flex justify-between items-center mb-2">
                           <h4 className="text-lg font-semibold truncate w-3/4">
-                            {sparePart.description}
+                            {sparePart.sparePart.description}
                           </h4>
                           <h4 className="text-lg font-semibold">
-                            Stock: {sparePart.stock}
+                            Stock: {sparePart.sparePart.stock}
                           </h4>
                         </div>
                       </div>

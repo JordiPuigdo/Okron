@@ -4,13 +4,16 @@ import SparePart, {
   ConsumeSparePart,
   RestoreSparePart,
 } from "interfaces/SparePart";
+import { WorkOrderSparePart } from "interfaces/workOrder";
 import { useEffect, useState } from "react";
 import SparePartService from "services/sparePartService";
 
 interface ChooseSparePartsProps {
   availableSpareParts: SparePart[];
-  selectedSpareParts: SparePart[];
-  setSelectedSpareParts: React.Dispatch<React.SetStateAction<SparePart[]>>;
+  selectedSpareParts: WorkOrderSparePart[];
+  setSelectedSpareParts: React.Dispatch<
+    React.SetStateAction<WorkOrderSparePart[]>
+  >;
   WordOrderId: string;
 }
 
@@ -46,6 +49,9 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
     setFilteredSpareParts(filtered);
   };
 
+  const x = selectedSpareParts;
+  debugger;
+
   async function consumeSparePart(sparePart: SparePart) {
     const currentUnits = unitsPerSparePart[sparePart.id] || 0;
     if (
@@ -63,7 +69,11 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
       }));
       sparePart.stock = sparePart.stock - currentUnits;
       sparePart.unitsConsum = currentUnits;
-      setSelectedSpareParts((prevSelected) => [...prevSelected, sparePart]);
+
+      setSelectedSpareParts((prevSelected) => [
+        ...prevSelected,
+        mapSparePartToWorkorderSparePart(sparePart, currentUnits),
+      ]);
 
       const consRequest: ConsumeSparePart = {
         sparePartId: sparePart.id,
@@ -75,6 +85,18 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
       console.log("Spare part not found in the available parts list.");
     }
   }
+
+  const mapSparePartToWorkorderSparePart = (
+    sparePart: SparePart,
+    units: number
+  ): WorkOrderSparePart => {
+    const workOrderSparePart: WorkOrderSparePart = {
+      id: sparePart.id,
+      quantity: units,
+      sparePart: sparePart,
+    };
+    return workOrderSparePart;
+  };
 
   async function cancelSparePartConsumption(sparePart: SparePart) {
     sparePart.stock += sparePart.unitsConsum!;
@@ -205,20 +227,18 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
 
           {selectedSpareParts.map((selectedPart) => (
             <div key={selectedPart.id} className="mb-2 text-black">
-              <span>{selectedPart.code}</span>
+              <span>{selectedPart.sparePart.code}</span>
               <span>{" - "}</span>
-              <span>{selectedPart.description}</span>
+              <span>{selectedPart.sparePart.description}</span>
               <span>{" - "}</span>
               <span className="font-bold">{" Unitats Consumides:"} </span>
-              {
-                selectedSpareParts.find(
-                  (sparePart) => sparePart.id === selectedPart.id
-                )?.unitsConsum
-              }
+              {selectedPart.quantity}
               <button
                 type="button"
                 className="ml-4 bg-red-600 hover:bg-red-400 text-white font-semibold py-2 px-4 rounded-md"
-                onClick={(e) => cancelSparePartConsumption(selectedPart)}
+                onClick={(e) =>
+                  cancelSparePartConsumption(selectedPart.sparePart)
+                }
               >
                 X
               </button>

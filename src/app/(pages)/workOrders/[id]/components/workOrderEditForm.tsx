@@ -4,6 +4,8 @@ import Operator from "interfaces/Operator";
 import WorkOrder, {
   StateWorkOrder,
   UpdateWorkOrderRequest,
+  WorkOrderSparePart,
+  WorkOrderType,
 } from "interfaces/workOrder";
 import { Averia_Sans_Libre } from "next/font/google";
 import { useRouter } from "next/navigation";
@@ -49,7 +51,9 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [availableSpareParts, setAvailableSpareParts] = useState<SparePart[]>(
     []
   );
-  const [selectedSpareParts, setSelectedSpareParts] = useState<SparePart[]>([]);
+  const [selectedSpareParts, setSelectedSpareParts] = useState<
+    WorkOrderSparePart[]
+  >([]);
   const [selectedOperators, setSelectedOperators] = useState<Operator[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
 
@@ -107,17 +111,17 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         ...prevSelected,
         ...operatorsToAdd!,
       ]);
-      debugger;
-      const sparePartsToAdd = availableSpareParts?.filter((sparePart) =>
-        responseWorkOrder.workOrderSpareParts!.some(
-          (workOrderSparePart) => workOrderSparePart.id === sparePart.id
-        )
-      );
 
-      setSelectedSpareParts((prevSelected) => [
-        ...prevSelected,
-        ...sparePartsToAdd!,
-      ]);
+      if (
+        responseWorkOrder &&
+        responseWorkOrder.workOrderSpareParts &&
+        responseWorkOrder.workOrderSpareParts.length > 0
+      ) {
+        setSelectedSpareParts((prevSelected) => [
+          ...prevSelected,
+          ...responseWorkOrder.workOrderSpareParts!,
+        ]);
+      }
     }
   }
   useEffect(() => {
@@ -263,14 +267,16 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               setSelectedOperators={setSelectedOperators}
             />
           )}
-          {availableSpareParts !== undefined && currentWorkOrder && (
-            <ChooseSpareParts
-              availableSpareParts={availableSpareParts}
-              selectedSpareParts={selectedSpareParts}
-              setSelectedSpareParts={setSelectedSpareParts}
-              WordOrderId={currentWorkOrder.id}
-            />
-          )}
+          {availableSpareParts !== undefined &&
+            currentWorkOrder &&
+            currentWorkOrder.workOrderType == WorkOrderType.Corrective && (
+              <ChooseSpareParts
+                availableSpareParts={availableSpareParts}
+                selectedSpareParts={selectedSpareParts}
+                setSelectedSpareParts={setSelectedSpareParts}
+                WordOrderId={currentWorkOrder.id}
+              />
+            )}
           <div className="flex flex-col sm:flex-row mb-8">
             <button
               type="submit"
