@@ -98,8 +98,15 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
     return workOrderSparePart;
   };
 
-  async function cancelSparePartConsumption(sparePart: SparePart) {
-    sparePart.stock += sparePart.unitsConsum!;
+  async function cancelSparePartConsumption(
+    sparePart: SparePart,
+    quantity: number
+  ) {
+    if (quantity <= 0) {
+      alert("Quantitat negativa!");
+    }
+
+    sparePart.stock += quantity;
 
     setSelectedSpareParts((prevSelected) =>
       prevSelected.filter((selectedPart) => selectedPart.id !== sparePart.id)
@@ -107,7 +114,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
 
     const consRequest: RestoreSparePart = {
       sparePartId: sparePart.id,
-      unitsSparePart: sparePart.unitsConsum!,
+      unitsSparePart: quantity,
       workOrderId: WordOrderId,
     };
     await sparePartService.restoreSparePart(consRequest);
@@ -237,7 +244,10 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
                 type="button"
                 className="ml-4 bg-red-600 hover:bg-red-400 text-white font-semibold py-2 px-4 rounded-md"
                 onClick={(e) =>
-                  cancelSparePartConsumption(selectedPart.sparePart)
+                  cancelSparePartConsumption(
+                    selectedPart.sparePart,
+                    selectedPart.quantity
+                  )
                 }
               >
                 X
