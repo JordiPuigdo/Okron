@@ -1,5 +1,6 @@
 import Operator from "./Operator";
 import SparePart from "./SparePart";
+import InspectionPoint from "./inspectionPoint";
 import Machine from "./machine";
 
 export interface WorkOrder {
@@ -36,19 +37,18 @@ export enum StateWorkOrder {
 }
 
 
-interface WorkOrderInspectionPoint {
-  inspectionPointId: string;
-  description: string;
-  check: boolean;
+export interface WorkOrderInspectionPoint {
+  id : string;
+  check?: boolean;
+  inspectionPoint : InspectionPoint;
 }
 
-interface WorkOrderTimes {
-  id: string;
+export interface WorkOrderTimes {
+  id?: string;
   startTime: Date;
-  endTime: Date;
-  totalTime: string;
-  operatorId: string;
-  name: string;
+  endTime?: Date;
+  totalTime?: string;
+  operator: Operator;
 }
 
 export interface UpdateWorkOrderRequest extends CreateWorkOrderRequest {

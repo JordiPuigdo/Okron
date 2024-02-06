@@ -19,6 +19,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
 import WorkOrderService from "services/workOrderService";
+import { SvgSpinner } from "app/icons/icons";
+import { translateStateWorkOrder } from "utils/utils";
 
 function CorrectivePage() {
   const operatorService = new OperatorService(
@@ -36,7 +38,8 @@ function CorrectivePage() {
   const [machines, setMachines] = useState<Machine[]>([]);
 
   const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingPage, setIsLoadingPage] = useState(true);
   const { register, handleSubmit, setValue } = useForm<Corrective>();
 
   const router = useRouter();
@@ -51,13 +54,14 @@ function CorrectivePage() {
     await fetchMachines();
     await createCode();
 
-    setIsLoading(false);
+    setIsLoadingPage(false);
   }
 
   async function createCode() {
     await workOrderService
       .countByWorkOrderType(WorkOrderType.Corrective)
       .then((numberCorrectives) => {
+        numberCorrectives = numberCorrectives += 1;
         const paddedCounter = numberCorrectives
           ? numberCorrectives.toString().padStart(4, "0")
           : "0000";
@@ -110,26 +114,12 @@ function CorrectivePage() {
     return createWorkOrderRequest;
   }
 
-  const translateStateWorkOrder = (state: any): string => {
-    switch (state) {
-      case StateWorkOrder.Waiting:
-        return "Pendent";
-      case StateWorkOrder.OnGoing:
-        return "En curs";
-      case StateWorkOrder.Paused:
-        return "En pausa";
-      case StateWorkOrder.Finished:
-        return "Finalitzada";
-      default:
-        return "";
-    }
-  };
-
   useEffect(() => {
     setValue("stateWorkOrder", StateWorkOrder.Waiting);
   }, [setValue]);
 
   const onSubmit: SubmitHandler<Corrective> = async (data) => {
+    setIsLoading(true);
     data.startTime = startDate || new Date();
     await machinService
       .createMachineWorkOrder(
@@ -139,10 +129,11 @@ function CorrectivePage() {
       .then((aviableMachines) => {
         setShowSuccessMessage(true);
         setTimeout(() => {
-          router.refresh();
-        }, 2000);
+          window.location.reload();
+        }, 2500);
       })
       .catch((error) => {
+        setIsLoading(false);
         setErrorMessage("Error Màquines: " + error);
       });
   };
@@ -181,7 +172,7 @@ function CorrectivePage() {
     );
   };
 
-  if (isLoading) return <Layout>Carregant dades...</Layout>;
+  if (isLoadingPage) return <Layout>Carregant dades...</Layout>;
   else
     return (
       <Layout>
@@ -325,6 +316,7 @@ function CorrectivePage() {
             <div className="flex flex-col sm:flex-row mb-8">
               <button
                 type="submit"
+                disabled={isLoading}
                 className={`${
                   showSuccessMessage
                     ? "bg-green-500"
@@ -337,12 +329,14 @@ function CorrectivePage() {
                     : showErrorMessage
                     ? "bg-red-700"
                     : "bg-blue-700"
-                } text-white font-bold py-2 px-4 rounded mt-6 mb-4 sm:mb-0 sm:mr-2`}
+                } text-white font-bold py-2 px-4 rounded mt-6 mb-4 sm:mb-0 sm:mr-2 flex items-center`}
               >
                 Crear Correctiu
+                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
               </button>
               <button
                 type="button"
+                disabled={isLoading}
                 onClick={(e) => router.back()}
                 className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2"
               >

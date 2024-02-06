@@ -19,6 +19,7 @@ export default function InspectionPointsPage() {
   const [filterText, setFilterText] = useState<string>("");
 
   const handleFormSubmit = async (e: React.FormEvent) => {
+    setIsLoading(true);
     e.preventDefault();
     try {
       const inspectionPointService = new InspectionPointService(
@@ -34,7 +35,9 @@ export default function InspectionPointsPage() {
 
       setNewDescription("");
       setIsFormVisible(false);
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       console.error("Error creating inspection point:", error);
     }
   };

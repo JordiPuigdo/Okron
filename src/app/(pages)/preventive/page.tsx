@@ -1,9 +1,11 @@
 "use client";
+import { SvgSpinner } from "app/icons/icons";
 import Layout from "components/Layout";
 import { Preventive } from "interfaces/Preventive";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import PreventiveService from "services/preventiveService";
+import { formatDate } from "utils/utils";
 
 const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50];
 
@@ -16,6 +18,8 @@ function PreventivePage() {
   const [preventivesCreated, setPreventivesCreated] = useState<
     Preventive[] | null
   >([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     const fetchPreventives = async () => {
@@ -32,6 +36,11 @@ function PreventivePage() {
 
   const handleDelete = async (id: string) => {
     try {
+      const isConfirmed = window.confirm(
+        `Esteu segurs que voleu eliminar el preventiu?`
+      );
+      if (!isConfirmed) return;
+
       await preventiveService.deletePreventive(id);
 
       setPreventives((prevPreventives) =>
@@ -49,34 +58,50 @@ function PreventivePage() {
   );
 
   const generateWorkOrders = async () => {
+    setIsLoading(true);
     const preventives =
       await preventiveService.CreateWorkOrderPreventivePerDay();
-    setPreventivesCreated(preventives);
-    setTimeout(() => {
-      setPreventivesCreated([]);
-    }, 10000);
+    debugger;
+    if (preventives?.length! > 0) {
+      setPreventivesCreated(preventives);
+      setTimeout(() => {
+        setPreventivesCreated([]);
+      }, 10000);
+    } else {
+      setMessage("Avui no hi ha preventius per crear");
+      setTimeout(() => {
+        setMessage("");
+      }, 3000);
+    }
+
+    setIsLoading(false);
   };
   return (
     <Layout>
       <div className="container mx-auto mt-10 text-black">
-        <h1 className="text-2xl font-bold mb-4">Preventius</h1>
+        <h1 className="text-2xl font-bold mb-4">Gestió de Preventius</h1>
 
-        <Link
-          href={{
-            pathname: "/preventive/preventiveForm",
-            query: { counter: preventives.length },
-          }}
-          className="text-blue-500 underline mb-2 block"
-        >
-          Crear
-        </Link>
+        <div className="flex flex-row gap-3 items-start">
+          <Link
+            href={{
+              pathname: "/preventive/preventiveForm",
+              query: { counter: preventives.length },
+            }}
+            className="text-white mb-2 block rounded-md bg-blue-500 px-4 py-2"
+          >
+            Crear Nova Configuració de Preventiu
+          </Link>
 
-        <button
-          onClick={generateWorkOrders}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md"
-        >
-          Generar Preventius d'avui
-        </button>
+          <button
+            onClick={generateWorkOrders}
+            className="bg-orange-500 text-white px-4 py-2 rounded-md flex"
+          >
+            Generar Preventius d'Avui {formatDate(new Date(), false)}
+            {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+          </button>
+        </div>
+        {message != "" && <span className="text-red-500">{message}</span>}
+
         <p className="text-black font-bold">
           {(preventivesCreated?.length || 0 > 0) &&
             "Preventius creats per avui:"}

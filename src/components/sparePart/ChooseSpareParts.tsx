@@ -49,9 +49,6 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
     setFilteredSpareParts(filtered);
   };
 
-  const x = selectedSpareParts;
-  debugger;
-
   async function consumeSparePart(sparePart: SparePart) {
     const currentUnits = unitsPerSparePart[sparePart.id] || 0;
     if (
@@ -132,42 +129,43 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
   return (
     <>
       <div className="mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-4">
-          Seleccionar peçes de recanvi a consumir
-        </h1>
-        <input
-          type="text"
-          placeholder="Buscador"
-          className="p-3 mb-4 border border-gray-300 rounded-md"
-          onChange={(e) => filterSpareParts(e.target.value)}
-        />
-
+        <div className="flex items-center gap-6">
+          <span className="text-xl font-bold mb-4">
+            Seleccionar peçes de recanvi a consumir
+          </span>
+          <input
+            type="text"
+            placeholder="Buscador"
+            className="p-3 mb-4 border border-gray-300 rounded-md"
+            onChange={(e) => filterSpareParts(e.target.value)}
+          />
+        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
                   Codi
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
                   Descripció
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
                   Proveïdor
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
                   Stock
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
                   Família
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
                   Ubicació
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
                   Unitats
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
                   Accions
                 </th>
               </tr>
@@ -178,7 +176,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap">
                     {sparePart.code}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-normal break-all">
                     {sparePart.description}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -187,7 +185,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap">
                     {sparePart.stock}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-normal break-all">
                     {sparePart.family}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -233,32 +231,33 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
           </table>
         </div>
         <div className="text-black ml-4 mt-8">
-          <h1 className="text-2xl font-bold mb-4">
+          <span className="text-xl font-bold">
             Peçes de recanvi consumides a la ordre
-          </h1>
-
-          {selectedSpareParts.map((selectedPart) => (
-            <div key={selectedPart.id} className="mb-2 text-black">
-              <span>{selectedPart.sparePart.code}</span>
-              <span>{" - "}</span>
-              <span>{selectedPart.sparePart.description}</span>
-              <span>{" - "}</span>
-              <span className="font-bold">{" Unitats Consumides:"} </span>
-              {selectedPart.quantity}
-              <button
-                type="button"
-                className="ml-4 bg-red-600 hover:bg-red-400 text-white font-semibold py-2 px-4 rounded-md"
-                onClick={(e) =>
-                  cancelSparePartConsumption(
-                    selectedPart.sparePart,
-                    selectedPart.quantity
-                  )
-                }
-              >
-                X
-              </button>
-            </div>
-          ))}
+          </span>
+          <div className="mt-6">
+            {selectedSpareParts.map((selectedPart) => (
+              <div key={selectedPart.id} className="mb-2 text-black">
+                <span>{selectedPart.sparePart.code}</span>
+                <span>{" - "}</span>
+                <span>{selectedPart.sparePart.description}</span>
+                <span>{" - "}</span>
+                <span className="font-bold">{" Unitats Consumides:"} </span>
+                {selectedPart.quantity}
+                <button
+                  type="button"
+                  className="ml-4 bg-red-600 hover:bg-red-400 text-white font-semibold py-2 px-4 rounded-md"
+                  onClick={(e) =>
+                    cancelSparePartConsumption(
+                      selectedPart.sparePart,
+                      selectedPart.quantity
+                    )
+                  }
+                >
+                  X
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </>

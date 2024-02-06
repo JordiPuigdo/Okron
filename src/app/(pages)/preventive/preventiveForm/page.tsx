@@ -18,6 +18,7 @@ import Machine from "interfaces/machine";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
+import { SvgSpinner } from "app/icons/icons";
 
 const PreventiveForm = () => {
   const router = useRouter();
@@ -55,6 +56,7 @@ const PreventiveForm = () => {
   const [date, setDate] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchSpareParts = async () => {
@@ -147,8 +149,10 @@ const PreventiveForm = () => {
   }
 
   const onSubmit = async (data: any) => {
+    setIsLoading(true);
     try {
       if (!notValidForm(data)) {
+        setIsLoading(false);
         return;
       }
       const response = await preventiveService.createPreventive(
@@ -163,9 +167,11 @@ const PreventiveForm = () => {
       } else {
         setTimeout(() => {
           setShowErrorMessage(false);
+          setIsLoading(false);
         }, 2000);
       }
     } catch (error) {
+      setIsLoading(false);
       setShowErrorMessage(true);
       setTimeout(() => {
         setShowErrorMessage(false);
@@ -202,32 +208,6 @@ const PreventiveForm = () => {
     }
   };
 
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const dateValue = e.target.value;
-    const validDateFormat = /^\d{2}\/\d{2}\/\d{4}$/;
-
-    if (validDateFormat.test(dateValue)) {
-      const [day, month, year] = dateValue.split("/");
-      const parsedDate = new Date(
-        parseInt(year, 10),
-        parseInt(month, 10) - 1,
-        parseInt(day, 10)
-      );
-
-      setValue("startExecution", parsedDate);
-    }
-  };
-
-  const handleSparePartChange = (id: string, isChecked: boolean) => {
-    setSelectedSpareParts((prevSelected) => {
-      if (isChecked) {
-        return [...prevSelected, id];
-      } else {
-        return prevSelected.filter((selectedId) => selectedId !== id);
-      }
-    });
-  };
-
   const handleCheckboxMachineChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -238,27 +218,6 @@ const PreventiveForm = () => {
       setSelectedMachines((prevSelected) =>
         prevSelected.filter((id) => id !== machineId)
       );
-    }
-  };
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
-    setDate(inputValue);
-
-    const dateRegex = /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
-
-    if (!dateRegex.test(inputValue)) {
-      setError("El format de la data ha de ser: DD/MM/YYYY");
-    } else {
-      setError(null);
-      const [day, month, year] = inputValue.split("/");
-      const parsedDate = new Date(
-        parseInt(year, 10),
-        parseInt(month, 10) - 1,
-        parseInt(day, 10)
-      );
-      setDate(inputValue);
-      setValue("startExecution", parsedDate);
     }
   };
 
@@ -459,6 +418,7 @@ const PreventiveForm = () => {
           </div>
           <button
             type="submit"
+            disabled={isLoading}
             className={`${
               showSuccessMessage
                 ? "bg-green-500"
@@ -471,9 +431,10 @@ const PreventiveForm = () => {
                 : showErrorMessage
                 ? "bg-red-700"
                 : "bg-blue-700"
-            } text-white font-bold py-2 px-4 rounded mt-6`}
+            } text-white font-bold py-2 px-4 rounded mt-6 flex items-center justify-center`}
           >
             Crear Preventiu
+            {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </button>
           {showSuccessMessage && (
             <div className="bg-green-200 text-green-800 p-4 rounded mb-4">

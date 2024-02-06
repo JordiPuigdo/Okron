@@ -104,7 +104,7 @@ const WorkOrderForm: React.FC<WorkOrderFormProps> = ({
               setValue("startTime", workOrderData!.startTime);
               setValue("stateWorkOrder", workOrderData!.stateWorkOrder);
 
-              const selectedInspectionPoints =
+              /*const selectedInspectionPoints =
                 workOrderData!.workOrderInspectionPoint?.map(
                   (point) => point.inspectionPointId
                 );

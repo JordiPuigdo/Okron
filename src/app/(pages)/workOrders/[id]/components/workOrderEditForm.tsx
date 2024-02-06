@@ -4,7 +4,9 @@ import Operator from "interfaces/Operator";
 import WorkOrder, {
   StateWorkOrder,
   UpdateWorkOrderRequest,
+  WorkOrderInspectionPoint,
   WorkOrderSparePart,
+  WorkOrderTimes,
   WorkOrderType,
 } from "interfaces/workOrder";
 import { Averia_Sans_Libre } from "next/font/google";
@@ -18,9 +20,11 @@ import { translateStateWorkOrder } from "utils/utils";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
-import ChooseSpareParts from "components/operator/ChooseSpareParts";
+import ChooseSpareParts from "components/sparePart/ChooseSpareParts";
 import SparePartService from "services/sparePartService";
 import SparePart from "interfaces/SparePart";
+import CompleteInspectionPoints from "components/inspectionPoint/ChooseInspectionPoint";
+import WorkOrderOperatorTimes from "components/operator/WorkOrderOperatorTimes";
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -54,6 +58,15 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [selectedSpareParts, setSelectedSpareParts] = useState<
     WorkOrderSparePart[]
   >([]);
+
+  const [inspectionPoints, setInspectionPoints] = useState<
+    WorkOrderInspectionPoint[]
+  >([]);
+  const [passedInspectionPoints, setPassedInspectionPoints] = useState<
+    WorkOrderInspectionPoint[]
+  >([]);
+
+  const [workOrderTimes, setWorkOrderTimes] = useState<WorkOrderTimes[]>([]);
   const [selectedOperators, setSelectedOperators] = useState<Operator[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
 
@@ -63,6 +76,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       .then((responseWorkOrder) => {
         if (responseWorkOrder) {
           setCurrentWorkOrder(responseWorkOrder);
+          console.log(responseWorkOrder.workOrderType);
           loadForm(responseWorkOrder);
         }
       })
@@ -101,6 +115,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       setValue("description", responseWorkOrder.description);
       setValue("stateWorkOrder", responseWorkOrder.stateWorkOrder);
       setValue("startTime", responseWorkOrder.startTime);
+
       const finalData = new Date(responseWorkOrder.startTime);
       setStartDate(finalData);
       const operatorsToAdd = aviableOperators?.filter((operator: any) =>
@@ -121,6 +136,18 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           ...prevSelected,
           ...responseWorkOrder.workOrderSpareParts!,
         ]);
+      }
+
+      setPassedInspectionPoints(responseWorkOrder.workOrderInspectionPoint!);
+      /*const x = responseWorkOrder.workOrderInspectionPoint?.map(
+        (order) => order.inspectionPoint
+      );
+      if (x) setInspectionPoints(x!);*/
+      if (responseWorkOrder.workOrderInspectionPoint?.length! > 0 || 0)
+        setInspectionPoints(responseWorkOrder.workOrderInspectionPoint!);
+
+      if (responseWorkOrder.workOrderTimes) {
+        setWorkOrderTimes(responseWorkOrder.workOrderTimes!);
       }
     }
   }
@@ -153,6 +180,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     }
   };
 
+  function finalizeWorkOrder() {
+    console.log("Finalize!");
+  }
+
   const renderHeader = () => {
     return (
       <div className="flex px-4 sm:px-12 pt-12 items-center flex-col sm:flex-row">
@@ -177,14 +208,14 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         </div>
         <div className="items-center text-center w-full">
           <div className="mb-4">
-            <h2 className="text-2xl font-bold text-black mx-auto">
+            <span className="text-2xl font-bold text-black mx-auto">
               Ordre de Treball - {currentWorkOrder?.code}
-            </h2>
+            </span>
           </div>
           <div>
-            <h3 className="text-xl font-bold text-black mx-auto">
+            <span className="text-xl font-bold text-black mx-auto">
               Màquina - {currentWorkOrder?.machine?.name}
-            </h3>
+            </span>
           </div>
         </div>
         {errorMessage !== "" && (
@@ -199,9 +230,9 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     <>
       {renderHeader()}
       <div className="p-4 sm:p-12">
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
-          <div className="flex flex-col sm:flex-row">
-            <div className="mb-6 sm:w-1/2 ml-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-12">
+          <div className="flex flex-col sm:flex-row items-center">
+            <div className="sm:w-1/2 ml-4">
               <label
                 htmlFor="description"
                 className="block text-xl font-medium text-gray-700 mb-2"
@@ -269,7 +300,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           )}
           {availableSpareParts !== undefined &&
             currentWorkOrder &&
-            currentWorkOrder.workOrderType == WorkOrderType.Corrective && (
+            currentWorkOrder.workOrderType === WorkOrderType.Corrective && (
               <ChooseSpareParts
                 availableSpareParts={availableSpareParts}
                 selectedSpareParts={selectedSpareParts}
@@ -277,7 +308,24 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 WordOrderId={currentWorkOrder.id}
               />
             )}
-          <div className="flex flex-col sm:flex-row mb-8">
+          {currentWorkOrder &&
+            currentWorkOrder.workOrderType === WorkOrderType.Preventive && (
+              <CompleteInspectionPoints
+                workOrderInspectionPoints={passedInspectionPoints!}
+                setCompletedWorkOrderInspectionPoints={
+                  setPassedInspectionPoints
+                }
+              />
+            )}
+
+          {currentWorkOrder && aviableOperators !== undefined && (
+            <WorkOrderOperatorTimes
+              operators={aviableOperators!}
+              workOrdertimes={workOrderTimes}
+              setWorkOrderTimes={setWorkOrderTimes}
+            />
+          )}
+          <div className="flex flex-col sm:flex-row mb-8 pt-12">
             <button
               type="submit"
               className={`${
@@ -302,6 +350,13 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2"
             >
               Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={(e) => finalizeWorkOrder()}
+              className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2"
+            >
+              Finalitzar Ordre
             </button>
           </div>
 
