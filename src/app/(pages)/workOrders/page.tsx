@@ -20,6 +20,7 @@ import {
   translateStateWorkOrder,
   translateWorkOrderType,
 } from "utils/utils";
+import { SvgSpinner } from "app/icons/icons";
 
 export default function WorkOrdersPage() {
   const [machines, setMachines] = useState<Machine[] | []>([]);
@@ -38,6 +39,8 @@ export default function WorkOrdersPage() {
   const [selectedTypeFilter, setSelectedTypeFilter] = useState<
     number | undefined
   >(undefined);
+  const [isLoadingPage, setIsLoadingPage] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const loadMachines = async () => {
     try {
@@ -51,15 +54,16 @@ export default function WorkOrdersPage() {
 
   useEffect(() => {
     loadMachines();
+    setIsLoadingPage(false);
   }, []);
 
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
 
   const handleSearch = async () => {
-    //setSelectedStateFilter(undefined);
-    //setSelectedTypeFilter(undefined);
+    setIsLoading(true);
     await searchWorkOrders();
+    setIsLoading(false);
   };
 
   const searchWorkOrders = async () => {
@@ -149,8 +153,13 @@ export default function WorkOrdersPage() {
     ) {
       return false;
     }
+    if (currentMachineId !== "" && order.machineId !== currentMachineId) {
+      return false;
+    }
     return true;
   });
+
+  if (isLoadingPage) return <Layout>Carregant dades...</Layout>;
 
   return (
     <Layout>
@@ -203,10 +212,11 @@ export default function WorkOrdersPage() {
           </div>
           <button
             type="button"
-            className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+            className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
             onClick={(e) => handleSearch()}
           >
             Buscar
+            {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </button>
           {message != "" && (
             <span className="text-red-500 ml-4">{message}</span>

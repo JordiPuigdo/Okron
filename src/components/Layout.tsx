@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { SvgSpinner } from "app/icons/icons";
+import { usePathname } from "next/navigation";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -9,6 +11,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [preventiusSubMenuOpen, setPreventiusSubMenuOpen] = useState(false);
   const [historicSubMenuOpen, setHistoricSubMenuOpen] = useState(false);
   const [correctiveSubMenuOpen, setCorrectiveSubMenuOpen] = useState(false);
+  const [loadingKey, setLoadingKey] = useState<string | null>(null);
+  const route = usePathname();
 
   const toggleHistoricSubMenu = () => {
     setHistoricSubMenuOpen(!historicSubMenuOpen);
@@ -28,6 +32,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const toggleCorrectiveSubMenu = () => {
     setCorrectiveSubMenuOpen(!correctiveSubMenuOpen);
+  };
+
+  const handleLinkClick = (key: string) => {
+    setLoadingKey(key === loadingKey ? null : key);
+    if (route.includes(key)) {
+      setLoadingKey(key === loadingKey ? null : null);
+      setMenuOpen(false);
+      setSubMenuOpen(false);
+      setPreventiusSubMenuOpen(false);
+      setCorrectiveSubMenuOpen(false);
+    }
   };
 
   return (
@@ -95,10 +110,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               {subMenuOpen && (
                 <div className="ml-4">
                   <Link
-                    className="block px-4 py-2 hover:bg-gray-700"
+                    className="flex px-4 py-2 hover:bg-gray-700 items-center"
                     href="/machines"
+                    onClick={() => handleLinkClick("machines")}
                   >
                     Configuració
+                    {loadingKey === "machines" && (
+                      <SvgSpinner style={{ marginLeft: "0.5rem" }} />
+                    )}
                   </Link>
                   {/*  <Link
                       className="block px-4 py-2 hover:bg-gray-700"
@@ -143,16 +162,24 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               {preventiusSubMenuOpen && (
                 <div className="ml-4">
                   <Link
-                    className="block px-4 py-2 hover:bg-gray-700"
+                    className="flex px-4 py-2 hover:bg-gray-700 items-center"
                     href="/preventive"
+                    onClick={() => handleLinkClick("preventive")}
                   >
                     Configuració
+                    {loadingKey === "preventive" && (
+                      <SvgSpinner style={{ marginLeft: "0.5rem" }} />
+                    )}
                   </Link>
                   <Link
-                    className="block px-4 py-2 hover:bg-gray-700"
+                    className="flex px-4 py-2 hover:bg-gray-700 items-center"
                     href="/inspectionPoints"
+                    onClick={() => handleLinkClick("inspectionPoints")}
                   >
                     Punts d'Inspecció
+                    {loadingKey === "inspectionPoints" && (
+                      <SvgSpinner style={{ marginLeft: "0.5rem" }} />
+                    )}
                   </Link>
                 </div>
               )}
@@ -195,10 +222,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               {correctiveSubMenuOpen && (
                 <div className="ml-4">
                   <Link
-                    className="block px-4 py-2 hover:bg-gray-700"
+                    className="flex px-4 py-2 hover:bg-gray-700 items-center"
                     href="/corrective"
+                    onClick={() => handleLinkClick("corrective")}
                   >
                     Crear
+                    {loadingKey === "corrective" && (
+                      <SvgSpinner style={{ marginLeft: "0.5rem" }} />
+                    )}
                   </Link>
                 </div>
               )}
@@ -240,16 +271,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               {historicSubMenuOpen && (
                 <div className="ml-4">
                   <Link
-                    className="block px-4 py-2 hover:bg-gray-700"
+                    className="flex px-4 py-2 hover:bg-gray-700 items-center"
                     href="/workOrders"
+                    onClick={() => handleLinkClick("historic")}
                   >
                     Històric
+                    {loadingKey === "historic" && (
+                      <SvgSpinner style={{ marginLeft: "0.5rem" }} />
+                    )}
                   </Link>
                 </div>
               )}
               <Link
                 className="flex items-center border-r-2 px-2 py-1"
                 href="/operators"
+                onClick={() => handleLinkClick("operators")}
               >
                 <svg
                   className="h-5 w-5 mr-2"
@@ -266,10 +302,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   />
                 </svg>
                 Operaris
+                {loadingKey === "operators" && (
+                  <SvgSpinner style={{ marginLeft: "0.5rem" }} />
+                )}
               </Link>
               <Link
                 className="flex items-center border-r-2 px-2 py-1"
                 href="/spareParts"
+                onClick={() => handleLinkClick("spareParts")}
               >
                 <svg
                   className="h-5 w-5 mr-2"
@@ -286,6 +326,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   />
                 </svg>
                 Recanvis
+                {loadingKey === "spareParts" && (
+                  <SvgSpinner style={{ marginLeft: "0.5rem" }} />
+                )}
               </Link>
             </>
           </nav>

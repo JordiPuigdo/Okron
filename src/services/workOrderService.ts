@@ -1,4 +1,4 @@
-import WorkOrder, { AddWorkOrderTimes, CreateWorkOrderRequest, FinishWorkOrderTimes, SearchWorkOrderFilters, WorkOrderType } from 'interfaces/workOrder';
+import WorkOrder, { AddWorkOrderTimes, CreateWorkOrderRequest, FinishWorkOrderTimes, SaveInspectionResultPointRequest, SearchWorkOrderFilters, WorkOrderType } from 'interfaces/workOrder';
 
 class WorkOrderService {
   private baseUrl: string;
@@ -7,7 +7,7 @@ class WorkOrderService {
     this.baseUrl = baseUrl;
   }
 
-  async addWorkOrderTimes(addWorkOrderTimes: AddWorkOrderTimes): Promise<boolean> {
+  async addWorkOrderTimes(addWorkOrderTimesValues: AddWorkOrderTimes): Promise<boolean> {
     try {
       const url = `${this.baseUrl}AddWorkOrderTimes`
       const response = await fetch(url, {
@@ -15,7 +15,7 @@ class WorkOrderService {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(addWorkOrderTimes),
+        body: JSON.stringify(addWorkOrderTimesValues),
       });
       if (!response.ok) {
         throw new Error('Failed to fetch addWorkOrderTimes');
@@ -195,6 +195,34 @@ class WorkOrderService {
       throw error;
     }
   }
+
+   async saveInspectionPointResult(saveInspectionPointResul: SaveInspectionResultPointRequest): Promise<WorkOrder[]> {
+    try {
+      const url = `${this.baseUrl}SaveInsepctionPointResult`;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+          body: JSON.stringify(saveInspectionPointResul),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch WorkOrders-machines');
+      }
+      if (response.status === 204) {
+        return [];
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching WorkOrders by machines:', error);
+      throw error;
+    }
+  }
 }
+
+
+
 
 export default WorkOrderService;

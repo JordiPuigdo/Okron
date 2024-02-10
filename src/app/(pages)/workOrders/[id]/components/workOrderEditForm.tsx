@@ -23,7 +23,7 @@ import ca from "date-fns/locale/ca";
 import ChooseSpareParts from "components/sparePart/ChooseSpareParts";
 import SparePartService from "services/sparePartService";
 import SparePart from "interfaces/SparePart";
-import CompleteInspectionPoints from "components/inspectionPoint/ChooseInspectionPoint";
+import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspectionPoint";
 import WorkOrderOperatorTimes from "components/operator/WorkOrderOperatorTimes";
 
 type WorkOrdeEditFormProps = {
@@ -76,7 +76,6 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       .then((responseWorkOrder) => {
         if (responseWorkOrder) {
           setCurrentWorkOrder(responseWorkOrder);
-          console.log(responseWorkOrder.workOrderType);
           loadForm(responseWorkOrder);
         }
       })
@@ -147,10 +146,34 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         setInspectionPoints(responseWorkOrder.workOrderInspectionPoint!);
 
       if (responseWorkOrder.workOrderTimes) {
-        setWorkOrderTimes(responseWorkOrder.workOrderTimes!);
+        setWorkOrderTimes((prevWorkOrderTimes) => {
+          const newWorkOrderTimes = responseWorkOrder.workOrderTimes!.map(
+            (t) => ({
+              operator: t.operator,
+              startTime: t.startTime,
+              endTime: t.endTime,
+              id: t.id,
+              totalTime: t.endTime
+                ? formatTotaltime(t.startTime, t.endTime)
+                : "",
+            })
+          );
+          return [...prevWorkOrderTimes, ...newWorkOrderTimes];
+        });
       }
     }
   }
+
+  const formatTotaltime = (startTime: Date, endTime: Date) => {
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+    const totalTimeInMilliseconds = end.getTime() - start.getTime();
+    const totalTimeInSeconds = Math.floor(totalTimeInMilliseconds / 1000);
+    return `${Math.floor(totalTimeInSeconds / 3600)}h ${Math.floor(
+      (totalTimeInSeconds % 3600) / 60
+    )}m ${totalTimeInSeconds % 60}s`;
+  };
+
   useEffect(() => {
     fetchSparePart();
     fetchOperators();
@@ -315,6 +338,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 setCompletedWorkOrderInspectionPoints={
                   setPassedInspectionPoints
                 }
+                workOrderId={currentWorkOrder.id}
               />
             )}
 
@@ -323,6 +347,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               operators={aviableOperators!}
               workOrdertimes={workOrderTimes}
               setWorkOrderTimes={setWorkOrderTimes}
+              workOrderId={currentWorkOrder.id}
             />
           )}
           <div className="flex flex-col sm:flex-row mb-8 pt-12">

@@ -19,6 +19,7 @@ function PreventivePage() {
     Preventive[] | null
   >([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingPage, setIsLoadingPage] = useState(true);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -27,8 +28,10 @@ function PreventivePage() {
         const fetchedPreventives = await preventiveService.getPreventives();
         setPreventives(fetchedPreventives);
       } catch (error) {
+        setIsLoadingPage(false);
         console.error("Error fetching preventives:", error);
       }
+      setIsLoadingPage(false);
     };
 
     fetchPreventives();
@@ -61,7 +64,6 @@ function PreventivePage() {
     setIsLoading(true);
     const preventives =
       await preventiveService.CreateWorkOrderPreventivePerDay();
-    debugger;
     if (preventives?.length! > 0) {
       setPreventivesCreated(preventives);
       setTimeout(() => {
@@ -87,9 +89,11 @@ function PreventivePage() {
               pathname: "/preventive/preventiveForm",
               query: { counter: preventives.length },
             }}
-            className="text-white mb-2 block rounded-md bg-blue-500 px-4 py-2"
+            className="text-white mb-2 block rounded-md bg-blue-500 px-4 py-2 flex"
+            onClick={(e) => setIsLoading(true)}
           >
             Crear Nova Configuració de Preventiu
+            {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </Link>
 
           <button
@@ -120,22 +124,24 @@ function PreventivePage() {
             className="border border-gray-300 rounded-md px-3 py-2 flex-1"
           />
         </div>
-        {filteredPreventives.map((preventive) => (
-          <div key={preventive.id} className="border p-4 my-4">
-            <h2 className="text-lg font-semibold">{preventive.code}</h2>
-            <p className="text-sm text-gray-600">{preventive.description}</p>
-            <p className="text-sm text-gray-600">{preventive.machine.name}</p>
-            <Link href="/preventive/[id]" as={`/preventive/${preventive.id}`}>
-              Editar
-            </Link>
-            <button
-              onClick={() => handleDelete(preventive.id)}
-              className="bg-red-500 text-white px-3 py-1 ml-2 rounded-md cursor-pointer"
-            >
-              Eliminar
-            </button>
-          </div>
-        ))}
+        {isLoadingPage && <SvgSpinner className="flex w-full" />}
+        {!isLoadingPage &&
+          filteredPreventives.map((preventive) => (
+            <div key={preventive.id} className="border p-4 my-4">
+              <h2 className="text-lg font-semibold">{preventive.code}</h2>
+              <p className="text-sm text-gray-600">{preventive.description}</p>
+              <p className="text-sm text-gray-600">{preventive.machine.name}</p>
+              <Link href="/preventive/[id]" as={`/preventive/${preventive.id}`}>
+                Editar
+              </Link>
+              <button
+                onClick={() => handleDelete(preventive.id)}
+                className="bg-red-500 text-white px-3 py-1 ml-2 rounded-md cursor-pointer"
+              >
+                Eliminar
+              </button>
+            </div>
+          ))}
       </div>
     </Layout>
   );

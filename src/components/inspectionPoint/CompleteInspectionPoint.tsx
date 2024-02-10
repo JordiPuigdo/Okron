@@ -1,37 +1,100 @@
-import React from "react";
-import { WorkOrderInspectionPoint } from "interfaces/workOrder";
+import React, { useState } from "react";
+import {
+  ResultInspectionPoint,
+  SaveInspectionResultPointRequest,
+  WorkOrderInspectionPoint,
+} from "interfaces/workOrder";
+import WorkOrderService from "services/workOrderService";
+import { SvgSpinner } from "app/icons/icons";
 
 interface CompleteInspectionPoints {
   workOrderInspectionPoints: WorkOrderInspectionPoint[];
   setCompletedWorkOrderInspectionPoints: React.Dispatch<
     React.SetStateAction<WorkOrderInspectionPoint[]>
   >;
+  workOrderId: string;
 }
 
 const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
   workOrderInspectionPoints,
   setCompletedWorkOrderInspectionPoints,
+  workOrderId,
 }) => {
-  const handleSelectInspectionPoint = (
+  const workOrderService = new WorkOrderService(
+    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  );
+  const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
+
+  const handleSelectInspectionPoint = async (
     inspectionPoint: WorkOrderInspectionPoint,
     e: any
   ) => {
-    setCompletedWorkOrderInspectionPoints((prevSelected) =>
-      prevSelected.map((point) =>
-        point.id === inspectionPoint.id ? { ...point, check: e } : point
-      )
-    );
+    setIsLoading((prevLoadingMap) => ({
+      ...prevLoadingMap,
+      [inspectionPoint.id]: true,
+    }));
+    const saveInspectionPointResult: SaveInspectionResultPointRequest = {
+      WorkOrderId: workOrderId,
+      WorkOrderInspectionPointId: inspectionPoint.id,
+      resultInspectionPoint:
+        e == true ? ResultInspectionPoint.Ok : ResultInspectionPoint.NOk,
+    };
+    await workOrderService
+      .saveInspectionPointResult(saveInspectionPointResult)
+      .then((response) => {
+        setCompletedWorkOrderInspectionPoints((prevSelected) =>
+          prevSelected.map((point) =>
+            point.id === inspectionPoint.id ? { ...point, check: e } : point
+          )
+        );
+      })
+      .catch((error) => {
+        setIsLoading((prevLoadingMap) => ({
+          ...prevLoadingMap,
+          [inspectionPoint.id]: false,
+        }));
+        console.log("Error insepctionPoint: " + error);
+      });
+    setIsLoading((prevLoadingMap) => ({
+      ...prevLoadingMap,
+      [inspectionPoint.id]: false,
+    }));
   };
 
-  const handleResetInspectionPoint = (
+  const handleResetInspectionPoint = async (
     inspectionPoint: WorkOrderInspectionPoint
   ) => {
+    setIsLoading((prevLoadingMap) => ({
+      ...prevLoadingMap,
+      [inspectionPoint.id]: true,
+    }));
     const x = undefined;
-    setCompletedWorkOrderInspectionPoints((prevSelected) =>
-      prevSelected.map((point) =>
-        point.id === inspectionPoint.id ? { ...point, check: x } : point
-      )
-    );
+
+    const saveInspectionPointResult: SaveInspectionResultPointRequest = {
+      WorkOrderId: workOrderId,
+      WorkOrderInspectionPointId: inspectionPoint.id,
+      resultInspectionPoint: ResultInspectionPoint.Pending,
+    };
+    await workOrderService
+      .saveInspectionPointResult(saveInspectionPointResult)
+      .then((response) => {
+        setCompletedWorkOrderInspectionPoints((prevSelected) =>
+          prevSelected.map((point) =>
+            point.id === inspectionPoint.id ? { ...point, check: x } : point
+          )
+        );
+      })
+      .catch((error) => {
+        setIsLoading((prevLoadingMap) => ({
+          ...prevLoadingMap,
+          [inspectionPoint.id]: false,
+        }));
+        console.log("Error Operaris: " + error);
+      });
+    setIsLoading((prevLoadingMap) => ({
+      ...prevLoadingMap,
+      [inspectionPoint.id]: false,
+    }));
   };
 
   return (
@@ -66,12 +129,12 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
                   <input
                     type="checkbox"
                     checked={inspectionPoint.check || false}
-                    onChange={(event) =>
+                    onChange={(event) => {
                       handleSelectInspectionPoint(
                         inspectionPoint,
                         event.target.checked
-                      )
-                    }
+                      );
+                    }}
                     className="w-6 h-6 cursor-pointer"
                   />
                 </td>
@@ -86,9 +149,10 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
                 >
                   <button
                     type="button"
-                    className="border border-gray-700 rounded-xl p-2 gap-2 bg-slate-500 text-white w-full text-lg"
+                    className="border border-gray-700 rounded-xl p-2 gap-2 bg-slate-500 text-white w-full text-lg flex items-center justify-center"
                   >
                     Reset
+                    {isLoading[inspectionPoint.id] && <SvgSpinner />}
                   </button>
                 </td>
               </tr>

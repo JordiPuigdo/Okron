@@ -1,77 +1,138 @@
 import React, { useState } from "react";
-import { WorkOrderTimes } from "interfaces/workOrder";
+import {
+  AddWorkOrderTimes,
+  FinishWorkOrderTimes,
+  WorkOrderTimes,
+} from "interfaces/workOrder";
 import Operator from "interfaces/Operator";
 import { formatDate } from "utils/utils";
+import WorkOrderService from "services/workOrderService";
+import { SvgSpinner } from "app/icons/icons";
 
 interface WorkOrderOperatorTimes {
   operators: Operator[];
   workOrdertimes: WorkOrderTimes[];
   setWorkOrderTimes: React.Dispatch<React.SetStateAction<WorkOrderTimes[]>>;
+  workOrderId: string;
 }
 
 const WorkOrderOperatorTimes: React.FC<WorkOrderOperatorTimes> = ({
   operators,
   workOrdertimes,
   setWorkOrderTimes,
+  workOrderId,
 }) => {
   const [codeOperator, setCodeOperator] = useState("");
+  const workOrderService = new WorkOrderService(
+    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  );
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const addWorkOrderTime = () => {
+  const addWorkOrderTime = async () => {
+    setIsLoading(true);
     const op = operators.find((x) => x.code === codeOperator);
     if (!op) {
       alert("Codi Operari Incorrecte");
+      setIsLoading(false);
       return;
     }
+
     const last = workOrdertimes.find(
-      (time) => time.operator.id === op.id && time.endTime === undefined
+      (time) =>
+        time.operator.id === op.id &&
+        (time.endTime === undefined || time.endTime === null)
     );
 
     if (last) {
       alert("Aquest Operari és dins l'ordre de treball");
+      setIsLoading(false);
       return;
     }
+    const startTime = new Date();
 
-    const newWorkOrderTimes: WorkOrderTimes = {
-      startTime: new Date(),
-      endTime: undefined,
-      operator: op,
+    const x: AddWorkOrderTimes = {
+      operatorId: op.id,
+      startTime: startTime,
+      WorkOrderId: workOrderId,
     };
-
-    setWorkOrderTimes((prevSelected) => [...prevSelected, newWorkOrderTimes]);
-    setCodeOperator("");
+    await workOrderService
+      .addWorkOrderTimes(x)
+      .then((x) => {
+        const newWorkOrderTimes: WorkOrderTimes = {
+          startTime: startTime,
+          endTime: undefined,
+          operator: op,
+        };
+        setWorkOrderTimes((prevSelected) => [
+          ...prevSelected,
+          newWorkOrderTimes,
+        ]);
+      })
+      .catch((e) => {
+        setIsLoading(false);
+        setErrorMessage("Error fitxant operari " + e);
+      })
+      .finally(() => {
+        setIsLoading(false);
+        setCodeOperator("");
+      });
   };
 
-  const finishWorkOrderTime = () => {
+  const finishWorkOrderTime = async () => {
+    setIsLoading(true);
     const op = operators.find((x) => x.code === codeOperator);
     if (!op) {
       alert("Codi Operari Incorrecte");
+      setIsLoading(false);
       return;
     }
 
     const last = workOrdertimes.find(
-      (time) => time.operator.id === op.id && time.endTime === undefined
+      (time) =>
+        time.operator.id === op.id &&
+        (time.endTime === undefined || time.endTime === null)
     );
 
-    if (last) {
-      const endTime = new Date();
-      const totalTimeInMilliseconds =
-        endTime.getTime() - last.startTime.getTime();
-      const totalTimeInSeconds = Math.floor(totalTimeInMilliseconds / 1000); // Convert milliseconds to seconds
-      const totalTime = `${Math.floor(totalTimeInSeconds / 3600)}h ${Math.floor(
-        (totalTimeInSeconds % 3600) / 60
-      )}m ${totalTimeInSeconds % 60}s`;
-
-      const updatedTimes = workOrdertimes.map((time) =>
-        time.operator.id === last.operator.id
-          ? { ...time, endTime, totalTime }
-          : time
-      );
-
-      setWorkOrderTimes(updatedTimes);
-    } else {
+    if (!last) {
       alert("Aquest Operari no està fitxat");
+      setIsLoading(false);
+      return;
     }
-    setCodeOperator("");
+
+    const endTime = new Date();
+    const startTime = new Date(last!.startTime);
+    const totalTimeInMilliseconds = endTime.getTime() - startTime.getTime();
+    const totalTimeInSeconds = Math.floor(totalTimeInMilliseconds / 1000);
+    const totalTime = `${Math.floor(totalTimeInSeconds / 3600)}h ${Math.floor(
+      (totalTimeInSeconds % 3600) / 60
+    )}m ${totalTimeInSeconds % 60}s`;
+
+    const updatedTimes = workOrdertimes.map((time) =>
+      time.operator.id === last!.operator.id
+        ? { ...time, endTime, totalTime }
+        : time
+    );
+
+    const finishWorkOrderTimes: FinishWorkOrderTimes = {
+      operatorId: op.id,
+      finishTime: endTime,
+      WorkOrderId: workOrderId,
+    };
+    await workOrderService
+      .finishWorkOrderTimes(finishWorkOrderTimes)
+      .then((response) => {
+        setWorkOrderTimes(updatedTimes);
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        setIsLoading(false);
+        setErrorMessage("Error fitxant operari " + e);
+      })
+      .finally(() => {
+        setIsLoading(false);
+        setCodeOperator("");
+      });
   };
 
   const totalTimeByOperatorId: { [id: string]: number } = {};
@@ -137,17 +198,21 @@ const WorkOrderOperatorTimes: React.FC<WorkOrderOperatorTimes> = ({
           />
           <button
             type="button"
+            disabled={isLoading}
             onClick={addWorkOrderTime}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 flex items-center"
           >
             Entrar
+            {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </button>
           <button
             type="button"
+            disabled={isLoading}
             onClick={finishWorkOrderTime}
-            className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600"
+            className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600 flex items-center"
           >
             Sortir
+            {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </button>
         </div>
       </div>
@@ -191,7 +256,9 @@ const WorkOrderOperatorTimes: React.FC<WorkOrderOperatorTimes> = ({
                 <tr
                   key={time.id}
                   className={` ${
-                    time.endTime === undefined ? "bg-green-300" : "bg-gray-300"
+                    time.endTime === undefined || time.endTime === null
+                      ? "bg-green-300"
+                      : "bg-gray-300"
                   }`}
                 >
                   <td className="px-6 py-4 whitespace-nowrap">

@@ -91,3 +91,16 @@ export enum WorkOrderType {
   Preventive = 1,
   Predicitve = 2,
 }
+
+export interface SaveInspectionResultPointRequest {
+  WorkOrderId : string;
+  WorkOrderInspectionPointId : string
+  resultInspectionPoint : ResultInspectionPoint
+
+}
+
+export enum ResultInspectionPoint {
+  Pending,
+  Ok,
+  NOk
+}
