@@ -1,4 +1,4 @@
-import WorkOrder, { AddWorkOrderTimes, CreateWorkOrderRequest, FinishWorkOrderTimes, SaveInspectionResultPointRequest, SearchWorkOrderFilters, WorkOrderType } from 'interfaces/workOrder';
+import WorkOrder, { AddWorkOrderTimes, CreateWorkOrderRequest, FinishWorkOrderTimes, SaveInspectionResultPointRequest, SearchWorkOrderFilters, StateWorkOrder, WorkOrderType } from 'interfaces/workOrder';
 
 class WorkOrderService {
   private baseUrl: string;
@@ -196,7 +196,7 @@ class WorkOrderService {
     }
   }
 
-   async saveInspectionPointResult(saveInspectionPointResul: SaveInspectionResultPointRequest): Promise<WorkOrder[]> {
+  async saveInspectionPointResult(saveInspectionPointResul: SaveInspectionResultPointRequest): Promise<WorkOrder[]> {
     try {
       const url = `${this.baseUrl}SaveInsepctionPointResult`;
 
@@ -217,6 +217,29 @@ class WorkOrderService {
       return response.json();
     } catch (error) {
       console.error('Error fetching WorkOrders by machines:', error);
+      throw error;
+    }
+  }
+
+  
+  async updateStateWorkOrder(id : string, workOrderState : StateWorkOrder): Promise<boolean> {
+    try {
+      const url = `${this.baseUrl}machine-WorkOrder/${id}?state=${workOrderState}`;
+
+      
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update WorkOrder');
+      }
+      return true;
+    } catch (error) {
+      console.error('Error updating WorkOrder:', error);
       throw error;
     }
   }

@@ -120,6 +120,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
           setValue("code", data.code);
           setValue("description", data.description);
           setValue("hours", data.hours);
+          setValue("days", data.days);
           setValue("startExecution", data.startExecution);
           const finalData = new Date(data.startExecution);
           setStartDate(finalData);
@@ -184,7 +185,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
       code: preventive.code,
       description: preventive.description,
       startExecution: startDate!,
-      hours: preventive.hours,
+      days: preventive.days,
       counter: preventive.counter,
       machineId: [machine?.id || ""],
       inspectionPointId: selectedInspectionPoints.map((point) => point),
@@ -276,13 +277,13 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
             <div className="mb-4">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
-                htmlFor="hours"
+                htmlFor="days"
               >
-                Hores
+                Dies
               </label>
               <input
-                {...register("hours")}
-                id="hours"
+                {...register("days")}
+                id="days"
                 type="number"
                 className="form-input border border-gray-300 rounded-md w-full"
               />

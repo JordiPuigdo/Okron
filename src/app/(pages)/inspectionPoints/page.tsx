@@ -168,11 +168,14 @@ export default function InspectionPointsPage() {
                 Descripció
               </th>
               <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                Actiu
+              </th>
+              <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                 Accions
               </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="bg-white">
             {filteredInspectionPoints.map((inspectionPoint) => (
               <tr key={inspectionPoint?.id}>
                 <td className="px-6 py-4 whitespace-no-wrap">
@@ -185,18 +188,37 @@ export default function InspectionPointsPage() {
                       )
                     }
                   >
-                    {inspectionPoint?.description} {inspectionPoint?.active}
+                    {inspectionPoint?.description}
                   </span>
                 </td>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={inspectionPoint.active}
+                    disabled
+                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  />
+                </td>
                 <td className="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
-                  <button
-                    className="text-red-600 hover:text-red-900"
-                    onClick={() =>
-                      handleDeleteInspectionPoint(inspectionPoint.id)
-                    }
-                  >
-                    Eliminar
-                  </button>
+                  {inspectionPoint.active ? (
+                    <button
+                      className="text-red-600 hover:text-red-900"
+                      onClick={() =>
+                        handleDeleteInspectionPoint(inspectionPoint.id)
+                      }
+                    >
+                      Eliminar
+                    </button>
+                  ) : (
+                    <button
+                      className="text-green-600 hover:text-green-900"
+                      onClick={() =>
+                        handleDeleteInspectionPoint(inspectionPoint.id)
+                      }
+                    >
+                      Activar
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

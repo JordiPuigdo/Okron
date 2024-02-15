@@ -10,7 +10,8 @@ export interface Preventive {
     machine : Machine,
     startExecution : Date,
     lastExecution : Date,
-    hours : number,
+    hours? : number,
+    days : number,
     counter : number,
     inspectionPoints : InspectionPoint[],
     spareParts : SparePart[]
@@ -23,7 +24,7 @@ export interface CreatePreventiveRequest {
     description : string,
     machineId : string[],
     startExecution : Date,
-    hours : number,
+    days : number,
     counter : number,
     inspectionPointId : string[],
     sparePartId : string[],

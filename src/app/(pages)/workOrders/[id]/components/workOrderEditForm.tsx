@@ -6,7 +6,6 @@ import WorkOrder, {
   UpdateWorkOrderRequest,
   WorkOrderInspectionPoint,
   WorkOrderSparePart,
-  WorkOrderTimes,
   WorkOrderType,
 } from "interfaces/workOrder";
 import { Averia_Sans_Libre } from "next/font/google";
@@ -25,6 +24,7 @@ import SparePartService from "services/sparePartService";
 import SparePart from "interfaces/SparePart";
 import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspectionPoint";
 import WorkOrderOperatorTimes from "components/operator/WorkOrderOperatorTimes";
+import { SvgSpinner } from "app/icons/icons";
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -39,7 +39,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
@@ -66,15 +66,23 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     WorkOrderInspectionPoint[]
   >([]);
 
-  const [workOrderTimes, setWorkOrderTimes] = useState<WorkOrderTimes[]>([]);
+  const [workOrderTimes, setWorkOrderTimes] = useState<
+    WorkOrderOperatorTimes[]
+  >([]);
   const [selectedOperators, setSelectedOperators] = useState<Operator[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
+  const [isFinished, setIsFinished] = useState(false);
 
   async function fetchWorkOrder() {
     await workOrderService
       .getWorkOrderById(id)
       .then((responseWorkOrder) => {
         if (responseWorkOrder) {
+          setIsFinished(
+            responseWorkOrder.stateWorkOrder == StateWorkOrder.Finished
+              ? true
+              : false
+          );
           setCurrentWorkOrder(responseWorkOrder);
           loadForm(responseWorkOrder);
         }
@@ -145,10 +153,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       if (responseWorkOrder.workOrderInspectionPoint?.length! > 0 || 0)
         setInspectionPoints(responseWorkOrder.workOrderInspectionPoint!);
 
-      if (responseWorkOrder.workOrderTimes) {
+      if (responseWorkOrder.workOrderOperatorTimes) {
         setWorkOrderTimes((prevWorkOrderTimes) => {
-          const newWorkOrderTimes = responseWorkOrder.workOrderTimes!.map(
-            (t) => ({
+          const newWorkOrderTimes =
+            responseWorkOrder.workOrderOperatorTimes!.map((t) => ({
               operator: t.operator,
               startTime: t.startTime,
               endTime: t.endTime,
@@ -156,8 +164,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               totalTime: t.endTime
                 ? formatTotaltime(t.startTime, t.endTime)
                 : "",
-            })
-          );
+            }));
           return [...prevWorkOrderTimes, ...newWorkOrderTimes];
         });
       }
@@ -184,6 +191,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   }, [aviableOperators, availableSpareParts]);
 
   const onSubmit: SubmitHandler<WorkOrder> = async (data) => {
+    setIsLoading(true);
     try {
       const updatedWorkOrderData: UpdateWorkOrderRequest = {
         id: id,
@@ -198,15 +206,58 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       setShowSuccessMessage(true);
       setShowErrorMessage(false);
     } catch (error) {
+      setTimeout(() => {
+        setIsLoading(false);
+        setShowErrorMessage(false);
+      }, 3000);
       setShowSuccessMessage(false);
       setShowErrorMessage(true);
     }
+    setTimeout(() => {
+      setIsLoading(false);
+      window.location.reload();
+    }, 2000);
   };
 
-  function finalizeWorkOrder() {
-    console.log("Finalize!");
+  async function finalizeWorkOrder() {
+    setIsLoading(true);
+
+    await workOrderService
+      .updateStateWorkOrder(currentWorkOrder!.id, StateWorkOrder.Finished)
+      .then((response) => {
+        if (response) {
+          setTimeout(() => {
+            setIsLoading(false);
+            window.location.reload();
+          }, 1000);
+        }
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        setErrorMessage(error);
+        setShowErrorMessage(true);
+      });
   }
 
+  async function handleReopenWorkOrder() {
+    setIsLoading(true);
+
+    await workOrderService
+      .updateStateWorkOrder(currentWorkOrder!.id, StateWorkOrder.Waiting)
+      .then((response) => {
+        if (response) {
+          setTimeout(() => {
+            setIsLoading(false);
+            window.location.reload();
+          }, 1000);
+        }
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        setErrorMessage(error);
+        setShowErrorMessage(true);
+      });
+  }
   const renderHeader = () => {
     return (
       <div className="flex px-4 sm:px-12 pt-12 items-center flex-col sm:flex-row">
@@ -268,6 +319,12 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 id="description"
                 name="description"
                 className="p-3 border border-gray-300 rounded-md w-full"
+                disabled={isFinished}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                  }
+                }}
               />
             </div>
             <div className="sm:w-1/2 ml-4">
@@ -282,9 +339,14 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 id="stateWorkOrder"
                 name="stateWorkOrder"
                 className="p-3 border border-gray-300 rounded-md w-full"
+                disabled={isFinished}
               >
                 {Object.values(StateWorkOrder)
-                  .filter((value) => typeof value === "number")
+                  .filter(
+                    (value) =>
+                      typeof value === "number" &&
+                      (isFinished || value !== StateWorkOrder.Finished)
+                  )
                   .map((state) => (
                     <option
                       key={state}
@@ -305,6 +367,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 Data Inici
               </label>
               <DatePicker
+                disabled={isFinished}
                 id="startDate"
                 selected={startDate}
                 onChange={(date: Date) => setStartDate(date)}
@@ -319,6 +382,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               aviableOperators={aviableOperators}
               selectedOperators={selectedOperators}
               setSelectedOperators={setSelectedOperators}
+              isFinished={isFinished}
             />
           )}
           {availableSpareParts !== undefined &&
@@ -329,6 +393,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 selectedSpareParts={selectedSpareParts}
                 setSelectedSpareParts={setSelectedSpareParts}
                 WordOrderId={currentWorkOrder.id}
+                isFinished={isFinished}
               />
             )}
           {currentWorkOrder &&
@@ -348,41 +413,61 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               workOrdertimes={workOrderTimes}
               setWorkOrderTimes={setWorkOrderTimes}
               workOrderId={currentWorkOrder.id}
+              isFinished={isFinished}
             />
           )}
-          <div className="flex flex-col sm:flex-row mb-8 pt-12">
-            <button
-              type="submit"
-              className={`${
-                showSuccessMessage
-                  ? "bg-green-500"
-                  : showErrorMessage
-                  ? "bg-red-500"
-                  : "bg-blue-500"
-              } hover:${
-                showSuccessMessage
-                  ? "bg-green-700"
-                  : showErrorMessage
-                  ? "bg-red-700"
-                  : "bg-blue-700"
-              } text-white font-bold py-2 px-4 rounded mt-6 mb-4 sm:mb-0 sm:mr-2`}
-            >
-              Actualizar Ordre
-            </button>
-            <button
-              type="button"
-              onClick={(e) => router.back()}
-              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={(e) => finalizeWorkOrder()}
-              className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2"
-            >
-              Finalitzar Ordre
-            </button>
+          <div className="flex sm:flex-row mb-8 pt-12">
+            {isFinished ? (
+              <button
+                type="button"
+                onClick={(e) => handleReopenWorkOrder()}
+                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
+              >
+                Reobrir Ordre
+                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+              </button>
+            ) : (
+              <>
+                {" "}
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className={`${
+                    showSuccessMessage
+                      ? "bg-green-500"
+                      : showErrorMessage
+                      ? "bg-red-500"
+                      : "bg-blue-500"
+                  } hover:${
+                    showSuccessMessage
+                      ? "bg-green-700"
+                      : showErrorMessage
+                      ? "bg-red-700"
+                      : "bg-blue-700"
+                  } text-white font-bold py-2 px-4 rounded mt-6 mb-4 sm:mb-0 sm:mr-2 flex items-center`}
+                >
+                  Actualizar Ordre
+                  {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => router.back()}
+                  className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
+                  disabled={isLoading}
+                >
+                  Cancelar
+                  {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => finalizeWorkOrder()}
+                  className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
+                >
+                  Finalitzar Ordre
+                  {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+                </button>
+              </>
+            )}
           </div>
 
           {showSuccessMessage && (

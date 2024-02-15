@@ -20,3 +20,13 @@ export interface ConsumeSparePart {
     sparePartId : string;
     unitsSparePart : number;
 }
+
+export interface CreateSparePartRequest {
+    code: string;
+    description: string;
+    refProvider: string;
+    family: string;
+    ubication? : string;
+    stock?: number;
+    brand?: string;
+}

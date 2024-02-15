@@ -130,7 +130,7 @@ function CorrectivePage() {
         setShowSuccessMessage(true);
         setTimeout(() => {
           window.location.reload();
-        }, 2500);
+        }, 1000);
       })
       .catch((error) => {
         setIsLoading(false);

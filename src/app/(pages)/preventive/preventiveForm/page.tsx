@@ -138,7 +138,7 @@ const PreventiveForm = () => {
       code: preventive.code,
       description: preventive.description,
       startExecution: startDate!,
-      hours: preventive.hours,
+      days: preventive.days,
       counter: 0,
       machineId: selectedMachines.map((machine) => machine),
       inspectionPointId: selectedInspectionPoints.map((point) => point),
@@ -183,7 +183,7 @@ const PreventiveForm = () => {
     if (
       !preventive.code ||
       !preventive.description ||
-      !preventive.hours ||
+      !preventive.days ||
       !startDate ||
       !selectedInspectionPoints ||
       !selectedOperator ||
@@ -271,18 +271,17 @@ const PreventiveForm = () => {
             <div className="mb-4">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
-                htmlFor="hours"
+                htmlFor="days"
               >
-                Hores
+                Dies
               </label>
               <input
-                {...register("hours")}
-                id="hours"
+                {...register("days")}
+                id="days"
                 type="number"
                 className="form-input border border-gray-300 rounded-md w-full"
               />
             </div>
-
             <div className="mb-4">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"

@@ -14,7 +14,7 @@ export interface WorkOrder {
   machineId: string
   machine? : Machine;
   workOrderInspectionPoint?: WorkOrderInspectionPoint[];
-  workOrderTimes?: WorkOrderTimes[]
+  workOrderOperatorTimes?: WorkOrderOperatorTimes[]
   operator?: Operator[];
   operatorId?: string[];
   workOrderSpareParts?: WorkOrderSparePart[]
@@ -43,7 +43,7 @@ export interface WorkOrderInspectionPoint {
   inspectionPoint : InspectionPoint;
 }
 
-export interface WorkOrderTimes {
+export interface WorkOrderOperatorTimes {
   id?: string;
   startTime: Date;
   endTime?: Date;

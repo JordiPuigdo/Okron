@@ -89,7 +89,7 @@ function PreventivePage() {
               pathname: "/preventive/preventiveForm",
               query: { counter: preventives.length },
             }}
-            className="text-white mb-2 block rounded-md bg-blue-500 px-4 py-2 flex"
+            className="text-white mb-2 rounded-md bg-blue-500 px-4 py-2 flex"
             onClick={(e) => setIsLoading(true)}
           >
             Crear Nova Configuració de Preventiu

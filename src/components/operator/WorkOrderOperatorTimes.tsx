@@ -2,25 +2,29 @@ import React, { useState } from "react";
 import {
   AddWorkOrderTimes,
   FinishWorkOrderTimes,
-  WorkOrderTimes,
+  WorkOrderOperatorTimes,
 } from "interfaces/workOrder";
 import Operator from "interfaces/Operator";
 import { formatDate } from "utils/utils";
 import WorkOrderService from "services/workOrderService";
 import { SvgSpinner } from "app/icons/icons";
 
-interface WorkOrderOperatorTimes {
+interface IWorkOrderOperatorTimes {
   operators: Operator[];
-  workOrdertimes: WorkOrderTimes[];
-  setWorkOrderTimes: React.Dispatch<React.SetStateAction<WorkOrderTimes[]>>;
+  workOrdertimes: WorkOrderOperatorTimes[];
+  setWorkOrderTimes: React.Dispatch<
+    React.SetStateAction<WorkOrderOperatorTimes[]>
+  >;
   workOrderId: string;
+  isFinished: boolean;
 }
 
-const WorkOrderOperatorTimes: React.FC<WorkOrderOperatorTimes> = ({
+const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
   operators,
   workOrdertimes,
   setWorkOrderTimes,
   workOrderId,
+  isFinished,
 }) => {
   const [codeOperator, setCodeOperator] = useState("");
   const workOrderService = new WorkOrderService(
@@ -59,7 +63,7 @@ const WorkOrderOperatorTimes: React.FC<WorkOrderOperatorTimes> = ({
     await workOrderService
       .addWorkOrderTimes(x)
       .then((x) => {
-        const newWorkOrderTimes: WorkOrderTimes = {
+        const newWorkOrderTimes: WorkOrderOperatorTimes = {
           startTime: startTime,
           endTime: undefined,
           operator: op,
@@ -195,21 +199,34 @@ const WorkOrderOperatorTimes: React.FC<WorkOrderOperatorTimes> = ({
               setCodeOperator(e.target.value);
             }}
             className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:border-blue-500"
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+              }
+            }}
           />
           <button
             type="button"
-            disabled={isLoading}
+            disabled={isLoading || isFinished}
             onClick={addWorkOrderTime}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 flex items-center"
+            className={`${
+              isFinished
+                ? "bg-gray-500"
+                : "bg-blue-500  hover:bg-blue-600 focus:bg-blue-600"
+            } px-4 py-2 text-white rounded-md focus:outline-none  flex items-center`}
           >
             Entrar
             {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </button>
           <button
             type="button"
-            disabled={isLoading}
+            disabled={isLoading || isFinished}
             onClick={finishWorkOrderTime}
-            className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600 flex items-center"
+            className={`${
+              isFinished
+                ? "bg-gray-500"
+                : "bg-red-500 hover:bg-red-600 focus:bg-red-600"
+            } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
           >
             Sortir
             {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}

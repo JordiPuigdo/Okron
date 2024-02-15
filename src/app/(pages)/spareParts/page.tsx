@@ -29,6 +29,7 @@ function SparePartsPage() {
   useEffect(() => {
     async function fetchOperators() {
       try {
+        debugger;
         const data = await sparePartService.getSpareParts();
         setSpareParts(data);
         setFilteredSpareParts(data);
@@ -48,22 +49,24 @@ function SparePartsPage() {
 
     const filtered = spareParts.filter((sparePart) => {
       return (
-        sparePart.code &&
-        sparePart.code.toLowerCase().includes(filters.code.toLowerCase()) &&
-        sparePart.description &&
-        sparePart.description
-          .toLowerCase()
-          .includes(filters.description.toLowerCase()) &&
-        sparePart.refProvider &&
-        sparePart.refProvider
-          .toLowerCase()
-          .includes(filters.refProvider.toLowerCase()) &&
-        sparePart.family &&
-        sparePart.family.toLowerCase().includes(filters.family.toLowerCase()) &&
-        sparePart.ubication &&
-        sparePart.ubication
-          .toLowerCase()
-          .includes(filters.ubication.toLowerCase())
+        (!filters.code ||
+          sparePart.code?.toLowerCase().includes(filters.code.toLowerCase())) &&
+        (!filters.description ||
+          sparePart.description
+            ?.toLowerCase()
+            .includes(filters.description.toLowerCase())) &&
+        (!filters.refProvider ||
+          sparePart.refProvider
+            ?.toLowerCase()
+            .includes(filters.refProvider.toLowerCase())) &&
+        (!filters.family ||
+          sparePart.family
+            ?.toLowerCase()
+            .includes(filters.family.toLowerCase())) &&
+        (!filters.ubication ||
+          sparePart.ubication
+            ?.toLowerCase()
+            .includes(filters.ubication.toLowerCase()))
       );
     });
     setFinalIndex(filtered.length);
@@ -96,6 +99,15 @@ function SparePartsPage() {
           <p>Carregant dades...</p>
         ) : (
           <>
+            <div>
+              {" "}
+              <Link
+                href="/spareParts/sparePartForm"
+                as={`/spareParts/sparePartForm`}
+              >
+                Crear
+              </Link>
+            </div>
             <div className="mb-4 flex space-x-4 text-black">
               <input
                 type="text"

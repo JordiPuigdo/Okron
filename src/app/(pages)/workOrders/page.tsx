@@ -66,6 +66,12 @@ export default function WorkOrdersPage() {
     setIsLoading(false);
   };
 
+  const handleFinalizeWorkOrdersDayBefore = async () => {
+    setIsLoading(true);
+    //    await searchWorkOrders();
+    setIsLoading(false);
+  };
+
   const searchWorkOrders = async () => {
     const startDateTime = startDate ? new Date(startDate) : null;
     const endDateTime = endDate ? new Date(endDate) : null;
@@ -167,6 +173,17 @@ export default function WorkOrdersPage() {
         <h1 className="text-3xl font-semibold mb-4">
           Històric Ordres de treball
         </h1>
+        <div>
+          <button
+            type="button"
+            className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
+            onClick={(e) => handleFinalizeWorkOrdersDayBefore()}
+          >
+            Finalizar les ordres del dia anterior{" "}
+            {formatDate(new Date(Date.now() - 86400000), false)}
+            {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+          </button>
+        </div>
         <div className="flex items-center text-black mb-4">
           <label htmlFor="machineSelect" className="mr-2">
             Màquina:
@@ -321,20 +338,33 @@ export default function WorkOrdersPage() {
                     {translateWorkOrderType(order.workOrderType)}
                   </td>
                   <td className="border p-3 flex space-x-2 items-center">
-                    <Link
-                      href="/workOrders/[id]"
-                      as={`/workOrders/${order.id}`}
-                    >
-                      <button className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
-                        Editar
-                      </button>
-                    </Link>
-                    <button
-                      onClick={() => handleDeleteOrder(order.id)}
-                      className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600"
-                    >
-                      Eliminar
-                    </button>
+                    {order.stateWorkOrder == StateWorkOrder.Finished ? (
+                      <Link
+                        href="/workOrders/[id]"
+                        as={`/workOrders/${order.id}`}
+                      >
+                        <button className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
+                          Detall
+                        </button>
+                      </Link>
+                    ) : (
+                      <>
+                        <Link
+                          href="/workOrders/[id]"
+                          as={`/workOrders/${order.id}`}
+                        >
+                          <button className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
+                            Editar
+                          </button>
+                        </Link>
+                        <button
+                          onClick={() => handleDeleteOrder(order.id)}
+                          className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600"
+                        >
+                          Eliminar
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}

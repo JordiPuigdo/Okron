@@ -15,6 +15,7 @@ interface ChooseSparePartsProps {
     React.SetStateAction<WorkOrderSparePart[]>
   >;
   WordOrderId: string;
+  isFinished: boolean;
 }
 
 const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
@@ -22,6 +23,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
   selectedSpareParts,
   setSelectedSpareParts,
   WordOrderId,
+  isFinished,
 }) => {
   const sparePartService = new SparePartService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
@@ -134,10 +136,16 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
             Seleccionar peçes de recanvi a consumir
           </span>
           <input
+            disabled={isFinished}
             type="text"
             placeholder="Buscador"
             className="p-3 mb-4 border border-gray-300 rounded-md"
             onChange={(e) => filterSpareParts(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+              }
+            }}
           />
         </div>
         <div className="overflow-x-auto">
@@ -193,8 +201,14 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
+                      disabled={isFinished}
                       type="number"
                       className="p-2 border border-gray-300 rounded-md w-20"
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                        }
+                      }}
                       value={unitsPerSparePart[sparePart.id] || ""}
                       onChange={(e) => {
                         const value = parseInt(e.target.value, 10);
@@ -207,13 +221,13 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
-                      disabled={
-                        selectedSpareParts.find(
-                          (part) => part.id === sparePart.id
-                        ) !== undefined
-                      }
+                      disabled={isFinished}
                       type="button"
-                      className={`ml-4 bg-orange-400 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-md ${
+                      className={` ${
+                        isFinished
+                          ? "bg-gray-400"
+                          : "bg-orange-400 hover:bg-orange-600"
+                      } ml-4 text-white font-semibold py-2 px-4 rounded-md ${
                         selectedSpareParts.find(
                           (part) => part.id === sparePart.id
                         ) !== undefined

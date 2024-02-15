@@ -6,12 +6,14 @@ type ChooseOperatorProps = {
   aviableOperators: Operator[];
   selectedOperators: Operator[];
   setSelectedOperators: React.Dispatch<React.SetStateAction<Operator[]>>;
+  isFinished: boolean;
 };
 
 const ChooseOperator: React.FC<ChooseOperatorProps> = ({
   aviableOperators = [],
   selectedOperators,
   setSelectedOperators,
+  isFinished,
 }) => {
   const [operatorAdded, setOperatorAdded] = useState<{
     [key: string]: boolean;
@@ -52,17 +54,27 @@ const ChooseOperator: React.FC<ChooseOperatorProps> = ({
                     {!operatorAdded[operator.id] &&
                     !selectedOperators.find((x) => x.id === operator.id) ? (
                       <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                        className={`${
+                          isFinished
+                            ? "bg-gray-500"
+                            : "bg-blue-500 hover:bg-blue-600"
+                        }  text-white px-4 py-2 rounded `}
                         onClick={() => addOperatorToSelected(operator)}
                         type="button"
+                        disabled={isFinished}
                       >
                         Afegir
                       </button>
                     ) : (
                       <button
-                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                        className={`${
+                          isFinished
+                            ? "bg-gray-500"
+                            : "bg-red-500  hover:bg-red-600"
+                        } text-white px-4 py-2 rounded`}
                         onClick={() => removeOperatorFromAdded(operator.id)}
                         type="button"
+                        disabled={isFinished}
                       >
                         Esborrar
                       </button>

@@ -1,4 +1,4 @@
-import SparePart, { ConsumeSparePart, RestoreSparePart } from "interfaces/SparePart";
+import SparePart, { ConsumeSparePart, CreateSparePartRequest, RestoreSparePart } from "interfaces/SparePart";
 
 class SparePartService {
   private baseUrl: string;
@@ -14,7 +14,26 @@ class SparePartService {
     }
     return response.json();
   }
+  async createSparePart(sparePart : CreateSparePartRequest ): Promise<boolean> {
+    try {
+      const url = `${this.baseUrl}sparePart`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(sparePart),
+      });
 
+      if (!response.ok) {
+        throw new Error(`Failed to update sparePart`);
+      }
+      return true;
+    } catch (error) {
+      console.error('Error updating SparePart:', error);
+      throw error;
+    }
+  }
   async updateSparePart(sparePart : SparePart ): Promise<boolean> {
     try {
       const url = `${this.baseUrl}sparePart`;
