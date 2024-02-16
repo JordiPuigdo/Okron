@@ -404,6 +404,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                   setPassedInspectionPoints
                 }
                 workOrderId={currentWorkOrder.id}
+                isFinished={isFinished}
               />
             )}
 

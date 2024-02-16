@@ -13,12 +13,14 @@ interface CompleteInspectionPoints {
     React.SetStateAction<WorkOrderInspectionPoint[]>
   >;
   workOrderId: string;
+  isFinished: boolean;
 }
 
 const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
   workOrderInspectionPoints,
   setCompletedWorkOrderInspectionPoints,
   workOrderId,
+  isFinished,
 }) => {
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
@@ -127,6 +129,7 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
               >
                 <td className="py-2 px-4 text-center align-middle">
                   <input
+                    disabled={isFinished}
                     type="checkbox"
                     checked={inspectionPoint.check || false}
                     onChange={(event) => {
@@ -148,6 +151,7 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
                   }}
                 >
                   <button
+                    disabled={isFinished}
                     type="button"
                     className="border border-gray-700 rounded-xl p-2 gap-2 bg-slate-500 text-white w-full text-lg flex items-center justify-center"
                   >
