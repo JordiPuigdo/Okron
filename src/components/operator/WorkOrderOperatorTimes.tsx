@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
-  AddWorkOrderTimes,
-  FinishWorkOrderTimes,
+  AddWorkOrderOperatorTimes,
+  FinishWorkOrderOperatorTimes,
   WorkOrderOperatorTimes,
 } from "interfaces/workOrder";
 import Operator from "interfaces/Operator";
@@ -11,8 +11,8 @@ import { SvgSpinner } from "app/icons/icons";
 
 interface IWorkOrderOperatorTimes {
   operators: Operator[];
-  workOrdertimes: WorkOrderOperatorTimes[];
-  setWorkOrderTimes: React.Dispatch<
+  workOrderOperatortimes: WorkOrderOperatorTimes[];
+  setWorkOrderOperatortimes: React.Dispatch<
     React.SetStateAction<WorkOrderOperatorTimes[]>
   >;
   workOrderId: string;
@@ -21,8 +21,8 @@ interface IWorkOrderOperatorTimes {
 
 const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
   operators,
-  workOrdertimes,
-  setWorkOrderTimes,
+  workOrderOperatortimes,
+  setWorkOrderOperatortimes,
   workOrderId,
   isFinished,
 }) => {
@@ -42,7 +42,7 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
       return;
     }
 
-    const last = workOrdertimes.find(
+    const last = workOrderOperatortimes.find(
       (time) =>
         time.operator.id === op.id &&
         (time.endTime === undefined || time.endTime === null)
@@ -55,22 +55,22 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
     }
     const startTime = new Date();
 
-    const x: AddWorkOrderTimes = {
+    const x: AddWorkOrderOperatorTimes = {
       operatorId: op.id,
       startTime: startTime,
       WorkOrderId: workOrderId,
     };
     await workOrderService
-      .addWorkOrderTimes(x)
+      .addWorkOrderOperatorTimes(x)
       .then((x) => {
-        const newWorkOrderTimes: WorkOrderOperatorTimes = {
+        const newworkOrderOperatortimes: WorkOrderOperatorTimes = {
           startTime: startTime,
           endTime: undefined,
           operator: op,
         };
-        setWorkOrderTimes((prevSelected) => [
+        setWorkOrderOperatortimes((prevSelected) => [
           ...prevSelected,
-          newWorkOrderTimes,
+          newworkOrderOperatortimes,
         ]);
       })
       .catch((e) => {
@@ -92,7 +92,7 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
       return;
     }
 
-    const last = workOrdertimes.find(
+    const last = workOrderOperatortimes.find(
       (time) =>
         time.operator.id === op.id &&
         (time.endTime === undefined || time.endTime === null)
@@ -112,21 +112,21 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
       (totalTimeInSeconds % 3600) / 60
     )}m ${totalTimeInSeconds % 60}s`;
 
-    const updatedTimes = workOrdertimes.map((time) =>
+    const updatedTimes = workOrderOperatortimes.map((time) =>
       time.operator.id === last!.operator.id
         ? { ...time, endTime, totalTime }
         : time
     );
 
-    const finishWorkOrderTimes: FinishWorkOrderTimes = {
+    const FinishWorkOrderOperatorTimes: FinishWorkOrderOperatorTimes = {
       operatorId: op.id,
       finishTime: endTime,
       WorkOrderId: workOrderId,
     };
     await workOrderService
-      .finishWorkOrderTimes(finishWorkOrderTimes)
+      .finishWorkOrderOperatorTimes(FinishWorkOrderOperatorTimes)
       .then((response) => {
-        setWorkOrderTimes(updatedTimes);
+        setWorkOrderOperatortimes(updatedTimes);
         setIsLoading(false);
       })
       .catch((e) => {
@@ -140,7 +140,7 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
   };
 
   const totalTimeByOperatorId: { [id: string]: number } = {};
-  workOrdertimes.forEach((time) => {
+  workOrderOperatortimes.forEach((time) => {
     const operatorId = time.operator.id;
     if (time.totalTime) {
       const [hours, minutes, seconds] = time.totalTime.split(" ");
@@ -163,7 +163,7 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
     totalTimes[operatorId] = `${totalHours}h ${totalMinutes}m ${totalSeconds}s`;
   });
   // Calculate total time without operator
-  const totalMilliseconds = workOrdertimes.reduce((total, time) => {
+  const totalMilliseconds = workOrderOperatortimes.reduce((total, time) => {
     if (time.totalTime) {
       const [hours, minutes, seconds] = time.totalTime.split(" ");
       const totalTimeInSeconds =
@@ -204,6 +204,7 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
                 e.preventDefault();
               }
             }}
+            disabled={isFinished}
           />
           <button
             type="button"
@@ -269,7 +270,7 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {workOrdertimes.map((time) => (
+              {workOrderOperatortimes.map((time) => (
                 <tr
                   key={time.id}
                   className={` ${

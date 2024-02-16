@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { CreatePreventiveRequest, Preventive } from "interfaces/Preventive";
 import { useRouter } from "next/navigation";
 import PreventiveService from "services/preventiveService";
@@ -57,6 +57,7 @@ const PreventiveForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [isLoading, setIsLoading] = useState(false);
+  const [preventiveDays, setPreventiveDays] = useState(0);
 
   useEffect(() => {
     const fetchSpareParts = async () => {
@@ -148,7 +149,7 @@ const PreventiveForm = () => {
     return createPreventiveRequest;
   }
 
-  const onSubmit = async (data: any) => {
+  const onSubmit: SubmitHandler<Preventive> = async (data) => {
     setIsLoading(true);
     try {
       if (!notValidForm(data)) {
@@ -180,18 +181,42 @@ const PreventiveForm = () => {
   };
 
   function notValidForm(preventive: Preventive) {
-    if (
-      !preventive.code ||
-      !preventive.description ||
-      !preventive.days ||
-      !startDate ||
-      !selectedInspectionPoints ||
-      !selectedOperator ||
-      !selectedMachines
-    ) {
+    let invalidFields = [];
+
+    if (!preventive.code || preventive.code.trim().length === 0) {
+      invalidFields.push("Code");
+    }
+
+    if (!preventive.description || preventive.description.trim().length === 0) {
+      invalidFields.push("Description");
+    }
+
+    if (!startDate) {
+      invalidFields.push("StartDate");
+    }
+
+    if (preventiveDays === 0) {
+      invalidFields.push("PreventiveDays");
+    }
+
+    if (selectedInspectionPoints.length === 0) {
+      invalidFields.push("SelectedInspectionPoints");
+    }
+
+    if (selectedOperator.length === 0) {
+      invalidFields.push("SelectedOperator");
+    }
+
+    if (selectedMachines.length === 0) {
+      invalidFields.push("SelectedMachines");
+    }
+
+    if (invalidFields.length > 0) {
+      console.log("Invalid fields:", invalidFields);
       alert("Falten dades per assignar al preventiu");
       return false;
     }
+
     return true;
   }
 
@@ -276,7 +301,8 @@ const PreventiveForm = () => {
                 Dies
               </label>
               <input
-                {...register("days")}
+                value={preventiveDays}
+                onChange={(e) => setPreventiveDays(parseInt(e.target.value))}
                 id="days"
                 type="number"
                 className="form-input border border-gray-300 rounded-md w-full"

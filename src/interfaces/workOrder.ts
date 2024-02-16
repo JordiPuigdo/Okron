@@ -68,13 +68,13 @@ export interface CreateWorkOrderRequest {
   sparePartId?: string[]
 }
 
-export interface AddWorkOrderTimes {
+export interface AddWorkOrderOperatorTimes {
   WorkOrderId: string;
   startTime: Date;
   operatorId: string
 }
 
-export interface FinishWorkOrderTimes {
+export interface FinishWorkOrderOperatorTimes {
   WorkOrderId: string;
   finishTime: Date;
   operatorId: string

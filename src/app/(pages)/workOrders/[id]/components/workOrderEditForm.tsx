@@ -66,7 +66,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     WorkOrderInspectionPoint[]
   >([]);
 
-  const [workOrderTimes, setWorkOrderTimes] = useState<
+  const [workOrderOperatorTimes, setworkOrderOperatorTimes] = useState<
     WorkOrderOperatorTimes[]
   >([]);
   const [selectedOperators, setSelectedOperators] = useState<Operator[]>([]);
@@ -154,8 +154,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         setInspectionPoints(responseWorkOrder.workOrderInspectionPoint!);
 
       if (responseWorkOrder.workOrderOperatorTimes) {
-        setWorkOrderTimes((prevWorkOrderTimes) => {
-          const newWorkOrderTimes =
+        setworkOrderOperatorTimes((prevworkOrderOperatorTimes) => {
+          const newworkOrderOperatorTimes =
             responseWorkOrder.workOrderOperatorTimes!.map((t) => ({
               operator: t.operator,
               startTime: t.startTime,
@@ -165,7 +165,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 ? formatTotaltime(t.startTime, t.endTime)
                 : "",
             }));
-          return [...prevWorkOrderTimes, ...newWorkOrderTimes];
+          return [...prevworkOrderOperatorTimes, ...newworkOrderOperatorTimes];
         });
       }
     }
@@ -410,8 +410,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           {currentWorkOrder && aviableOperators !== undefined && (
             <WorkOrderOperatorTimes
               operators={aviableOperators!}
-              workOrdertimes={workOrderTimes}
-              setWorkOrderTimes={setWorkOrderTimes}
+              workOrderOperatortimes={workOrderOperatorTimes}
+              setWorkOrderOperatortimes={setworkOrderOperatorTimes}
               workOrderId={currentWorkOrder.id}
               isFinished={isFinished}
             />

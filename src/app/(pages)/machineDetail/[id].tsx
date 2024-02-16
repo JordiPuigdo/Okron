@@ -1,7 +1,7 @@
 import Layout from "components/Layout";
 import WorkOrder, {
-  AddWorkOrderTimes,
-  FinishWorkOrderTimes,
+  AddWorkOrderOperatorTimes,
+  FinishWorkOrderOperatorTimes,
   StateWorkOrder,
 } from "interfaces/workOrder";
 import Machine from "interfaces/machine";
@@ -60,22 +60,24 @@ const MachineDetailsPage = () => {
 
   const startWorkOrder = async (id: string) => {
     //TODO Fitxar Operari
-    const addWorkOrderTimes: AddWorkOrderTimes = {
+    const addWorkOrderOperatorTimes: AddWorkOrderOperatorTimes = {
       WorkOrderId: id,
       operatorId: "652fdb692614987920656210",
       startTime: new Date(),
     };
-    await workOrderService.addWorkOrderTimes(addWorkOrderTimes);
+    await workOrderService.addWorkOrderOperatorTimes(addWorkOrderOperatorTimes);
   };
 
   const finishWorkOrder = async (id: string) => {
     //TODO Fitxar Operari
-    const finishWorkOrderTimes: FinishWorkOrderTimes = {
+    const finishWorkOrderOperatorTimes: FinishWorkOrderOperatorTimes = {
       WorkOrderId: id,
       operatorId: "652fdb692614987920656210",
       finishTime: new Date(),
     };
-    await workOrderService.finishWorkOrderTimes(finishWorkOrderTimes);
+    await workOrderService.finishWorkOrderOperatorTimes(
+      finishWorkOrderOperatorTimes
+    );
   };
 
   if (!machine) {

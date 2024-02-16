@@ -1,4 +1,4 @@
-import WorkOrder, { AddWorkOrderTimes, CreateWorkOrderRequest, FinishWorkOrderTimes, SaveInspectionResultPointRequest, SearchWorkOrderFilters, StateWorkOrder, WorkOrderType } from 'interfaces/workOrder';
+import WorkOrder, { AddWorkOrderOperatorTimes, CreateWorkOrderRequest, FinishWorkOrderOperatorTimes, SaveInspectionResultPointRequest, SearchWorkOrderFilters, StateWorkOrder, WorkOrderType } from 'interfaces/workOrder';
 
 class WorkOrderService {
   private baseUrl: string;
@@ -7,48 +7,48 @@ class WorkOrderService {
     this.baseUrl = baseUrl;
   }
 
-  async addWorkOrderTimes(addWorkOrderTimesValues: AddWorkOrderTimes): Promise<boolean> {
+  async addWorkOrderOperatorTimes(AddWorkOrderOperatorTimesValues: AddWorkOrderOperatorTimes): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}AddWorkOrderTimes`
+      const url = `${this.baseUrl}AddWorkOrderOperatorTimes`
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(addWorkOrderTimesValues),
+        body: JSON.stringify(AddWorkOrderOperatorTimesValues),
       });
       if (!response.ok) {
-        throw new Error('Failed to fetch addWorkOrderTimes');
+        throw new Error('Failed to fetch AddWorkOrderOperatorTimes');
       }
       if (response.status === 204) {
         return true;
       }
       return response.json();
     } catch (error) {
-      console.error('Error fetching addWorkOrderTimes:', error);
+      console.error('Error fetching AddWorkOrderOperatorTimes:', error);
       throw error;
     }
   }
 
-  async finishWorkOrderTimes(finishWorkOrderTimes: FinishWorkOrderTimes): Promise<boolean> {
+  async finishWorkOrderOperatorTimes(FinishWorkOrderOperatorTimes: FinishWorkOrderOperatorTimes): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}FinishWorkOrderTimes`
+      const url = `${this.baseUrl}FinishWorkOrderOperatorTimes`
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(finishWorkOrderTimes),
+        body: JSON.stringify(FinishWorkOrderOperatorTimes),
       });
       if (!response.ok) {
-        throw new Error('Failed to fetch addWorkOrderTimes');
+        throw new Error('Failed to fetch AddWorkOrderOperatorTimes');
       }
       if (response.status === 204) {
         return true;
       }
       return response.json();
     } catch (error) {
-      console.error('Error fetching addWorkOrderTimes:', error);
+      console.error('Error fetching AddWorkOrderOperatorTimes:', error);
       throw error;
     }
   }

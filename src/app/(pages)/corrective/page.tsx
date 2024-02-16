@@ -120,6 +120,11 @@ function CorrectivePage() {
 
   const onSubmit: SubmitHandler<Corrective> = async (data) => {
     setIsLoading(true);
+    if (!validData(data)) {
+      setIsLoading(false);
+      alert("Falten dades per completar");
+      return;
+    }
     data.startTime = startDate || new Date();
     await machinService
       .createMachineWorkOrder(
@@ -138,6 +143,16 @@ function CorrectivePage() {
       });
   };
 
+  function validData(corrective: Corrective) {
+    if (!corrective.description || corrective.description.trim().length === 0) {
+      return false;
+    }
+    if (corrective.operators.length == 0) {
+      return false;
+    }
+
+    return true;
+  }
   const renderHeader = () => {
     return (
       <div className="flex px-4 sm:px-12 pt-12 items-center flex-col sm:flex-row">
@@ -300,7 +315,7 @@ function CorrectivePage() {
                         type="checkbox"
                         id={`operator-${operator.id}`}
                         value={operator.id}
-                        {...register("operators", { required: true })}
+                        {...register("operators")}
                       />
                       <label
                         htmlFor={`operator-${operator.id}`}
