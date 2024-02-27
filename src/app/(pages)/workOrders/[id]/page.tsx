@@ -1,6 +1,5 @@
 "use client";
 
-import WorkOrderForm from "./old_WorkOrderForm";
 import WorkOrder, { CreateWorkOrderRequest } from "app/interfaces/workOrder";
 import Machine from "app/interfaces/machine";
 import WorkOrderService from "components/services/workOrderService";
