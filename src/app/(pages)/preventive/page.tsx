@@ -1,11 +1,12 @@
 "use client";
 import { SvgSpinner } from "app/icons/icons";
-import Layout from "components/Layout";
-import { Preventive } from "interfaces/Preventive";
+import MainLayout from "components/layout/MainLayout";
+import { Preventive } from "app/interfaces/Preventive";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import PreventiveService from "services/preventiveService";
-import { formatDate } from "utils/utils";
+import PreventiveService from "components/services/preventiveService";
+import { formatDate } from "app/utils/utils";
+import Container from "components/layout/Container";
 
 const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50];
 
@@ -79,8 +80,8 @@ function PreventivePage() {
     setIsLoading(false);
   };
   return (
-    <Layout>
-      <div className="container mx-auto mt-10 text-black">
+    <MainLayout>
+      <Container>
         <h1 className="text-2xl font-bold mb-4">Gestió de Preventius</h1>
 
         <div className="flex flex-row gap-3 items-start">
@@ -131,7 +132,11 @@ function PreventivePage() {
               <h2 className="text-lg font-semibold">{preventive.code}</h2>
               <p className="text-sm text-gray-600">{preventive.description}</p>
               <p className="text-sm text-gray-600">{preventive.machine.name}</p>
-              <Link href="/preventive/[id]" as={`/preventive/${preventive.id}`}>
+              <Link
+                href="/preventive/[id]"
+                as={`/preventive/${preventive.id}`}
+                className="bg-green-500 text-white px-3 py-1 ml-2 rounded-md "
+              >
                 Editar
               </Link>
               <button
@@ -142,8 +147,8 @@ function PreventivePage() {
               </button>
             </div>
           ))}
-      </div>
-    </Layout>
+      </Container>
+    </MainLayout>
   );
 }
 

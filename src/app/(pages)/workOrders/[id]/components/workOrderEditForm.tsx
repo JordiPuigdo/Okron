@@ -1,27 +1,27 @@
 "use client";
 import ChooseOperator from "components/operator/ChooseOperator";
-import Operator from "interfaces/Operator";
+import Operator from "app/interfaces/Operator";
 import WorkOrder, {
   StateWorkOrder,
   UpdateWorkOrderRequest,
   WorkOrderInspectionPoint,
   WorkOrderSparePart,
   WorkOrderType,
-} from "interfaces/workOrder";
+} from "app/interfaces/workOrder";
 import { Averia_Sans_Libre } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import OperatorService from "services/operatorService";
-import WorkOrderService from "services/workOrderService";
-import { translateStateWorkOrder } from "utils/utils";
+import OperatorService from "components/services/operatorService";
+import WorkOrderService from "components/services/workOrderService";
+import { translateStateWorkOrder } from "app/utils/utils";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
 import ChooseSpareParts from "components/sparePart/ChooseSpareParts";
-import SparePartService from "services/sparePartService";
-import SparePart from "interfaces/SparePart";
+import SparePartService from "components/services/sparePartService";
+import SparePart from "app/interfaces/SparePart";
 import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspectionPoint";
 import WorkOrderOperatorTimes from "components/operator/WorkOrderOperatorTimes";
 import { SvgSpinner } from "app/icons/icons";

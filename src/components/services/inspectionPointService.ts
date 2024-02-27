@@ -1,4 +1,4 @@
-import InspectionPoint from '../interfaces/inspectionPoint'; // Import your InspectionPoint model
+import InspectionPoint from '../../app/interfaces/inspectionPoint'; // Import your InspectionPoint model
 
 class InspectionPointService {
   private baseUrl: string; // Replace with your API base URL

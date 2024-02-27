@@ -19,6 +19,7 @@ export interface ConsumeSparePart {
     workOrderId : string;
     sparePartId : string;
     unitsSparePart : number;
+    operatorId : string
 }
 
 export interface CreateSparePartRequest {

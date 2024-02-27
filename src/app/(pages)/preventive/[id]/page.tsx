@@ -1,23 +1,23 @@
 "use client";
 
-import Layout from "components/Layout";
-import Operator from "interfaces/Operator";
-import { Preventive, UpdatePreventiveRequest } from "interfaces/Preventive";
-import SparePart from "interfaces/SparePart";
-import InspectionPoint from "interfaces/inspectionPoint";
-import Machine from "interfaces/machine";
+import Operator from "app/interfaces/Operator";
+import { Preventive, UpdatePreventiveRequest } from "app/interfaces/Preventive";
+import SparePart from "app/interfaces/SparePart";
+import InspectionPoint from "app/interfaces/inspectionPoint";
+import Machine from "app/interfaces/machine";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import InspectionPointService from "services/inspectionPointService";
-import MachineService from "services/machineService";
-import OperatorService from "services/operatorService";
-import PreventiveService from "services/preventiveService";
-import SparePartService from "services/sparePartService";
+import InspectionPointService from "components/services/inspectionPointService";
+import MachineService from "components/services/machineService";
+import OperatorService from "components/services/operatorService";
+import PreventiveService from "components/services/preventiveService";
+import SparePartService from "components/services/sparePartService";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
+import MainLayout from "components/layout/MainLayout";
 
 export default function EditPreventive({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -230,7 +230,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
   };
 
   return (
-    <Layout>
+    <MainLayout>
       <div className="mx-auto w-full">
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -424,6 +424,6 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
           )}
         </form>
       </div>
-    </Layout>
+    </MainLayout>
   );
 }

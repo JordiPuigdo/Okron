@@ -1,11 +1,12 @@
 "use client";
 
-import Layout from "components/Layout";
 import WorkOrderForm from "./old_WorkOrderForm";
-import WorkOrder, { CreateWorkOrderRequest } from "interfaces/workOrder";
-import Machine from "interfaces/machine";
-import WorkOrderService from "services/workOrderService";
+import WorkOrder, { CreateWorkOrderRequest } from "app/interfaces/workOrder";
+import Machine from "app/interfaces/machine";
+import WorkOrderService from "components/services/workOrderService";
 import WorkOrderEditForm from "./components/workOrderEditForm";
+import MainLayout from "components/layout/MainLayout";
+import Container from "components/layout/Container";
 
 export default function EditWorkOrder({ params }: { params: { id: string } }) {
   const workOrderService = new WorkOrderService(
@@ -32,8 +33,10 @@ export default function EditWorkOrder({ params }: { params: { id: string } }) {
     }
   };
   return (
-    <Layout>
-      <WorkOrderEditForm id={params.id} />
-    </Layout>
+    <MainLayout>
+      <Container>
+        <WorkOrderEditForm id={params.id} />
+      </Container>
+    </MainLayout>
   );
 }

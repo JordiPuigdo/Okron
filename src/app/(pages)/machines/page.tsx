@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import MachineService from "../../../services/machineService";
-import Machine from "../../../interfaces/machine";
+import MachineService from "../../../components/services/machineService";
+import Machine from "../../interfaces/machine";
 import Link from "next/link";
-import Layout from "../../../components/Layout";
 import { useForm, SubmitHandler } from "react-hook-form";
-import sections from "interfaces/sections";
+import sections from "app/interfaces/sections";
+import MainLayout from "components/layout/MainLayout";
+import Container from "components/layout/Container";
 
 export default function MachinesPage() {
   const [machines, setMachines] = useState<Machine[]>([]);
@@ -88,8 +89,8 @@ export default function MachinesPage() {
   }
 
   return (
-    <Layout>
-      <div className="container mx-auto py-8">
+    <MainLayout>
+      <Container>
         <h1 className="text-3xl font-semibold mb-4">Llistat de màquines</h1>
         <button
           onClick={toggleFormVisibility}
@@ -161,6 +162,9 @@ export default function MachinesPage() {
           <thead>
             <tr>
               <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                Codi
+              </th>
+              <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                 Nom
               </th>
               <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
@@ -189,6 +193,7 @@ export default function MachinesPage() {
           <tbody>
             {filteredMachines.map((machine) => (
               <tr key={machine.id}>
+                <td className="px-6 py-4 whitespace-no-wrap">{machine.code}</td>
                 <td className="px-6 py-4 whitespace-no-wrap">{machine.name}</td>
                 <td className="px-6 py-4 whitespace-no-wrap">
                   {machine.company}
@@ -229,7 +234,7 @@ export default function MachinesPage() {
             ))}
           </tbody>
         </table>
-      </div>
-    </Layout>
+      </Container>
+    </MainLayout>
   );
 }

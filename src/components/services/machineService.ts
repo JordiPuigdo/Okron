@@ -1,5 +1,5 @@
-import WorkOrder, { CreateWorkOrderRequest } from 'interfaces/workOrder';
-import Machine from '../interfaces/machine'; // Import your Machine model
+import WorkOrder, { CreateWorkOrderRequest } from 'app/interfaces/workOrder';
+import Machine from '../../app/interfaces/machine'; // Import your Machine model
 
 class MachineService {
   private baseUrl: string; // Replace with your API base URL

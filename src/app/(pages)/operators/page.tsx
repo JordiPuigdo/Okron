@@ -2,10 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import OperatorForm from "../../../components/OperatorForm";
-import OperatorService from "services/operatorService";
-import Operator from "interfaces/Operator";
-import Layout from "components/Layout";
+import OperatorService from "components/services/operatorService";
+import Operator from "app/interfaces/Operator";
 import Link from "next/link";
+import MainLayout from "components/layout/MainLayout";
+import Container from "components/layout/Container";
 
 function OperatorsPage() {
   const [operators, setOperators] = useState<Operator[]>([]);
@@ -54,8 +55,8 @@ function OperatorsPage() {
   }
 
   return (
-    <Layout>
-      <div className="py-8">
+    <MainLayout>
+      <Container>
         <h1 className="text-2xl font-semibold mb-4">Operaris</h1>
         <button
           onClick={toggleFormVisibility}
@@ -108,8 +109,8 @@ function OperatorsPage() {
             </tbody>
           </table>
         </div>
-      </div>
-    </Layout>
+      </Container>
+    </MainLayout>
   );
 }
 

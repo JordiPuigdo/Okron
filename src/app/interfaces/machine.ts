@@ -3,6 +3,7 @@ import WorkOrder from "./workOrder";
 
 interface Machine {
     id: string;
+    code : string;
     name: string;
     serialNumber: string;
     company: string;

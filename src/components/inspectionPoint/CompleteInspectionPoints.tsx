@@ -1,6 +1,6 @@
 import React from "react";
-import InspectionPoint from "interfaces/inspectionPoint";
-import { WorkOrderInspectionPoint } from "interfaces/workOrder";
+import InspectionPoint from "app/interfaces/inspectionPoint";
+import { WorkOrderInspectionPoint } from "app/interfaces/workOrder";
 
 interface PassInspectionPointProps {
   availableInspectionPoints: InspectionPoint[];

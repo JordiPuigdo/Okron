@@ -3,10 +3,12 @@
 import SparePart, {
   ConsumeSparePart,
   RestoreSparePart,
-} from "interfaces/SparePart";
-import { WorkOrderSparePart } from "interfaces/workOrder";
+} from "app/interfaces/SparePart";
+import { WorkOrderSparePart } from "app/interfaces/workOrder";
 import { useEffect, useState } from "react";
-import SparePartService from "services/sparePartService";
+import SparePartService from "components/services/sparePartService";
+import { checkOperatorCreated, isOperatorLogged } from "app/utils/utils";
+import { useSessionStore } from "app/stores/globalStore";
 
 interface ChooseSparePartsProps {
   availableSpareParts: SparePart[];
@@ -34,6 +36,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
   const [unitsPerSparePart, setUnitsPerSparePart] = useState<{
     [key: string]: number;
   }>({});
+  const { operatorLogged } = useSessionStore((state) => state);
 
   const filterSpareParts = (searchTerm: string) => {
     const filtered = availableSpareParts.filter((sparePart) => {
@@ -52,6 +55,10 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
   };
 
   async function consumeSparePart(sparePart: SparePart) {
+    if (operatorLogged == undefined) {
+      alert("Has de tenir un operari fitxat per fer aquesta acció!");
+      return;
+    }
     const currentUnits = unitsPerSparePart[sparePart.id] || 0;
     if (
       sparePart.stock < currentUnits ||
@@ -78,6 +85,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
         sparePartId: sparePart.id,
         unitsSparePart: currentUnits,
         workOrderId: WordOrderId,
+        operatorId: operatorLogged?.idOperatorLogged!,
       };
       await sparePartService.consumeSparePart(consRequest);
     } else {
@@ -101,6 +109,10 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
     sparePart: SparePart,
     quantity: number
   ) {
+    if (operatorLogged == undefined) {
+      alert("Has de tenir un operari fitxat per fer aquesta acció!");
+      return;
+    }
     if (quantity <= 0) {
       alert("Quantitat negativa!");
     }
@@ -120,6 +132,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
       sparePartId: sparePart.id,
       unitsSparePart: quantity,
       workOrderId: WordOrderId,
+      operatorId: operatorLogged?.idOperatorLogged!,
     };
     await sparePartService.restoreSparePart(consRequest);
   }
@@ -258,8 +271,11 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
                 <span className="font-bold">{" Unitats Consumides:"} </span>
                 {selectedPart.quantity}
                 <button
+                  disabled={isFinished}
                   type="button"
-                  className="ml-4 bg-red-600 hover:bg-red-400 text-white font-semibold py-2 px-4 rounded-md"
+                  className={`${
+                    isFinished ? "bg-gray-400" : " bg-red-600 hover:bg-red-400"
+                  }ml-4 text-white font-semibold py-2 px-4 rounded-md`}
                   onClick={(e) =>
                     cancelSparePartConsumption(
                       selectedPart.sparePart,

@@ -3,10 +3,10 @@ import {
   AddWorkOrderOperatorTimes,
   FinishWorkOrderOperatorTimes,
   WorkOrderOperatorTimes,
-} from "interfaces/workOrder";
-import Operator from "interfaces/Operator";
-import { formatDate } from "utils/utils";
-import WorkOrderService from "services/workOrderService";
+} from "app/interfaces/workOrder";
+import Operator from "app/interfaces/Operator";
+import { formatDate } from "app/utils/utils";
+import WorkOrderService from "components/services/workOrderService";
 import { SvgSpinner } from "app/icons/icons";
 
 interface IWorkOrderOperatorTimes {
@@ -186,7 +186,7 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
     <div className="mx-auto px-4 py-8 mt-12">
       <div className="flex flex-col">
         <div className="bg-white w-full text-center p-4 rounded-md border-2 border-gray-400">
-          <span className="text-xl font-bold">Fitxar Operari</span>
+          <span className="text-xl font-bold">Temps d'Operari</span>
         </div>
 
         <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
@@ -236,7 +236,9 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
       </div>
       <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
       <div className="bg-white w-full text-center p-4 rounded-md border-2 border-gray-40 mt-6">
-        <span className="text-xl font-bold">Temps d'Operaris</span>
+        <span className="text-xl font-bold">
+          Registres dels temps d'Operaris
+        </span>
       </div>
       <div className="mt-6">
         <div className="overflow-x-auto mt-6">

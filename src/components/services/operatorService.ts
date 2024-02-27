@@ -1,4 +1,4 @@
-import Operator from 'interfaces/Operator';
+import Operator from 'app/interfaces/Operator';
 
 class OperatorService {
   private baseUrl: string;

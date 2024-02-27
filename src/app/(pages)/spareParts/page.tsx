@@ -1,10 +1,11 @@
 "use client";
 
-import Layout from "components/Layout";
-import SparePart from "interfaces/SparePart";
+import MainLayout from "components/layout/MainLayout";
+import SparePart from "app/interfaces/SparePart";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import SparePartService from "services/sparePartService";
+import SparePartService from "components/services/sparePartService";
+import Container from "components/layout/Container";
 
 const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50];
 
@@ -91,19 +92,20 @@ function SparePartsPage() {
   };
 
   return (
-    <Layout>
-      <div className="container mx-auto mt-10">
+    <MainLayout>
+      <Container>
         <h1 className="text-2xl font-bold mb-4">Recanvis</h1>
 
         {loading ? (
           <p>Carregant dades...</p>
         ) : (
           <>
-            <div>
+            <div className="mb-4">
               {" "}
               <Link
                 href="/spareParts/sparePartForm"
                 as={`/spareParts/sparePartForm`}
+                className="bg-blue-500 text-white px-3 py-1 ml-2 rounded-md "
               >
                 Crear
               </Link>
@@ -201,6 +203,7 @@ function SparePartsPage() {
                       <Link
                         href="/spareParts/[id]"
                         as={`/spareParts/${sparePart.id}`}
+                        className="bg-green-500 text-white px-3 py-1 ml-2 rounded-md "
                       >
                         Editar
                       </Link>
@@ -235,8 +238,8 @@ function SparePartsPage() {
             </div>
           </>
         )}
-      </div>
-    </Layout>
+      </Container>
+    </MainLayout>
   );
 }
 

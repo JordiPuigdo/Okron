@@ -1,26 +1,27 @@
 "use client";
 
-import Layout from "components/Layout";
-import { Corrective } from "interfaces/Corrective";
-import Operator from "interfaces/Operator";
-import Machine from "interfaces/machine";
+import { Corrective } from "app/interfaces/Corrective";
+import Operator from "app/interfaces/Operator";
+import Machine from "app/interfaces/machine";
 import {
   CreateWorkOrderRequest,
   StateWorkOrder,
   WorkOrderType,
-} from "interfaces/workOrder";
+} from "app/interfaces/workOrder";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import MachineService from "services/machineService";
-import OperatorService from "services/operatorService";
+import MachineService from "components/services/machineService";
+import OperatorService from "components/services/operatorService";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
-import WorkOrderService from "services/workOrderService";
+import WorkOrderService from "components/services/workOrderService";
 import { SvgSpinner } from "app/icons/icons";
-import { translateStateWorkOrder } from "utils/utils";
+import { translateStateWorkOrder } from "app/utils/utils";
+import MainLayout from "components/layout/MainLayout";
+import Container from "components/layout/Container";
 
 function CorrectivePage() {
   const operatorService = new OperatorService(
@@ -155,7 +156,7 @@ function CorrectivePage() {
   }
   const renderHeader = () => {
     return (
-      <div className="flex px-4 sm:px-12 pt-12 items-center flex-col sm:flex-row">
+      <div className="flex px-4 sm:px-12 items-center flex-col sm:flex-row">
         <div
           className="cursor-pointer mb-4 sm:mb-0"
           onClick={() => router.back()}
@@ -187,192 +188,194 @@ function CorrectivePage() {
     );
   };
 
-  if (isLoadingPage) return <Layout>Carregant dades...</Layout>;
+  if (isLoadingPage) return <MainLayout>Carregant dades...</MainLayout>;
   else
     return (
-      <Layout>
-        {renderHeader()}
-        <div className="p-4 sm:p-12">
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
-            <div className="flex flex-col sm:flex-row">
-              <div className="mb-6 sm:w-1/2">
-                <label
-                  htmlFor="code"
-                  className="block text-xl font-medium text-gray-700 mb-2"
-                >
-                  Codi
-                </label>
-                <input
-                  {...register("code")}
-                  type="text"
-                  id="code"
-                  name="code"
-                  readOnly
-                  className="p-3 border border-gray-300 rounded-md w-full"
-                />
-              </div>
-              <div className="mb-6 sm:w-1/2 sm:ml-6">
-                <label
-                  htmlFor="description"
-                  className="block text-xl font-medium text-gray-700 mb-2"
-                >
-                  Descripció
-                </label>
-                <input
-                  {...register("description")}
-                  type="text"
-                  id="description"
-                  name="description"
-                  className="p-3 border border-gray-300 rounded-md w-full"
-                  placeholder="Descripció del correctiu"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row">
-              <div className="mb-6 sm:w-1/2">
-                <label
-                  htmlFor="machine"
-                  className="block text-xl font-medium text-gray-700 mb-2"
-                >
-                  Màquina
-                </label>
-                <select
-                  {...register("machineId")}
-                  id="machine"
-                  name="machine"
-                  className="p-3 border border-gray-300 rounded-md w-full"
-                  onChange={(e) => {
-                    setValue("machineId", e.target.value, {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                    });
-                  }}
-                >
-                  {machines.map((machine) => (
-                    <option key={machine.id} value={machine.id}>
-                      {machine.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="mb-6 sm:w-1/2 sm:ml-6">
-                <label
-                  htmlFor="stateWorkOrder"
-                  className="block text-xl font-medium text-gray-700 mb-2"
-                >
-                  Estat
-                </label>
-                <select
-                  {...register("stateWorkOrder", { valueAsNumber: true })}
-                  id="stateWorkOrder"
-                  name="stateWorkOrder"
-                  className="p-3 border border-gray-300 rounded-md w-full"
-                >
-                  {Object.values(StateWorkOrder)
-                    .filter((value) => typeof value === "number")
-                    .map((state) => (
-                      <option
-                        key={state}
-                        value={
-                          typeof state === "string"
-                            ? parseInt(state, 10)
-                            : state
-                        }
-                      >
-                        {translateStateWorkOrder(state)}
-                      </option>
-                    ))}
-                </select>
-              </div>
-            </div>
-            <div className="flex flex-col sm:flex-row">
-              <div className="mb-6 sm:mr-6">
-                <label
-                  htmlFor="startDate"
-                  className="block text-xl font-medium text-gray-700 mb-2"
-                >
-                  Data Inici
-                </label>
-                <DatePicker
-                  id="startDate"
-                  selected={startDate}
-                  onChange={(date: Date) => setStartDate(date)}
-                  dateFormat="dd/MM/yyyy"
-                  locale={ca}
-                  className="p-3 border border-gray-300 rounded-md text-lg"
-                />
-              </div>
-
-              <div className="mb-6">
-                <label className="block text-xl font-medium text-gray-700 mb-2">
-                  Operaris
-                </label>
-                <div className="flex flex-wrap">
-                  {operators.map((operator) => (
-                    <div key={operator.id} className="mr-4 mb-2">
-                      <input
-                        type="checkbox"
-                        id={`operator-${operator.id}`}
-                        value={operator.id}
-                        {...register("operators")}
-                      />
-                      <label
-                        htmlFor={`operator-${operator.id}`}
-                        className="ml-2 text-lg"
-                      >
-                        {operator.name}
-                      </label>
-                    </div>
-                  ))}
+      <MainLayout>
+        <Container>
+          {renderHeader()}
+          <div className="p-4 sm:p-12">
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
+              <div className="flex flex-col sm:flex-row">
+                <div className="mb-6 sm:w-1/2">
+                  <label
+                    htmlFor="code"
+                    className="block text-xl font-medium text-gray-700 mb-2"
+                  >
+                    Codi
+                  </label>
+                  <input
+                    {...register("code")}
+                    type="text"
+                    id="code"
+                    name="code"
+                    readOnly
+                    className="p-3 border border-gray-300 rounded-md w-full"
+                  />
+                </div>
+                <div className="mb-6 sm:w-1/2 sm:ml-6">
+                  <label
+                    htmlFor="description"
+                    className="block text-xl font-medium text-gray-700 mb-2"
+                  >
+                    Descripció
+                  </label>
+                  <input
+                    {...register("description")}
+                    type="text"
+                    id="description"
+                    name="description"
+                    className="p-3 border border-gray-300 rounded-md w-full"
+                    placeholder="Descripció del correctiu"
+                  />
                 </div>
               </div>
-            </div>
-            <div className="flex flex-col sm:flex-row mb-8">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`${
-                  showSuccessMessage
-                    ? "bg-green-500"
-                    : showErrorMessage
-                    ? "bg-red-500"
-                    : "bg-blue-500"
-                } hover:${
-                  showSuccessMessage
-                    ? "bg-green-700"
-                    : showErrorMessage
-                    ? "bg-red-700"
-                    : "bg-blue-700"
-                } text-white font-bold py-2 px-4 rounded mt-6 mb-4 sm:mb-0 sm:mr-2 flex items-center`}
-              >
-                Crear Correctiu
-                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-              </button>
-              <button
-                type="button"
-                disabled={isLoading}
-                onClick={(e) => router.back()}
-                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2"
-              >
-                Cancelar
-              </button>
-            </div>
 
-            {showSuccessMessage && (
-              <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
-                Correctiu creat correctament
+              <div className="flex flex-col sm:flex-row">
+                <div className="mb-6 sm:w-1/2">
+                  <label
+                    htmlFor="machine"
+                    className="block text-xl font-medium text-gray-700 mb-2"
+                  >
+                    Màquina
+                  </label>
+                  <select
+                    {...register("machineId")}
+                    id="machine"
+                    name="machine"
+                    className="p-3 border border-gray-300 rounded-md w-full"
+                    onChange={(e) => {
+                      setValue("machineId", e.target.value, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      });
+                    }}
+                  >
+                    {machines.map((machine) => (
+                      <option key={machine.id} value={machine.id}>
+                        {machine.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="mb-6 sm:w-1/2 sm:ml-6">
+                  <label
+                    htmlFor="stateWorkOrder"
+                    className="block text-xl font-medium text-gray-700 mb-2"
+                  >
+                    Estat
+                  </label>
+                  <select
+                    {...register("stateWorkOrder", { valueAsNumber: true })}
+                    id="stateWorkOrder"
+                    name="stateWorkOrder"
+                    className="p-3 border border-gray-300 rounded-md w-full"
+                  >
+                    {Object.values(StateWorkOrder)
+                      .filter((value) => typeof value === "number")
+                      .map((state) => (
+                        <option
+                          key={state}
+                          value={
+                            typeof state === "string"
+                              ? parseInt(state, 10)
+                              : state
+                          }
+                        >
+                          {translateStateWorkOrder(state)}
+                        </option>
+                      ))}
+                  </select>
+                </div>
               </div>
-            )}
+              <div className="flex flex-col sm:flex-row">
+                <div className="mb-6 sm:mr-6">
+                  <label
+                    htmlFor="startDate"
+                    className="block text-xl font-medium text-gray-700 mb-2"
+                  >
+                    Data Inici
+                  </label>
+                  <DatePicker
+                    id="startDate"
+                    selected={startDate}
+                    onChange={(date: Date) => setStartDate(date)}
+                    dateFormat="dd/MM/yyyy"
+                    locale={ca}
+                    className="p-3 border border-gray-300 rounded-md text-lg"
+                  />
+                </div>
 
-            {showErrorMessage && (
-              <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
-                Error al crear Correctiu
+                <div className="mb-6">
+                  <label className="block text-xl font-medium text-gray-700 mb-2">
+                    Operaris
+                  </label>
+                  <div className="flex flex-wrap">
+                    {operators.map((operator) => (
+                      <div key={operator.id} className="mr-4 mb-2">
+                        <input
+                          type="checkbox"
+                          id={`operator-${operator.id}`}
+                          value={operator.id}
+                          {...register("operators")}
+                        />
+                        <label
+                          htmlFor={`operator-${operator.id}`}
+                          className="ml-2 text-lg"
+                        >
+                          {operator.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-            )}
-          </form>
-        </div>
-      </Layout>
+              <div className="flex flex-col sm:flex-row mb-8">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className={`${
+                    showSuccessMessage
+                      ? "bg-green-500"
+                      : showErrorMessage
+                      ? "bg-red-500"
+                      : "bg-blue-500"
+                  } hover:${
+                    showSuccessMessage
+                      ? "bg-green-700"
+                      : showErrorMessage
+                      ? "bg-red-700"
+                      : "bg-blue-700"
+                  } text-white font-bold py-2 px-4 rounded mt-6 mb-4 sm:mb-0 sm:mr-2 flex items-center`}
+                >
+                  Crear Correctiu
+                  {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+                </button>
+                <button
+                  type="button"
+                  disabled={isLoading}
+                  onClick={(e) => router.back()}
+                  className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2"
+                >
+                  Cancelar
+                </button>
+              </div>
+
+              {showSuccessMessage && (
+                <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
+                  Correctiu creat correctament
+                </div>
+              )}
+
+              {showErrorMessage && (
+                <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
+                  Error al crear Correctiu
+                </div>
+              )}
+            </form>
+          </div>
+        </Container>
+      </MainLayout>
     );
 }
 

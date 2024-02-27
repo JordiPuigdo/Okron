@@ -1,4 +1,4 @@
-import SparePart, { ConsumeSparePart, CreateSparePartRequest, RestoreSparePart } from "interfaces/SparePart";
+import SparePart, { ConsumeSparePart, CreateSparePartRequest, RestoreSparePart } from "app/interfaces/SparePart";
 
 class SparePartService {
   private baseUrl: string;

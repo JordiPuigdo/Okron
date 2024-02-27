@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import InspectionPointService from "../../../services/inspectionPointService";
-import InspectionPoint from "../../../interfaces/inspectionPoint";
-import Layout from "../../../components/Layout";
+import InspectionPointService from "../../../components/services/inspectionPointService";
+import InspectionPoint from "../../interfaces/inspectionPoint";
+import MainLayout from "components/layout/MainLayout";
 
 export default function InspectionPointsPage() {
   const [inspectionPoints, setInspectionPoints] = useState<InspectionPoint[]>(
@@ -115,7 +115,7 @@ export default function InspectionPointsPage() {
   }
 
   return (
-    <Layout>
+    <MainLayout>
       <div className="container mx-auto py-8">
         <h1 className="text-3xl font-semibold mb-4">
           Llista de punts d'inspecció
@@ -225,6 +225,6 @@ export default function InspectionPointsPage() {
           </tbody>
         </table>
       </div>
-    </Layout>
+    </MainLayout>
   );
 }

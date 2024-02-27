@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/router";
-import Layout from "../../../../components/Layout";
 import MachineForm from "../../../../components/MachineForm";
-import Machine from "../../../../interfaces/machine";
-import MachineService from "../../../../services/machineService";
+import Machine from "../../../interfaces/machine";
+import MachineService from "../../../../components/services/machineService";
 import { useEffect, useState } from "react";
+import MainLayout from "components/layout/MainLayout";
+import Container from "components/layout/Container";
 
 export default function EditMachinePage({
   params,
@@ -44,16 +45,18 @@ export default function EditMachinePage({
   }
 
   return (
-    <Layout>
-      {machineData && (
-        <MachineForm
-          machine={machineData}
-          onCancel={onCancel}
-          onSubmit={function (data: Machine): void {
-            throw new Error("Function not implemented.");
-          }}
-        />
-      )}
-    </Layout>
+    <MainLayout>
+      <Container>
+        {machineData && (
+          <MachineForm
+            machine={machineData}
+            onCancel={onCancel}
+            onSubmit={function (data: Machine): void {
+              throw new Error("Function not implemented.");
+            }}
+          />
+        )}
+      </Container>
+    </MainLayout>
   );
 }

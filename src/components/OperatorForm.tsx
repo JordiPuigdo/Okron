@@ -1,4 +1,4 @@
-import Operator from "interfaces/Operator";
+import Operator from "app/interfaces/Operator";
 import React from "react";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 
@@ -100,6 +100,7 @@ const OperatorForm: React.FC<OperatorFormProps> = ({
           Guardar
         </button>
         <button
+          type="button"
           onClick={() => {
             onCancel();
           }}

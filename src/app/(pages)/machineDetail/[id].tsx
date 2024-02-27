@@ -1,14 +1,14 @@
-import Layout from "components/Layout";
 import WorkOrder, {
   AddWorkOrderOperatorTimes,
   FinishWorkOrderOperatorTimes,
   StateWorkOrder,
-} from "interfaces/workOrder";
-import Machine from "interfaces/machine";
+} from "app/interfaces/workOrder";
+import Machine from "app/interfaces/machine";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import MachineService from "services/machineService";
-import WorkOrderService from "services/workOrderService";
+import MachineService from "components/services/machineService";
+import WorkOrderService from "components/services/workOrderService";
+import MainLayout from "components/layout/MainLayout";
 
 const MachineDetailsPage = () => {
   const router = useRouter();
@@ -85,7 +85,7 @@ const MachineDetailsPage = () => {
   }
 
   return (
-    <Layout>
+    <MainLayout>
       <div className="bg-white p-6 rounded-lg shadow-md flex">
         <div className="flex-none w-1/3 mr-6">
           <img
@@ -242,7 +242,7 @@ const MachineDetailsPage = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </MainLayout>
   );
 };
 

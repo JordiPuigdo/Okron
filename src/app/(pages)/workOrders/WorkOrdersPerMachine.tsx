@@ -1,7 +1,7 @@
-import WorkOrder, { StateWorkOrder } from "interfaces/workOrder";
+import WorkOrder, { StateWorkOrder } from "app/interfaces/workOrder";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import WorkOrderService from "services/workOrderService";
+import WorkOrderService from "components/services/workOrderService";
 import SidebarWorkOrder from "./backup_WorkOrderSideBar";
 import React from "react";
 

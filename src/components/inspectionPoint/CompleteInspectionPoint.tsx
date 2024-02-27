@@ -3,9 +3,10 @@ import {
   ResultInspectionPoint,
   SaveInspectionResultPointRequest,
   WorkOrderInspectionPoint,
-} from "interfaces/workOrder";
-import WorkOrderService from "services/workOrderService";
+} from "app/interfaces/workOrder";
+import WorkOrderService from "components/services/workOrderService";
 import { SvgSpinner } from "app/icons/icons";
+import { useSessionStore } from "app/stores/globalStore";
 
 interface CompleteInspectionPoints {
   workOrderInspectionPoints: WorkOrderInspectionPoint[];
@@ -26,11 +27,16 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
+  const { operatorLogged } = useSessionStore((state) => state);
 
   const handleSelectInspectionPoint = async (
     inspectionPoint: WorkOrderInspectionPoint,
     e: any
   ) => {
+    if (operatorLogged == undefined) {
+      alert("Has de tenir un operari fitxat per fer aquesta acció!");
+      return;
+    }
     setIsLoading((prevLoadingMap) => ({
       ...prevLoadingMap,
       [inspectionPoint.id]: true,
@@ -66,6 +72,10 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
   const handleResetInspectionPoint = async (
     inspectionPoint: WorkOrderInspectionPoint
   ) => {
+    if (operatorLogged == undefined) {
+      alert("Has de tenir un operari fitxat per fer aquesta acció!");
+      return;
+    }
     setIsLoading((prevLoadingMap) => ({
       ...prevLoadingMap,
       [inspectionPoint.id]: true,
@@ -102,7 +112,7 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
   return (
     <div className="mx-auto px-4 py-8 mt-12">
       <div className="bg-white w-full text-center p-4 rounded-md border-2 border-gray-400">
-        <span className="text-xl font-bold">Punts de Inspecció</span>
+        <span className="text-xl font-bold">Passar Punts d'Inspecció</span>
       </div>
       <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
       <div className="mt-6 overflow-x-auto">

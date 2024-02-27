@@ -1,10 +1,11 @@
 "use client";
 
-import Layout from "components/Layout";
 import OperatorForm from "components/OperatorForm";
-import Operator from "interfaces/Operator";
+import MainLayout from "components/layout/MainLayout";
+import Operator from "app/interfaces/Operator";
 import { BaseSyntheticEvent, useEffect, useState } from "react";
-import OperatorService from "services/operatorService";
+import OperatorService from "components/services/operatorService";
+import Container from "components/layout/Container";
 
 export default function EditOperatorPage({
   params,
@@ -33,6 +34,7 @@ export default function EditOperatorPage({
 
   const updateOperator = async (operator: Operator) => {
     await operatorService.updateOperator(operator).then((data) => {
+      debugger;
       if (data) {
         setIsUpdateSuccessful(true);
         setTimeout(() => {
@@ -61,22 +63,24 @@ export default function EditOperatorPage({
   }, [params.id]);
 
   return (
-    <Layout>
-      {operatorData && (
-        <OperatorForm
-          operator={operatorData}
-          onSubmit={function (
-            data: Operator,
-            event?: BaseSyntheticEvent<object, any, any> | undefined
-          ): unknown {
-            return updateOperator(data);
-          }}
-          onCancel={function (): void {
-            history.back();
-          }}
-          onUpdatedSuccesfully={isUpdateSuccessful}
-        />
-      )}
-    </Layout>
+    <MainLayout>
+      <Container>
+        {operatorData && (
+          <OperatorForm
+            operator={operatorData}
+            onSubmit={function (
+              data: Operator,
+              event?: BaseSyntheticEvent<object, any, any> | undefined
+            ): unknown {
+              return updateOperator(data);
+            }}
+            onCancel={function (): void {
+              history.back();
+            }}
+            onUpdatedSuccesfully={isUpdateSuccessful}
+          />
+        )}
+      </Container>
+    </MainLayout>
   );
 }

@@ -1,11 +1,11 @@
-import Layout from "components/Layout";
 import SparePartForm from "./sparePartForm";
+import MainLayout from "components/layout/MainLayout";
 
 function SparePartsFormPage() {
   return (
-    <Layout>
+    <MainLayout>
       <SparePartForm sparePartLoaded={undefined} />
-    </Layout>
+    </MainLayout>
   );
 }
 

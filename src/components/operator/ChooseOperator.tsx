@@ -1,4 +1,4 @@
-import Operator from "interfaces/Operator";
+import Operator from "app/interfaces/Operator";
 import { Open_Sans } from "next/font/google";
 import { useState } from "react";
 

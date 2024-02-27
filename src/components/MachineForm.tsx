@@ -1,8 +1,8 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
-import Machine from "interfaces/machine";
-import MachineService from "services/machineService";
-import sections from "interfaces/sections";
+import Machine from "app/interfaces/machine";
+import MachineService from "components/services/machineService";
+import sections from "app/interfaces/sections";
 
 type MachineFormProps = {
   machine: Machine;
@@ -49,6 +49,22 @@ const MachineForm: React.FC<MachineFormProps> = ({
           Màquina actualitzada correctament!
         </div>
       )}
+      <div className="mb-4">
+        <label htmlFor="code" className="block font-medium text-gray-700">
+          Codi
+        </label>
+        <Controller
+          name="code"
+          control={control}
+          render={({ field }) => (
+            <input
+              {...field}
+              type="text"
+              className="border rounded-md w-full px-3 py-2 mt-1 text-gray-700 focus:outline-none focus:border-indigo-500"
+            />
+          )}
+        />
+      </div>
       <div className="mb-4">
         <label htmlFor="name" className="block font-medium text-gray-700">
           Nom

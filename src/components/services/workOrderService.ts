@@ -1,4 +1,4 @@
-import WorkOrder, { AddWorkOrderOperatorTimes, CreateWorkOrderRequest, FinishWorkOrderOperatorTimes, SaveInspectionResultPointRequest, SearchWorkOrderFilters, StateWorkOrder, WorkOrderType } from 'interfaces/workOrder';
+import WorkOrder, { AddWorkOrderOperatorTimes, CreateWorkOrderRequest, FinishWorkOrderOperatorTimes, SaveInspectionResultPointRequest, SearchWorkOrderFilters, StateWorkOrder, WorkOrderType } from 'app/interfaces/workOrder';
 
 class WorkOrderService {
   private baseUrl: string;

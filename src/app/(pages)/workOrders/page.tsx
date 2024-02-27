@@ -1,16 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Machine from "../../../interfaces/machine";
+import Machine from "../../interfaces/machine";
 import WorkOrder, {
   CreateWorkOrderRequest,
   SearchWorkOrderFilters,
   StateWorkOrder,
   WorkOrderType,
-} from "../../../interfaces/workOrder";
-import Layout from "components/Layout";
-import MachineService from "../../../services/machineService";
-import WorkOrderService from "services/workOrderService";
+} from "../../interfaces/workOrder";
+import MachineService from "../../../components/services/machineService";
+import WorkOrderService from "components/services/workOrderService";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
@@ -19,8 +18,10 @@ import {
   formatDate,
   translateStateWorkOrder,
   translateWorkOrderType,
-} from "utils/utils";
+} from "app/utils/utils";
 import { SvgSpinner } from "app/icons/icons";
+import MainLayout from "components/layout/MainLayout";
+import Container from "components/layout/Container";
 
 export default function WorkOrdersPage() {
   const [machines, setMachines] = useState<Machine[] | []>([]);
@@ -165,11 +166,11 @@ export default function WorkOrdersPage() {
     return true;
   });
 
-  if (isLoadingPage) return <Layout>Carregant dades...</Layout>;
+  if (isLoadingPage) return <MainLayout>Carregant dades...</MainLayout>;
 
   return (
-    <Layout>
-      <div className="container mx-auto py-6">
+    <MainLayout>
+      <Container>
         <h1 className="text-3xl font-semibold mb-4">
           Històric Ordres de treball
         </h1>
@@ -371,7 +372,7 @@ export default function WorkOrdersPage() {
             </tbody>
           </table>
         </div>
-      </div>
-    </Layout>
+      </Container>
+    </MainLayout>
   );
 }

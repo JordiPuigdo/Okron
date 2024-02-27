@@ -5,14 +5,14 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import WorkOrder, {
   CreateWorkOrderRequest,
   StateWorkOrder,
-} from "../../../../interfaces/workOrder";
-import InspectionPoint from "interfaces/inspectionPoint";
-import InspectionPointService from "services/inspectionPointService";
-import OperatorService from "services/operatorService";
-import Operator from "interfaces/Operator";
-import SparePartService from "services/sparePartService";
-import SparePart, { ConsumeSparePart } from "interfaces/SparePart";
-import WorkOrderService from "services/workOrderService";
+} from "../../../interfaces/workOrder";
+import InspectionPoint from "app/interfaces/inspectionPoint";
+import InspectionPointService from "components/services/inspectionPointService";
+import OperatorService from "components/services/operatorService";
+import Operator from "app/interfaces/Operator";
+import SparePartService from "components/services/sparePartService";
+import SparePart, { ConsumeSparePart } from "app/interfaces/SparePart";
+import WorkOrderService from "components/services/workOrderService";
 import { stringifyCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 type WorkOrderFormProps = {

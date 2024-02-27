@@ -1,4 +1,4 @@
-import { CreatePreventiveRequest, Preventive, UpdatePreventiveRequest } from "interfaces/Preventive";
+import { CreatePreventiveRequest, Preventive, UpdatePreventiveRequest } from "app/interfaces/Preventive";
 
 class PreventiveService {
   private baseUrl: string;

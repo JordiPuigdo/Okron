@@ -1,11 +1,12 @@
 "use client";
 
-import Layout from "components/Layout";
-import SparePart from "interfaces/SparePart";
+import MainLayout from "components/layout/MainLayout";
+import SparePart from "app/interfaces/SparePart";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import SparePartService from "services/sparePartService";
+import SparePartService from "components/services/sparePartService";
+import Container from "components/layout/Container";
 
 export default function EditSparePart({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -68,11 +69,42 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
   function handleBack() {
     router.back();
   }
+
+  const renderHeader = () => {
+    return (
+      <div className="flex px-4 sm:px-12 items-center flex-col sm:flex-row mb-6">
+        <div
+          className="cursor-pointer mb-4 sm:mb-0"
+          onClick={() => router.back()}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            className="w-6 h-6 inline-block mr-2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+        </div>
+
+        <h2 className="text-2xl font-bold text-black mx-auto">
+          {sparePart?.code} - {sparePart?.description}
+        </h2>
+      </div>
+    );
+  };
   if (!sparePart) return <>Carregant dades</>;
   if (sparePart)
     return (
-      <Layout>
-        <div className="w-full mx-auto p-4 bg-white rounded-md shadow-md text-black">
+      <MainLayout>
+        <Container>
+          {renderHeader()}
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-600">
@@ -161,7 +193,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
               </p>
             )}
           </form>
-        </div>
-      </Layout>
+        </Container>
+      </MainLayout>
     );
 }
