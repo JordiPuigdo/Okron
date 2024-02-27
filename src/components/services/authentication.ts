@@ -44,9 +44,9 @@ class AuthenticationService {
                 },
                 
             });
-
             if (!response.ok) {
-                throw new Error('Failed to fetch user data');
+                console.log('Failed to fetch user data');
+                return {} as Operator;
             }
 
             return await response.json();

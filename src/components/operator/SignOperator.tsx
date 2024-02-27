@@ -10,16 +10,22 @@ export default function SignOperator() {
   );
   const [codeOperator, setCodeOperator] = useState("");
   const [errorSign, setErrorSign] = useState<string | undefined>("");
+  const [isLoading, setIsLoading] = useState("");
 
   const authService = new AuthenticationService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
 
   function signOperator() {
+    if (!/^\d+$/.test(codeOperator) || codeOperator == "") {
+      setCodeOperator("");
+      alert("Codi de operari només pot ser númeric");
+      return;
+    }
     authService
       .LoginOperator(codeOperator)
       .then((x) => {
-        if (x) {
+        if (x.id != undefined) {
           const op: OperatorLogged = {
             codeOperatorLogged: x.code,
             idOperatorLogged: x.id,
@@ -27,6 +33,12 @@ export default function SignOperator() {
           };
           setOperatorLogged(op);
           setCodeOperator("");
+        } else {
+          setErrorSign("Operari no trobat!");
+          setCodeOperator("");
+          setTimeout(() => {
+            setErrorSign(undefined);
+          }, 4000);
         }
       })
       .catch((err) => {
@@ -50,6 +62,13 @@ export default function SignOperator() {
           onClick={signOperator}
         >
           Fitxar
+        </button>
+        <button
+          type="button"
+          className="ml-4 bg-red-500 rounded-md p-1 text-white"
+          onClick={(e) => setOperatorLogged(undefined)}
+        >
+          Desfitxar
         </button>
         <p className="text-red-500">{errorSign && errorSign}</p>
       </div>

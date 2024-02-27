@@ -6,7 +6,6 @@ export default function MenuPage() {
   return (
     <MainLayout>
       <Container>
-        Home!
         <SignOperator />
       </Container>
     </MainLayout>
