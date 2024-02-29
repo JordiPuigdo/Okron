@@ -71,6 +71,7 @@ export default function WorkOrdersPage() {
     setIsLoading(true);
     const today = new Date();
     await workOrderService.finishWorkOrdersByDate(today);
+    await searchWorkOrders();
     setIsLoading(false);
   };
 
