@@ -91,7 +91,6 @@ export const isOperatorLogged = () => {
 };
 
 export function checkOperatorCreated() {
-  debugger;
   if (!isOperatorLogged) {
     alert("Operari no assignat");
     return false;

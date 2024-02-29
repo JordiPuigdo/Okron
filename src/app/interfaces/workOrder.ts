@@ -18,6 +18,7 @@ export interface WorkOrder {
   operator?: Operator[];
   operatorId?: string[];
   workOrderSpareParts?: WorkOrderSparePart[]
+  workOrderComments? : WorkOrderComment[]
 }
 
 export default WorkOrder;
@@ -103,4 +104,17 @@ export enum ResultInspectionPoint {
   Pending,
   Ok,
   NOk
+}
+
+export interface WorkOrderComment {
+  id?: string;
+  creationDate : string;
+  comment : string;
+  operator : Operator;
+}
+
+export interface AddCommentToWorkOrderRequest {
+  comment : string;
+  operatorId : string;
+  workOrderId : string;
 }

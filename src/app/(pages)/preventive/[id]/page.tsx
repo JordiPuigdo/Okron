@@ -18,6 +18,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
 import MainLayout from "components/layout/MainLayout";
+import Container from "components/layout/Container";
 
 export default function EditPreventive({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -231,7 +232,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
 
   return (
     <MainLayout>
-      <div className="mx-auto w-full">
+      <Container>
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="mx-auto bg-white p-8 rounded shadow-md"
@@ -423,7 +424,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
             </div>
           )}
         </form>
-      </div>
+      </Container>
     </MainLayout>
   );
 }

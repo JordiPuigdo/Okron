@@ -236,9 +236,7 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
       </div>
       <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
       <div className="bg-white w-full text-center p-4 rounded-md border-2 border-gray-40 mt-6">
-        <span className="text-xl font-bold">
-          Registres dels temps d'Operaris
-        </span>
+        <span className="text-xl font-bold">Registres</span>
       </div>
       <div className="mt-6">
         <div className="overflow-x-auto mt-6">

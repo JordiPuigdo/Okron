@@ -34,7 +34,6 @@ export default function EditOperatorPage({
 
   const updateOperator = async (operator: Operator) => {
     await operatorService.updateOperator(operator).then((data) => {
-      debugger;
       if (data) {
         setIsUpdateSuccessful(true);
         setTimeout(() => {

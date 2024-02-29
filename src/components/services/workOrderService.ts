@@ -1,4 +1,4 @@
-import WorkOrder, { AddWorkOrderOperatorTimes, CreateWorkOrderRequest, FinishWorkOrderOperatorTimes, SaveInspectionResultPointRequest, SearchWorkOrderFilters, StateWorkOrder, WorkOrderType } from 'app/interfaces/workOrder';
+import WorkOrder, { AddCommentToWorkOrderRequest, AddWorkOrderOperatorTimes, CreateWorkOrderRequest, FinishWorkOrderOperatorTimes, SaveInspectionResultPointRequest, SearchWorkOrderFilters, StateWorkOrder, WorkOrderComment, WorkOrderType } from 'app/interfaces/workOrder';
 
 class WorkOrderService {
   private baseUrl: string;
@@ -238,6 +238,78 @@ class WorkOrderService {
         throw new Error('Failed to update WorkOrder');
       }
       return true;
+    } catch (error) {
+      console.error('Error updating WorkOrder:', error);
+      throw error;
+    }
+  }
+
+  async addCommentToWorkOrder(addCommentToWorkOrder: AddCommentToWorkOrderRequest): Promise<WorkOrderComment> {
+    try {
+      const url = `${this.baseUrl}AddCommentToWorkOrder`
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(addCommentToWorkOrder),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch addCommentToWorkOrder');
+      }
+      if (response.status === 204) {
+        return {} as WorkOrderComment;
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching addCommentToWorkOrder:', error);
+      throw error;
+    }
+  }
+
+  async deleteCommentToWorkOrder(workOrderId : string, commentId : string): Promise<boolean> {
+    try {
+      const url = `${this.baseUrl}CommentToWorkOrder?workOrderId=${workOrderId}&commentId=${commentId}`
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch addCommentToWorkOrder');
+      }
+      if (response.status === 204) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('Error fetching addCommentToWorkOrder:', error);
+      throw error;
+    }
+  }
+
+  async finishWorkOrdersByDate(date: Date): Promise<boolean> {
+    try {
+      const isoDateString = date.toISOString();
+      const url = `${this.baseUrl}FinishWorkOrdersByDate`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(isoDateString),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update WorkOrder');
+      }
+
+      if (response.status === 204) {
+        return true;
+      }
+
+      return response.json();
     } catch (error) {
       console.error('Error updating WorkOrder:', error);
       throw error;

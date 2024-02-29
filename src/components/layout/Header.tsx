@@ -26,8 +26,8 @@ const Header: React.FC<Header> = ({ setOpenMenu }) => {
   }
 
   return (
-    <header className="flex items-center justify-between bg-gradient-to-r from-purple-500 to-indigo-500 text-lg font-semibold text-white p-2">
-      <div className="flex items-center">
+    <header className="flex items-center justify-between bg-gradient-to-r from-purple-500 to-indigo-500 text-lg font-semibold text-white p-2 w-full sticky transition-all">
+      <div>
         <button
           onClick={handleMenuClick}
           className="focus:outline-none flex items-center"

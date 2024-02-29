@@ -4,6 +4,7 @@ import Operator from "app/interfaces/Operator";
 import WorkOrder, {
   StateWorkOrder,
   UpdateWorkOrderRequest,
+  WorkOrderComment,
   WorkOrderInspectionPoint,
   WorkOrderSparePart,
   WorkOrderType,
@@ -25,6 +26,7 @@ import SparePart from "app/interfaces/SparePart";
 import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspectionPoint";
 import WorkOrderOperatorTimes from "components/operator/WorkOrderOperatorTimes";
 import { SvgSpinner } from "app/icons/icons";
+import WorkOrderOperatorComments from "components/operator/WorkOrderCommentOperator";
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -69,6 +71,11 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [workOrderOperatorTimes, setworkOrderOperatorTimes] = useState<
     WorkOrderOperatorTimes[]
   >([]);
+
+  const [workOrderComments, setWorkOrderComments] = useState<
+    WorkOrderComment[]
+  >([]);
+
   const [selectedOperators, setSelectedOperators] = useState<Operator[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [isFinished, setIsFinished] = useState(false);
@@ -152,6 +159,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       if (x) setInspectionPoints(x!);*/
       if (responseWorkOrder.workOrderInspectionPoint?.length! > 0 || 0)
         setInspectionPoints(responseWorkOrder.workOrderInspectionPoint!);
+
+      if (responseWorkOrder.workOrderComments?.length! > 0) {
+        setWorkOrderComments(responseWorkOrder.workOrderComments!);
+      }
 
       if (responseWorkOrder.workOrderOperatorTimes) {
         setworkOrderOperatorTimes((prevworkOrderOperatorTimes) => {
@@ -415,6 +426,14 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               setWorkOrderOperatortimes={setworkOrderOperatorTimes}
               workOrderId={currentWorkOrder.id}
               isFinished={isFinished}
+            />
+          )}
+          {currentWorkOrder && (
+            <WorkOrderOperatorComments
+              workOrderComments={workOrderComments}
+              workOrderId={currentWorkOrder.id}
+              isFinished={isFinished}
+              setWorkOrderComments={setWorkOrderComments}
             />
           )}
           <div className="flex sm:flex-row mb-8 pt-12">

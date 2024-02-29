@@ -30,7 +30,6 @@ function SparePartsPage() {
   useEffect(() => {
     async function fetchOperators() {
       try {
-        debugger;
         const data = await sparePartService.getSpareParts();
         setSpareParts(data);
         setFilteredSpareParts(data);

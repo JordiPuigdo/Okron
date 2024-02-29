@@ -25,7 +25,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     key: 3,
     title: 'Correctius',
     path: '/corrective',
-    permission: 2
+    permission: 0
   },
   {
     key: 4,
@@ -43,7 +43,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     key: 6,
     title: 'Recanvis',
     path: '/spareParts',
-    permission: 2
+    permission: 0
   },
   /*{
     title: 'Test Sumbenu',

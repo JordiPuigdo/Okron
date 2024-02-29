@@ -69,7 +69,8 @@ export default function WorkOrdersPage() {
 
   const handleFinalizeWorkOrdersDayBefore = async () => {
     setIsLoading(true);
-    //    await searchWorkOrders();
+    const today = new Date();
+    await workOrderService.finishWorkOrdersByDate(today);
     setIsLoading(false);
   };
 
@@ -180,7 +181,7 @@ export default function WorkOrdersPage() {
             className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
             onClick={(e) => handleFinalizeWorkOrdersDayBefore()}
           >
-            Finalizar les ordres del dia anterior{" "}
+            Finalitzar les ordres del dia anterior{" "}
             {formatDate(new Date(Date.now() - 86400000), false)}
             {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </button>

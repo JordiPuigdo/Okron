@@ -1,3 +1,5 @@
+import LoginChecker from "./LoginChecker";
+
 export default function ContainerCRM({
   children,
   enablePading = true,
@@ -7,7 +9,7 @@ export default function ContainerCRM({
 }) {
   return (
     <div
-      className={`mx-auto bg-gray-200 h-screen overflow-y-auto   ${
+      className={`bg-gray-100 h-screen overflow-y-auto   ${
         enablePading ? "mt-14 p-16" : ""
       } `}
     >

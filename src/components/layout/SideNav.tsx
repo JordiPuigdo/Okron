@@ -13,7 +13,7 @@ const SideNav = () => {
         className="font-semibold text-lg text-white p-1 hover:bg-purple-900 rounded-md"
         href={"/menu"}
       >
-        Ökron
+        Okron
       </Link>
       <div className="pt-4">
         {SIDENAV_ITEMS.map((item, idx) => {
