@@ -22,6 +22,7 @@ import {
 import { SvgSpinner } from "app/icons/icons";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
+import { useRouter } from "next/navigation";
 
 export default function WorkOrdersPage() {
   const [machines, setMachines] = useState<Machine[] | []>([]);
@@ -42,7 +43,7 @@ export default function WorkOrdersPage() {
   >(undefined);
   const [isLoadingPage, setIsLoadingPage] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-
+  const router = useRouter();
   const loadMachines = async () => {
     try {
       const machinesData = await machineService.getAllMachines();
@@ -168,14 +169,41 @@ export default function WorkOrdersPage() {
     return true;
   });
 
+  const renderHeader = () => {
+    return (
+      <div className="flex px-4 sm:px-12 items-center flex-col sm:flex-row mb-8">
+        <div
+          className="cursor-pointer mb-4 sm:mb-0"
+          onClick={() => router.back()}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            className="w-6 h-6 inline-block mr-2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+        </div>
+
+        <h2 className="text-2xl font-bold text-black mx-auto">
+          Històric Ordres de treball
+        </h2>
+      </div>
+    );
+  };
   if (isLoadingPage) return <MainLayout>Carregant dades...</MainLayout>;
 
   return (
     <MainLayout>
       <Container>
-        <h1 className="text-3xl font-semibold mb-4">
-          Històric Ordres de treball
-        </h1>
+        {renderHeader()}
         <div>
           <button
             type="button"
@@ -302,7 +330,7 @@ export default function WorkOrdersPage() {
           <table className="min-w-full table-auto border-collapse border border-gray-300">
             <thead>
               <tr className="bg-gray-200">
-                <th className="border p-3 text-left">Codi</th>
+                <th className="border p-3 text-left">Núm. Sèrie</th>
                 <th className="border p-3 text-left">Descripció</th>
                 <th className="border p-3 text-left">Data Inici</th>
                 <th className="border p-3 text-left">Màquina</th>
@@ -345,9 +373,13 @@ export default function WorkOrdersPage() {
                       <Link
                         href="/workOrders/[id]"
                         as={`/workOrders/${order.id}`}
+                        onClick={(e) => setIsLoading(true)}
                       >
-                        <button className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
+                        <button className="flex bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
                           Detall
+                          {isLoading && (
+                            <SvgSpinner style={{ marginLeft: "0.5rem" }} />
+                          )}
                         </button>
                       </Link>
                     ) : (

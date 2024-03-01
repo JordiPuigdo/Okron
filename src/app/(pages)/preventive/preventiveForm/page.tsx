@@ -300,7 +300,7 @@ const PreventiveForm = () => {
                   className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="days"
                 >
-                  Dies
+                  Freqüència Dies
                 </label>
                 <input
                   value={preventiveDays}
@@ -315,7 +315,7 @@ const PreventiveForm = () => {
                   className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="startExecution"
                 >
-                  Inici Preventiu
+                  Primera Execució del Preventiu
                 </label>
                 <DatePicker
                   id="startDate"

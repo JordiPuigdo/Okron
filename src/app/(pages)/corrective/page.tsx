@@ -202,7 +202,7 @@ function CorrectivePage() {
                     htmlFor="code"
                     className="block text-xl font-medium text-gray-700 mb-2"
                   >
-                    Codi
+                    Núm. Sèrie
                   </label>
                   <input
                     {...register("code")}

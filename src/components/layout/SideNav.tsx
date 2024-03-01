@@ -56,7 +56,9 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
                 return (
                   <Link key={idx} href={subItem.path}>
                     <span
-                      className="text-xl font-semibold text-white flex p-1 hover:bg-purple-900 rounded-md"
+                      className={`${
+                        isLoading[subItem.key] ? "text-sm" : "text-xl"
+                      } font-semibold text-white flex p-1 hover:bg-purple-900 rounded-md items-center`}
                       onClick={() =>
                         setIsLoading((prevLoading) => ({
                           ...prevLoading,
