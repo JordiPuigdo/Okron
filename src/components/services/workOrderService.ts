@@ -315,6 +315,24 @@ class WorkOrderService {
       throw error;
     }
   }
+
+  async cleanCache(): Promise<boolean> {
+    try {
+      const url = `${this.baseUrl}machine-WorkOrder/CleanCache`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch WorkOrders-machines');
+      }
+      if (response.status === 204) {
+        return false;
+      }
+      return true;
+
+    } catch (error) {
+      console.error('Error updating WorkOrder:', error);
+      throw error;
+    }
+  }
 }
 
 

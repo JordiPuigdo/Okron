@@ -42,16 +42,21 @@ function PreventivePage() {
 
   const handleDelete = async (id: string) => {
     try {
+      setIsLoading(true);
       const isConfirmed = window.confirm(
         `Esteu segurs que voleu eliminar el preventiu?`
       );
-      if (!isConfirmed) return;
+      if (!isConfirmed) {
+        setIsLoading(false);
+        return;
+      }
 
       await preventiveService.deletePreventive(id);
 
       setPreventives((prevPreventives) =>
         prevPreventives.filter((preventive) => preventive.id !== id)
       );
+      setIsLoading(false);
     } catch (error) {
       console.error("Error deleting preventive:", error);
     }
@@ -161,23 +166,37 @@ function PreventivePage() {
         {isLoadingPage && <SvgSpinner className="flex w-full" />}
         {!isLoadingPage &&
           filteredPreventives.map((preventive) => (
-            <div key={preventive.id} className="border p-4 my-4">
-              <h2 className="text-lg font-semibold">{preventive.code}</h2>
-              <p className="text-sm text-gray-600">{preventive.description}</p>
-              <p className="text-sm text-gray-600">{preventive.machine.name}</p>
-              <Link
-                href="/preventive/[id]"
-                as={`/preventive/${preventive.id}`}
-                className="bg-green-500 text-white px-3 py-1 ml-2 rounded-md "
-              >
-                Editar
-              </Link>
-              <button
-                onClick={() => handleDelete(preventive.id)}
-                className="bg-red-500 text-white px-3 py-1 ml-2 rounded-md cursor-pointer"
-              >
-                Eliminar
-              </button>
+            <div
+              key={preventive.id}
+              className="border p-4 my-4 flex flex-col sm:flex-row items-start sm:items-center justify-between"
+            >
+              <div className="flex flex-col">
+                <h2 className="text-lg font-semibold">{preventive.code}</h2>
+                <p className="text-sm text-gray-600">
+                  {preventive.description}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {preventive.machine.name}
+                </p>
+              </div>
+              <div className="flex mt-4 sm:mt-0">
+                <Link
+                  href="/preventive/[id]"
+                  as={`/preventive/${preventive.id}`}
+                  className="bg-green-500 text-white px-3 py-1 ml-2 rounded-md flex items-center"
+                  onClick={(e) => setIsLoading(true)}
+                >
+                  Editar
+                  {isLoading && <SvgSpinner className="ml-2 w-4 h-4" />}
+                </Link>
+                <button
+                  onClick={() => handleDelete(preventive.id)}
+                  className="bg-red-500 text-white px-3 py-1 ml-2 rounded-md cursor-pointer flex items-center"
+                >
+                  Eliminar
+                  {isLoading && <SvgSpinner className="ml-2 w-4 h-4" />}
+                </button>
+              </div>
             </div>
           ))}
       </Container>

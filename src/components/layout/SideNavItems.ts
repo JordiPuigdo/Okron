@@ -19,6 +19,11 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         title: 'Configuració',
         path: '/preventive',
         permission: 2
+      },{
+        key: 22,
+        title: 'Punts Inspecció',
+        path: '/inspectionPoints',
+        permission: 2
       },]
   },
   {

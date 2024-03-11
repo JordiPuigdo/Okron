@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import SparePartService from "components/services/sparePartService";
 import { checkOperatorCreated, isOperatorLogged } from "app/utils/utils";
 import { useSessionStore } from "app/stores/globalStore";
+import WorkOrderService from "components/services/workOrderService";
 
 interface ChooseSparePartsProps {
   availableSpareParts: SparePart[];
@@ -28,6 +29,9 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
   isFinished,
 }) => {
   const sparePartService = new SparePartService(
+    process.env.NEXT_PUBLIC_API_BASE_URL!
+  );
+  const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
   const [filteredSpareParts, setFilteredSpareParts] =
@@ -88,6 +92,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
         operatorId: operatorLogged?.idOperatorLogged!,
       };
       await sparePartService.consumeSparePart(consRequest);
+      await workOrderService.cleanCache();
     } else {
       console.log("Spare part not found in the available parts list.");
     }
@@ -135,6 +140,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
       operatorId: operatorLogged?.idOperatorLogged!,
     };
     await sparePartService.restoreSparePart(consRequest);
+    await workOrderService.cleanCache();
   }
 
   useEffect(() => {

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import SparePartService from "components/services/sparePartService";
 import Container from "components/layout/Container";
+import { useSessionStore } from "app/stores/globalStore";
 
 const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50];
 
@@ -26,6 +27,7 @@ function SparePartsPage() {
   const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE_OPTIONS[0]);
   const [currentPage, setCurrentPage] = useState(1);
   const [finalIndex, setFinalIndex] = useState(1);
+  const { loginUser } = useSessionStore((state) => state);
 
   useEffect(() => {
     async function fetchOperators() {
@@ -99,16 +101,18 @@ function SparePartsPage() {
           <p>Carregant dades...</p>
         ) : (
           <>
-            <div className="mb-4">
-              {" "}
-              <Link
-                href="/spareParts/sparePartForm"
-                as={`/spareParts/sparePartForm`}
-                className="bg-blue-500 text-white px-3 py-1 ml-2 rounded-md "
-              >
-                Crear
-              </Link>
-            </div>
+            {loginUser != undefined && loginUser?.permission > 0 && (
+              <div className="mb-4">
+                {" "}
+                <Link
+                  href="/spareParts/sparePartForm"
+                  as={`/spareParts/sparePartForm`}
+                  className="bg-blue-500 text-white px-3 py-1 ml-2 rounded-md "
+                >
+                  Crear
+                </Link>
+              </div>
+            )}
             <div className="mb-4 flex space-x-4 text-black">
               <input
                 type="text"
@@ -180,7 +184,9 @@ function SparePartsPage() {
                   <th className="py-2 px-4 border-b">Referència</th>
                   <th className="py-2 px-4 border-b">Familia</th>
                   <th className="py-2 px-4 border-b">Stock</th>
-                  <th className="py-2 px-4 border-b">Accions</th>
+                  {loginUser != undefined && loginUser?.permission > 0 && (
+                    <th className="py-2 px-4 border-b">Accions</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -198,15 +204,17 @@ function SparePartsPage() {
                     </td>
                     <td className="py-2 px-4 border-b">{sparePart.family}</td>
                     <td className="py-2 px-4 border-b">{sparePart.stock}</td>
-                    <td>
-                      <Link
-                        href="/spareParts/[id]"
-                        as={`/spareParts/${sparePart.id}`}
-                        className="bg-green-500 text-white px-3 py-1 ml-2 rounded-md "
-                      >
-                        Editar
-                      </Link>
-                    </td>
+                    {loginUser != undefined && loginUser?.permission > 0 && (
+                      <td>
+                        <Link
+                          href="/spareParts/[id]"
+                          as={`/spareParts/${sparePart.id}`}
+                          className="bg-green-500 text-white px-3 py-1 ml-2 rounded-md "
+                        >
+                          Editar
+                        </Link>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
