@@ -2,7 +2,7 @@
 
 import WorkOrder, { CreateWorkOrderRequest } from "app/interfaces/workOrder";
 import Machine from "app/interfaces/machine";
-import WorkOrderService from "components/services/workOrderService";
+import WorkOrderService from "app/services/workOrderService";
 import WorkOrderEditForm from "./components/workOrderEditForm";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";

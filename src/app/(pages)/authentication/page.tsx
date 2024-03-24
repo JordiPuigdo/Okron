@@ -4,8 +4,8 @@ import { useState } from "react";
 import AuthenticationComponent from "./authentication";
 import { User } from "app/interfaces/User";
 import useRoutes from "app/utils/useRoutes";
-import AuthenticationService from "components/services/authentication";
 import { useSessionStore } from "app/stores/globalStore";
+import AuthenticationService from "app/services/authentication";
 
 export default function AuthenticationPage() {
   const [username, setUserName] = useState("");
@@ -39,7 +39,7 @@ export default function AuthenticationPage() {
 
     await authService
       .Login(userLogin.username, userLogin.password)
-      .then(async (data) => {
+      .then(async (data: any) => {
         if (data.agentId != null) {
           setLoginUser(data);
           router.push(ROUTES.menu);
@@ -47,7 +47,7 @@ export default function AuthenticationPage() {
           handleErrorMessage("Login Incorrecte");
         }
       })
-      .catch((err) => {
+      .catch((err: any) => {
         handleErrorMessage("Login Incorrecte");
       });
   };

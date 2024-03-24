@@ -11,13 +11,13 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import MachineService from "components/services/machineService";
-import OperatorService from "components/services/operatorService";
+import MachineService from "app/services/machineService";
+import OperatorService from "app/services/operatorService";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
-import WorkOrderService from "components/services/workOrderService";
+import WorkOrderService from "app/services/workOrderService";
 import { SvgSpinner } from "app/icons/icons";
 import { translateStateWorkOrder } from "app/utils/utils";
 import MainLayout from "components/layout/MainLayout";

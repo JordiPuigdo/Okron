@@ -4,7 +4,7 @@ import OperatorForm from "components/OperatorForm";
 import MainLayout from "components/layout/MainLayout";
 import Operator from "app/interfaces/Operator";
 import { BaseSyntheticEvent, useEffect, useState } from "react";
-import OperatorService from "components/services/operatorService";
+import OperatorService from "app/services/operatorService";
 import Container from "components/layout/Container";
 
 export default function EditOperatorPage({

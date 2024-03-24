@@ -1,8 +1,7 @@
 import WorkOrder, { StateWorkOrder } from "app/interfaces/workOrder";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import WorkOrderService from "components/services/workOrderService";
-import SidebarWorkOrder from "./backup_WorkOrderSideBar";
+import WorkOrderService from "app/services/workOrderService";
 import React from "react";
 
 interface WorkOrdersPerMachineProps {
@@ -111,12 +110,6 @@ const WorkOrdersPerMachine: React.FC<WorkOrdersPerMachineProps> = ({
           ))}
         </tbody>
       </table>
-      {isEditModalVisible && (
-        <SidebarWorkOrder
-          close={() => handleCloseEditModal()}
-          id={editedWorkOrder?.id}
-        ></SidebarWorkOrder>
-      )}
     </div>
   );
 };

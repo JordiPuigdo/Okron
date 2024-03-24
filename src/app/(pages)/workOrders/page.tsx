@@ -8,8 +8,8 @@ import WorkOrder, {
   StateWorkOrder,
   WorkOrderType,
 } from "../../interfaces/workOrder";
-import MachineService from "../../../components/services/machineService";
-import WorkOrderService from "components/services/workOrderService";
+import MachineService from "app/services/machineService";
+import WorkOrderService from "app/services/workOrderService";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";

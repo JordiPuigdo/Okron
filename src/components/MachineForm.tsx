@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import Machine from "app/interfaces/machine";
-import MachineService from "components/services/machineService";
-import sections from "app/interfaces/sections";
+import MachineService from "app/services/machineService";
+import SectionService from "app/services/sectionService";
+import Section from "app/interfaces/Section";
 
 type MachineFormProps = {
   machine: Machine;
@@ -24,6 +25,20 @@ const MachineForm: React.FC<MachineFormProps> = ({
   const machineService = new MachineService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
+
+  const sectionService = new SectionService(
+    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  );
+  const [sections, setSections] = useState<Section[]>([]);
+  useEffect(() => {
+    async function getSection() {
+      var response = await sectionService.getSections();
+      if (response.length > 0) {
+        setSections(response);
+      }
+    }
+    getSection();
+  }, []);
 
   const handleFormSubmit = async (data: Machine) => {
     try {

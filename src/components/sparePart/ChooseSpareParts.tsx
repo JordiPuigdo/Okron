@@ -6,10 +6,10 @@ import SparePart, {
 } from "app/interfaces/SparePart";
 import { WorkOrderSparePart } from "app/interfaces/workOrder";
 import { useEffect, useState } from "react";
-import SparePartService from "components/services/sparePartService";
+import SparePartService from "app/services/sparePartService";
 import { checkOperatorCreated, isOperatorLogged } from "app/utils/utils";
 import { useSessionStore } from "app/stores/globalStore";
-import WorkOrderService from "components/services/workOrderService";
+import WorkOrderService from "app/services/workOrderService";
 
 interface ChooseSparePartsProps {
   availableSpareParts: SparePart[];

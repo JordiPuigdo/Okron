@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 import MachineForm from "../../../../components/MachineForm";
 import Machine from "../../../interfaces/machine";
-import MachineService from "../../../../components/services/machineService";
+import MachineService from "app/services/machineService";
 import { useEffect, useState } from "react";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";

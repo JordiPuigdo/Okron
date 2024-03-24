@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import InspectionPointService from "../../../components/services/inspectionPointService";
+import InspectionPointService from "app/services/inspectionPointService";
 import InspectionPoint from "../../interfaces/inspectionPoint";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";

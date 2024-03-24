@@ -6,8 +6,8 @@ import WorkOrder, {
 import Machine from "app/interfaces/machine";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import MachineService from "components/services/machineService";
-import WorkOrderService from "components/services/workOrderService";
+import MachineService from "app/services/machineService";
+import WorkOrderService from "app/services/workOrderService";
 import MainLayout from "components/layout/MainLayout";
 
 const MachineDetailsPage = () => {

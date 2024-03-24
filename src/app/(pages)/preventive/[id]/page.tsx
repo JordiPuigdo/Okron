@@ -8,11 +8,11 @@ import Machine from "app/interfaces/machine";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import InspectionPointService from "components/services/inspectionPointService";
-import MachineService from "components/services/machineService";
-import OperatorService from "components/services/operatorService";
-import PreventiveService from "components/services/preventiveService";
-import SparePartService from "components/services/sparePartService";
+import InspectionPointService from "app/services/inspectionPointService";
+import MachineService from "app/services/machineService";
+import OperatorService from "app/services/operatorService";
+import PreventiveService from "app/services/preventiveService";
+import SparePartService from "app/services/sparePartService";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";

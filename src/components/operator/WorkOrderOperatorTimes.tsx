@@ -6,7 +6,7 @@ import {
 } from "app/interfaces/workOrder";
 import Operator from "app/interfaces/Operator";
 import { formatDate } from "app/utils/utils";
-import WorkOrderService from "components/services/workOrderService";
+import WorkOrderService from "app/services/workOrderService";
 import { SvgSpinner } from "app/icons/icons";
 
 interface IWorkOrderOperatorTimes {

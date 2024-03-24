@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import OperatorForm from "../../../components/OperatorForm";
-import OperatorService from "components/services/operatorService";
+import OperatorService from "app/services/operatorService";
 import Operator from "app/interfaces/Operator";
 import Link from "next/link";
 import MainLayout from "components/layout/MainLayout";

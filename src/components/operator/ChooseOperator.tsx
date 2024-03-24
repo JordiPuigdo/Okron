@@ -32,9 +32,9 @@ const ChooseOperator: React.FC<ChooseOperatorProps> = ({
   };
 
   return (
-    <div className="px-4 py-8 mt-12">
+    <div className="mt-8">
       <div className="bg-white w-full text-center p-4 rounded-md border-2 border-gray-400">
-        <span className="text-xl font-bold mb-4 ">Seleccionar Operari</span>
+        <span className="text-xl font-bold mb-4 ">Assignar Operari</span>
       </div>
       <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
       <div className="flex flex-col gap-4 mt-6 w-full">

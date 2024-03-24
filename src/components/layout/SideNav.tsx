@@ -3,12 +3,12 @@ import { useState } from "react";
 import { SIDENAV_ITEMS } from "./SideNavItems";
 import Link from "next/link";
 import { useSessionStore } from "app/stores/globalStore";
-import { SvgSpinner } from "app/icons/icons";
+import { SvgConfiguration, SvgGear, SvgSpinner } from "app/icons/icons";
 
 const SideNav = () => {
   const { loginUser } = useSessionStore((state) => state);
   return (
-    <div className="flex flex-col space-y-2 md:px-6">
+    <div className="flex flex-col md:px-4">
       <Link
         className="font-semibold text-lg text-white p-1 hover:bg-purple-900 rounded-md"
         href={"/menu"}
@@ -20,7 +20,9 @@ const SideNav = () => {
           return (
             <>
               {item.permission <= loginUser?.permission! && (
-                <MenuItem key={idx} item={item} />
+                <>
+                  <MenuItem key={idx} item={item} />
+                </>
               )}
             </>
           );
@@ -44,6 +46,7 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
         <>
           <button onClick={toggleSubMenu} className="w-full">
             <div className="flex flex-row space-x-4 items-center">
+              {item.icon}
               <span className="font-semibold text-xl flex text-white p-1 w-full hover:bg-purple-900 rounded-md">
                 {item.title}
               </span>
@@ -51,13 +54,13 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
           </button>
 
           {subMenuOpen && (
-            <div className="my-4 ml-4 flex flex-col space-y-4 ">
+            <div className="my-2 ml-2 flex flex-col ">
               {item.submenuItems?.map((subItem, idx) => {
                 return (
                   <Link key={idx} href={subItem.path}>
                     <span
                       className={`${
-                        isLoading[subItem.key] ? "text-sm" : "text-xl"
+                        isLoading[subItem.key] ? "text-sm" : "text-sm"
                       } font-semibold text-white flex p-1 hover:bg-purple-900 rounded-md items-center`}
                       onClick={() =>
                         setIsLoading((prevLoading) => ({
@@ -88,6 +91,7 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
               }))
             }
           >
+            {item.icon && <item.icon className="mr-2" />}
             {item.title}
             {isLoading[item.key] && (
               <SvgSpinner style={{ marginLeft: "0.5rem" }} />

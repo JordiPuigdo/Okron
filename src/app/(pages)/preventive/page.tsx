@@ -4,7 +4,7 @@ import MainLayout from "components/layout/MainLayout";
 import { Preventive } from "app/interfaces/Preventive";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import PreventiveService from "components/services/preventiveService";
+import PreventiveService from "app/services/preventiveService";
 import { formatDate } from "app/utils/utils";
 import Container from "components/layout/Container";
 import { useRouter } from "next/navigation";

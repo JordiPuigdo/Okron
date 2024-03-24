@@ -4,7 +4,7 @@ import MainLayout from "components/layout/MainLayout";
 import SparePart from "app/interfaces/SparePart";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import SparePartService from "components/services/sparePartService";
+import SparePartService from "app/services/sparePartService";
 import Container from "components/layout/Container";
 import { useSessionStore } from "app/stores/globalStore";
 

@@ -13,15 +13,15 @@ import { Averia_Sans_Libre } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import OperatorService from "components/services/operatorService";
-import WorkOrderService from "components/services/workOrderService";
+import OperatorService from "app/services/operatorService";
+import WorkOrderService from "app/services/workOrderService";
 import { translateStateWorkOrder } from "app/utils/utils";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
 import ChooseSpareParts from "components/sparePart/ChooseSpareParts";
-import SparePartService from "components/services/sparePartService";
+import SparePartService from "app/services/sparePartService";
 import SparePart from "app/interfaces/SparePart";
 import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspectionPoint";
 import WorkOrderOperatorTimes from "components/operator/WorkOrderOperatorTimes";
@@ -316,86 +316,165 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       {renderHeader()}
       <div className="p-4 sm:p-12">
         <form onSubmit={handleSubmit(onSubmit)} className="mt-12">
-          <div className="flex flex-col sm:flex-row items-center">
-            <div className="sm:w-1/2 ml-4">
-              <label
-                htmlFor="description"
-                className="block text-xl font-medium text-gray-700 mb-2"
-              >
-                Descripció
-              </label>
-              <input
-                {...register("description")}
-                type="text"
-                id="description"
-                name="description"
-                className="p-3 border border-gray-300 rounded-md w-full"
-                disabled={isFinished}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                  }
-                }}
-              />
+          <div className="flex flex-col md:flex-row justify-center items-stretch gap-8 w-full">
+            <div className="flex flex-col flex-grow gap-4">
+              <div>
+                <label
+                  htmlFor="description"
+                  className="block text-xl font-medium text-gray-700 mb-2 w-full"
+                >
+                  Descripció
+                </label>
+                <input
+                  {...register("description")}
+                  type="text"
+                  id="description"
+                  name="description"
+                  className="p-3 border border-gray-300 rounded-md w-full"
+                  disabled={isFinished}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="stateWorkOrder"
+                  className="block text-xl font-medium text-gray-700 mb-2"
+                >
+                  Estat
+                </label>
+                <select
+                  {...register("stateWorkOrder", { valueAsNumber: true })}
+                  id="stateWorkOrder"
+                  name="stateWorkOrder"
+                  className="p-3 border border-gray-300 rounded-md w-full"
+                  disabled={isFinished}
+                >
+                  {Object.values(StateWorkOrder)
+                    .filter(
+                      (value) =>
+                        typeof value === "number" &&
+                        (isFinished || value !== StateWorkOrder.Finished)
+                    )
+                    .map((state) => (
+                      <option
+                        key={state}
+                        value={
+                          typeof state === "string"
+                            ? parseInt(state, 10)
+                            : state
+                        }
+                      >
+                        {translateStateWorkOrder(state)}
+                      </option>
+                    ))}
+                </select>
+              </div>
+              <div>
+                <label
+                  htmlFor="stateWorkOrder"
+                  className="block text-xl font-medium text-gray-700 mb-2"
+                >
+                  Data Inici
+                </label>
+                <DatePicker
+                  disabled={isFinished}
+                  id="startDate"
+                  selected={startDate}
+                  onChange={(date: Date) => setStartDate(date)}
+                  dateFormat="dd/MM/yyyy"
+                  locale={ca}
+                  className="p-3 border border-gray-300 rounded-md text-lg"
+                />
+              </div>
             </div>
-            <div className="sm:w-1/2 ml-4">
-              <label
-                htmlFor="stateWorkOrder"
-                className="block text-xl font-medium text-gray-700 mb-2"
-              >
-                Estat
-              </label>
-              <select
-                {...register("stateWorkOrder", { valueAsNumber: true })}
-                id="stateWorkOrder"
-                name="stateWorkOrder"
-                className="p-3 border border-gray-300 rounded-md w-full"
-                disabled={isFinished}
-              >
-                {Object.values(StateWorkOrder)
-                  .filter(
-                    (value) =>
-                      typeof value === "number" &&
-                      (isFinished || value !== StateWorkOrder.Finished)
-                  )
-                  .map((state) => (
-                    <option
-                      key={state}
-                      value={
-                        typeof state === "string" ? parseInt(state, 10) : state
-                      }
-                    >
-                      {translateStateWorkOrder(state)}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            <div className="sm:w-1/2 ml-4">
-              <label
-                htmlFor="stateWorkOrder"
-                className="block text-xl font-medium text-gray-700 mb-2"
-              >
-                Data Inici
-              </label>
-              <DatePicker
-                disabled={isFinished}
-                id="startDate"
-                selected={startDate}
-                onChange={(date: Date) => setStartDate(date)}
-                dateFormat="dd/MM/yyyy"
-                locale={ca}
-                className="p-3 border border-gray-300 rounded-md text-lg"
-              />
+            <div className="flex flex-col flex-grow">
+              {aviableOperators !== undefined && currentWorkOrder && (
+                <ChooseOperator
+                  aviableOperators={aviableOperators}
+                  selectedOperators={selectedOperators}
+                  setSelectedOperators={setSelectedOperators}
+                  isFinished={isFinished}
+                />
+              )}
             </div>
           </div>
-          {aviableOperators !== undefined && currentWorkOrder && (
-            <ChooseOperator
-              aviableOperators={aviableOperators}
-              selectedOperators={selectedOperators}
-              setSelectedOperators={setSelectedOperators}
-              isFinished={isFinished}
-            />
-          )}
+          <div>
+            <div className="flex sm:flex-row mb-8 pt-12">
+              {isFinished ? (
+                <button
+                  type="button"
+                  onClick={(e) => handleReopenWorkOrder()}
+                  className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
+                >
+                  Reobrir Ordre
+                  {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+                </button>
+              ) : (
+                <>
+                  {" "}
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className={`${
+                      showSuccessMessage
+                        ? "bg-green-500"
+                        : showErrorMessage
+                        ? "bg-red-500"
+                        : "bg-blue-500"
+                    } hover:${
+                      showSuccessMessage
+                        ? "bg-green-700"
+                        : showErrorMessage
+                        ? "bg-red-700"
+                        : "bg-blue-700"
+                    } text-white font-bold py-2 px-4 rounded mt-6 mb-4 sm:mb-0 sm:mr-2 flex items-center`}
+                  >
+                    Actualizar Ordre
+                    {isLoading && (
+                      <SvgSpinner style={{ marginLeft: "0.5rem" }} />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => router.back()}
+                    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
+                    disabled={isLoading}
+                  >
+                    Cancelar
+                    {isLoading && (
+                      <SvgSpinner style={{ marginLeft: "0.5rem" }} />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => finalizeWorkOrder()}
+                    className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
+                  >
+                    Finalitzar Ordre
+                    {isLoading && (
+                      <SvgSpinner style={{ marginLeft: "0.5rem" }} />
+                    )}
+                  </button>
+                </>
+              )}
+            </div>
+
+            {showSuccessMessage && (
+              <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
+                Ordre actualizada correctament
+              </div>
+            )}
+
+            {showErrorMessage && (
+              <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
+                Error actualitzant ordre de treball
+              </div>
+            )}
+          </div>
           {availableSpareParts !== undefined &&
             currentWorkOrder &&
             currentWorkOrder.workOrderType === WorkOrderType.Corrective && (
@@ -435,71 +514,6 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               isFinished={isFinished}
               setWorkOrderComments={setWorkOrderComments}
             />
-          )}
-          <div className="flex sm:flex-row mb-8 pt-12">
-            {isFinished ? (
-              <button
-                type="button"
-                onClick={(e) => handleReopenWorkOrder()}
-                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
-              >
-                Reobrir Ordre
-                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-              </button>
-            ) : (
-              <>
-                {" "}
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className={`${
-                    showSuccessMessage
-                      ? "bg-green-500"
-                      : showErrorMessage
-                      ? "bg-red-500"
-                      : "bg-blue-500"
-                  } hover:${
-                    showSuccessMessage
-                      ? "bg-green-700"
-                      : showErrorMessage
-                      ? "bg-red-700"
-                      : "bg-blue-700"
-                  } text-white font-bold py-2 px-4 rounded mt-6 mb-4 sm:mb-0 sm:mr-2 flex items-center`}
-                >
-                  Actualizar Ordre
-                  {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => router.back()}
-                  className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
-                  disabled={isLoading}
-                >
-                  Cancelar
-                  {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => finalizeWorkOrder()}
-                  className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
-                >
-                  Finalitzar Ordre
-                  {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-                </button>
-              </>
-            )}
-          </div>
-
-          {showSuccessMessage && (
-            <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
-              Ordre actualizada correctament
-            </div>
-          )}
-
-          {showErrorMessage && (
-            <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
-              Error actualitzant ordre de treball
-            </div>
           )}
         </form>
       </div>

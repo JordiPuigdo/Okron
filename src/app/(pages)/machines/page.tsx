@@ -1,17 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import MachineService from "../../../components/services/machineService";
+import MachineService from "app/services/machineService";
 import Machine from "../../interfaces/machine";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
-import sections from "app/interfaces/sections";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
 import { useRouter } from "next/navigation";
+import Section from "app/interfaces/Section";
+import SectionService from "app/services/sectionService";
 
 export default function MachinesPage() {
   const [machines, setMachines] = useState<Machine[]>([]);
+  const [sections, SetSections] = useState<Section[]>([]);
+  const sectionService = new SectionService(
+    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
@@ -38,6 +43,8 @@ export default function MachinesPage() {
         );
         const machinesData = await machineService.getAllMachines();
         setMachines(machinesData);
+        const response = await sectionService.getSections();
+        SetSections(response);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching machines:", error);
@@ -50,11 +57,16 @@ export default function MachinesPage() {
 
   async function handleDeleteMachine(id: string) {
     try {
-      const machineService = new MachineService(
-        process.env.NEXT_PUBLIC_API_BASE_URL || ""
+      const isConfirmed = window.confirm(
+        "Segur que voleu eliminar la màquina?"
       );
-      await machineService.deleteMachine(id);
-      setCreateSuccess(true);
+      if (isConfirmed) {
+        const machineService = new MachineService(
+          process.env.NEXT_PUBLIC_API_BASE_URL || ""
+        );
+        await machineService.deleteMachine(id);
+        setCreateSuccess(true);
+      }
     } catch (error) {
       console.error("Error deleting machine:", error);
     }
@@ -142,7 +154,7 @@ export default function MachinesPage() {
             className="border rounded-md px-3 ml-3 py-2 mt-1 text-gray-700 focus:outline-none focus:border-indigo-500"
           >
             <option value="">Totes les seccions</option>
-            {sections.map((section) => (
+            {sections?.map((section) => (
               <option key={section.id} value={section.id}>
                 {section.description}
               </option>

@@ -1,3 +1,5 @@
+import { SVGProps } from "react";
+
 export type SideNavItem = {
     key : number
     title : string;
@@ -5,4 +7,5 @@ export type SideNavItem = {
     submenu? : boolean;
     submenuItems?: SideNavItem[];
     permission : number;
+    icon?: React.FunctionComponent<SVGProps<SVGSVGElement>>;
 };

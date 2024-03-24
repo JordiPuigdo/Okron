@@ -4,7 +4,7 @@ import {
   SaveInspectionResultPointRequest,
   WorkOrderInspectionPoint,
 } from "app/interfaces/workOrder";
-import WorkOrderService from "components/services/workOrderService";
+import WorkOrderService from "app/services/workOrderService";
 import { SvgSpinner } from "app/icons/icons";
 import { useSessionStore } from "app/stores/globalStore";
 

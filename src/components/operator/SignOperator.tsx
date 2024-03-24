@@ -1,7 +1,7 @@
 "use client";
 import { OperatorLogged } from "app/interfaces/User";
 import { useSessionStore } from "app/stores/globalStore";
-import AuthenticationService from "components/services/authentication";
+import AuthenticationService from "app/services/authentication";
 import { useState } from "react";
 
 export default function SignOperator() {

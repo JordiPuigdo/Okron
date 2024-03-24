@@ -5,7 +5,7 @@ import SparePart from "app/interfaces/SparePart";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import SparePartService from "components/services/sparePartService";
+import SparePartService from "app/services/sparePartService";
 import Container from "components/layout/Container";
 
 export default function EditSparePart({ params }: { params: { id: string } }) {
