@@ -1,4 +1,4 @@
-import SparePart, { ConsumeSparePart, CreateSparePartRequest, RestoreSparePart } from "app/interfaces/SparePart";
+import SparePart, { ConsumeSparePart, CreateSparePartRequest, RestoreSparePart, SparePartDetailRequest, SparePartDetailResponse } from "app/interfaces/SparePart";
 
 class SparePartService {
   private baseUrl: string;
@@ -55,14 +55,31 @@ class SparePartService {
     }
   }
 
-  async getSparePart(id: string): Promise<SparePart> {
-    const response = await fetch(`${this.baseUrl}sparepart/${id}`);
+  async getSparePart(sparePartDetailRequest: SparePartDetailRequest): Promise<SparePartDetailResponse> {
+      const url = `${this.baseUrl}sparePart/Detail`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(sparePartDetailRequest),
+      });
+    if (!response.ok) {
+      throw new Error('Failed to fetch spare part');
+    }
+
+    const sparePart: SparePartDetailResponse = await response.json();
+    return sparePart;
+  }
+
+  async getSparePartHistoryByDates(sparePartDetailRequest : SparePartDetailRequest  ): Promise<SparePartDetailResponse> {
+    const response = await fetch(`${this.baseUrl}sparepart/$Detail`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch spare part');
     }
 
-    const sparePart: SparePart = await response.json();
+    const sparePart: SparePartDetailResponse = await response.json();
     return sparePart;
   }
 

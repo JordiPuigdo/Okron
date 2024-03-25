@@ -148,7 +148,7 @@ function CorrectivePage() {
     if (!corrective.description || corrective.description.trim().length === 0) {
       return false;
     }
-    if (corrective.operators.length == 0) {
+    if (!corrective.operators) {
       return false;
     }
 

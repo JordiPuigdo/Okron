@@ -1,3 +1,6 @@
+import Operator from "./Operator";
+import Machine from "./machine";
+
 interface SparePart {
     id: string;
     code: string;
@@ -30,4 +33,28 @@ export interface CreateSparePartRequest {
     ubication? : string;
     stock?: number;
     brand?: string;
+}
+
+export interface SparePartDetailResponse {
+    sparePart : SparePart;
+    sparePartPerMachineResponse : SparePartPerMachineResponse[];
+}   
+
+export interface SparePartPerMachineResponse {
+    machine : Machine;
+    workOrderId : string;
+    spareParts : SparePartsConsumeds[];
+}
+
+interface SparePartsConsumeds {
+    quantity : number;
+    operator : Operator
+    creationDate : string;
+    sparePart : SparePart;
+}
+
+export interface SparePartDetailRequest {
+    id: string;
+    startDate : string;
+    endDate : string;
 }

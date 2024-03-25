@@ -98,3 +98,29 @@ export function checkOperatorCreated() {
     return true;
   }
 }
+
+export function startOrEndDate(date: Date, start: boolean): Date {
+  const modifiedDate = new Date(date); // Make a copy of the original date
+
+  // Conditionally set hours, minutes, seconds, and milliseconds
+  if (start) {
+    modifiedDate.setHours(0, 0, 0, 0); // Start of the day
+  } else {
+    modifiedDate.setUTCHours(23, 59, 59, 999); // End of the day in UTC
+  }
+
+  return modifiedDate; // Return the modified date
+}
+
+export function formatDateQuery(date: Date, startDate: boolean) {
+  const formated = new Date(date);
+  if (startDate) {
+    formated.setHours(0, 0, 0, 0);
+  } else {
+    formated.setHours(23, 59, 59, 999);
+  }
+
+  return new Date(
+    formated.getTime() - formated.getTimezoneOffset() * 60000
+  ).toISOString();
+}
