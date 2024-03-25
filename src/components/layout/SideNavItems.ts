@@ -55,7 +55,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     key: 7,
     title: 'Recanvis',
     path: '/spareParts',
-    permission: 0,
-    icon : SvgGear,
+    permission: 0
+    //icon : SvgGear,
   },
 ];
