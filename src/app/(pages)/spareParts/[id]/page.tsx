@@ -278,7 +278,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
               </button>
               <input
                 type="text"
-                placeholder="Buscar per màquina o operari"
+                placeholder="Màquina / Operari"
                 value={searchTerm}
                 onChange={handleSearchChange}
                 className="p-3 border border-gray-300 rounded-md text-lg bg-white text-gray-900"
