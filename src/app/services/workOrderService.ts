@@ -128,10 +128,11 @@ class WorkOrderService {
 
   async getWorkOrdersWithFilters(searchWorkOrderFilters: SearchWorkOrderFilters): Promise<WorkOrder[]> {
     try {
-      const url = `${this.baseUrl}GetWorkOrderWithFilters?` +
-      `machineId=${searchWorkOrderFilters.machineId}` +
-      `&startDateTime=${searchWorkOrderFilters.startTime || ''}` +
-      `&endDateTime=${searchWorkOrderFilters.endTime || ''}`;
+      let url = `${this.baseUrl}GetWorkOrderWithFilters?`;
+      searchWorkOrderFilters.machineId ? url += `machineId=${searchWorkOrderFilters.machineId}`: "";
+      searchWorkOrderFilters.startTime ? url +=      `&startDateTime=${searchWorkOrderFilters.startTime || ''}` +
+      `&endDateTime=${searchWorkOrderFilters.endTime || ''}` : "";
+      searchWorkOrderFilters.operatorId? url += `&operatorId=${searchWorkOrderFilters.operatorId || ''}`: "";
 
       const response = await fetch(url, {
         method: 'GET',

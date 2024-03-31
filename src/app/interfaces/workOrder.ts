@@ -82,9 +82,10 @@ export interface FinishWorkOrderOperatorTimes {
 }
 
 export interface SearchWorkOrderFilters {
-  machineId : string;
+  machineId? : string;
   startTime? : string;
   endTime? : string;
+  operatorId? : string;
 }
 
 export enum WorkOrderType {

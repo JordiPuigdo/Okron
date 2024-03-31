@@ -16,6 +16,7 @@ export default function AuthenticationPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sectionsPerPage] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     sectionService
@@ -30,17 +31,29 @@ export default function AuthenticationPage() {
 
   const indexOfLastSection = currentPage * sectionsPerPage;
   const indexOfFirstSection = indexOfLastSection - sectionsPerPage;
-  const currentSections = sections.slice(
-    indexOfFirstSection,
-    indexOfLastSection
-  );
+  const currentSections = sections
+    .filter(
+      (section) =>
+        section.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        section.description.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .slice(indexOfFirstSection, indexOfLastSection);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
     <MainLayout>
       <Container>
-        <div className="flex">
+        <div className="flex justify-between">
+          <div>
+            <input
+              type="text"
+              placeholder="Buscador"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="border border-gray-300 rounded-md px-2 py-1"
+            />
+          </div>
           <Link
             href={{
               pathname: "/section/id",

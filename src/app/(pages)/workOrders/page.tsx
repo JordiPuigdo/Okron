@@ -23,9 +23,11 @@ import { SvgSpinner } from "app/icons/icons";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
 import { useRouter } from "next/navigation";
+import AutocompleteSearchBar from "components/selector/AutocompleteSearchBar";
+import { ElementList } from "components/selector/ElementList";
 
 export default function WorkOrdersPage() {
-  const [machines, setMachines] = useState<Machine[] | []>([]);
+  const [machines, setMachines] = useState<ElementList[] | []>([]);
   const machineService = new MachineService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
@@ -48,7 +50,11 @@ export default function WorkOrdersPage() {
     try {
       const machinesData = await machineService.getAllMachines();
       const activeMachines = machinesData.filter((machine) => machine.active);
-      setMachines(activeMachines);
+      const mappedMachines = activeMachines.map((machine) => ({
+        id: machine.id,
+        name: machine.name,
+      }));
+      setMachines(mappedMachines as ElementList[]);
     } catch (error) {
       console.error("Error fetching machine WorkOrders:", error);
     }
@@ -215,8 +221,36 @@ export default function WorkOrdersPage() {
             {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </button>
         </div>
+        <div className="flex gap-4 my-4 items-center">
+          <AutocompleteSearchBar
+            elements={machines}
+            setCurrentId={setCurrentMachineId}
+            placeholder="Buscar Màquines"
+          />
+          {currentMachineId.length > 0 && (
+            <div className="flex gap-4 items-center">
+              {machines
+                .filter((x) => x.id === currentMachineId)
+                .map((machine) => (
+                  <div key={machine.id}>
+                    <p>Màquina Seleccionada: {machine.name}</p>
+                  </div>
+                ))}
+              <div>
+                <button
+                  className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
+                  onClick={(e) => {
+                    setCurrentMachineId("");
+                  }}
+                >
+                  Eliminar filtre
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         <div className="flex items-center text-black mb-4">
-          <label htmlFor="machineSelect" className="mr-2">
+          {/* <label htmlFor="machineSelect" className="mr-2">
             Màquina:
           </label>
           <select
@@ -231,7 +265,7 @@ export default function WorkOrdersPage() {
                 {machine.name}
               </option>
             ))}
-          </select>
+          </select>*/}
           <div className="flex items-center">
             <label htmlFor="startDate" className="mr-2">
               Data inici entre:

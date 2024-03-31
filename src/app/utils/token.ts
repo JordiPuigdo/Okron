@@ -13,7 +13,7 @@ export const useToken = () => {
   };
 
   const getRefreshTokenExpiryTimestamp = () =>
-    new Date(loginUser!.refreshTokenExpirationDate).getTime();
+    new Date(loginUser!.refreshTokenExpiryTime).getTime();
 
   const clearUserLoginResponse = () => setLoginUser(undefined);
 

@@ -22,6 +22,7 @@ import { SvgSpinner } from "app/icons/icons";
 import { translateStateWorkOrder } from "app/utils/utils";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
+import AutocompleteSearchBar from "components/selector/AutocompleteSearchBar";
 
 function CorrectivePage() {
   const operatorService = new OperatorService(
@@ -35,6 +36,7 @@ function CorrectivePage() {
   );
   const [operators, setOperators] = useState<Operator[]>([]);
   const [selectedOperator, setSelectedOperator] = useState<string[]>([]);
+  const [selectedMachineId, setSelectedMachineId] = useState<string>("");
 
   const [machines, setMachines] = useState<Machine[]>([]);
 
@@ -107,7 +109,7 @@ function CorrectivePage() {
       code: corrective.code,
       description: corrective.description,
       initialDateTime: corrective.startTime,
-      machineId: corrective.machineId,
+      machineId: selectedMachineId,
       operatorId: corrective.operators.map((operator) => operator),
       stateWorkOrder: corrective.stateWorkOrder,
       workOrderType: 0,
@@ -145,7 +147,11 @@ function CorrectivePage() {
   };
 
   function validData(corrective: Corrective) {
-    if (!corrective.description || corrective.description.trim().length === 0) {
+    if (
+      !corrective.description ||
+      corrective.description.trim().length === 0 ||
+      !selectedMachineId
+    ) {
       return false;
     }
     if (!corrective.operators) {
@@ -239,24 +245,32 @@ function CorrectivePage() {
                   >
                     Màquina
                   </label>
-                  <select
-                    {...register("machineId")}
-                    id="machine"
-                    name="machine"
-                    className="p-3 border border-gray-300 rounded-md w-full"
-                    onChange={(e) => {
-                      setValue("machineId", e.target.value, {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                      });
-                    }}
-                  >
-                    {machines.map((machine) => (
-                      <option key={machine.id} value={machine.id}>
-                        {machine.name}
-                      </option>
-                    ))}
-                  </select>
+                  <AutocompleteSearchBar
+                    elements={machines}
+                    setCurrentId={setSelectedMachineId}
+                    placeholder="Buscar Màquines"
+                  />
+                  {selectedMachineId.length > 0 && (
+                    <div className="flex gap-4 items-center mt-4">
+                      {machines
+                        .filter((x) => x.id === selectedMachineId)
+                        .map((machine) => (
+                          <div key={machine.id}>
+                            <p>Màquina Seleccionada: {machine.name}</p>
+                          </div>
+                        ))}
+                      <div>
+                        <button
+                          className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
+                          onClick={(e) => {
+                            setSelectedMachineId("");
+                          }}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="mb-6 sm:w-1/2 sm:ml-6">
                   <label

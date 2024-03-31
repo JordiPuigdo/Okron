@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import useRoutes from "app/utils/useRoutes";
 import { useToken } from "app/utils/token";
 import { SvgSpinner } from "app/icons/icons";
+import { useSessionStore } from "app/stores/globalStore";
 
 interface LoginCheckerProps {
   children: ReactNode;
@@ -18,22 +19,35 @@ const LoginChecker: React.FC<LoginCheckerProps> = ({
   const ROUTES = useRoutes();
   const [isLoaded, setIsLoaded] = useState(false);
   const { isValidToken, clearUserLoginResponse } = useToken();
+  const { loginUser } = useSessionStore((state) => state);
+  const [loginAttempts, setLoginAttempts] = useState(0);
 
   useEffect(() => {
-    if (!isValidToken()) {
-      clearUserLoginResponse();
-      if (!isLoginPage) {
-        router.push(ROUTES.home);
-        return;
+    function validate() {
+      if (!isValidToken()) {
+        clearUserLoginResponse();
+        if (!isLoginPage) {
+          router.push(ROUTES.home);
+          return;
+        }
+      } else {
+        if (isLoginPage) {
+          router.push(ROUTES.menu);
+          return;
+        }
       }
-    } else {
-      if (isLoginPage) {
-        router.push(ROUTES.menu);
-        return;
-      }
+      setIsLoaded(true);
     }
-    setIsLoaded(true);
-  }, [isLoaded]);
+
+    const loginTimer = setTimeout(() => {
+      if (loginUser !== undefined || loginAttempts > 1) {
+        validate();
+      } else {
+        setLoginAttempts(loginAttempts + 1);
+      }
+    }, 150);
+    return () => clearTimeout(loginTimer);
+  }, [loginUser, loginAttempts]);
 
   if (isLoaded) return <>{children}</>;
   else

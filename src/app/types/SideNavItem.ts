@@ -1,3 +1,4 @@
+import { UserPermission } from "app/interfaces/User";
 import { SVGProps } from "react";
 
 export type SideNavItem = {
@@ -6,6 +7,7 @@ export type SideNavItem = {
     path : string;
     submenu? : boolean;
     submenuItems?: SideNavItem[];
-    permission : number;
+    permission : UserPermission;
     icon?: React.FunctionComponent<SVGProps<SVGSVGElement>>;
 };
+

@@ -6,7 +6,7 @@ export interface User {
 export interface LoginUser {
     token : string;
     refreshToken : string;
-    refreshTokenExpirationDate : Date;
+    refreshTokenExpiryTime : Date;
     agentId : string;
     username : string;
     permission : UserPermission

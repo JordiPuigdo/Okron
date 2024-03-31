@@ -32,6 +32,8 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
   );
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [enterManualTime, setEnterManualTime] = useState(false);
+  const [manualTime, setManualTime] = useState("");
 
   const addWorkOrderTime = async () => {
     setIsLoading(true);
@@ -53,8 +55,11 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
       setIsLoading(false);
       return;
     }
-    const startTime = new Date();
-
+    const startTime = createDate();
+    if (startTime == null) {
+      setIsLoading(false);
+      return;
+    }
     const x: AddWorkOrderOperatorTimes = {
       operatorId: op.id,
       startTime: startTime,
@@ -104,7 +109,11 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
       return;
     }
 
-    const endTime = new Date();
+    const endTime = createDate();
+    if (endTime == null) {
+      setIsLoading(false);
+      return;
+    }
     const startTime = new Date(last!.startTime);
     const totalTimeInMilliseconds = endTime.getTime() - startTime.getTime();
     const totalTimeInSeconds = Math.floor(totalTimeInMilliseconds / 1000);
@@ -162,7 +171,7 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
     const totalSeconds = totalTimeInSeconds % 60;
     totalTimes[operatorId] = `${totalHours}h ${totalMinutes}m ${totalSeconds}s`;
   });
-  // Calculate total time without operator
+
   const totalMilliseconds = workOrderOperatortimes.reduce((total, time) => {
     if (time.totalTime) {
       const [hours, minutes, seconds] = time.totalTime.split(" ");
@@ -181,6 +190,43 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
   const totalSeconds = Math.floor((totalMilliseconds % (1000 * 60)) / 1000);
 
   const totalFormatted = `${totalHours}h ${totalMinutes}m ${totalSeconds}s`;
+
+  const handleManualTimeChange = (event: any) => {
+    setManualTime(event.target.value);
+  };
+
+  function createDate(): Date | null {
+    if (manualTime) {
+      if (manualTime && !enterManualTime) {
+        const confirmation = window.confirm(
+          `Tens la data ${manualTime}, vols continuar?`
+        );
+        if (!confirmation) return null;
+      }
+      if (!validateDateTimeFormat(manualTime)) {
+        alert("Format incorrecte, dia/mes/any hores/minuts");
+        return null;
+      }
+      const [day, month, year, hour, minute] = manualTime.split(/[\/ :]/);
+      setManualTime("");
+      setEnterManualTime(false);
+      return new Date(
+        parseInt(year),
+        parseInt(month) - 1,
+        parseInt(day),
+        parseInt(hour),
+        parseInt(minute)
+      );
+    } else {
+      return new Date();
+    }
+  }
+
+  function validateDateTimeFormat(dateTime: string): boolean {
+    const pattern =
+      /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4} (0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$/;
+    return pattern.test(dateTime);
+  }
 
   return (
     <div className="mx-auto px-4 py-8 mt-12">
@@ -232,6 +278,31 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
             Sortir
             {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </button>
+          <button
+            type="button"
+            className={`${
+              isFinished
+                ? "bg-gray-500"
+                : "bg-orange-500 hover:bg-orange-600 focus:bg-orange-600"
+            } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
+            onClick={(e) => {
+              setEnterManualTime(!enterManualTime);
+            }}
+          >
+            Entrada Manual
+          </button>
+          {enterManualTime && (
+            <>
+              <input
+                type="text"
+                pattern="\d{2}/\d{2}/\d{4} \d{2}:\d{2}"
+                placeholder="dd/mm/yyyy hh:mm"
+                value={manualTime}
+                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:border-blue-500"
+                onChange={handleManualTimeChange}
+              />
+            </>
+          )}
         </div>
       </div>
       <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
