@@ -284,6 +284,7 @@ function CorrectivePage() {
                     id="stateWorkOrder"
                     name="stateWorkOrder"
                     className="p-3 border border-gray-300 rounded-md w-full"
+                    value={StateWorkOrder.OnGoing}
                   >
                     {Object.values(StateWorkOrder)
                       .filter((value) => typeof value === "number")
