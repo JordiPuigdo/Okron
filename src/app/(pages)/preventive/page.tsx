@@ -164,41 +164,80 @@ function PreventivePage() {
           />
         </div>
         {isLoadingPage && <SvgSpinner className="flex w-full" />}
-        {!isLoadingPage &&
-          filteredPreventives.map((preventive) => (
-            <div
-              key={preventive.id}
-              className="border p-4 my-4 flex flex-col sm:flex-row items-start sm:items-center justify-between"
-            >
-              <div className="flex flex-col">
-                <h2 className="text-lg font-semibold">{preventive.code}</h2>
-                <p className="text-sm text-gray-600">
-                  {preventive.description}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {preventive.machine.name}
-                </p>
-              </div>
-              <div className="flex mt-4 sm:mt-0">
-                <Link
-                  href="/preventive/[id]"
-                  as={`/preventive/${preventive.id}`}
-                  className="bg-green-500 text-white px-3 py-1 ml-2 rounded-md flex items-center"
-                  onClick={(e) => setIsLoading(true)}
-                >
-                  Editar
-                  {isLoading && <SvgSpinner className="ml-2 w-4 h-4" />}
-                </Link>
-                <button
-                  onClick={() => handleDelete(preventive.id)}
-                  className="bg-red-500 text-white px-3 py-1 ml-2 rounded-md cursor-pointer flex items-center"
-                >
-                  Eliminar
-                  {isLoading && <SvgSpinner className="ml-2 w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-          ))}
+        {!isLoadingPage && (
+          <div className="mt-4">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Codi
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Descripció
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Màquina
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Accions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {!isLoadingPage &&
+                  filteredPreventives.map((preventive) => (
+                    <tr key={preventive.id}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {preventive.code}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {preventive.description}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {preventive.machine.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex gap-4">
+                          <Link
+                            href="/preventive/[id]"
+                            as={`/preventive/${preventive.id}`}
+                            className="bg-green-500 text-white px-3 py-1 rounded-md cursor-pointer flex items-center"
+                            onClick={(e) => setIsLoading(true)}
+                          >
+                            Editar
+                            {isLoading && (
+                              <SvgSpinner className="ml-2 w-4 h-4" />
+                            )}
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(preventive.id)}
+                            className="bg-red-500 text-white px-3 py-1 rounded-md cursor-pointer flex items-center"
+                          >
+                            Eliminar
+                            {isLoading && (
+                              <SvgSpinner className="ml-2 w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </Container>
     </MainLayout>
   );

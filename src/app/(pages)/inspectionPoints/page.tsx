@@ -25,7 +25,7 @@ export default function InspectionPointsPage() {
     try {
       const inspectionPointService = new InspectionPointService(
         process.env.NEXT_PUBLIC_API_BASE_URL || ""
-      ); // Replace with your API base URL
+      );
       const newInspectionPoint =
         await inspectionPointService.createInspectionPoint({
           description: newDescription,
@@ -51,7 +51,7 @@ export default function InspectionPointsPage() {
     try {
       const inspectionPointService = new InspectionPointService(
         process.env.NEXT_PUBLIC_API_BASE_URL || ""
-      ); // Replace with your API base URL
+      );
       const inspectionPointsData =
         await inspectionPointService.getAllInspectionPoints();
       setInspectionPoints(inspectionPointsData);
@@ -67,12 +67,12 @@ export default function InspectionPointsPage() {
       try {
         const newDescription = prompt("Edita la descripció", description);
         if (newDescription === null) {
-          return; // User cancelled the edit
+          return;
         }
 
         const inspectionPointService = new InspectionPointService(
           process.env.NEXT_PUBLIC_API_BASE_URL || ""
-        ); // Replace with your API base URL
+        );
         await inspectionPointService.updateInspectionPoint(id, {
           description: newDescription,
           id: id,
@@ -97,7 +97,7 @@ export default function InspectionPointsPage() {
     try {
       const inspectionPointService = new InspectionPointService(
         process.env.NEXT_PUBLIC_API_BASE_URL || ""
-      ); // Replace with your API base URL
+      );
       await inspectionPointService.deleteInspectionPoint(id);
       fetchInspectionPoints();
     } catch (error) {
@@ -128,6 +128,23 @@ export default function InspectionPointsPage() {
           >
             {isFormVisible ? "Cancelar" : "Crear nou punt d'inspecció"}
           </button>
+          {isFormVisible && (
+            <form onSubmit={handleFormSubmit} className="mb-4">
+              <input
+                type="text"
+                placeholder="Escriu la descripció"
+                value={newDescription}
+                onChange={(e) => setNewDescription(e.target.value)}
+                className="border rounded py-2 px-3"
+              />
+              <button
+                type="submit"
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 ml-2 rounded"
+              >
+                Crear
+              </button>
+            </form>
+          )}
           <div className="flex space-x-2">
             <input
               type="text"
@@ -146,23 +163,7 @@ export default function InspectionPointsPage() {
               className="ml-2"
             />
           </label>
-          {isFormVisible && (
-            <form onSubmit={handleFormSubmit} className="mb-4">
-              <input
-                type="text"
-                placeholder="Escriu la descripció"
-                value={newDescription}
-                onChange={(e) => setNewDescription(e.target.value)}
-                className="border rounded py-2 px-3"
-              />
-              <button
-                type="submit"
-                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 ml-2 rounded"
-              >
-                Crear
-              </button>
-            </form>
-          )}
+
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
               <tr>

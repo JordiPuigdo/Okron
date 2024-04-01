@@ -250,22 +250,6 @@ export default function WorkOrdersPage() {
           )}
         </div>
         <div className="flex items-center text-black mb-4">
-          {/* <label htmlFor="machineSelect" className="mr-2">
-            Màquina:
-          </label>
-          <select
-            id="machineSelect"
-            value={currentMachineId}
-            onChange={(e) => setCurrentMachineId(e.target.value)}
-            className="border border-gray-300 p-2 rounded-md mr-4"
-          >
-            <option value="">Selecciona la màquina</option>
-            {machines.map((machine) => (
-              <option key={machine.id} value={machine.id}>
-                {machine.name}
-              </option>
-            ))}
-          </select>*/}
           <div className="flex items-center">
             <label htmlFor="startDate" className="mr-2">
               Data inici entre:

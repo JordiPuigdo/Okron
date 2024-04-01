@@ -1,6 +1,4 @@
-import LoginChecker from "./LoginChecker";
-
-export default function ContainerCRM({
+export default function Container({
   children,
   enablePading = true,
 }: {
