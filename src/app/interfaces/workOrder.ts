@@ -81,6 +81,13 @@ export interface FinishWorkOrderOperatorTimes {
   operatorId: string
 }
 
+export interface UpdateWorkOrderOperatorTimes {
+  workOrderid: string;
+  startTime: Date;
+  endTime: Date;
+  operatorId: string;
+}
+
 export interface SearchWorkOrderFilters {
   machineId? : string;
   startTime? : string;

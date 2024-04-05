@@ -92,6 +92,17 @@ function SparePartsPage() {
     setCurrentPage(1);
   };
 
+  const handleSparePartActiveChange = async (id: string) => {
+    const isConfirmed = window.confirm(
+      "Segur que voleu eliminar aquest recanvi?"
+    );
+    if (isConfirmed) {
+      await sparePartService.deleteSparePart(id).then((data) => {
+        window.location.reload();
+      });
+    }
+  };
+
   return (
     <MainLayout>
       <Container>
@@ -184,6 +195,7 @@ function SparePartsPage() {
                   <th className="py-2 px-4 border-b">Referència</th>
                   <th className="py-2 px-4 border-b">Familia</th>
                   <th className="py-2 px-4 border-b">Stock</th>
+                  <th className="py-2 px-4 border-b">Actiu</th>
                   {loginUser != undefined && loginUser?.permission > 0 && (
                     <th className="py-2 px-4 border-b">Accions</th>
                   )}
@@ -204,8 +216,11 @@ function SparePartsPage() {
                     </td>
                     <td className="py-2 px-4 border-b">{sparePart.family}</td>
                     <td className="py-2 px-4 border-b">{sparePart.stock}</td>
+                    <td className="py-2 px-4 border-b">
+                      <input type="checkbox" checked={sparePart.active} />
+                    </td>
                     {loginUser != undefined && loginUser?.permission > 0 && (
-                      <td>
+                      <td className="flex flex-row gap-1">
                         <Link
                           href="/spareParts/[id]"
                           as={`/spareParts/${sparePart.id}`}
@@ -213,6 +228,15 @@ function SparePartsPage() {
                         >
                           Editar
                         </Link>
+                        <button
+                          className="bg-red-500 text-white px-3 py-1 ml-2 rounded-md "
+                          onClick={(e) => {
+                            handleSparePartActiveChange(sparePart.id);
+                            // window.location.reload();
+                          }}
+                        >
+                          Eliminar
+                        </button>
                       </td>
                     )}
                   </tr>

@@ -8,6 +8,8 @@ import Operator from "app/interfaces/Operator";
 import { formatDate } from "app/utils/utils";
 import WorkOrderService from "app/services/workOrderService";
 import { SvgSpinner } from "app/icons/icons";
+import { useSessionStore } from "app/stores/globalStore";
+import { UserPermission } from "app/interfaces/User";
 
 interface IWorkOrderOperatorTimes {
   operators: Operator[];
@@ -19,7 +21,7 @@ interface IWorkOrderOperatorTimes {
   isFinished: boolean;
 }
 
-const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
+const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
   operators,
   workOrderOperatortimes,
   setWorkOrderOperatortimes,
@@ -33,7 +35,10 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [enterManualTime, setEnterManualTime] = useState(false);
-  const [manualTime, setManualTime] = useState("");
+  const [manualTime, setManualTime] = useState(
+    formatDate(new Date(), true, false)
+  );
+  const { loginUser } = useSessionStore((state) => state);
 
   const addWorkOrderTime = async () => {
     setIsLoading(true);
@@ -208,7 +213,7 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
         return null;
       }
       const [day, month, year, hour, minute] = manualTime.split(/[\/ :]/);
-      setManualTime("");
+      setManualTime(formatDate(new Date(), true, false));
       setEnterManualTime(false);
       return new Date(
         parseInt(year),
@@ -226,6 +231,10 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
     const pattern =
       /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4} (0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$/;
     return pattern.test(dateTime);
+  }
+
+  async function updateWorkOrderOperatorTimes() {
+    setIsLoading(true);
   }
 
   return (
@@ -297,7 +306,7 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
                 type="text"
                 pattern="\d{2}/\d{2}/\d{4} \d{2}:\d{2}"
                 placeholder="dd/mm/yyyy hh:mm"
-                value={manualTime}
+                value={manualTime!}
                 className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:border-blue-500"
                 onChange={handleManualTimeChange}
               />
@@ -338,6 +347,14 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
                 >
                   Operari
                 </th>
+                {loginUser?.permission == UserPermission.Administrator && (
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Accions
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -370,6 +387,21 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
                       {time.operator.name}
                     </div>
                   </td>
+                  {loginUser?.permission == UserPermission.Administrator && (
+                    <td className="px-6 py-4 whitespace-nowrap align-center">
+                      <button
+                        type="button"
+                        className={`${
+                          isFinished
+                            ? "bg-gray-500"
+                            : "bg-green-500 hover:bg-green-600 focus:bg-green-600"
+                        } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
+                        onClick={updateWorkOrderOperatorTimes}
+                      >
+                        Editar
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -404,4 +436,4 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
   );
 };
 
-export default WorkOrderOperatorTimes;
+export default WorkOrderOperatorTimesComponent;

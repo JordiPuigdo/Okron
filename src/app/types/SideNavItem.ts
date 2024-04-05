@@ -11,3 +11,8 @@ export type SideNavItem = {
     icon?: React.FunctionComponent<SVGProps<SVGSVGElement>>;
 };
 
+let keyCounter = 1; // Initialize a counter for generating unique keys
+
+export const generateKey = (): number => {
+    return keyCounter++;
+};

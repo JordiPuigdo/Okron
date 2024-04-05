@@ -16,7 +16,11 @@ export const translateStateWorkOrder = (state: any): string => {
   }
 };
 
-export const formatDate = (dateString: any, includeHours: boolean = true) => {
+export const formatDate = (
+  dateString: any,
+  includeHours: boolean = true,
+  includeSeconds: boolean = true
+) => {
   if (dateString === null) {
     return "";
   }
@@ -26,7 +30,7 @@ export const formatDate = (dateString: any, includeHours: boolean = true) => {
     year: "numeric",
     hour: includeHours ? "2-digit" : undefined,
     minute: includeHours ? "2-digit" : undefined,
-    second: includeHours ? "2-digit" : undefined,
+    second: includeSeconds ? "2-digit" : undefined,
     hour12: false, // Use 24-hour format
   };
   const date = new Date(dateString);

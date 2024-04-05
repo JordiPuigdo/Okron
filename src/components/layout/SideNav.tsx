@@ -45,9 +45,9 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
       {item.submenu ? (
         <>
           <button onClick={toggleSubMenu} className="w-full">
-            <div className="flex flex-row space-x-4 items-center">
-              {item.icon}
-              <span className="font-semibold text-xl flex text-white p-1 w-full hover:bg-purple-900 rounded-md">
+            <div className="flex flex-row items-center">
+              <span className="font-semibold text-l flex text-white p-1 w-full hover:bg-purple-900 rounded-md items-center">
+                {item.icon && <item.icon className="mr-2 " />}
                 {item.title}
               </span>
             </div>
@@ -69,6 +69,7 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
                         }))
                       }
                     >
+                      {subItem.icon && <subItem.icon className="mr-2 " />}
                       {subItem.title}
                       {isLoading[subItem.key] && (
                         <SvgSpinner style={{ marginLeft: "0.5rem" }} />
@@ -83,7 +84,7 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
       ) : (
         <Link href={item.path}>
           <span
-            className="font-semibold text-xl flex text-white p-1 hover:bg-purple-900 rounded-md items-center"
+            className="font-semibold text-l flex text-white p-1 hover:bg-purple-900 rounded-md items-center"
             onClick={() =>
               setIsLoading((prevLoading) => ({
                 ...prevLoading,

@@ -125,6 +125,26 @@ class SparePartService {
     }
   }
 
+  async deleteSparePart(id: string): Promise<boolean> {
+    try {
+      const url = `${this.baseUrl}sparePart/${id}`;
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update sparePart`);
+      }
+      return true;
+    } catch (error) {
+      console.error('Error updating SparePart:', error);
+      throw error;
+    }
+    
+  }
 
 }
 

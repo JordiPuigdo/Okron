@@ -60,11 +60,23 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
         setValue("id", sparePartDetailResponse.sparePart.id);
         setValue("code", sparePartDetailResponse.sparePart.code);
         setValue("description", sparePartDetailResponse.sparePart.description);
-        setValue("ubication", sparePartDetailResponse.sparePart.ubication);
+        setValue(
+          "ubication",
+          sparePartDetailResponse.sparePart.ubication != null
+            ? sparePartDetailResponse.sparePart.ubication
+            : ""
+        );
         setValue("refProvider", sparePartDetailResponse.sparePart.refProvider);
         setValue("family", sparePartDetailResponse.sparePart.family);
-        setValue("brand", sparePartDetailResponse.sparePart.brand);
+        setValue(
+          "brand",
+          sparePartDetailResponse.sparePart.brand != null
+            ? sparePartDetailResponse.sparePart.brand
+            : ""
+        );
         setValue("stock", sparePartDetailResponse.sparePart.stock);
+        setValue("price", sparePartDetailResponse.sparePart.price);
+        setValue("active", sparePartDetailResponse.sparePart.active);
         setSparePartPerMachine(
           sparePartDetailResponse.sparePartPerMachineResponse
         );
@@ -78,6 +90,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
   }, [params.id, setValue]);
 
   const onSubmit = async (sparePart: SparePart) => {
+    debugger;
     await sparePartService
       .updateSparePart(sparePart)
       .then((spare) => {
@@ -122,6 +135,12 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
       )
     );
   });
+  const totalUnitsPerMachine = filteredSpareParts?.map((sparePartPerMachine) =>
+    sparePartPerMachine.spareParts.reduce(
+      (total, consumes) => total + consumes.quantity,
+      0
+    )
+  );
 
   const renderHeader = () => {
     return (
@@ -210,6 +229,15 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                 className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
               />
             </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-600">
+                Preu
+              </label>
+              <input
+                {...register("price")}
+                className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+              />
+            </div>
 
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-600">
@@ -217,6 +245,16 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
               </label>
               <input
                 {...register("stock")}
+                className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-600">
+                Actiu
+              </label>
+              <input
+                {...register("active")}
+                type="checkbox"
                 className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
               />
             </div>
@@ -362,6 +400,22 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                     </td>
                   </tr>
                 ))}
+                <tr className="bg-gray-100">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900 font-semibold">
+                      Total Unitats Consumides
+                    </div>
+                  </td>
+                  <td
+                    colSpan={4}
+                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold"
+                  >
+                    {totalUnitsPerMachine?.reduce(
+                      (total, units) => total + units,
+                      0
+                    )}
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>

@@ -11,6 +11,8 @@ interface SparePart {
     stock: number;
     brand: string;
     unitsConsum? : number;
+    price : number;
+    active : boolean
 }
 
 export default SparePart;
