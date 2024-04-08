@@ -6,6 +6,7 @@ import WorkOrder, {
   UpdateWorkOrderRequest,
   WorkOrderComment,
   WorkOrderInspectionPoint,
+  WorkOrderOperatorTimes,
   WorkOrderSparePart,
   WorkOrderType,
 } from "app/interfaces/workOrder";
@@ -24,9 +25,9 @@ import ChooseSpareParts from "components/sparePart/ChooseSpareParts";
 import SparePartService from "app/services/sparePartService";
 import SparePart from "app/interfaces/SparePart";
 import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspectionPoint";
-import WorkOrderOperatorTimes from "components/operator/WorkOrderOperatorTimes";
 import { SvgSpinner } from "app/icons/icons";
 import WorkOrderOperatorComments from "components/operator/WorkOrderCommentOperator";
+import WorkOrderOperatorTimesComponent from "components/operator/WorkOrderOperatorTimes";
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -499,7 +500,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             )}
 
           {currentWorkOrder && aviableOperators !== undefined && (
-            <WorkOrderOperatorTimes
+            <WorkOrderOperatorTimesComponent
               operators={aviableOperators!}
               workOrderOperatortimes={workOrderOperatorTimes}
               setWorkOrderOperatortimes={setworkOrderOperatorTimes}
