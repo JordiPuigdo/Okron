@@ -135,9 +135,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
     )}m ${totalTimeInSeconds % 60}s`;
 
     const updatedTimes = workOrderOperatortimes.map((time) =>
-      time.operator.id === last!.operator.id
-        ? { ...time, endTime, totalTime }
-        : time
+      time.id === last!.id ? { ...time, endTime, totalTime } : time
     );
 
     const FinishWorkOrderOperatorTimes: FinishWorkOrderOperatorTimes = {
