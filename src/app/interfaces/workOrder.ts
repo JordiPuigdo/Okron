@@ -73,12 +73,25 @@ export interface AddWorkOrderOperatorTimes {
   WorkOrderId: string;
   startTime: Date;
   operatorId: string
+  workOrderOperatorTimesId? : string;
 }
 
 export interface FinishWorkOrderOperatorTimes {
   WorkOrderId: string;
   finishTime: Date;
   operatorId: string
+}
+
+export interface UpdateWorkOrderOperatorTimes {
+  workOrderId: string;
+  startTime: Date;
+  endTime?: Date;
+  workOrderOperatorTimesId: string;
+}
+
+export interface DeleteWorkOrderOperatorTimes {
+  workOrderId: string;
+  workOrderOperatorTimesId: string;
 }
 
 export interface SearchWorkOrderFilters {
@@ -118,4 +131,4 @@ export interface AddCommentToWorkOrderRequest {
   comment : string;
   operatorId : string;
   workOrderId : string;
-}
+}	 
