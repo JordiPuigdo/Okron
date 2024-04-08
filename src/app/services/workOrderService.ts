@@ -7,7 +7,7 @@ class WorkOrderService {
     this.baseUrl = baseUrl;
   }
 
-  async addWorkOrderOperatorTimes(AddWorkOrderOperatorTimesValues: AddWorkOrderOperatorTimes): Promise<boolean> {
+  async addWorkOrderOperatorTimes(AddWorkOrderOperatorTimesValues: AddWorkOrderOperatorTimes): Promise<AddWorkOrderOperatorTimes> {
     try {
       const url = `${this.baseUrl}AddWorkOrderOperatorTimes`
       const response = await fetch(url, {
@@ -21,7 +21,7 @@ class WorkOrderService {
         throw new Error('Failed to fetch AddWorkOrderOperatorTimes');
       }
       if (response.status === 204) {
-        return true;
+        return response.json();
       }
       return response.json();
     } catch (error) {
