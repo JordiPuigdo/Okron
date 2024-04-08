@@ -90,7 +90,6 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
   }, [params.id, setValue]);
 
   const onSubmit = async (sparePart: SparePart) => {
-    debugger;
     await sparePartService
       .updateSparePart(sparePart)
       .then((spare) => {

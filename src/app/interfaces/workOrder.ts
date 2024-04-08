@@ -82,10 +82,15 @@ export interface FinishWorkOrderOperatorTimes {
 }
 
 export interface UpdateWorkOrderOperatorTimes {
-  workOrderid: string;
+  workOrderId: string;
   startTime: Date;
-  endTime: Date;
-  operatorId: string;
+  endTime?: Date;
+  workOrderOperatorTimesId: string;
+}
+
+export interface DeleteWorkOrderOperatorTimes {
+  workOrderId: string;
+  workOrderOperatorTimesId: string;
 }
 
 export interface SearchWorkOrderFilters {
