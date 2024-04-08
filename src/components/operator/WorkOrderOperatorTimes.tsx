@@ -84,6 +84,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
           startTime: startTime,
           endTime: undefined,
           operator: op,
+          id: x.workOrderOperatorTimesId,
         };
         setWorkOrderOperatortimes((prevSelected) => [
           ...prevSelected,

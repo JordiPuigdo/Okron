@@ -73,6 +73,7 @@ export interface AddWorkOrderOperatorTimes {
   WorkOrderId: string;
   startTime: Date;
   operatorId: string
+  workOrderOperatorTimesId? : string;
 }
 
 export interface FinishWorkOrderOperatorTimes {
