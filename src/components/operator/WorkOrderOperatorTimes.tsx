@@ -1,13 +1,19 @@
 import React, { useState } from "react";
 import {
   AddWorkOrderOperatorTimes,
+  DeleteWorkOrderOperatorTimes,
   FinishWorkOrderOperatorTimes,
+  UpdateWorkOrderOperatorTimes,
   WorkOrderOperatorTimes,
 } from "app/interfaces/workOrder";
 import Operator from "app/interfaces/Operator";
 import { formatDate } from "app/utils/utils";
 import WorkOrderService from "app/services/workOrderService";
 import { SvgSpinner } from "app/icons/icons";
+import { useSessionStore } from "app/stores/globalStore";
+import { UserPermission } from "app/interfaces/User";
+import { set } from "react-hook-form";
+import { start } from "repl";
 
 interface IWorkOrderOperatorTimes {
   operators: Operator[];
@@ -19,7 +25,7 @@ interface IWorkOrderOperatorTimes {
   isFinished: boolean;
 }
 
-const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
+const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
   operators,
   workOrderOperatortimes,
   setWorkOrderOperatortimes,
@@ -33,7 +39,13 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [enterManualTime, setEnterManualTime] = useState(false);
-  const [manualTime, setManualTime] = useState("");
+  const [manualTime, setManualTime] = useState(
+    formatDate(new Date(), true, false)
+  );
+  const { loginUser } = useSessionStore((state) => state);
+  const [editingIndex, setEditingIndex] = useState(-1);
+  const [editedStartTime, setEditedStartTime] = useState("");
+  const [editedEndTime, setEditedEndTime] = useState("");
 
   const addWorkOrderTime = async () => {
     setIsLoading(true);
@@ -195,21 +207,34 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
     setManualTime(event.target.value);
   };
 
-  function createDate(): Date | null {
-    if (manualTime) {
+  function createDate(newDate = ""): Date | null {
+    if (enterManualTime) {
       if (manualTime && !enterManualTime) {
         const confirmation = window.confirm(
           `Tens la data ${manualTime}, vols continuar?`
         );
         if (!confirmation) return null;
       }
-      if (!validateDateTimeFormat(manualTime)) {
+      if (!validateDateTimeFormat(manualTime!)) {
         alert("Format incorrecte, dia/mes/any hores/minuts");
         return null;
       }
-      const [day, month, year, hour, minute] = manualTime.split(/[\/ :]/);
-      setManualTime("");
+      const [day, month, year, hour, minute] =
+        manualTime!.length > 0
+          ? manualTime!.split(/[\/ :]/)
+          : newDate.split(/[\/ :]/);
+
+      setManualTime(formatDate(new Date(), true, false));
       setEnterManualTime(false);
+      return new Date(
+        parseInt(year),
+        parseInt(month) - 1,
+        parseInt(day),
+        parseInt(hour),
+        parseInt(minute)
+      );
+    } else if (newDate.length > 0) {
+      const [day, month, year, hour, minute] = newDate.split(/[\/ :]/);
       return new Date(
         parseInt(year),
         parseInt(month) - 1,
@@ -226,6 +251,72 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
     const pattern =
       /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4} (0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$/;
     return pattern.test(dateTime);
+  }
+
+  async function updateWorkOrderOperatorTimes(
+    index: number,
+    workOrderOperatorTimesId: string,
+    starttime: string,
+    endtime: string
+  ) {
+    if (editingIndex === index) {
+      if (!validateDateTimeFormat(editedStartTime)) {
+        alert("Format incorrecte, dia/mes/any hores/minuts");
+        return null;
+      }
+
+      let newStartTime = createDate(
+        editedStartTime.length > 0 ? editedStartTime : starttime
+      );
+
+      let updateWorkOrderOperatorTimes: UpdateWorkOrderOperatorTimes = {
+        workOrderId: workOrderId,
+        startTime: newStartTime!,
+        workOrderOperatorTimesId: workOrderOperatorTimesId,
+      };
+      if (editedEndTime != null) {
+        if (editedEndTime != "" && !validateDateTimeFormat(editedEndTime)) {
+          alert("Format incorrecte, dia/mes/any hores/minuts");
+          return null;
+        }
+        let newEndTime = createDate(
+          editedEndTime.length > 0 ? editedEndTime : endtime
+        );
+        updateWorkOrderOperatorTimes.endTime = newEndTime!;
+      }
+
+      await workOrderService
+        .updateWorkOrderOperatorTimes(updateWorkOrderOperatorTimes)
+        .then((response) => {
+          window.location.reload();
+        })
+        .catch((e) => {
+          setIsLoading(false);
+          setErrorMessage("Error fitxant operari " + e);
+        })
+        .finally(() => {
+          setIsLoading(false);
+          setCodeOperator("");
+        });
+      setEditedEndTime("");
+      setEditedStartTime("");
+      setEditingIndex(-1);
+    } else {
+      setEditingIndex(index);
+      setEditedEndTime(formatDate(endtime!, true, false)!);
+      setEditedStartTime(formatDate(starttime!, true, false)!);
+    }
+  }
+
+  async function deleteWorkOrderOperatorTimes(operatorTimesId: string) {
+    const x: DeleteWorkOrderOperatorTimes = {
+      workOrderId: workOrderId,
+      workOrderOperatorTimesId: operatorTimesId,
+    };
+
+    await workOrderService.deleteWorkOrderOperatorTimes(x).then((response) => {
+      window.location.reload();
+    });
   }
 
   return (
@@ -297,7 +388,7 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
                 type="text"
                 pattern="\d{2}/\d{2}/\d{4} \d{2}:\d{2}"
                 placeholder="dd/mm/yyyy hh:mm"
-                value={manualTime}
+                value={manualTime!}
                 className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:border-blue-500"
                 onChange={handleManualTimeChange}
               />
@@ -338,10 +429,18 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
                 >
                   Operari
                 </th>
+                {loginUser?.permission == UserPermission.Administrator && (
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Accions
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {workOrderOperatortimes.map((time) => (
+              {workOrderOperatortimes.map((time, index) => (
                 <tr
                   key={time.id}
                   className={` ${
@@ -351,13 +450,34 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
                   }`}
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-lg text-gray-900">
+                    <div className="text-lg text-gray-900 flex flex-col">
                       {formatDate(time.startTime.toLocaleString())}
+                      {editingIndex === index && (
+                        <input
+                          type="text"
+                          className="text-lg text-gray-900 w-full border-0"
+                          value={editedStartTime}
+                          onChange={(e) => {
+                            setEditedStartTime(e.target.value);
+                          }}
+                        />
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-lg text-gray-900">
+                    <div className="text-lg text-gray-900 flex flex-col">
                       {formatDate(time.endTime?.toLocaleString())}
+                      {editingIndex === index &&
+                        formatDate(time.endTime?.toLocaleString()) !== null && (
+                          <input
+                            type="text"
+                            className="text-lg text-gray-900 w-full border-0"
+                            value={editedEndTime}
+                            onChange={(e) => {
+                              setEditedEndTime(e.target.value);
+                            }}
+                          />
+                        )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -370,17 +490,74 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
                       {time.operator.name}
                     </div>
                   </td>
+                  {loginUser?.permission == UserPermission.Administrator && (
+                    <td className="px-6 py-4 whitespace-nowrap align-center flex flex-row gap-4">
+                      <button
+                        type="button"
+                        className={`${
+                          isFinished
+                            ? "bg-gray-500"
+                            : "bg-green-500 hover:bg-green-600 focus:bg-green-600"
+                        } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
+                        onClick={() =>
+                          updateWorkOrderOperatorTimes(
+                            index,
+                            time.id!,
+                            time.startTime.toString(),
+                            time.endTime != null ? time.endTime?.toString() : ""
+                          )
+                        }
+                      >
+                        {editingIndex === index ? "Guardar" : "Editar"}
+                      </button>
+                      {editingIndex === index && (
+                        <>
+                          <button
+                            type="button"
+                            className={`${
+                              isFinished
+                                ? "bg-gray-500"
+                                : "bg-gray-500 hover:bg-gray-600 focus:bg-gray-600"
+                            } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
+                            onClick={(e) => {
+                              setEditingIndex(-1);
+                              setEditedEndTime("");
+                              setEditedStartTime("");
+                            }}
+                          >
+                            {"Cancelar"}
+                          </button>
+                          <button
+                            type="button"
+                            className={`${
+                              isFinished
+                                ? "bg-gray-500"
+                                : "bg-red-500 hover:bg-red-600 focus:bg-red-600"
+                            } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
+                            onClick={(e) => {
+                              setEditingIndex(-1);
+                              setEditedEndTime("");
+                              setEditedStartTime("");
+                              deleteWorkOrderOperatorTimes(time.id!);
+                            }}
+                          >
+                            {"Eliminar"}
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
             <tfoot className="bg-white divide-y divide-gray-200">
               <tr>
-                <td colSpan={2}></td>
+                <td colSpan={3}></td>
                 <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900 font-bold">
                   Temps Total
                 </td>
                 <td
-                  colSpan={2}
+                  colSpan={3}
                   className="px-6 py-4 whitespace-nowrap text-lg text-gray-900 font-bold"
                 >
                   {totalFormatted}
@@ -388,7 +565,7 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
               </tr>
               {Object.keys(totalTimes).map((operatorId) => (
                 <tr key={operatorId}>
-                  <td colSpan={3}></td>
+                  <td colSpan={4}></td>
                   <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900 font-bold">
                     {operators.find((op) => op.id === operatorId)?.name}:{" "}
                     {totalTimes[operatorId]}
@@ -404,4 +581,4 @@ const WorkOrderOperatorTimes: React.FC<IWorkOrderOperatorTimes> = ({
   );
 };
 
-export default WorkOrderOperatorTimes;
+export default WorkOrderOperatorTimesComponent;

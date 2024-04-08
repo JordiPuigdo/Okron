@@ -39,6 +39,8 @@ const SparePartForm: React.FC<SparePartForm> = ({ sparePartLoaded }) => {
         setValue("family", sparePartLoaded!.family);
         setValue("brand", sparePartLoaded!.brand);
         setValue("stock", sparePartLoaded!.stock);
+        setValue("price", sparePartLoaded!.price);
+        setValue("active", sparePartLoaded!.active);
         setSparePart(sparePart);
       } catch (error) {
         setShowErrorMessage(true);
@@ -169,10 +171,30 @@ const SparePartForm: React.FC<SparePartForm> = ({ sparePartLoaded }) => {
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-600">
+            Preu
+          </label>
+          <input
+            {...register("price")}
+            className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-600">
             Stock
           </label>
           <input
             {...register("stock")}
+            className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-600">
+            Actiu
+          </label>
+          <input
+            type="checkbox"
+            {...register("active")}
             className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
           />
         </div>

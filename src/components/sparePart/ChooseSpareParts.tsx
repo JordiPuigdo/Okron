@@ -34,8 +34,9 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
-  const [filteredSpareParts, setFilteredSpareParts] =
-    useState<SparePart[]>(availableSpareParts);
+  const [filteredSpareParts, setFilteredSpareParts] = useState<SparePart[]>(
+    availableSpareParts.filter((x) => x.active)
+  );
   const sparePartsLimit = 5;
   const [unitsPerSparePart, setUnitsPerSparePart] = useState<{
     [key: string]: number;

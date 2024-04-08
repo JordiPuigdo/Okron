@@ -217,7 +217,7 @@ export default function WorkOrdersPage() {
             onClick={(e) => handleFinalizeWorkOrdersDayBefore()}
           >
             Finalitzar les ordres del dia anterior{" "}
-            {formatDate(new Date(Date.now() - 86400000), false)}
+            {formatDate(new Date(Date.now() - 86400000), false, false)}
             {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </button>
         </div>

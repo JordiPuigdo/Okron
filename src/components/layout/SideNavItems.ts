@@ -1,69 +1,81 @@
-import { SideNavItem } from "app/types/SideNavItem";
-import { SvgGear } from "app/icons/icons";
+import { SideNavItem, generateKey } from "app/types/SideNavItem";
+import { SvgGear, SvgMachine, SvgSparePart } from "app/icons/icons";
 import { UserPermission } from "app/interfaces/User";
 
 export const SIDENAV_ITEMS: SideNavItem[] = [
+
+
   {
-    key: 1,
-    title: 'Màquines',
-    path: '/machines',
-    permission: UserPermission.Administrator
-  },
-  {
-    key: 2,
-    title: 'Seccions',
-    path: '/section',
-    permission: UserPermission.Administrator
-  },
-  {
-    key: 3,
+    key: generateKey(),
     title: 'Preventius',
     path: '',
     submenu: true,
     permission: UserPermission.Administrator,
     submenuItems: [
       {
-        key: 31,
+        key: generateKey(),
         title: 'Configuració',
         path: '/preventive',
         permission: UserPermission.Administrator
       },{
-        key: 32,
+        key: generateKey(),
         title: 'Punts Inspecció',
         path: '/inspectionPoints',
         permission: UserPermission.Administrator
       },]
   },
   {
-    key: 4,
+    key: generateKey(),
     title: 'Correctius',
     path: '/corrective',
     permission: UserPermission.Worker
   },
   {
-    key: 5,
+    key: generateKey(),
     title: 'Ordres de treball',
     path: '/workOrders',
     permission: UserPermission.Worker
   },
   {
-    key: 6,
-    title: 'Operaris',
-    path: '/operators',
-    permission: UserPermission.Administrator
-  },
-  {
-    key: 7,
+    key: generateKey(),
     title: 'Recanvis',
     path: '/spareParts',
-    permission: UserPermission.Worker
-    //icon : SvgGear,
+    permission: UserPermission.Worker,
+    icon : SvgSparePart,
   },
   {
-    key: 9,
-    title: 'Sistema',
-    path: '/spareParts',
+    key: generateKey(),
+    title: 'Configuració',
+    path: '',
     permission: UserPermission.Administrator,
+    submenu: true,
     icon : SvgGear,
+    submenuItems: [
+      {
+        key: generateKey(),
+        title: 'Actius i Equips',
+        path: '/assets',
+        permission: UserPermission.Administrator
+      },  
+      {
+        key: generateKey(),
+        title: 'Seccions',
+        path: '/section',
+        permission: UserPermission.Administrator
+      },
+      {
+      key: generateKey(),
+      title: 'Màquines',
+      path: '/machines',
+      icon: SvgMachine,
+      permission: UserPermission.Administrator
+      },
+      {
+        key: generateKey(),
+        title: 'Operaris',
+        path: '/operators',
+        permission: UserPermission.Administrator
+      },
+    ]
   },
 ];
