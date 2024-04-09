@@ -139,7 +139,7 @@ function PreventivePage() {
             onClick={generateWorkOrders}
             className="bg-orange-500 text-white px-4 py-2 rounded-md flex"
           >
-            Generar Preventius d'Avui {formatDate(new Date(), false)}
+            Generar Preventius d'Avui {formatDate(new Date(), false, false)}
             {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </button>
         </div>
