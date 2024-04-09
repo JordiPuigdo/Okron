@@ -52,7 +52,6 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
               className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
               onClick={(e) => {
                 onDelete(asset.id);
-                window.location.reload();
               }}
             >
               Eliminar
@@ -74,6 +73,7 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
 const AssetList: React.FC = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
+  const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
     assetService
@@ -87,7 +87,20 @@ const AssetList: React.FC = () => {
   }, []);
 
   const handleDelete = (id: string) => {
-    assetService.deleteAsset(id).then((data) => {});
+    assetService
+      .deleteAsset(id)
+      .then((data) => {
+        if (data) {
+          window.location.reload();
+        }
+      })
+      .catch((error) => {
+        console.error("Error al eliminar activo:", error);
+        setMessage("Error al eliminar activo");
+        setTimeout(() => {
+          setMessage("");
+        }, 3000);
+      });
   };
 
   return (
@@ -105,6 +118,7 @@ const AssetList: React.FC = () => {
           <AssetListItem key={asset.id} asset={asset} onDelete={handleDelete} />
         ))}
       </ul>
+      {message != "" && <span className="text-red-500">{message}</span>}
     </div>
   );
 };
