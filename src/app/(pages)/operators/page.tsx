@@ -7,9 +7,59 @@ import Operator from "app/interfaces/Operator";
 import Link from "next/link";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
+import DataTable from "components/table/DataTable";
+import {
+  Column,
+  ColumnFormat,
+  Filters,
+  FiltersFormat,
+  TableButtons,
+} from "components/table/interfaceTable";
+import { EntityTable } from "components/table/tableEntitys";
 
 function OperatorsPage() {
   const [operators, setOperators] = useState<Operator[]>([]);
+
+  const columns: Column[] = [
+    {
+      label: "ID",
+      key: "id",
+      format: ColumnFormat.TEXT,
+    },
+    {
+      label: "Codi",
+      key: "code",
+      format: ColumnFormat.TEXT,
+    },
+    {
+      label: "Nom",
+      key: "name",
+      format: ColumnFormat.TEXT,
+    },
+    {
+      label: "Actiu",
+      key: "active",
+      format: ColumnFormat.BOOLEAN,
+    },
+  ];
+  const filters: Filters[] = [
+    {
+      key: "code",
+      label: "Codi",
+      format: FiltersFormat.TEXT,
+    },
+    {
+      key: "name",
+      label: "Nom",
+      format: FiltersFormat.TEXT,
+    },
+  ];
+
+  const tableButtons: TableButtons = {
+    edit: true,
+    delete: true,
+  };
+
   const operatorService = new OperatorService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
@@ -48,10 +98,15 @@ function OperatorsPage() {
   }
 
   async function deleteOperator(id: string) {
-    const data = await operatorService.deleteOperator(id);
-    setOperators((prevOperators) =>
-      prevOperators.filter((prevOperators) => prevOperators.id !== id)
+    const isConfirmed = window.confirm(
+      "Segur que voleu eliminar aquest operari?"
     );
+    if (isConfirmed) {
+      await operatorService.deleteOperator(id);
+      setOperators((prevOperators) =>
+        prevOperators.filter((prevOperators) => prevOperators.id !== id)
+      );
+    }
   }
 
   return (
@@ -74,40 +129,14 @@ function OperatorsPage() {
           />
         )}
         <div className="overflow-x-auto text-black">
-          <table className="min-w-full border rounded-lg">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border py-2 px-4">Nom</th>
-                <th className="border py-2 px-4">Codi</th>
-                <th className="border py-2 px-4">Accions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {operators.map((operator) => (
-                <tr key={operator.id} className="bg-white">
-                  <td className="border py-2 px-4">{operator.name}</td>
-                  <td className="border py-2 px-4">{operator.code}</td>
-                  <td className="border py-2 px-4">
-                    <button className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
-                      <Link
-                        href="/operators/[id]"
-                        as={`/operators/${operator.id}`}
-                      >
-                        Editar
-                      </Link>
-                    </button>
-
-                    <button
-                      onClick={() => deleteOperator(operator.id)}
-                      className="bg-red-500 text-white px-3 py-1 ml-2 rounded-md cursor-pointer"
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <DataTable
+            data={operators.sort((a, b) => a.code.localeCompare(b.code))}
+            filters={filters}
+            columns={columns}
+            tableButtons={tableButtons}
+            entity={EntityTable.OPERATOR}
+            onDelete={deleteOperator}
+          />
         </div>
       </Container>
     </MainLayout>

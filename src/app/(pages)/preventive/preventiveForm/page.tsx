@@ -20,6 +20,10 @@ import ca from "date-fns/locale/ca";
 import { SvgSpinner } from "app/icons/icons";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
+import ChooseInspectionPoint from "components/inspectionPoint/ChooseInspectionPoint";
+import ChooseOperatorV2 from "components/operator/ChooseOperatorV2";
+import ChooseElement from "components/ChooseElement";
+import machine from "app/interfaces/machine";
 
 const PreventiveForm = () => {
   const router = useRouter();
@@ -37,9 +41,7 @@ const PreventiveForm = () => {
   const [selectedInspectionPoints, setSelectedInspectionPoints] = useState<
     string[]
   >([]);
-  const [filteredSpareParts, setFilteredSpareParts] = useState<SparePart[]>([]);
-  const [filterSparePartsText, setFilterSparePartsText] = useState<string>("");
-  const [sparePartsLimit, setSparePartsLimit] = useState(5);
+
   const preventiveService = new PreventiveService(apiURL);
   const sparePartService = new SparePartService(apiURL);
   const inspectionPointService = new InspectionPointService(apiURL);
@@ -61,16 +63,6 @@ const PreventiveForm = () => {
   const [preventiveDays, setPreventiveDays] = useState(0);
 
   useEffect(() => {
-    const fetchSpareParts = async () => {
-      try {
-        const parts = await sparePartService.getSpareParts();
-        setAvailableSpareParts(parts);
-        setFilteredSpareParts(parts);
-      } catch (error) {
-        console.error("Error fetching spare parts:", error);
-      }
-    };
-
     const fetchInspectionPoints = async () => {
       try {
         const points = await inspectionPointService.getAllInspectionPoints();
@@ -95,7 +87,6 @@ const PreventiveForm = () => {
       }
     };
 
-    fetchSpareParts();
     fetchInspectionPoints();
     fetchOperators();
     fetchMachines();
@@ -107,30 +98,15 @@ const PreventiveForm = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const filtered = availableSpareParts.filter((sparePart) => {
-      const searchText = filterSparePartsText.toLowerCase();
+  const handleDeleteInspectionPointSelected = (id: string) => {
+    setSelectedInspectionPoints((prevSelected) =>
+      prevSelected.filter((id) => id !== id)
+    );
+  };
 
-      return [
-        sparePart.code,
-        sparePart.description,
-        sparePart.refProvider,
-        sparePart.family,
-      ].some((field) => field && field.toLowerCase().includes(searchText));
-    });
-
-    setFilteredSpareParts(filtered);
-  }, [filterSparePartsText]);
-
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const pointId = event.target.value;
-    if (event.target.checked) {
-      setSelectedInspectionPoints((prevSelected) => [...prevSelected, pointId]);
-    } else {
-      setSelectedInspectionPoints((prevSelected) =>
-        prevSelected.filter((id) => id !== pointId)
-      );
-    }
+  const handleInspectionPointSelected = (id: string) => {
+    if (id == "") return;
+    setSelectedInspectionPoints((prevSelected) => [...prevSelected, id]);
   };
 
   function convertToCreateWorkOrderRequest(
@@ -144,7 +120,6 @@ const PreventiveForm = () => {
       counter: 0,
       machineId: selectedMachines.map((machine) => machine),
       inspectionPointId: selectedInspectionPoints.map((point) => point),
-      sparePartId: selectedSpareParts.map((sparePart) => sparePart),
       operatorId: selectedOperator.map((operator) => operator),
     };
     return createPreventiveRequest;
@@ -221,34 +196,30 @@ const PreventiveForm = () => {
     return true;
   }
 
-  const handleCheckboxOperatorChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const operator = event.target.value;
-    if (event.target.checked) {
-      setSelectedOperator((prevSelected) => [...prevSelected, operator]);
-    } else {
-      setSelectedOperator((prevSelected) =>
-        prevSelected.filter((id) => id !== operator)
-      );
-    }
+  const handleDeleteSelectedOperator = (id: string) => {
+    setSelectedOperator((prevSelected) =>
+      prevSelected.filter((id) => id !== id)
+    );
   };
 
-  const handleCheckboxMachineChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const machineId = event.target.value;
-    if (event.target.checked) {
-      setSelectedMachines((prevSelected) => [...prevSelected, machineId]);
-    } else {
-      setSelectedMachines((prevSelected) =>
-        prevSelected.filter((id) => id !== machineId)
-      );
-    }
+  const handleSelectedOperator = (id: string) => {
+    if (id == "") return;
+    setSelectedOperator((prevSelected) => [...prevSelected, id]);
   };
 
   const handleCancel = () => {
     router.back();
+  };
+
+  const handleDeleteSelectedMachine = (idMachine: string) => {
+    setSelectedMachines((prevSelected) =>
+      prevSelected.filter((id) => id !== idMachine)
+    );
+  };
+
+  const handleMachineSelected = (id: string) => {
+    if (id == "") return;
+    setSelectedMachines((prevSelected) => [...prevSelected, id]);
   };
 
   return (
@@ -261,230 +232,137 @@ const PreventiveForm = () => {
             style={{ display: "flex", flexDirection: "column", width: "100%" }}
           >
             <h2 className="text-2xl font-bold mb-6 text-black">
-              Configurar Preventiu
+              Configurar Nou Preventiu
             </h2>
-            <div
-              className="grid grid-cols-1 md:grid-cols-2 gap-4"
-              style={{ flex: "1" }}
-            >
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="code"
-                >
-                  Codi
-                </label>
-                <input
-                  {...register("code")}
-                  id="code"
-                  type="text"
-                  className="form-input border border-gray-300 rounded-md w-full"
-                />
-              </div>
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="description"
-                >
-                  Descripció
-                </label>
-                <textarea
-                  {...register("description")}
-                  id="description"
-                  className="form-textarea border border-gray-300 rounded-md w-full"
-                />
-              </div>
 
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="days"
-                >
-                  Freqüència Dies
-                </label>
-                <input
-                  value={preventiveDays}
-                  onChange={(e) => setPreventiveDays(parseInt(e.target.value))}
-                  id="days"
-                  type="number"
-                  className="form-input border border-gray-300 rounded-md w-full"
-                />
-              </div>
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="startExecution"
-                >
-                  Primera Execució del Preventiu
-                </label>
-                <DatePicker
-                  id="startDate"
-                  selected={startDate}
-                  onChange={(date: Date) => setStartDate(date)}
-                  dateFormat="dd/MM/yyyy"
-                  locale={ca}
-                  className="border border-gray-300 p-2 rounded-md mr-4"
-                />
-
-                {error && <p style={{ color: "red" }}>{error}</p>}
-              </div>
+            <div className="flex flex-col md:flex-row justify-center gap-8 w-full items-center my-4">
+              <label
+                className="block text-gray-700 font-bold mb-2 text-lg"
+                htmlFor="code"
+              >
+                Codi
+              </label>
+              <input
+                {...register("code")}
+                id="code"
+                type="text"
+                className="form-input border border-gray-300 rounded-md w-full"
+              />
+              <label
+                className="block text-gray-700 font-bold mb-2 text-lg"
+                htmlFor="description"
+              >
+                Descripció
+              </label>
+              <input
+                {...register("description")}
+                id="description"
+                type="text"
+                className="form-input border border-gray-300 rounded-md w-full"
+              />
             </div>
 
-            <div style={{ display: "flex", flex: "1" }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <div style={{ flex: 1 }}>
-                  <h3 className="text-lg font-medium text-gray-600 mb-2">
-                    Selecciona els punts d'inspecció
-                  </h3>
+            <div className="flex flex-col md:flex-row justify-center gap-8 w-3/4 items-center my-4">
+              <label
+                className="block text-gray-700 font-bold mb-2 text-lg"
+                htmlFor="days"
+              >
+                Freqüència Dies
+              </label>
+              <input
+                value={preventiveDays}
+                onChange={(e) => setPreventiveDays(parseInt(e.target.value))}
+                id="days"
+                type="number"
+                className="form-input border border-gray-300 rounded-md w-full"
+              />
+              <label
+                className="block text-gray-700 font-bold mb-2 text-lg"
+                htmlFor="startExecution"
+              >
+                Primera Execució del Preventiu
+              </label>
+              <DatePicker
+                id="startDate"
+                selected={startDate}
+                onChange={(date: Date) => setStartDate(date)}
+                dateFormat="dd/MM/yyyy"
+                locale={ca}
+                className="border border-gray-300 p-2 rounded-md mr-4"
+              />
+            </div>
+            {error && <p style={{ color: "red" }}>{error}</p>}
 
-                  <div className="mb-4">
-                    <input
-                      type="text"
-                      placeholder="Filtrar per descripció"
-                      value={filterText}
-                      onChange={(e) => setFilterText(e.target.value)}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-                    />
+            <div className="flex flex-row gap-8 w-full my-6">
+              <ChooseInspectionPoint
+                preventiveInspectionPoints={availableInspectionPoints}
+                onInspectionPointSelected={handleInspectionPointSelected}
+                onDeleteInspectionPointSelected={
+                  handleDeleteInspectionPointSelected
+                }
+                preventiveSelectedInspectionPoints={selectedInspectionPoints}
+              />
+              <ChooseOperatorV2
+                availableOperators={operators}
+                preventiveSelectedOperators={selectedOperator}
+                onDeleteSelectedOperator={handleDeleteSelectedOperator}
+                onSelectedOperator={handleSelectedOperator}
+              />
+            </div>
 
-                    {filteredInspectionPoints.map((point) => (
-                      <div key={point.id} className="mb-2">
-                        <label
-                          htmlFor={`inspectionPoint-${point.id}`}
-                          className="block text-gray-600 font-medium"
-                        >
-                          <input
-                            type="checkbox"
-                            id={`inspectionPoint-${point.id}`}
-                            value={point.id}
-                            onChange={handleCheckboxChange}
-                            checked={selectedInspectionPoints.includes(
-                              point.id
-                            )}
-                          />
-                          {point.description}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
+            <div className="flex flex-row gap-8 w-full my-6">
+              <ChooseElement
+                elements={aviableMachines}
+                selectedElements={selectedMachines}
+                onElementSelected={handleMachineSelected}
+                onDeleteElementSelected={handleDeleteSelectedMachine}
+                placeholder="Buscar màquines"
+                mapElement={(machine) => ({
+                  id: machine.id,
+                  description: machine.description,
+                })}
+              />
+            </div>
+            <div className="flex flex-row gap-4">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`${
+                  showSuccessMessage
+                    ? "bg-green-500"
+                    : showErrorMessage
+                    ? "bg-red-500"
+                    : "bg-blue-500"
+                } hover:${
+                  showSuccessMessage
+                    ? "bg-green-700"
+                    : showErrorMessage
+                    ? "bg-red-700"
+                    : "bg-blue-700"
+                } text-white font-bold py-2 px-4 rounded mt-6 flex items-center justify-center`}
+              >
+                Crear Preventiu
+                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+              </button>
+              {showSuccessMessage && (
+                <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
+                  Preventiu creat correctament
                 </div>
+              )}
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6"
+              >
+                Cancelar
+              </button>
 
-                <div style={{ flex: 1 }}>
-                  <h3 className="text-lg font-medium text-gray-600 mb-2">
-                    Punts d'inspecció seleccionats
-                  </h3>
-
-                  {selectedInspectionPoints.map((selectedPoint) => (
-                    <div key={selectedPoint} className="mb-2 text-black">
-                      {
-                        availableInspectionPoints.find(
-                          (point) => point.id === selectedPoint
-                        )?.description
-                      }
-                    </div>
-                  ))}
+              {showErrorMessage && (
+                <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
+                  Error al crear preventiu
                 </div>
-              </div>
+              )}
             </div>
-            <div className="mb-4">
-              <h3 className="text-lg font-medium text-gray-600 mb-2">
-                Operaris
-              </h3>
-              {operators.map((worker) => (
-                <div key={worker.id} className="mb-2">
-                  <label
-                    htmlFor={`operator-${worker.id}`}
-                    className="block text-gray-600 font-medium"
-                  >
-                    <input
-                      type="checkbox"
-                      id={`operator-${worker.id}`}
-                      value={worker.id}
-                      onChange={handleCheckboxOperatorChange}
-                      checked={selectedOperator.includes(worker.id)}
-                    />
-                    {worker.name}
-                  </label>
-                </div>
-              ))}
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              {/* Display list of available machines */}
-              <div style={{ flex: 1 }}>
-                <h3 className="text-lg font-medium text-gray-600 mb-2">
-                  Màquines
-                </h3>
-                {aviableMachines.map((machine) => (
-                  <div key={machine.id} className="mb-2">
-                    <label
-                      htmlFor={`machine-${machine.id}`}
-                      className="block text-gray-600 font-medium"
-                    >
-                      <input
-                        type="checkbox"
-                        id={`machine-${machine.id}`}
-                        value={machine.id}
-                        onChange={handleCheckboxMachineChange}
-                        checked={selectedMachines.includes(machine.id)}
-                      />
-                      {machine.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ flex: 1 }}>
-                <h3 className="text-lg font-medium text-gray-600 mb-2">
-                  Màquines seleccionades
-                </h3>
-                {selectedMachines.map((selectedMachine) => (
-                  <div key={selectedMachine} className="mb-2 text-black">
-                    {
-                      aviableMachines.find(
-                        (point) => point.id === selectedMachine
-                      )?.name
-                    }
-                  </div>
-                ))}
-              </div>
-            </div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`${
-                showSuccessMessage
-                  ? "bg-green-500"
-                  : showErrorMessage
-                  ? "bg-red-500"
-                  : "bg-blue-500"
-              } hover:${
-                showSuccessMessage
-                  ? "bg-green-700"
-                  : showErrorMessage
-                  ? "bg-red-700"
-                  : "bg-blue-700"
-              } text-white font-bold py-2 px-4 rounded mt-6 flex items-center justify-center`}
-            >
-              Crear Preventiu
-              {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-            </button>
-            {showSuccessMessage && (
-              <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
-                Preventiu creat correctament
-              </div>
-            )}
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6"
-            >
-              Cancelar
-            </button>
-
-            {showErrorMessage && (
-              <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
-                Error al crear preventiu
-              </div>
-            )}
           </form>
         </div>
       </Container>

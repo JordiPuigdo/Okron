@@ -29,8 +29,8 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
             </button>
           )}
           <div className="flex-grow">
-            <strong>Nom:</strong> {asset.name} | <strong>Nivell:</strong>{" "}
-            {asset.level}
+            <strong>Codi:</strong> {asset.code} | <strong>Descripció:</strong>{" "}
+            {asset.description} | <strong>Nivell:</strong> {asset.level}
           </div>
           <div>
             {asset.level < 7 && (
@@ -74,6 +74,7 @@ const AssetList: React.FC = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
   const [message, setMessage] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
     assetService
@@ -102,10 +103,37 @@ const AssetList: React.FC = () => {
         }, 3000);
       });
   };
+  const filterAssetsRecursive = (assets: Asset[], term: string): Asset[] => {
+    return assets.reduce((filtered: Asset[], asset) => {
+      const includesTerm =
+        asset.code.toLowerCase().includes(term.toLowerCase()) ||
+        asset.description.toLowerCase().includes(term.toLowerCase());
+
+      const filteredChildren = filterAssetsRecursive(asset.childs, term);
+
+      if (includesTerm || filteredChildren.length > 0) {
+        filtered.push({
+          ...asset,
+          childs: filteredChildren,
+        });
+      }
+
+      return filtered;
+    }, []);
+  };
+
+  const filteredAssets = filterAssetsRecursive(assets, searchTerm);
 
   return (
     <div className="max-w-4xl mx-auto">
       <h2 className="text-2xl font-semibold mb-6">Llistat d'actius i equips</h2>
+      <input
+        type="text"
+        placeholder="Buscar per codi o descripció"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="mb-4 px-2 py-1 border border-gray-300 rounded"
+      />
       <Link
         href="/assets/0"
         passHref
@@ -114,7 +142,7 @@ const AssetList: React.FC = () => {
         Afegir Nou Equip Pare
       </Link>
       <ul>
-        {assets.map((asset) => (
+        {filteredAssets.map((asset) => (
           <AssetListItem key={asset.id} asset={asset} onDelete={handleDelete} />
         ))}
       </ul>

@@ -21,11 +21,14 @@ const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrentId("");
     setQuery(event.target.value);
     setSelectedElementIndex(-1);
     setSearchResults(
       elements.filter((element) =>
-        element.name.toLowerCase().includes(event.target.value.toLowerCase())
+        element.description
+          .toLowerCase()
+          .includes(event.target.value.toLowerCase())
       )
     );
   };
@@ -89,7 +92,7 @@ const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
   }, [selectedElementIndex]);
 
   return (
-    <div ref={dropdownRef}>
+    <div ref={dropdownRef} className="w-full">
       <SearchInput
         value={query}
         onChange={handleQueryChange}

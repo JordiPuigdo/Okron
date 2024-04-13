@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Machine from "../../interfaces/machine";
 import WorkOrder, {
-  CreateWorkOrderRequest,
   SearchWorkOrderFilters,
   StateWorkOrder,
   WorkOrderType,
@@ -25,6 +23,13 @@ import Container from "components/layout/Container";
 import { useRouter } from "next/navigation";
 import AutocompleteSearchBar from "components/selector/AutocompleteSearchBar";
 import { ElementList } from "components/selector/ElementList";
+import DataTable from "components/table/DataTable";
+import {
+  Column,
+  ColumnFormat,
+  TableButtons,
+} from "components/table/interfaceTable";
+import { EntityTable } from "components/table/tableEntitys";
 
 export default function WorkOrdersPage() {
   const [machines, setMachines] = useState<ElementList[] | []>([]);
@@ -34,6 +39,50 @@ export default function WorkOrdersPage() {
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
+
+  const columns: Column[] = [
+    {
+      label: "ID",
+      key: "id",
+      format: ColumnFormat.TEXT,
+    },
+    {
+      label: "Codi",
+      key: "code",
+      format: ColumnFormat.TEXT,
+    },
+    {
+      label: "Descripció",
+      key: "description",
+      format: ColumnFormat.TEXT,
+    },
+    {
+      label: "Tipus",
+      key: "workOrderType",
+      format: ColumnFormat.WORKORDERTYPE,
+    },
+    {
+      label: "Data Inici",
+      key: "startTime",
+      format: ColumnFormat.DATE,
+    },
+    {
+      label: "Estat",
+      key: "stateWorkOrder",
+      format: ColumnFormat.STATEWORKORDER,
+    },
+    {
+      label: "Equip",
+      key: "machine.description",
+      format: ColumnFormat.TEXT,
+    },
+  ];
+
+  const tableButtons: TableButtons = {
+    edit: true,
+    delete: true,
+  };
+
   const [workOrders, setWorkOrders] = useState<WorkOrder[] | []>([]);
   const [currentMachineId, setCurrentMachineId] = useState<string | "">("");
   const [message, setMessage] = useState<string>("");
@@ -52,7 +101,7 @@ export default function WorkOrdersPage() {
       const activeMachines = machinesData.filter((machine) => machine.active);
       const mappedMachines = activeMachines.map((machine) => ({
         id: machine.id,
-        name: machine.name,
+        description: machine.description,
       }));
       setMachines(mappedMachines as ElementList[]);
     } catch (error) {
@@ -96,12 +145,12 @@ export default function WorkOrdersPage() {
     }
     const search: SearchWorkOrderFilters = {
       machineId: machineId,
-      startTime: startDateTime
+      startDateTime: startDateTime
         ? new Date(
             startDateTime.getTime() - startDateTime.getTimezoneOffset() * 60000
           ).toISOString()
         : "",
-      endTime: endDateTime
+      endDateTime: endDateTime
         ? new Date(
             endDateTime.getTime() - endDateTime.getTimezoneOffset() * 60000
           ).toISOString()
@@ -204,52 +253,11 @@ export default function WorkOrdersPage() {
       </div>
     );
   };
-  if (isLoadingPage) return <MainLayout>Carregant dades...</MainLayout>;
 
-  return (
-    <MainLayout>
-      <Container>
-        {renderHeader()}
-        <div>
-          <button
-            type="button"
-            className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
-            onClick={(e) => handleFinalizeWorkOrdersDayBefore()}
-          >
-            Finalitzar les ordres del dia anterior{" "}
-            {formatDate(new Date(Date.now() - 86400000), false, false)}
-            {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-          </button>
-        </div>
+  const renderFilterWorkOrders = () => {
+    return (
+      <div className="bg-white p-2 my-4 rounded-xl gap-4">
         <div className="flex gap-4 my-4 items-center">
-          <AutocompleteSearchBar
-            elements={machines}
-            setCurrentId={setCurrentMachineId}
-            placeholder="Buscar Màquines"
-          />
-          {currentMachineId.length > 0 && (
-            <div className="flex gap-4 items-center">
-              {machines
-                .filter((x) => x.id === currentMachineId)
-                .map((machine) => (
-                  <div key={machine.id}>
-                    <p>Màquina Seleccionada: {machine.name}</p>
-                  </div>
-                ))}
-              <div>
-                <button
-                  className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
-                  onClick={(e) => {
-                    setCurrentMachineId("");
-                  }}
-                >
-                  Eliminar filtre
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="flex items-center text-black mb-4">
           <div className="flex items-center">
             <label htmlFor="startDate" className="mr-2">
               Data inici entre:
@@ -288,142 +296,108 @@ export default function WorkOrdersPage() {
             <span className="text-red-500 ml-4">{message}</span>
           )}
         </div>
+
         {workOrders.length > 0 && (
-          <div className="flex">
-            <div className="flex items-center justify-start gap-3">
-              <span>Estat: </span>
-              <select
-                id="stateWorkOrder"
-                name="stateWorkOrder"
-                className="p-3 border border-gray-300 rounded-md w-full"
-                value={
-                  selectedStateFilter !== undefined ? selectedStateFilter : ""
-                }
-                onChange={handleStateFilterChange}
-              >
-                <option value="">-</option>
-                {Object.values(StateWorkOrder)
-                  .filter((value) => typeof value === "number")
-                  .map((state) => (
-                    <option
-                      key={state}
-                      value={
-                        typeof state === "string" ? parseInt(state, 10) : state
-                      }
-                    >
-                      {translateStateWorkOrder(state)}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            <div className="flex items-center justify-start gap-3 ml-4">
-              <span>Tipus: </span>
-              <select
-                id="workOrderType"
-                name="workOrderType"
-                className="p-3 border border-gray-300 rounded-md w-full"
-                value={
-                  selectedTypeFilter !== undefined ? selectedTypeFilter : ""
-                }
-                onChange={handleTypeFilterChange}
-              >
-                <option value="">-</option>
-                {Object.values(WorkOrderType)
-                  .filter((value) => typeof value === "number")
-                  .map((state) => (
-                    <option
-                      key={state}
-                      value={
-                        typeof state === "string" ? parseInt(state, 10) : state
-                      }
-                    >
-                      {translateWorkOrderType(state)}
-                    </option>
-                  ))}
-              </select>
-            </div>
+          <div className="flex flex-row gap-4 items-center ">
+            <AutocompleteSearchBar
+              elements={machines}
+              setCurrentId={setCurrentMachineId}
+              placeholder="Buscar Màquines"
+            />
+            <span>Estat: </span>
+            <select
+              id="stateWorkOrder"
+              name="stateWorkOrder"
+              className="p-3 border border-gray-300 rounded-md w-full "
+              value={
+                selectedStateFilter !== undefined ? selectedStateFilter : ""
+              }
+              onChange={handleStateFilterChange}
+            >
+              <option value="">-</option>
+              {Object.values(StateWorkOrder)
+                .filter((value) => typeof value === "number")
+                .map((state) => (
+                  <option
+                    key={state}
+                    value={
+                      typeof state === "string" ? parseInt(state, 10) : state
+                    }
+                  >
+                    {translateStateWorkOrder(state)}
+                  </option>
+                ))}
+            </select>
+            <span>Tipus: </span>
+            <select
+              id="workOrderType"
+              name="workOrderType"
+              className="p-3 border border-gray-300 rounded-md w-full"
+              value={selectedTypeFilter !== undefined ? selectedTypeFilter : ""}
+              onChange={handleTypeFilterChange}
+            >
+              <option value="">-</option>
+              {Object.values(WorkOrderType)
+                .filter((value) => typeof value === "number")
+                .map((state) => (
+                  <option
+                    key={state}
+                    value={
+                      typeof state === "string" ? parseInt(state, 10) : state
+                    }
+                  >
+                    {translateWorkOrderType(state)}
+                  </option>
+                ))}
+            </select>
+            <span className="text-white rounded-full p-3 w-full text-center bg-okron-corrective font-semibold">
+              Correctius:{" "}
+              {
+                workOrders.filter(
+                  (x) => x.workOrderType == WorkOrderType.Corrective
+                ).length
+              }
+            </span>
+            <span className="text-white rounded-full p-3 w-full text-center bg-okron-preventive font-semibold">
+              Preventius:{" "}
+              {
+                workOrders.filter(
+                  (x) => x.workOrderType == WorkOrderType.Preventive
+                ).length
+              }
+            </span>
           </div>
         )}
-        <div className="overflow-x-auto mt-6">
-          <table className="min-w-full table-auto border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="border p-3 text-left">Núm. Sèrie</th>
-                <th className="border p-3 text-left">Descripció</th>
-                <th className="border p-3 text-left">Data Inici</th>
-                <th className="border p-3 text-left">Màquina</th>
-                <th className="border p-3 text-left">Estat</th>
-                <th className="border p-3 text-left">Tipus</th>
-                <th className="border p-3 text-left">Accions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredWorkOrders.map((order, index) => (
-                <tr
-                  key={order.id}
-                  className={`
-                    ${
-                      order.stateWorkOrder === StateWorkOrder.OnGoing
-                        ? "bg-green-300"
-                        : order.stateWorkOrder === StateWorkOrder.Waiting
-                        ? "bg-orange-300"
-                        : order.stateWorkOrder === StateWorkOrder.Finished
-                        ? "bg-purple-300"
-                        : index % 2 === 0
-                        ? "bg-gray-100"
-                        : "bg-white hover:bg-gray-50"
-                    }
-                    
-                  `}
-                >
-                  <td className="border p-3">{order.code}</td>
-                  <td className="border p-3">{order.description}</td>
-                  <td className="border p-3">{formatDate(order.startTime)}</td>
-                  <td className="border p-3">{order.machine?.name}</td>
-                  <td className="border p-3">
-                    {translateStateWorkOrder(order.stateWorkOrder)}
-                  </td>
-                  <td className="border p-3">
-                    {translateWorkOrderType(order.workOrderType)}
-                  </td>
-                  <td className="border p-3 flex space-x-2 items-center">
-                    {order.stateWorkOrder == StateWorkOrder.Finished ? (
-                      <Link
-                        href="/workOrders/[id]"
-                        as={`/workOrders/${order.id}`}
-                        onClick={(e) => setIsLoading(true)}
-                      >
-                        <button className="flex bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
-                          Detall
-                          {isLoading && (
-                            <SvgSpinner style={{ marginLeft: "0.5rem" }} />
-                          )}
-                        </button>
-                      </Link>
-                    ) : (
-                      <>
-                        <Link
-                          href="/workOrders/[id]"
-                          as={`/workOrders/${order.id}`}
-                        >
-                          <button className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
-                            Editar
-                          </button>
-                        </Link>
-                        <button
-                          onClick={() => handleDeleteOrder(order.id)}
-                          className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600"
-                        >
-                          Eliminar
-                        </button>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      </div>
+    );
+  };
+
+  if (isLoadingPage) return <MainLayout>Carregant dades...</MainLayout>;
+
+  return (
+    <MainLayout>
+      <Container>
+        {renderHeader()}
+        <div>
+          <button
+            type="button"
+            className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
+            onClick={(e) => handleFinalizeWorkOrdersDayBefore()}
+          >
+            Finalitzar les ordres del dia anterior{" "}
+            {formatDate(new Date(Date.now() - 86400000), false, false)}
+            {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+          </button>
         </div>
+        {renderFilterWorkOrders()}
+
+        <DataTable
+          columns={columns}
+          data={filteredWorkOrders}
+          tableButtons={tableButtons}
+          entity={EntityTable.WORKORDER}
+          onDelete={handleDeleteOrder}
+        />
       </Container>
     </MainLayout>
   );

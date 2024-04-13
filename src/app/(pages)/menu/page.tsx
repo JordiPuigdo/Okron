@@ -16,6 +16,7 @@ export default function MenuPage() {
             <div>
               <WorkOrderComponent />
             </div>
+            <div></div>
           </div>
         </LoginChecker>
       </Container>

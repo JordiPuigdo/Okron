@@ -94,7 +94,7 @@ export default function WorkOrderComponent() {
                 <td className="border p-3">{order.code}</td>
                 <td className="border p-3">{order.description}</td>
                 <td className="border p-3">{formatDate(order.startTime)}</td>
-                <td className="border p-3">{order.machine?.name}</td>
+                <td className="border p-3">{order.machine?.description}</td>
                 <td className="border p-3">
                   {translateStateWorkOrder(order.stateWorkOrder)}
                 </td>

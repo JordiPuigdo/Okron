@@ -1,3 +1,4 @@
+import { Asset } from "./Asset";
 import Operator from "./Operator";
 import Machine from "./machine";
 
@@ -43,7 +44,8 @@ export interface SparePartDetailResponse {
 }   
 
 export interface SparePartPerMachineResponse {
-    machine : Machine;
+    machine? : Machine;
+    asset? : Asset; 
     workOrderId : string;
     spareParts : SparePartsConsumeds[];
 }
@@ -56,7 +58,9 @@ interface SparePartsConsumeds {
 }
 
 export interface SparePartDetailRequest {
-    id: string;
+    id?: string;
     startDate : string;
     endDate : string;
+    machineId? : string;
+    assetId? : string;
 }

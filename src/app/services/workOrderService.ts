@@ -7,6 +7,19 @@ class WorkOrderService {
     this.baseUrl = baseUrl;
   }
 
+    async createWorkOrder(WorkOrder: CreateWorkOrderRequest, machineId : string): Promise<void> {
+    const response = await fetch(`${this.baseUrl}workorder`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(WorkOrder),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to create machine WorkOrder');
+    }
+  }
+
   async addWorkOrderOperatorTimes(AddWorkOrderOperatorTimesValues: AddWorkOrderOperatorTimes): Promise<AddWorkOrderOperatorTimes> {
     try {
       const url = `${this.baseUrl}AddWorkOrderOperatorTimes`
@@ -102,7 +115,7 @@ class WorkOrderService {
 
   async getWorkOrdersByMachine(Id: string): Promise<WorkOrder[]> {
     try {
-      const url = `${this.baseUrl}machine-WorkOrder?MachineId=${Id}`
+      const url = `${this.baseUrl}workorder?MachineId=${Id}`
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch WorkOrders-machines');
@@ -120,7 +133,7 @@ class WorkOrderService {
 
   async getWorkOrdersById(Id: string): Promise<WorkOrder[]> {
     try {
-      const url = `${this.baseUrl}machine-WorkOrder?MachineId=${Id}`
+      const url = `${this.baseUrl}workorder?MachineId=${Id}`
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch WorkOrders-machines');
@@ -134,7 +147,7 @@ class WorkOrderService {
 
   async getWorkOrderById(Id: string): Promise<WorkOrder | undefined> {
     try {
-      const url = `${this.baseUrl}machine-WorkOrder/${Id}`
+      const url = `${this.baseUrl}workorder/${Id}`
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch WorkOrders');
@@ -148,7 +161,7 @@ class WorkOrderService {
 
   async updateWorkOrder(updateWorkOrder: CreateWorkOrderRequest): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}machine-WorkOrder`;
+      const url = `${this.baseUrl}workorder`;
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -175,17 +188,14 @@ class WorkOrderService {
 
   async getWorkOrdersWithFilters(searchWorkOrderFilters: SearchWorkOrderFilters): Promise<WorkOrder[]> {
     try {
-      let url = `${this.baseUrl}GetWorkOrderWithFilters?`;
-      searchWorkOrderFilters.machineId ? url += `machineId=${searchWorkOrderFilters.machineId}`: "";
-      searchWorkOrderFilters.startTime ? url +=      `&startDateTime=${searchWorkOrderFilters.startTime || ''}` +
-      `&endDateTime=${searchWorkOrderFilters.endTime || ''}` : "";
-      searchWorkOrderFilters.operatorId? url += `&operatorId=${searchWorkOrderFilters.operatorId || ''}`: "";
+      let url = `${this.baseUrl}GetWorkOrderWithFilters`;
 
       const response = await fetch(url, {
-        method: 'GET',
+        method: 'Post',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify(searchWorkOrderFilters),
       });
       
       if (!response.ok) {
@@ -203,7 +213,7 @@ class WorkOrderService {
 
   async deleteWorkOrder(id : string ): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}machine-WorkOrder/${id}`;
+      const url = `${this.baseUrl}workorder/${id}`;
       const response = await fetch(url, {
         method: 'DELETE',
         headers: {
@@ -272,7 +282,7 @@ class WorkOrderService {
   
   async updateStateWorkOrder(id : string, workOrderState : StateWorkOrder): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}machine-WorkOrder/${id}?state=${workOrderState}`;
+      const url = `${this.baseUrl}workorder/${id}?state=${workOrderState}`;
 
       
       const response = await fetch(url, {
@@ -366,7 +376,7 @@ class WorkOrderService {
 
   async cleanCache(): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}machine-WorkOrder/CleanCache`;
+      const url = `${this.baseUrl}workorder/CleanCache`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch WorkOrders-machines');

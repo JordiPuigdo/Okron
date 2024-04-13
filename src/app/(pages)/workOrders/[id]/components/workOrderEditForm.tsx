@@ -300,7 +300,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           </div>
           <div>
             <span className="text-xl font-bold text-black mx-auto">
-              Màquina - {currentWorkOrder?.machine?.name}
+              Equip - {currentWorkOrder?.asset?.description}
             </span>
           </div>
         </div>

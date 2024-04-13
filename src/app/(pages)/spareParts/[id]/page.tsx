@@ -17,6 +17,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
 import Link from "next/link";
+import TableSparePartsConsumed from "../components/tableSparePartsConsumed";
 
 export default function EditSparePart({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -37,6 +38,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
   const [sparePerMachine, setSparePartPerMachine] = useState<
     SparePartPerMachineResponse[] | null
   >([]);
+
   const currentDate = new Date();
   currentDate.setDate(currentDate.getDate() - 15);
 
@@ -105,41 +107,9 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
       });
   };
 
-  async function filterSpareParts() {
-    const x: SparePartDetailRequest = {
-      id: params.id,
-      startDate: formatDateQuery(startDate!, true),
-      endDate: formatDateQuery(endDate!, false),
-    };
-    const sparePartDetailResponse = await sparePartService.getSparePart(x);
-    setSparePartPerMachine(sparePartDetailResponse.sparePartPerMachineResponse);
-  }
-
   function handleBack() {
     router.back();
   }
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const handleSearchChange = (event: any) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const filteredSpareParts = sparePerMachine!.filter((sparePartPerMachine) => {
-    return (
-      sparePartPerMachine.machine.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      sparePartPerMachine.spareParts.some((consumes) =>
-        consumes.operator.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-  });
-  const totalUnitsPerMachine = filteredSpareParts?.map((sparePartPerMachine) =>
-    sparePartPerMachine.spareParts.reduce(
-      (total, consumes) => total + consumes.quantity,
-      0
-    )
-  );
 
   const renderHeader = () => {
     return (
@@ -283,141 +253,11 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
               </p>
             )}
           </form>
-          <div className="overflow-x-auto mt-4 bg-gray-400 p-4 rounded-lg mb-6">
-            <div className="mb-4 text-white text-lg font-semibold">
-              Unitats consumides
-            </div>
-            <div className="flex items-center space-x-4 pb-4">
-              <span className="text-white pr-3">Data Inici:</span>
-              <DatePicker
-                id="startDate"
-                selected={startDate}
-                onChange={(date: Date) => setStartDate(date)}
-                dateFormat="dd/MM/yyyy"
-                locale={ca}
-                className="p-3 border border-gray-300 rounded-md text-lg bg-white text-gray-900"
-              />
-              <span className="text-white pr-3">Data Fi:</span>
-              <DatePicker
-                id="endDate"
-                selected={endDate}
-                onChange={(date: Date) => setEndDate(date)}
-                dateFormat="dd/MM/yyyy"
-                locale={ca}
-                className="p-3 border border-gray-300 rounded-md text-lg bg-white text-gray-900"
-              />
-              <button
-                type="button"
-                onClick={filterSpareParts}
-                className="bg-blue-500 text-white ml-4 px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300 "
-              >
-                Filtrar per dates
-              </button>
-              <input
-                type="text"
-                placeholder="Màquina / Operari"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="p-3 border border-gray-300 rounded-md text-lg bg-white text-gray-900"
-              />
-            </div>
-
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Màquina
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Unitats
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Dia
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Operari
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Detall Ordre
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredSpareParts?.map((sparePartPerMachine, index) => (
-                  <tr key={index} className="hover:bg-gray-100">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {sparePartPerMachine.machine.name}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {sparePartPerMachine.spareParts.map((consumes, index) => (
-                        <div key={index} className="text-sm text-gray-900">
-                          {consumes.quantity}
-                        </div>
-                      ))}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {sparePartPerMachine.spareParts.map((consumes, index) => (
-                        <div key={index} className="text-sm text-gray-900">
-                          {formatDate(consumes.creationDate, true)}
-                        </div>
-                      ))}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {sparePartPerMachine.spareParts.map((consumes, index) => (
-                        <div key={index} className="text-sm text-gray-900">
-                          {consumes.operator.name}
-                        </div>
-                      ))}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {sparePartPerMachine.workOrderId.length > 0 && (
-                        <Link
-                          href="/workOrders/[id]"
-                          as={`/workOrders/${sparePartPerMachine.workOrderId}`}
-                          className="flex bg-green-500 text-white p-2 rounded-md hover:bg-green-600"
-                        >
-                          Detall
-                        </Link>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-                <tr className="bg-gray-100">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 font-semibold">
-                      Total Unitats Consumides
-                    </div>
-                  </td>
-                  <td
-                    colSpan={4}
-                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold"
-                  >
-                    {totalUnitsPerMachine?.reduce(
-                      (total, units) => total + units,
-                      0
-                    )}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <TableSparePartsConsumed
+            searchPlaceHolder="Buscar per equip o operari"
+            sparePartsPerAsset={sparePerMachine != null ? sparePerMachine : []}
+            sparePartId={sparePart.id}
+          />
         </Container>
       </MainLayout>
     );

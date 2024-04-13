@@ -1,14 +1,15 @@
 "use client";
-
-import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import AssetService from "app/services/assetService";
 import { Asset, UpdateAssetRequest } from "app/interfaces/Asset";
-import { SvgSpinner } from "app/icons/icons";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
 import { useRouter } from "next/navigation";
 import useRoutes from "app/utils/useRoutes";
+import AssetForm from "../components/assetForm";
+import { SvgSpinner } from "app/icons/icons";
+import TableSparePartsConsumed from "app/(pages)/spareParts/components/tableSparePartsConsumed";
+import TableWorkOrdersPerAsset from "app/(pages)/workOrders/components/tableWorkOrdersPerAsset";
 
 export default function AssetDetailsPage({
   params,
@@ -16,43 +17,30 @@ export default function AssetDetailsPage({
   params: { id: string };
 }) {
   const id = params.id;
-  const [level, setLevel] = useState(0);
-  const { register, handleSubmit, setValue } = useForm();
   const [loading, setLoading] = useState(false);
   const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
   const [isloading, setIsloading] = useState(true);
-  const router = useRouter();
-  const ROUTES = useRoutes();
+  const [currentAsset, setCurrentAsset] = useState<Asset | null>(null); // Track current asset data
+  const [level, setLevel] = useState(0);
+  const queryString = window.location.search;
+  const par = new URLSearchParams(queryString);
+  const parentId = par.get("parentId");
+  const levelGetted =
+    par.get("level") != null ? parseInt(par.get("level")!) : 1;
 
   useEffect(() => {
-    const queryString = window.location.search;
-    const par = new URLSearchParams(queryString);
-    const parentId = par.get("parentId");
-    const levelGetted =
-      par.get("level") != null ? parseInt(par.get("level")!) : 1;
-    if (id != "0") {
+    if (id !== "0") {
       setLoading(true);
       assetService
         .getAssetById(id as string)
         .then((asset: Asset) => {
-          setValue("id", asset.id);
-          setValue("active", asset.active);
-          setValue("creationDate", asset.creationDate);
-          setValue("name", asset.name);
-          setValue("level", asset.level);
-          setValue("parentId", asset.parentId);
+          setCurrentAsset(asset); // Set current asset data
           setLoading(false);
         })
         .catch((error) => {
           console.error("Error fetching asset data:", error);
           setLoading(false);
         });
-    } else {
-      if (parentId != null || parentId != undefined) {
-        setValue("parentId", parentId.length > 0 ? parentId : "");
-      }
-      setLevel(levelGetted);
-      setValue("level", levelGetted!.toString().length > 0 ? levelGetted : 1);
     }
     setIsloading(false);
   }, [id]);
@@ -60,14 +48,14 @@ export default function AssetDetailsPage({
   const onSubmit = async (data: any) => {
     try {
       setLoading(true);
-      if (id != "0") {
+      if (id !== "0") {
         const newData: UpdateAssetRequest = {
           ...data,
-          id: id as string,
+          id: id,
           active: data.active,
           creationDate: data.creationDate,
         };
-        await assetService.updateAsset(id as string, newData);
+        await assetService.updateAsset(id, newData);
       } else {
         await assetService.createAsset(data);
       }
@@ -86,54 +74,31 @@ export default function AssetDetailsPage({
   return (
     <MainLayout>
       <Container>
-        <div className="mx-auto max-w-md p-6 bg-white shadow-md rounded-md">
-          {isloading ? (
-            <SvgSpinner />
-          ) : (
-            <>
-              <h2 className="text-2xl font-bold mb-4">
-                {id !== "0"
-                  ? "Actualizar Equip"
-                  : `Afegir Equip - Nivell: ${level}`}
-              </h2>
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="mb-4">
-                  <label className="block text-gray-700 mb-2">Nom:</label>
-                  <input
-                    type="text"
-                    {...register("name", { required: true })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div className="flex flex-row gap-4">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="flex items-center justify-center bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300 ease-in-out"
-                  >
-                    {loading ? (
-                      <SvgSpinner />
-                    ) : id !== "0" ? (
-                      "Actualizar"
-                    ) : (
-                      "Afegir"
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={loading}
-                    className="flex items-center justify-center bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300 ease-in-out"
-                    onClick={(e) => {
-                      router.push(ROUTES.assets);
-                    }}
-                  >
-                    {loading ? <SvgSpinner /> : "Cancelar"}
-                  </button>
-                </div>
-              </form>
-            </>
-          )}
-        </div>
+        {isloading ? (
+          <SvgSpinner />
+        ) : (
+          <>
+            <div className="mx-auto max-w-md p-6 bg-white shadow-md rounded-md">
+              <AssetForm
+                id={id}
+                loading={loading}
+                assetData={currentAsset != null ? currentAsset : undefined}
+                level={levelGetted}
+                parentId={parentId != null ? parentId : ""}
+                onSubmit={onSubmit}
+              />
+            </div>
+            {
+              <div>
+                <TableSparePartsConsumed
+                  assetId={id}
+                  searchPlaceHolder="Buscar per operari"
+                />
+                <TableWorkOrdersPerAsset assetId={id} />
+              </div>
+            }
+          </>
+        )}
       </Container>
     </MainLayout>
   );

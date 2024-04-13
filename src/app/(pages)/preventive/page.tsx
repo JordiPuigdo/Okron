@@ -8,8 +8,14 @@ import PreventiveService from "app/services/preventiveService";
 import { formatDate } from "app/utils/utils";
 import Container from "components/layout/Container";
 import { useRouter } from "next/navigation";
-
-const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50];
+import DataTable from "components/table/DataTable";
+import { EntityTable } from "components/table/tableEntitys";
+import {
+  Column,
+  ColumnFormat,
+  Filters,
+  FiltersFormat,
+} from "components/table/interfaceTable";
 
 function PreventivePage() {
   const preventiveService = new PreventiveService(
@@ -24,6 +30,57 @@ function PreventivePage() {
   const [isLoadingPage, setIsLoadingPage] = useState(true);
   const [message, setMessage] = useState("");
   const router = useRouter();
+
+  const columns: Column[] = [
+    {
+      label: "ID",
+      key: "id",
+      format: ColumnFormat.TEXT,
+    },
+    {
+      label: "Codi",
+      key: "code",
+      format: ColumnFormat.TEXT,
+    },
+    {
+      label: "Descripció",
+      key: "description",
+      format: ColumnFormat.TEXT,
+    },
+    {
+      label: "Màquina",
+      key: "machine.description",
+      format: ColumnFormat.TEXT,
+    },
+    {
+      label: "Última execució",
+      key: "lastExecution",
+      format: ColumnFormat.DATE,
+    },
+  ];
+
+  const filters: Filters[] = [
+    {
+      key: "code",
+      label: "Codi",
+      format: FiltersFormat.TEXT,
+    },
+    {
+      key: "description",
+      label: "Descripció",
+      format: FiltersFormat.TEXT,
+    },
+    {
+      key: "machine.description",
+      label: "Màquina",
+      format: FiltersFormat.TEXT,
+    },
+  ];
+
+  const tableButtons: any = {
+    edit: true,
+    delete: true,
+  };
 
   useEffect(() => {
     const fetchPreventives = async () => {
@@ -154,89 +211,17 @@ function PreventivePage() {
             {preventive.code} - {preventive.description}
           </div>
         ))}
-        <div className="flex space-x-2">
-          <input
-            type="text"
-            placeholder="Buscar per codi o descripció"
-            value={filterText}
-            onChange={(e) => setFilterText(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 flex-1"
-          />
-        </div>
+
         {isLoadingPage && <SvgSpinner className="flex w-full" />}
         {!isLoadingPage && (
-          <div className="mt-4">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Codi
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Descripció
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Màquina
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Accions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {!isLoadingPage &&
-                  filteredPreventives.map((preventive) => (
-                    <tr key={preventive.id}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {preventive.code}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {preventive.description}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {preventive.machine.name}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex gap-4">
-                          <Link
-                            href="/preventive/[id]"
-                            as={`/preventive/${preventive.id}`}
-                            className="bg-green-500 text-white px-3 py-1 rounded-md cursor-pointer flex items-center"
-                            onClick={(e) => setIsLoading(true)}
-                          >
-                            Editar
-                            {isLoading && (
-                              <SvgSpinner className="ml-2 w-4 h-4" />
-                            )}
-                          </Link>
-                          <button
-                            onClick={() => handleDelete(preventive.id)}
-                            className="bg-red-500 text-white px-3 py-1 rounded-md cursor-pointer flex items-center"
-                          >
-                            Eliminar
-                            {isLoading && (
-                              <SvgSpinner className="ml-2 w-4 h-4" />
-                            )}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            data={filteredPreventives}
+            columns={columns}
+            filters={filters}
+            tableButtons={tableButtons}
+            entity={EntityTable.PREVENTIVE}
+            onDelete={handleDelete}
+          />
         )}
       </Container>
     </MainLayout>

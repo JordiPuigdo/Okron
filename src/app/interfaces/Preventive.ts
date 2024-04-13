@@ -27,7 +27,6 @@ export interface CreatePreventiveRequest {
     days : number,
     counter : number,
     inspectionPointId : string[],
-    sparePartId : string[],
     operatorId : string[]
 }
 

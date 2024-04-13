@@ -81,11 +81,14 @@ const MachineForm: React.FC<MachineFormProps> = ({
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="name" className="block font-medium text-gray-700">
+        <label
+          htmlFor="description"
+          className="block font-medium text-gray-700"
+        >
           Nom
         </label>
         <Controller
-          name="name"
+          name="description"
           control={control}
           render={({ field }) => (
             <input

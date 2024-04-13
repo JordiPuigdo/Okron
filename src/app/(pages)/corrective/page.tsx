@@ -23,6 +23,9 @@ import { translateStateWorkOrder } from "app/utils/utils";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
 import AutocompleteSearchBar from "components/selector/AutocompleteSearchBar";
+import { Asset } from "app/interfaces/Asset";
+import AssetService from "app/services/assetService";
+import { ElementList } from "components/selector/ElementList";
 
 function CorrectivePage() {
   const operatorService = new OperatorService(
@@ -34,11 +37,13 @@ function CorrectivePage() {
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
+  const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
   const [operators, setOperators] = useState<Operator[]>([]);
   const [selectedOperator, setSelectedOperator] = useState<string[]>([]);
-  const [selectedMachineId, setSelectedMachineId] = useState<string>("");
+  const [selectedId, setSelectedId] = useState<string>("");
 
   const [machines, setMachines] = useState<Machine[]>([]);
+  const [assets, setAssets] = useState<ElementList[]>([]);
 
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -56,6 +61,7 @@ function CorrectivePage() {
     await fetchOperators();
     await fetchMachines();
     await createCode();
+    await fetchAssets();
 
     setIsLoadingPage(false);
   }
@@ -98,6 +104,32 @@ function CorrectivePage() {
       });
   }
 
+  async function fetchAssets() {
+    try {
+      const assets = await assetService.getAll();
+      const elements: ElementList[] = [];
+
+      const addAssetAndChildren = (asset: Asset) => {
+        elements.push({
+          id: asset.id,
+          description: asset.description,
+        });
+
+        asset.childs.forEach((childAsset) => {
+          addAssetAndChildren(childAsset);
+        });
+      };
+
+      assets.forEach((asset) => {
+        addAssetAndChildren(asset);
+      });
+
+      setAssets(elements);
+    } catch (error) {
+      console.error("Error al obtener activos:", error);
+    }
+  }
+
   useEffect(() => {
     fetchFormData();
   }, []);
@@ -109,7 +141,7 @@ function CorrectivePage() {
       code: corrective.code,
       description: corrective.description,
       initialDateTime: corrective.startTime,
-      machineId: selectedMachineId,
+      assetId: selectedId,
       operatorId: corrective.operators.map((operator) => operator),
       stateWorkOrder: corrective.stateWorkOrder,
       workOrderType: 0,
@@ -129,11 +161,8 @@ function CorrectivePage() {
       return;
     }
     data.startTime = startDate || new Date();
-    await machinService
-      .createMachineWorkOrder(
-        convertToCreateWorkOrderRequest(data),
-        data.machineId
-      )
+    await workOrderService
+      .createWorkOrder(convertToCreateWorkOrderRequest(data), data.machineId)
       .then((aviableMachines) => {
         setShowSuccessMessage(true);
         setTimeout(() => {
@@ -150,7 +179,7 @@ function CorrectivePage() {
     if (
       !corrective.description ||
       corrective.description.trim().length === 0 ||
-      !selectedMachineId
+      !selectedId
     ) {
       return false;
     }
@@ -243,27 +272,27 @@ function CorrectivePage() {
                     htmlFor="machine"
                     className="block text-xl font-medium text-gray-700 mb-2"
                   >
-                    Màquina
+                    Equip
                   </label>
                   <AutocompleteSearchBar
-                    elements={machines}
-                    setCurrentId={setSelectedMachineId}
-                    placeholder="Buscar Màquines"
+                    elements={assets}
+                    setCurrentId={setSelectedId}
+                    placeholder="Buscar Equip"
                   />
-                  {selectedMachineId.length > 0 && (
+                  {selectedId.length > 0 && (
                     <div className="flex gap-4 items-center mt-4">
-                      {machines
-                        .filter((x) => x.id === selectedMachineId)
+                      {assets
+                        .filter((x) => x.id === selectedId)
                         .map((machine) => (
                           <div key={machine.id}>
-                            <p>Màquina Seleccionada: {machine.name}</p>
+                            <p>Equip Seleccionat: {machine.description}</p>
                           </div>
                         ))}
                       <div>
                         <button
                           className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
                           onClick={(e) => {
-                            setSelectedMachineId("");
+                            setSelectedId("");
                           }}
                         >
                           Eliminar

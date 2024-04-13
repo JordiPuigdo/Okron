@@ -41,7 +41,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     title: 'Recanvis',
     path: '/spareParts',
     permission: UserPermission.Worker,
-    icon : SvgSparePart,
+    //icon : SvgSparePart,
   },
   {
     key: generateKey(),
@@ -67,7 +67,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
       key: generateKey(),
       title: 'Màquines',
       path: '/machines',
-      icon: SvgMachine,
+      //icon: SvgMachine,
       permission: UserPermission.Administrator
       },
       {

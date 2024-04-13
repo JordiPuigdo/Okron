@@ -14,25 +14,40 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
 }) => {
   return (
-    <div className="flex justify-end mt-8 gap-4 mr-4">
+    <div className="flex justify-end mt-8 gap-4 mr-4 items-center">
       <button
         onClick={() => {
           onPageChange(currentPage - 1);
         }}
         disabled={currentPage === 1}
+        className={` p-2 text-white rounded-xl  ${
+          currentPage === 1
+            ? "bg-okron-btnDisable text-gray-700"
+            : "bg-okron-btnPagination  hover:bg-okron-btnPaginationHover"
+        } `}
       >
         Anterior
       </button>
-      <span className="mr-2">
-        Página {currentPage} de {totalPages}
+      <span className="mr-2 text-center">
+        Pàgina {currentPage}{" "}
+        {currentPage === totalPages || totalPages === 0 ? (
+          <></>
+        ) : (
+          <>de {totalPages}</>
+        )}
       </span>
       <button
         onClick={() => {
           onPageChange(currentPage + 1);
         }}
         disabled={!hasNextPage}
+        className={` p-2 text-white rounded-xl  ${
+          currentPage === totalPages || totalPages === 0
+            ? "bg-okron-btnDisable text-gray-700"
+            : "bg-okron-btnPagination  hover:bg-okron-btnPaginationHover"
+        } `}
       >
-        Siguiente
+        Següent
       </button>
     </div>
   );
