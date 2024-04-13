@@ -13,10 +13,12 @@ import SectionService from "app/services/sectionService";
 import DataTable from "components/table/DataTable";
 import {
   Column,
+  ColumnFormat,
   Filters,
   FiltersFormat,
   TableButtons,
 } from "components/table/interfaceTable";
+import { EntityTable } from "components/table/tableEntitys";
 
 export default function MachinesPage() {
   const [machines, setMachines] = useState<Machine[]>([]);
@@ -45,32 +47,32 @@ export default function MachinesPage() {
     {
       label: "ID",
       key: "id",
-      format: "",
+      format: ColumnFormat.TEXT,
     },
     {
       label: "Codi",
       key: "code",
-      format: "",
+      format: ColumnFormat.TEXT,
     },
     {
       label: "Descripció",
       key: "description",
-      format: "",
+      format: ColumnFormat.TEXT,
     },
     {
       label: "Secció",
       key: "section.description",
-      format: "",
+      format: ColumnFormat.TEXT,
     },
     {
       label: "Numero de Sèrie",
       key: "serialNumber",
-      format: "",
+      format: ColumnFormat.TEXT,
     },
     {
       label: "Activa",
       key: "active",
-      format: "boolean",
+      format: ColumnFormat.BOOLEAN,
     },
   ];
 
@@ -232,7 +234,7 @@ export default function MachinesPage() {
           columns={columns}
           data={machines}
           tableButtons={tableButtons}
-          entity="Màquines"
+          entity={EntityTable.MACHINE}
           filters={filters}
           onDelete={handleDeleteMachine}
         />

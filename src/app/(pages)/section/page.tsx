@@ -15,6 +15,7 @@ import {
   FiltersFormat,
   TableButtons,
 } from "components/table/interfaceTable";
+import { EntityTable } from "components/table/tableEntitys";
 
 export default function AuthenticationPage() {
   const sectionService = new SectionService(
@@ -91,7 +92,7 @@ export default function AuthenticationPage() {
           tableButtons={tableButtons}
           filters={filters}
           columns={columns}
-          entity="SECTIONS"
+          entity={EntityTable.SECTION}
         />
       </Container>
     </MainLayout>
