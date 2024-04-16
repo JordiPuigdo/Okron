@@ -14,7 +14,7 @@ export const getStatusClassName = (status: string, entity: string): string => {
   const config = entityStatusConfig[entity];
   if (config && uppercaseStatus in config.colors) {
     const style = config.colors[uppercaseStatus];
-    return `text-white rounded-full py-1 px-2 text-sm ${style}`;
+    return ` text-white rounded-full py-1 px-2 text-sm text-center ${style}`;
   }
   return '';
 };

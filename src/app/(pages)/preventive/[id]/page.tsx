@@ -173,9 +173,9 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
   const handleSelectedOperator = (id: string) => {
     setSelectedOperator((prevSelected) => [...prevSelected, id]);
   };
-  const handleDeleteSelectedOperator = (id: string) => {
+  const handleDeleteSelectedOperator = (idOperator: string) => {
     setSelectedOperator((prevSelected) =>
-      prevSelected.filter((id) => id !== id)
+      prevSelected.filter((id) => id !== idOperator)
     );
   };
 

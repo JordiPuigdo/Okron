@@ -160,42 +160,40 @@ export default function InspectionPointsPage() {
   return (
     <MainLayout>
       <Container>
-        <div className="container mx-auto py-8">
-          <h1 className="text-3xl font-semibold mb-4">
-            Llista de punts d'inspecció
-          </h1>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
-            onClick={toggleFormVisibility}
-          >
-            {isFormVisible ? "Cancelar" : "Crear nou punt d'inspecció"}
-          </button>
-          {isFormVisible && (
-            <form onSubmit={handleFormSubmit} className="mb-4">
-              <input
-                type="text"
-                placeholder="Escriu la descripció"
-                value={newDescription}
-                onChange={(e) => setNewDescription(e.target.value)}
-                className="border rounded py-2 px-3"
-              />
-              <button
-                type="submit"
-                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 ml-2 rounded"
-              >
-                Crear
-              </button>
-            </form>
-          )}
-          <DataTable
-            data={inspectionPoints}
-            columns={columns}
-            filters={filters}
-            tableButtons={tableButtons}
-            entity={EntityTable.INSPECTIONPOINTS}
-            onDelete={handleDeleteInspectionPoint}
-          />
-        </div>
+        <h1 className="text-3xl font-semibold mb-4">
+          Llista de punts d'inspecció
+        </h1>
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
+          onClick={toggleFormVisibility}
+        >
+          {isFormVisible ? "Cancelar" : "Crear nou punt d'inspecció"}
+        </button>
+        {isFormVisible && (
+          <form onSubmit={handleFormSubmit} className="mb-4">
+            <input
+              type="text"
+              placeholder="Escriu la descripció"
+              value={newDescription}
+              onChange={(e) => setNewDescription(e.target.value)}
+              className="border rounded py-2 px-3"
+            />
+            <button
+              type="submit"
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 ml-2 rounded"
+            >
+              Crear
+            </button>
+          </form>
+        )}
+        <DataTable
+          data={inspectionPoints}
+          columns={columns}
+          filters={filters}
+          tableButtons={tableButtons}
+          entity={EntityTable.INSPECTIONPOINTS}
+          onDelete={handleDeleteInspectionPoint}
+        />
       </Container>
     </MainLayout>
   );

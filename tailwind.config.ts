@@ -74,11 +74,11 @@ const config: Config = {
           },
         },
         okron : {
-          btCreate: "#38a0ad",
-          btEdit: "#ffb72c",
-          btEditHover: "#ffa800",
-          btDelete: "#f01e6a",
-          btDeleteHover: "#db004f",
+          btCreate: "#007bff",
+          btEdit: "#28a745",
+          btEditHover: "#1a8031",
+          btDelete: "#dc3545",
+          btDeleteHover: "#9b212d",
           btDetail: "#58a971",
           btnDetailHover: "#378850",
           btnPagination: "#5f7173",
@@ -86,8 +86,11 @@ const config: Config = {
           btnDisable: "#cbd4dc",
           preventive : "#036cca",
           corrective : "#b8003b",
-          finished: "#58a971",
-          waiting: "#f7249a",
+          finished: "#158136",
+          waiting: "#cc0014",
+          onGoing : "#ffad00",
+          createold: "#38a0ad",
+          editOld : "ffb72c"
         }
       },
       boxShadow: {

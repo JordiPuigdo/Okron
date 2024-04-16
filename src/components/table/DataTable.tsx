@@ -226,7 +226,7 @@ const DataTable: React.FC<DataTableProps> = ({
     }
 
     return (
-      <div className="p-4 justify-center flex flex-row items-center">
+      <div className="p-4 justify-center flex flex-col sm:flex-row items-center">
         {loginUser?.permission != UserPermission.Administrator ? (
           <Link href={`${pathName}/${item[columns[0].key]}`}>
             <p className="font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover">
@@ -236,7 +236,7 @@ const DataTable: React.FC<DataTableProps> = ({
         ) : (
           <>
             {tableButtons.edit && (
-              <td className="p-4 flex flex-row justify-center items-center text-center gap-4">
+              <td className="p-4 flex flex-col sm:flex-row justify-center items-center text-center gap-4">
                 <Link href={`${pathName}/${item[columns[0].key]}`}>
                   <p className="font-medium text-white p-2 rounded-xl bg-okron-btEdit hover:bg-okron-btEditHover">
                     Editar
@@ -270,102 +270,104 @@ const DataTable: React.FC<DataTableProps> = ({
   if (filteredData)
     return (
       <>
-        <div className="bg-white rounded-lg p-2 flex flex-col">
+        <div className="bg-white rounded-lg p-2">
           {renderFilters()}
-          <div className="overflow-x-auto">
+          <div className="pt-4">
             {isLoading ? (
               <SvgSpinner className="w-full justify-center" />
             ) : (
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr>
-                    {columns.map(
-                      (column) =>
-                        column.key.toLocaleUpperCase() !== "ID" && (
-                          <th
-                            key={column.key}
-                            className="border-b border-blue-gray-100 bg-blue-gray-50 p-4 cursor-pointer"
-                          >
-                            <div className="flex">
-                              <label
-                                color="blue-gray"
-                                className="font-normal leading-none opacity-70  "
-                              >
-                                {column.label}
-                              </label>
-                              {sortColumn === column.key && (
-                                <span className="ml-2">
-                                  {sortOrder === "ASC" ? "↑" : "↓"}
-                                </span>
-                              )}
-                            </div>
-                          </th>
-                        )
-                    )}
-                    {renderHeadTableActions()}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredData
-                    .slice(0, itemsPerPage)
-                    .map((rowData, rowIndex) => (
-                      <tr
-                        key={rowIndex}
-                        className={`${
-                          rowIndex % 2 === 0 ? "" : "bg-gray-100"
-                        } text-left `}
-                      >
-                        {columns
-                          .filter(
-                            (column) => column.key.toLocaleUpperCase() !== "ID"
+              <div className="relative overflow-x-auto ">
+                <table className="w-full text-left text-lg">
+                  <thead>
+                    <tr className="border-t border-gray-200 pt-2">
+                      {columns.map(
+                        (column) =>
+                          column.key.toLocaleUpperCase() !== "ID" && (
+                            <th
+                              key={column.key}
+                              className="border-b border-blue-gray-100 bg-blue-gray-50 p-4 cursor-pointer"
+                            >
+                              <div className="flex">
+                                <label
+                                  color="blue-gray"
+                                  className="font-normal leading-none opacity-70 "
+                                >
+                                  {column.label}
+                                </label>
+                                {sortColumn === column.key && (
+                                  <span className="ml-2">
+                                    {sortOrder === "ASC" ? "↑" : "↓"}
+                                  </span>
+                                )}
+                              </div>
+                            </th>
                           )
-                          .map((column) => {
-                            let value = getNestedFieldValue(
-                              rowData,
-                              column.key
-                            );
-                            let className = "font-normal";
-
-                            const formatColumn =
-                              column.format.toLocaleUpperCase();
-
-                            if (column.key === "active") {
-                              className += " w-full";
-                              className += value
-                                ? " bg-green-500 p-2 rounded-xl text-white"
-                                : " bg-red-500 p-2 rounded-xl text-white";
-                              //className = getStatusClassName( value, entity);
-                            }
-
-                            if (formatColumn == ColumnFormat.DATE) {
-                              value = formatDate(value);
-                            }
-                            if (
-                              formatColumn.toLocaleUpperCase() ==
-                              ColumnFormat.WORKORDERTYPE
-                            ) {
-                              className = getStatusClassName(value, entity);
-                              value = translateWorkOrderType(value);
-                            }
-
-                            if (
-                              formatColumn.toLocaleUpperCase() ==
-                              ColumnFormat.STATEWORKORDER
-                            ) {
-                              className = getStatusClassName(
-                                value,
-                                "WORKORDERSTATE"
+                      )}
+                      {renderHeadTableActions()}
+                    </tr>
+                  </thead>
+                  <tbody className="border-b">
+                    {filteredData
+                      .slice(0, itemsPerPage)
+                      .map((rowData, rowIndex) => (
+                        <tr
+                          key={rowIndex}
+                          className={`${
+                            rowIndex % 2 === 0 ? "" : "bg-gray-100"
+                          } `}
+                        >
+                          {columns
+                            .filter(
+                              (column) =>
+                                column.key.toLocaleUpperCase() !== "ID"
+                            )
+                            .map((column) => {
+                              let value = getNestedFieldValue(
+                                rowData,
+                                column.key
                               );
-                              value = translateStateWorkOrder(value);
-                            }
+                              let className = "font-normal ";
 
-                            /* if (column.key === "status") {
+                              const formatColumn =
+                                column.format.toLocaleUpperCase();
+
+                              if (column.key === "active") {
+                                className += " w-full";
+                                className += value
+                                  ? " bg-green-500 p-2 rounded-xl text-white"
+                                  : " bg-red-500 p-2 rounded-xl text-white";
+                                //className = getStatusClassName( value, entity);
+                              }
+
+                              if (formatColumn == ColumnFormat.DATE) {
+                                value = formatDate(value);
+                              }
+                              if (
+                                formatColumn.toLocaleUpperCase() ==
+                                ColumnFormat.WORKORDERTYPE
+                              ) {
+                                className = getStatusClassName(value, entity);
+                                value = translateWorkOrderType(value);
+                              }
+
+                              if (
+                                formatColumn.toLocaleUpperCase() ==
+                                ColumnFormat.STATEWORKORDER
+                              ) {
+                                className = getStatusClassName(
+                                  value,
+                                  "WORKORDERSTATE"
+                                );
+                                value = translateStateWorkOrder(value);
+                              }
+
+                              /* if (column.key === "status") {
                             className = getStatusClassName(value, entity);
                           } else if (formatColumn === "DATE") {
                             className += "";
                           }*/
 
-                            /*const formattedValue =
+                              /*const formattedValue =
                             column.key === "status"
                               ? getStatusText(value, entity)
                               : formatColumn === "DATE" && !isValidDate(value)
@@ -374,24 +376,25 @@ const DataTable: React.FC<DataTableProps> = ({
                               ? dayjs(value).format("DD-MM-YYYY HH:mm:ss")
                               : value;^
 */
-                            const formattedValue = value;
-                            return (
-                              <td key={column.key} className="p-4">
-                                <label className={className}>
-                                  {formatColumn == ColumnFormat.BOOLEAN && (
-                                    <>{value ? "Actiu" : "Inactiu"}</>
-                                  )}
-                                  {formattedValue}
-                                </label>
-                              </td>
-                            );
-                          })}
+                              const formattedValue = value;
+                              return (
+                                <td key={column.key} className="p-2 relative">
+                                  <label className={className}>
+                                    {formatColumn == ColumnFormat.BOOLEAN && (
+                                      <>{value ? "Actiu" : "Inactiu"}</>
+                                    )}
+                                    {formattedValue}
+                                  </label>
+                                </td>
+                              );
+                            })}
 
-                        {renderTableButtons(rowData)}
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
+                          {renderTableButtons(rowData)}
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
           <Pagination

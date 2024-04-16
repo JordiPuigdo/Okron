@@ -26,6 +26,7 @@ import AutocompleteSearchBar from "components/selector/AutocompleteSearchBar";
 import { Asset } from "app/interfaces/Asset";
 import AssetService from "app/services/assetService";
 import { ElementList } from "components/selector/ElementList";
+import ChooseElement from "components/ChooseElement";
 
 function CorrectivePage() {
   const operatorService = new OperatorService(
@@ -142,7 +143,7 @@ function CorrectivePage() {
       description: corrective.description,
       initialDateTime: corrective.startTime,
       assetId: selectedId,
-      operatorId: corrective.operators.map((operator) => operator),
+      operatorId: selectedOperator.map((operator) => operator),
       stateWorkOrder: corrective.stateWorkOrder,
       workOrderType: 0,
     };
@@ -183,12 +184,22 @@ function CorrectivePage() {
     ) {
       return false;
     }
-    if (!corrective.operators) {
+    if (!selectedOperator) {
       return false;
     }
 
     return true;
   }
+
+  const handleSelectedOperator = (id: string) => {
+    setSelectedOperator([id]);
+  };
+  const handleDeleteSelectedOperator = (id: string) => {
+    setSelectedOperator((prevSelected) =>
+      prevSelected.filter((id) => id !== id)
+    );
+  };
+
   const renderHeader = () => {
     return (
       <div className="flex px-4 sm:px-12 items-center flex-col sm:flex-row">
@@ -229,7 +240,7 @@ function CorrectivePage() {
       <MainLayout>
         <Container>
           {renderHeader()}
-          <div className="p-4 sm:p-12">
+          <div className=" bg-white rounded-xl p-4 mt-12">
             <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
               <div className="flex flex-col sm:flex-row">
                 <div className="mb-6 sm:w-1/2">
@@ -354,24 +365,17 @@ function CorrectivePage() {
                   <label className="block text-xl font-medium text-gray-700 mb-2">
                     Operaris
                   </label>
-                  <div className="flex flex-wrap">
-                    {operators.map((operator) => (
-                      <div key={operator.id} className="mr-4 mb-2">
-                        <input
-                          type="checkbox"
-                          id={`operator-${operator.id}`}
-                          value={operator.id}
-                          {...register("operators")}
-                        />
-                        <label
-                          htmlFor={`operator-${operator.id}`}
-                          className="ml-2 text-lg"
-                        >
-                          {operator.name}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
+                  <ChooseElement
+                    elements={operators}
+                    selectedElements={selectedOperator}
+                    onElementSelected={handleSelectedOperator}
+                    onDeleteElementSelected={handleDeleteSelectedOperator}
+                    placeholder="Buscar Operaris"
+                    mapElement={(operator) => ({
+                      id: operator.id,
+                      description: operator.name,
+                    })}
+                  />
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row mb-8">

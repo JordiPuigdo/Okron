@@ -55,11 +55,11 @@ const ChooseOperatorV2: React.FC<ChooseOperatorV2Props> = ({
           setCurrentId={handleOperatorSelected}
           placeholder="Buscar operaris"
         />
-        <div className="mt-4">
+        <div className="mt-4 p-2 ">
           {selectedOperators.map((point) => (
             <div
               key={point.id}
-              className="flex items-center justify-between mb-2"
+              className="flex items-center justify-between mb-2 border-b-2 border-gray-800 p-2"
             >
               <span className="text-gray-600 font-medium">{point.name}</span>
               <button

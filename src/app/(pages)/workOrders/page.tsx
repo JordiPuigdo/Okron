@@ -30,6 +30,7 @@ import {
   TableButtons,
 } from "components/table/interfaceTable";
 import { EntityTable } from "components/table/tableEntitys";
+import Machine from "app/interfaces/machine";
 
 export default function WorkOrdersPage() {
   const [machines, setMachines] = useState<ElementList[] | []>([]);
@@ -144,7 +145,7 @@ export default function WorkOrdersPage() {
       endDateTime.setHours(23, 59, 59, 999);
     }
     const search: SearchWorkOrderFilters = {
-      machineId: machineId,
+      // machineId: machineId,
       startDateTime: startDateTime
         ? new Date(
             startDateTime.getTime() - startDateTime.getTimezoneOffset() * 60000
@@ -165,7 +166,13 @@ export default function WorkOrdersPage() {
         setMessage("");
       }, 3000);
     }
-    setWorkOrders(workOrders);
+    setWorkOrders(
+      workOrders.sort((a, b) => {
+        const startTimeA = new Date(a.startTime).valueOf();
+        const startTimeB = new Date(b.startTime).valueOf();
+        return startTimeA - startTimeB;
+      })
+    );
   };
 
   const handleDeleteOrder = (orderId: string) => {
@@ -176,7 +183,13 @@ export default function WorkOrdersPage() {
     if (isConfirmed) {
       workOrderService.deleteWorkOrder(orderId);
       setWorkOrders((prevWorkOrders) =>
-        prevWorkOrders.filter((prevWorkOrders) => prevWorkOrders.id !== orderId)
+        prevWorkOrders
+          .filter((prevWorkOrders) => prevWorkOrders.id !== orderId)
+          .sort((a, b) => {
+            const startTimeA = new Date(a.startTime).valueOf();
+            const startTimeB = new Date(b.startTime).valueOf();
+            return startTimeA - startTimeB;
+          })
       );
     } else {
       console.log(`Deletion of work order with ID ${orderId} canceled`);
@@ -353,7 +366,7 @@ export default function WorkOrdersPage() {
             <span className="text-white rounded-full p-3 w-full text-center bg-okron-corrective font-semibold">
               Correctius:{" "}
               {
-                workOrders.filter(
+                filteredWorkOrders.filter(
                   (x) => x.workOrderType == WorkOrderType.Corrective
                 ).length
               }
@@ -361,7 +374,7 @@ export default function WorkOrdersPage() {
             <span className="text-white rounded-full p-3 w-full text-center bg-okron-preventive font-semibold">
               Preventius:{" "}
               {
-                workOrders.filter(
+                filteredWorkOrders.filter(
                   (x) => x.workOrderType == WorkOrderType.Preventive
                 ).length
               }

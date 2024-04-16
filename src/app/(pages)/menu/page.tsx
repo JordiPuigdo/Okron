@@ -3,6 +3,7 @@ import LoginChecker from "components/layout/LoginChecker";
 import MainLayout from "components/layout/MainLayout";
 import SignOperator from "components/operator/SignOperator";
 import WorkOrderComponent from "components/workOrders/WorkOrderComponent";
+import DasboardPage from "./dasboard/page";
 
 export default function MenuPage() {
   return (
@@ -16,7 +17,9 @@ export default function MenuPage() {
             <div>
               <WorkOrderComponent />
             </div>
-            <div></div>
+            <div>
+              <DasboardPage />
+            </div>
           </div>
         </LoginChecker>
       </Container>

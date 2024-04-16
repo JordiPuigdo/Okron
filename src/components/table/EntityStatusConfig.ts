@@ -19,9 +19,9 @@ export const entityStatusConfig: Record<string, StatusConfig> = {
   }, 
   WORKORDER:{
     names: {
-      Preventive: 'En Curs',
-      Corrective: 'En Espera',
-      Predictive: 'Finalitzada',
+      Preventive: 'Preventiu',
+      Corrective: 'Correctiu',
+      Predictive: 'Predictiu',
     },
     colors: {
       "1": 'bg-okron-preventive',
@@ -36,9 +36,9 @@ export const entityStatusConfig: Record<string, StatusConfig> = {
       Predictive: 'Finalitzada',
     },
     colors: {
-      "1": 'bg-okron-preventive',
+      "1": 'bg-okron-onGoing',
       "0": 'bg-okron-waiting',
-      "2": 'bg-okron-btDetail',
+      "2": 'bg-okron-waiting',
       "3": 'bg-okron-finished',
     }
   }

@@ -553,12 +553,16 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
             </tbody>
             <tfoot className="bg-white divide-y divide-gray-200">
               <tr>
-                <td colSpan={3}></td>
+                <td colSpan={2}></td>
                 <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900 font-bold">
                   Temps Total
                 </td>
                 <td
-                  colSpan={3}
+                  colSpan={
+                    loginUser?.permission == UserPermission.Administrator
+                      ? 3
+                      : 2
+                  }
                   className="px-6 py-4 whitespace-nowrap text-lg text-gray-900 font-bold"
                 >
                   {totalFormatted}
@@ -566,7 +570,13 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
               </tr>
               {Object.keys(totalTimes).map((operatorId) => (
                 <tr key={operatorId}>
-                  <td colSpan={4}></td>
+                  <td
+                    colSpan={
+                      loginUser?.permission == UserPermission.Administrator
+                        ? 4
+                        : 3
+                    }
+                  ></td>
                   <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900 font-bold">
                     {operators.find((op) => op.id === operatorId)?.name}:{" "}
                     {totalTimes[operatorId]}

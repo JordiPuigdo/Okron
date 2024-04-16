@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import OperatorService from "app/services/operatorService";
 import WorkOrderService from "app/services/workOrderService";
-import { translateStateWorkOrder } from "app/utils/utils";
+import { isOperatorLogged, translateStateWorkOrder } from "app/utils/utils";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -28,6 +28,8 @@ import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspect
 import { SvgSpinner } from "app/icons/icons";
 import WorkOrderOperatorComments from "components/operator/WorkOrderCommentOperator";
 import WorkOrderOperatorTimesComponent from "components/operator/WorkOrderOperatorTimes";
+import { useSessionStore } from "app/stores/globalStore";
+import { UserPermission } from "app/interfaces/User";
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -80,6 +82,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [selectedOperators, setSelectedOperators] = useState<Operator[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [isFinished, setIsFinished] = useState(false);
+  const { loginUser } = useSessionStore((state) => state);
 
   async function fetchWorkOrder() {
     await workOrderService
@@ -405,18 +408,22 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           </div>
           <div>
             <div className="flex sm:flex-row mb-8 pt-12">
-              {isFinished ? (
-                <button
-                  type="button"
-                  onClick={(e) => handleReopenWorkOrder()}
-                  className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
-                >
-                  Reobrir Ordre
-                  {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-                </button>
-              ) : (
+              {isFinished &&
+                loginUser?.permission == UserPermission.Administrator && (
+                  <button
+                    type="button"
+                    onClick={(e) => handleReopenWorkOrder()}
+                    className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
+                  >
+                    Reobrir Ordre
+                    {isLoading && (
+                      <SvgSpinner style={{ marginLeft: "0.5rem" }} />
+                    )}
+                  </button>
+                )}
+
+              {!isFinished && (
                 <>
-                  {" "}
                   <button
                     type="submit"
                     disabled={isLoading}

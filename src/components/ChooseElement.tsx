@@ -59,7 +59,7 @@ const ChooseElement = <T,>({
   };
 
   return (
-    <div className="flex flex-row gap-8 w-full my-6">
+    <div className="flex flex-row gap-8 w-full">
       <div className="w-full">
         <AutocompleteSearchBar
           elements={filteredElements}

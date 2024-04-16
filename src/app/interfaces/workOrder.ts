@@ -1,10 +1,12 @@
+import { extend } from "dayjs";
 import { Asset } from "./Asset";
 import Operator from "./Operator";
 import SparePart from "./SparePart";
 import InspectionPoint from "./inspectionPoint";
 import Machine from "./machine";
+import { BaseModel } from "./BaseModel";
 
-export interface WorkOrder {
+export interface WorkOrder extends BaseModel {
   id: string;
   code : string;
   description: string;
