@@ -14,6 +14,7 @@ import { getStatusClassName, getStatusText } from "./tableUtils";
 import { EntityTable } from "./tableEntitys";
 import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
+import { Table } from "@tremor/react";
 
 interface DataTableProps {
   data: any[];
@@ -22,6 +23,7 @@ interface DataTableProps {
   tableButtons: TableButtons;
   entity: EntityTable;
   onDelete?: (id: string) => void;
+  totalCounts?: boolean;
 }
 
 const DataTable: React.FC<DataTableProps> = ({
@@ -31,6 +33,7 @@ const DataTable: React.FC<DataTableProps> = ({
   tableButtons,
   entity,
   onDelete,
+  totalCounts = false,
 }: DataTableProps) => {
   const itemsPerPageOptions = [5, 10, 15, 20, 25, 50];
   const pathName = usePathname();
@@ -44,6 +47,14 @@ const DataTable: React.FC<DataTableProps> = ({
   const [totalCount, setTotalCount] = useState(
     Math.ceil(data.length / itemsPerPage)
   );
+
+  const [isLoadingButton, setIsLoadingButton] = useState<{
+    [key: string]: boolean;
+  }>({
+    ["Edit"]: false,
+    ["Delete"]: false,
+    ["Detail"]: false,
+  });
   const { loginUser } = useSessionStore((state) => state);
 
   const handlePageChange = (page: number) => {
@@ -155,6 +166,18 @@ const DataTable: React.FC<DataTableProps> = ({
     setTotalCount(Math.ceil(filteredData.length / itemsPerPage));
   };
 
+  const handleDelete = async (id: string) => {
+    setIsLoadingButton((prevState) => ({
+      ...prevState,
+      ["Delete"]: true,
+    }));
+    onDelete && onDelete(id);
+    setIsLoadingButton((prevState) => ({
+      ...prevState,
+      ["Delete"]: false,
+    }));
+  };
+
   const renderFilters = () => {
     return (
       <>
@@ -229,8 +252,13 @@ const DataTable: React.FC<DataTableProps> = ({
       <div className="p-4 justify-center flex flex-col sm:flex-row items-center">
         {loginUser?.permission != UserPermission.Administrator ? (
           <Link href={`${pathName}/${item[columns[0].key]}`}>
-            <p className="font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover">
+            <p className="flex items-center font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover">
               Detall
+              {isLoadingButton && (
+                <span className="ml-2 text-xs">
+                  <SvgSpinner className="w-6 h-6" />
+                </span>
+              )}
             </p>
           </Link>
         ) : (
@@ -238,17 +266,35 @@ const DataTable: React.FC<DataTableProps> = ({
             {tableButtons.edit && (
               <td className="p-4 flex flex-col sm:flex-row justify-center items-center text-center gap-4">
                 <Link href={`${pathName}/${item[columns[0].key]}`}>
-                  <p className="font-medium text-white p-2 rounded-xl bg-okron-btEdit hover:bg-okron-btEditHover">
+                  <p
+                    className="flex items-center font-medium text-white p-2 rounded-xl bg-okron-btEdit hover:bg-okron-btEditHover"
+                    onClick={() => {
+                      setIsLoadingButton((prevState) => ({
+                        ...prevState,
+                        ["Edit"]: true,
+                      }));
+                    }}
+                  >
                     Editar
+                    {isLoadingButton["Edit"] && (
+                      <span className="ml-2 text-white">
+                        <SvgSpinner className="w-6 h-6" />
+                      </span>
+                    )}
                   </p>
                 </Link>
                 {tableButtons.delete && (
                   <button
                     type="button"
-                    className="font-medium text-white p-2 rounded-xl bg-okron-btDelete hover:bg-okron-btDeleteHover"
-                    onClick={() => onDelete && onDelete(item[columns[0].key])}
+                    className="flex items-center font-medium text-white p-2 rounded-xl bg-okron-btDelete hover:bg-okron-btDeleteHover"
+                    onClick={() => handleDelete(item[columns[0].key])}
                   >
                     Eliminar
+                    {isLoadingButton["Delete"] && (
+                      <span className="ml-2 text-white">
+                        <SvgSpinner className="w-6 h-6" />
+                      </span>
+                    )}
                   </button>
                 )}
                 {tableButtons.detail && (
@@ -257,6 +303,11 @@ const DataTable: React.FC<DataTableProps> = ({
                     className="font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btDeleteHover"
                   >
                     Detall
+                    {isLoadingButton && (
+                      <span className="ml-2 text-xs">
+                        <SvgSpinner className="w-4 h-4" />
+                      </span>
+                    )}
                   </button>
                 )}
               </td>

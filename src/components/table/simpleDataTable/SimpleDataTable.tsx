@@ -10,15 +10,15 @@ import { useState } from "react";
 import ca from "date-fns/locale/ca";
 import DatePicker from "react-datepicker";
 import SparePartService from "app/services/sparePartService";
-import { SSG_GET_INITIAL_PROPS_CONFLICT } from "next/dist/lib/constants";
-import { SvgSpinner } from "app/icons/icons";
 
-export default function TableSparePartsConsumed({
+export default function SimpleDataTable({
+  title,
   sparePartId,
   assetId,
   sparePartsPerAsset,
   searchPlaceHolder,
 }: {
+  title: string;
   sparePartId?: string;
   assetId?: string;
   sparePartsPerAsset?: SparePartPerMachineResponse[];
@@ -30,8 +30,6 @@ export default function TableSparePartsConsumed({
   const [startDate, setStartDate] = useState<Date | null>(currentDate);
   const [endDate, setEndDate] = useState<Date | null>(new Date());
   const [searchTerm, setSearchTerm] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   const [sparePerMachine, setSparePartPerMachine] = useState<
     SparePartPerMachineResponse[] | null
@@ -60,26 +58,9 @@ export default function TableSparePartsConsumed({
       startDate: formatDateQuery(startDate!, true),
       endDate: formatDateQuery(endDate!, false),
     };
-
-    await sparePartService
-      .getSparePartHistoryByDates(x)
-      .then((response) => {
-        if (response.length == 0) {
-          setErrorMessage("No hi ha recanvis disponibles amb aquests filtres");
-          setTimeout(() => {
-            setErrorMessage("");
-          }, 3000);
-          return;
-        }
-
-        setSparePartPerMachine(response);
-      })
-      .catch((error) => {
-        setErrorMessage(error);
-        setTimeout(() => {
-          setErrorMessage("");
-        });
-      });
+    const sparePartDetailResponse =
+      await sparePartService.getSparePartHistoryByDates(x);
+    setSparePartPerMachine(sparePartDetailResponse);
   }
 
   const handleSearchChange = (event: any) => {
@@ -99,7 +80,7 @@ export default function TableSparePartsConsumed({
       )
     );
   });
-  const totalUnitsPerAsset = filteredSpareParts?.map((sparePartPerAsset) =>
+  const totalUnits = filteredSpareParts?.map((sparePartPerAsset) =>
     sparePartPerAsset.spareParts.reduce(
       (total, consumes) => total + consumes.quantity,
       0
@@ -111,10 +92,8 @@ export default function TableSparePartsConsumed({
   };
 
   return (
-    <div className="overflow-x-auto mt-4 bg-gray-400 p-4 rounded-lg mb-6">
-      <div className="mb-4 text-white text-lg font-semibold">
-        Unitats de recanvi consumides
-      </div>
+    <div className="bg-white rounded-lg p-2 my-4">
+      <div className="mb-4 text-white text-lg font-semibold">{title}</div>
       <div className="flex items-center space-x-4 pb-4">
         <span className="text-white pr-3">Data Inici:</span>
         <DatePicker
@@ -148,11 +127,6 @@ export default function TableSparePartsConsumed({
           onChange={handleSearchChange}
           className="p-3 border border-gray-300 rounded-md text-lg bg-white text-gray-900"
         />
-        {errorMessage != "" && (
-          <p className="text-red-500 bg-white rounded-xl text-xl p-2 font-semibold">
-            {errorMessage}
-          </p>
-        )}
       </div>
 
       <table className="min-w-full divide-y divide-gray-200">
@@ -224,17 +198,11 @@ export default function TableSparePartsConsumed({
               <td className="px-6 py-4 whitespace-nowrap">
                 {sparePartPerMachine.workOrderId.length > 0 && (
                   <Link
-                    onClick={(e) => setIsLoading(true)}
                     href="/workOrders/[id]"
                     as={`/workOrders/${sparePartPerMachine.workOrderId}`}
-                    className="flex bg-green-500 text-white p-2 rounded-md hover:bg-green-600 items-center"
+                    className="flex bg-green-500 text-white p-2 rounded-md hover:bg-green-600"
                   >
                     Detall
-                    {isLoading && (
-                      <span className="ml-2 text-xs text-white ">
-                        <SvgSpinner className="w-6 h-6" />
-                      </span>
-                    )}
                   </Link>
                 )}
               </td>
@@ -246,12 +214,14 @@ export default function TableSparePartsConsumed({
                 Total Unitats Consumides
               </div>
             </td>
-            <td
-              colSpan={4}
-              className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold"
-            >
-              {totalUnitsPerAsset?.reduce((total, units) => total + units, 0)}
-            </td>
+            {totalUnits[0] > 0 && (
+              <td
+                colSpan={4}
+                className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold"
+              >
+                {totalUnits?.reduce((total, units) => total + units, 0)}
+              </td>
+            )}
           </tr>
         </tbody>
       </table>

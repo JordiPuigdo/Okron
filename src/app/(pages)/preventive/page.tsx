@@ -16,9 +16,13 @@ import {
   Filters,
   FiltersFormat,
 } from "components/table/interfaceTable";
+import WorkOrderService from "app/services/workOrderService";
 
 function PreventivePage() {
   const preventiveService = new PreventiveService(
+    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  );
+  const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
   const [preventives, setPreventives] = useState<Preventive[]>([]);
@@ -131,6 +135,7 @@ function PreventivePage() {
       await preventiveService.CreateWorkOrderPreventivePerDay();
     if (preventives?.length! > 0) {
       setPreventivesCreated(preventives);
+      workOrderService.cleanCache();
       setTimeout(() => {
         setPreventivesCreated([]);
       }, 10000);

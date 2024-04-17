@@ -18,6 +18,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
 import Link from "next/link";
 import TableSparePartsConsumed from "../components/tableSparePartsConsumed";
+import SimpleDataTable from "components/table/simpleDataTable/SimpleDataTable";
 
 export default function EditSparePart({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -253,7 +254,8 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
               </p>
             )}
           </form>
-          <TableSparePartsConsumed
+          <SimpleDataTable
+            title="Unitats de recanvi consumides"
             searchPlaceHolder="Buscar per equip o operari"
             sparePartsPerAsset={sparePerMachine != null ? sparePerMachine : []}
             sparePartId={sparePart.id}

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Asset } from "app/interfaces/Asset";
 import AssetService from "app/services/assetService";
+import { SvgSpinner } from "app/icons/icons";
 
 interface Props {
   asset: Asset;
@@ -11,6 +12,9 @@ interface Props {
 
 const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
   const [expanded, setExpanded] = useState<boolean>(false);
+  const [loadingAssets, setLoadingAssets] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   const toggleExpanded = () => {
     setExpanded(!expanded);
@@ -32,29 +36,55 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
             <strong>Codi:</strong> {asset.code} | <strong>Descripció:</strong>{" "}
             {asset.description} | <strong>Nivell:</strong> {asset.level}
           </div>
-          <div>
+          <div className="flex flex-row">
             {asset.level < 7 && (
               <Link
                 href={`/assets/0?parentId=${asset.id}&level=${asset.level + 1}`}
                 passHref
               >
-                <button className="mr-2 bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600">
+                <button
+                  onClick={(e) => {
+                    setLoadingAssets({ ...loadingAssets, [asset.id]: true });
+                  }}
+                  className="flex items-center mr-2 bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                >
                   Afegir subnivell
+                  {loadingAssets[asset.id] && (
+                    <span className="items-center ml-2 text-white">
+                      <SvgSpinner className="w-6 h-6" />
+                    </span>
+                  )}
                 </button>
               </Link>
             )}
             <Link href={`/assets/${asset.id}`} passHref>
-              <button className="mr-2 bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">
+              <button
+                onClick={(e) => {
+                  setLoadingAssets({ ...loadingAssets, [asset.id]: true });
+                }}
+                className="flex items-center mr-2 bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+              >
                 Editar
+                {loadingAssets[asset.id] && (
+                  <span className="items-center ml-2 text-white">
+                    <SvgSpinner className="w-6 h-6" />
+                  </span>
+                )}
               </button>
             </Link>
             <button
-              className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+              className="flex bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
               onClick={(e) => {
+                setLoadingAssets({ ...loadingAssets, [asset.id]: true });
                 onDelete(asset.id);
               }}
             >
               Eliminar
+              {loadingAssets[asset.id] && (
+                <span className="items-center ml-2 text-white">
+                  <SvgSpinner className="w-6 h-6" />
+                </span>
+              )}
             </button>
           </div>
         </div>

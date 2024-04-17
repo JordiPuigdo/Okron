@@ -118,6 +118,8 @@ export default function WorkOrdersPage() {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   const handleSearch = async () => {
     setIsLoading(true);
     await searchWorkOrders();
@@ -234,6 +236,12 @@ export default function WorkOrdersPage() {
     if (currentMachineId !== "" && order.machineId !== currentMachineId) {
       return false;
     }
+    if (
+      searchTerm.length > 0 &&
+      !order.description.toLowerCase().includes(searchTerm.toLowerCase())
+    ) {
+      return false;
+    }
     return true;
   });
 
@@ -317,6 +325,12 @@ export default function WorkOrdersPage() {
               setCurrentId={setCurrentMachineId}
               placeholder="Buscar Màquines"
             />
+            <input
+              type="text"
+              placeholder="Codi / Descripció"
+              className="p-3 border border-gray-300 rounded-md w-full"
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
             <span>Estat: </span>
             <select
               id="stateWorkOrder"
@@ -363,6 +377,7 @@ export default function WorkOrdersPage() {
                   </option>
                 ))}
             </select>
+
             <span className="text-white rounded-full p-3 w-full text-center bg-okron-corrective font-semibold">
               Correctius:{" "}
               {
