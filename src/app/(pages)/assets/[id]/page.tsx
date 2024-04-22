@@ -11,7 +11,6 @@ import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
 import AssetForm from "../components/assetForm";
 import { SvgSpinner } from "app/icons/icons";
-import TableSparePartPerAsset from "app/(pages)/spareParts/components/tableSparePartsPerAsset";
 import PreventiveService from "app/services/preventiveService";
 import PreventiveTable from "app/(pages)/preventive/preventiveTable/preventiveTable";
 import WorkOrderTable from "app/(pages)/workOrders/components/WorkOrderTable";

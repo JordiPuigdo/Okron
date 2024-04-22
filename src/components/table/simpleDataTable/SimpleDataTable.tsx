@@ -67,25 +67,7 @@ export default function SimpleDataTable({
     setSearchTerm(event.target.value);
   };
 
-  const filteredSpareParts = sparePerMachine!.filter((sparePerMachine) => {
-    return (
-      sparePerMachine.asset?.description
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      sparePerMachine.machine?.description
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      sparePerMachine.spareParts.some((consumes) =>
-        consumes.operator.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-  });
-  const totalUnits = filteredSpareParts?.map((sparePartPerAsset) =>
-    sparePartPerAsset.spareParts.reduce(
-      (total, consumes) => total + consumes.quantity,
-      0
-    )
-  );
+  const filteredSpareParts = sparePerMachine;
 
   const handlePaginationClick = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -165,63 +147,12 @@ export default function SimpleDataTable({
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {filteredSpareParts?.map((sparePartPerMachine, index) => (
-            <tr key={index} className="hover:bg-gray-100">
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">
-                  {sparePartPerMachine.machine != null
-                    ? sparePartPerMachine.machine?.description
-                    : sparePartPerMachine.asset?.description}
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {sparePartPerMachine.spareParts.map((consumes, index) => (
-                  <div key={index} className="text-sm text-gray-900">
-                    {consumes.quantity}
-                  </div>
-                ))}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {sparePartPerMachine.spareParts.map((consumes, index) => (
-                  <div key={index} className="text-sm text-gray-900">
-                    {formatDate(consumes.creationDate, true)}
-                  </div>
-                ))}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {sparePartPerMachine.spareParts.map((consumes, index) => (
-                  <div key={index} className="text-sm text-gray-900">
-                    {consumes.operator.name}
-                  </div>
-                ))}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {sparePartPerMachine.workOrderId.length > 0 && (
-                  <Link
-                    href="/workOrders/[id]"
-                    as={`/workOrders/${sparePartPerMachine.workOrderId}`}
-                    className="flex bg-green-500 text-white p-2 rounded-md hover:bg-green-600"
-                  >
-                    Detall
-                  </Link>
-                )}
-              </td>
-            </tr>
-          ))}
           <tr className="bg-gray-100">
             <td className="px-6 py-4 whitespace-nowrap">
               <div className="text-sm text-gray-900 font-semibold">
                 Total Unitats Consumides
               </div>
             </td>
-            {totalUnits[0] > 0 && (
-              <td
-                colSpan={4}
-                className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold"
-              >
-                {totalUnits?.reduce((total, units) => total + units, 0)}
-              </td>
-            )}
           </tr>
         </tbody>
       </table>
