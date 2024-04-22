@@ -115,6 +115,8 @@ const DataTable: React.FC<DataTableProps> = ({
     handleSortChange(sortText);
   };*/
 
+  let totalQuantity = 0;
+
   const handleItemsPerPageChange = (value: number) => {
     setIsLoading(true);
 
@@ -356,17 +358,21 @@ const DataTable: React.FC<DataTableProps> = ({
                 <table className="w-full text-left text-lg">
                   <thead>
                     <tr className="border-t border-gray-200 pt-2">
-                      {columns.map(
-                        (column) =>
-                          column.key.toLocaleUpperCase() !== "ID" && (
+                      {columns.map((column) => {
+                        if (column.key.toLocaleUpperCase() !== "ID") {
+                          let classname = "flex";
+                          if (column.format == ColumnFormat.NUMBER) {
+                            classname += " justify-end pr-4";
+                          }
+                          return (
                             <th
                               key={column.key}
-                              className="border-b border-blue-gray-100 bg-blue-gray-50 p-4 cursor-pointer"
+                              className="border-b border-blue-gray-100 bg-blue-gray-50 p-4 cursor-pointer "
                             >
-                              <div className="flex">
+                              <div className={classname}>
                                 <label
                                   color="blue-gray"
-                                  className="font-normal leading-none opacity-70 "
+                                  className="font-normal leading-none opacity-70"
                                 >
                                   {column.label}
                                 </label>
@@ -377,8 +383,9 @@ const DataTable: React.FC<DataTableProps> = ({
                                 )}
                               </div>
                             </th>
-                          )
-                      )}
+                          );
+                        }
+                      })}
                       {renderHeadTableActions()}
                     </tr>
                   </thead>
@@ -403,7 +410,7 @@ const DataTable: React.FC<DataTableProps> = ({
                                 column.key
                               );
                               let className = "font-normal ";
-                              let classNametd = " p-2 relative ";
+                              let classNametd = " p-4 relative ";
 
                               const formatColumn =
                                 column.format.toLocaleUpperCase();
@@ -431,7 +438,8 @@ const DataTable: React.FC<DataTableProps> = ({
                                 formatColumn.toLocaleUpperCase() ==
                                 ColumnFormat.NUMBER
                               ) {
-                                classNametd = " text-center ";
+                                totalQuantity += parseInt(value);
+                                classNametd = " text-right pr-8 ";
                               }
 
                               if (
@@ -477,19 +485,18 @@ const DataTable: React.FC<DataTableProps> = ({
                         </tr>
                       ))}
                     {totalCounts && (
-                      <>
-                        <tr className="bg-gray-100 border-t-2 border-gray-900">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            Total Unitats Consumides
-                          </td>
-                          <td
-                            colSpan={4}
-                            className="px-6 py-4 whitespace-nowrap text-lg text-gray-900 font-semibold"
-                          >
-                            5
-                          </td>
-                        </tr>
-                      </>
+                      <tr className="bg-gray-100 border-t-2 border-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap font-semibold text-left">
+                          Total Unitats Consumides
+                        </td>
+                        <td
+                          colSpan={columns.length - 2}
+                          className="px-6 pr-8 whitespace-nowrap text-lg text-gray-900 font-semibold text-right"
+                        >
+                          {totalQuantity}
+                        </td>
+                        <td className="px-6 pr-8 whitespace-nowrap text-lg text-gray-900 font-semibold text-right"></td>
+                      </tr>
                     )}
                   </tbody>
                 </table>

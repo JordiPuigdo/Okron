@@ -17,13 +17,16 @@ import {
   ColumnFormat,
   TableButtons,
 } from "components/table/interfaceTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
 import { SvgSpinner } from "app/icons/icons";
 import AutocompleteSearchBar from "components/selector/AutocompleteSearchBar";
 import { EntityTable } from "components/table/tableEntitys";
+import { Asset } from "app/interfaces/Asset";
+import AssetService from "app/services/assetService";
+import { ElementList } from "components/selector/ElementList";
 
 interface WorkOrderTableProps {
   enableFilterAssets?: boolean;
@@ -32,6 +35,7 @@ interface WorkOrderTableProps {
   enableEdit: boolean;
   enableDelete: boolean;
   assetId?: string | "";
+  enableFinalizeWorkOrdersDayBefore?: boolean;
 }
 
 const columns: Column[] = [
@@ -79,12 +83,14 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   enableEdit,
   enableDelete,
   assetId,
+  enableFinalizeWorkOrdersDayBefore = false,
 }) => {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string>("");
   const [workOrders, setWorkOrders] = useState<WorkOrder[] | []>([]);
+  const [assets, setAssets] = useState<ElementList[]>([]);
   const [selectedStateFilter, setSelectedStateFilter] = useState<
     number | undefined
   >(undefined);
@@ -92,6 +98,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     number | undefined
   >(undefined);
   const [searchTerm, setSearchTerm] = useState("");
+  const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
 
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
@@ -104,6 +111,35 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   };
 
   const [selectedAssetId, setSelectedAssetId] = useState<string>(assetId!);
+
+  useEffect(() => {
+    const fetchAssets = async () => {
+      try {
+        const assets = await assetService.getAll();
+        const elements: ElementList[] = [];
+
+        const addAssetAndChildren = (asset: Asset) => {
+          elements.push({
+            id: asset.id,
+            description: asset.description,
+          });
+
+          asset.childs.forEach((childAsset) => {
+            addAssetAndChildren(childAsset);
+          });
+        };
+
+        assets.forEach((asset) => {
+          addAssetAndChildren(asset);
+        });
+        setAssets(elements);
+      } catch (error) {
+        console.error("Error fetching assets:", error);
+      }
+    };
+
+    if (assetId == undefined) fetchAssets();
+  }, []);
 
   const searchWorkOrders = async () => {
     const startDateTime = startDate ? new Date(startDate) : null;
@@ -118,7 +154,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
       endDateTime.setHours(23, 59, 59, 999);
     }
     const search: SearchWorkOrderFilters = {
-      assetId: selectedAssetId || "",
+      assetId: "",
       startDateTime: startDateTime
         ? new Date(
             startDateTime.getTime() - startDateTime.getTimezoneOffset() * 60000
@@ -152,10 +188,10 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     return (
       <button
         type="button"
-        className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
+        className="bg-orange-500 text-white p-2 rounded-md hover:bg-orange-600 flex items-center"
         onClick={(e) => handleFinalizeWorkOrdersDayBefore()}
       >
-        Finalitzar les ordres del dia anterior{" "}
+        Finalitzar Ordres del{" "}
         {formatDate(new Date(Date.now() - 86400000), false, false)}
         {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
       </button>
@@ -200,6 +236,9 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
             Buscar
             {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </button>
+          {enableFinalizeWorkOrdersDayBefore && (
+            <>{renderFinalizeWorkOrdersDayBefore()}</>
+          )}
           {message != "" && (
             <span className="text-red-500 ml-4">{message}</span>
           )}
@@ -209,7 +248,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
           <div className="flex flex-row gap-4 items-center ">
             {enableFilterAssets && (
               <AutocompleteSearchBar
-                elements={[]}
+                elements={assets}
                 setCurrentId={setSelectedAssetId}
                 placeholder="Buscar Equips"
               />
@@ -291,6 +330,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 
   const handleSearch = async () => {
     setIsLoading(true);
+
     await searchWorkOrders();
     setIsLoading(false);
   };
@@ -365,6 +405,13 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     ) {
       return false;
     }
+    if (
+      selectedAssetId != undefined &&
+      selectedAssetId.length > 0 &&
+      order.asset?.id !== selectedAssetId
+    ) {
+      return false;
+    }
     return true;
   });
 
@@ -377,6 +424,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
         tableButtons={tableButtons}
         entity={EntityTable.WORKORDER}
         onDelete={handleDeleteOrder}
+        enableFilterActive={false}
       />
     </>
   );

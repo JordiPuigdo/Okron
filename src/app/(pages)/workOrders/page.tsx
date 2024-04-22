@@ -39,6 +39,7 @@ export default function WorkOrdersPage() {
           enableFilters={false}
           enableEdit={true}
           enableDelete={true}
+          enableFinalizeWorkOrdersDayBefore={true}
         />
       </Container>
     </MainLayout>

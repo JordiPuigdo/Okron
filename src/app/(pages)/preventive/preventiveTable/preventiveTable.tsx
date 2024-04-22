@@ -79,7 +79,7 @@ const PreventiveTable: React.FC<PreventiveTableProps> = ({
   useEffect(() => {
     const fetchPreventives = async () => {
       try {
-        if (assetId != undefined) {
+        if (assetId !== undefined) {
           const fetchedPreventives =
             await preventiveService.getPreventiveByAssetId(assetId!);
           setPreventives(fetchedPreventives);
@@ -123,14 +123,16 @@ const PreventiveTable: React.FC<PreventiveTableProps> = ({
   };
 
   return (
-    <DataTable
-      data={preventives}
-      columns={columns}
-      filters={enableFilters ? filters : undefined}
-      tableButtons={tableButtons}
-      entity={EntityTable.PREVENTIVE}
-      onDelete={handleDelete}
-    />
+    <div className="py-2">
+      <DataTable
+        data={preventives}
+        columns={columns}
+        filters={enableFilters ? filters : undefined}
+        tableButtons={tableButtons}
+        entity={EntityTable.PREVENTIVE}
+        onDelete={handleDelete}
+      />
+    </div>
   );
 };
 

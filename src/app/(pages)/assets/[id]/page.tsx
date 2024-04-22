@@ -32,9 +32,6 @@ export default function AssetDetailsPage({
   const id = params.id;
   const [loading, setLoading] = useState(false);
   const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
-  const preventiveService = new PreventiveService(
-    process.env.NEXT_PUBLIC_API_BASE_URL!
-  );
   const [isloading, setIsloading] = useState(true);
   const [currentAsset, setCurrentAsset] = useState<Asset | null>(null);
   const [parentId, setParentId] = useState<string | null>(null);
@@ -151,11 +148,11 @@ export default function AssetDetailsPage({
             {id != "0" && (
               <div className="flex flex-col gap-4">
                 <div>
-                  <TabGroup>
+                  <TabGroup className="bord">
                     <TabList className="mt-4">
-                      <Tab>Ordres de treball</Tab>
-                      <Tab>Revisions</Tab>
-                      <Tab>Recanvis</Tab>
+                      <Tab className="font-semibold">Ordres de treball</Tab>
+                      <Tab className="font-semibold">Revisions</Tab>
+                      <Tab className="font-semibold">Recanvis</Tab>
                     </TabList>
                     <TabPanels>
                       <TabPanel>

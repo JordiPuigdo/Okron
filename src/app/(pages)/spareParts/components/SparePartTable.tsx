@@ -183,7 +183,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
       }
     }
 
-    if (assetId != undefined) fetchSpareParts();
+    if (assetId == undefined) fetchSpareParts();
   }, []);
 
   const handleSparePartActiveChange = async (id: string) => {
