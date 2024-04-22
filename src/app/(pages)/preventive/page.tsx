@@ -18,22 +18,16 @@ import {
 } from "components/table/interfaceTable";
 import WorkOrderService from "app/services/workOrderService";
 import PreventiveTable from "./preventiveTable/preventiveTable";
+import GeneratePreventive from "./components/GeneratePreventive";
 
 function PreventivePage() {
   const preventiveService = new PreventiveService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
-  const workOrderService = new WorkOrderService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
-  );
+
   const [preventives, setPreventives] = useState<Preventive[]>([]);
-  const [filterText, setFilterText] = useState<string>("");
-  const [preventivesCreated, setPreventivesCreated] = useState<
-    Preventive[] | null
-  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPage, setIsLoadingPage] = useState(true);
-  const [message, setMessage] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -71,26 +65,6 @@ function PreventivePage() {
     } catch (error) {
       console.error("Error deleting preventive:", error);
     }
-  };
-
-  const generateWorkOrders = async () => {
-    setIsLoading(true);
-    const preventives =
-      await preventiveService.CreateWorkOrderPreventivePerDay();
-    if (preventives?.length! > 0) {
-      setPreventivesCreated(preventives);
-      workOrderService.cleanCache();
-      setTimeout(() => {
-        setPreventivesCreated([]);
-      }, 10000);
-    } else {
-      setMessage("Avui no hi ha revisions per crear");
-      setTimeout(() => {
-        setMessage("");
-      }, 3000);
-    }
-
-    setIsLoading(false);
   };
 
   const renderHeader = () => {
@@ -140,26 +114,8 @@ function PreventivePage() {
             Crear Revisió
             {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </Link>
-
-          <button
-            onClick={generateWorkOrders}
-            className="bg-orange-500 text-white px-4 py-2 rounded-md flex"
-          >
-            Generar Revisions {formatDate(new Date(), false, false)}
-            {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-          </button>
+          <GeneratePreventive />
         </div>
-        {message != "" && <span className="text-red-500">{message}</span>}
-
-        <p className="text-black font-bold">
-          {(preventivesCreated?.length || 0 > 0) &&
-            "Revisions creades per avui:"}
-        </p>
-        {preventivesCreated?.map((preventive, index) => (
-          <div key={index}>
-            {preventive.code} - {preventive.description}
-          </div>
-        ))}
 
         {isLoadingPage && <SvgSpinner className="flex w-full" />}
         {!isLoadingPage && (

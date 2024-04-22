@@ -88,6 +88,8 @@ const DataTable: React.FC<DataTableProps> = ({
         break;
       case EntityTable.PREVENTIVE:
         setPathDetail(ROUTES.preventive.configuration);
+      case EntityTable.SPAREPART:
+        setPathDetail(ROUTES.spareParts);
         break;
       default:
         setPathDetail(pathName);
@@ -253,12 +255,6 @@ const DataTable: React.FC<DataTableProps> = ({
   };
 
   const renderHeadTableActions = () => {
-    if (
-      entity == EntityTable.SPAREPART &&
-      loginUser?.permission != UserPermission.Administrator
-    ) {
-      return <></>;
-    }
     return tableButtons.delete || tableButtons.detail || tableButtons.edit ? (
       <th className="text-center border-b border-blue-gray-100 bg-blue-gray-50 p-4 cursor-pointer">
         Accions
@@ -269,26 +265,29 @@ const DataTable: React.FC<DataTableProps> = ({
   };
 
   const renderTableButtons = (item: any) => {
-    if (
-      entity == EntityTable.SPAREPART &&
-      loginUser?.permission != UserPermission.Administrator
-    ) {
-      return <></>;
-    }
-
     return (
       <div className="justify-center flex flex-col sm:flex-row items-center">
-        {loginUser?.permission != UserPermission.Administrator ? (
-          <Link href={`${pathDetail}/${item[columns[0].key]}`}>
-            <p className="flex items-center font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover">
-              Detall
-              {isLoadingButton && (
-                <span className="ml-2 text-xs">
-                  <SvgSpinner className="w-6 h-6" />
-                </span>
-              )}
-            </p>
-          </Link>
+        {loginUser?.permission !== UserPermission.Administrator ? (
+          <td className="p-4 flex flex-col sm:flex-row justify-center items-center text-center gap-4">
+            <Link href={`${pathDetail}/${item[columns[0].key]}`}>
+              <p
+                className="flex items-center font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover"
+                onClick={() => {
+                  setIsLoadingButton((prevState) => ({
+                    ...prevState,
+                    ["Detail"]: true,
+                  }));
+                }}
+              >
+                Detall
+                {isLoadingButton["Detail"] && (
+                  <span className="ml-2 text-xs">
+                    <SvgSpinner className="w-6 h-6" />
+                  </span>
+                )}
+              </p>
+            </Link>
+          </td>
         ) : (
           <>
             <td className="p-4 flex flex-col sm:flex-row justify-center items-center text-center gap-4">

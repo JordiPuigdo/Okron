@@ -36,7 +36,7 @@ export default function WorkOrdersPage() {
         {renderHeader()}
         <WorkOrderTable
           enableFilterAssets={true}
-          enableFilters={false}
+          enableFilters={true}
           enableEdit={true}
           enableDelete={true}
           enableFinalizeWorkOrdersDayBefore={true}

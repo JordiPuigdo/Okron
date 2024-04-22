@@ -27,6 +27,9 @@ import { EntityTable } from "components/table/tableEntitys";
 import { Asset } from "app/interfaces/Asset";
 import AssetService from "app/services/assetService";
 import { ElementList } from "components/selector/ElementList";
+import FinalizeWorkOrdersDaysBefore from "./FinalizeWorkOrdersDaysBefore";
+import { useSessionStore } from "app/stores/globalStore";
+import { UserPermission } from "app/interfaces/User";
 
 interface WorkOrderTableProps {
   enableFilterAssets?: boolean;
@@ -36,6 +39,7 @@ interface WorkOrderTableProps {
   enableDelete: boolean;
   assetId?: string | "";
   enableFinalizeWorkOrdersDayBefore?: boolean;
+  operatorId?: string | "";
 }
 
 const columns: Column[] = [
@@ -84,6 +88,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   enableDelete,
   assetId,
   enableFinalizeWorkOrdersDayBefore = false,
+  operatorId,
 }) => {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
@@ -139,6 +144,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     };
 
     if (assetId == undefined) fetchAssets();
+    if (operatorId !== undefined) handleSearch();
   }, []);
 
   const searchWorkOrders = async () => {
@@ -149,12 +155,12 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     if (startDateTime) {
       startDateTime.setHours(0, 0, 0, 0);
     }
-
     if (endDateTime) {
       endDateTime.setHours(23, 59, 59, 999);
     }
     const search: SearchWorkOrderFilters = {
       assetId: "",
+      operatorId: operatorId || "",
       startDateTime: startDateTime
         ? new Date(
             startDateTime.getTime() - startDateTime.getTimezoneOffset() * 60000
@@ -181,20 +187,6 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
         const startTimeB = new Date(b.startTime).valueOf();
         return startTimeA - startTimeB;
       })
-    );
-  };
-
-  const renderFinalizeWorkOrdersDayBefore = () => {
-    return (
-      <button
-        type="button"
-        className="bg-orange-500 text-white p-2 rounded-md hover:bg-orange-600 flex items-center"
-        onClick={(e) => handleFinalizeWorkOrdersDayBefore()}
-      >
-        Finalitzar Ordres del{" "}
-        {formatDate(new Date(Date.now() - 86400000), false, false)}
-        {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-      </button>
     );
   };
 
@@ -237,7 +229,9 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
             {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </button>
           {enableFinalizeWorkOrdersDayBefore && (
-            <>{renderFinalizeWorkOrdersDayBefore()}</>
+            <FinalizeWorkOrdersDaysBefore
+              onFinalizeWorkOrdersDayBefore={searchWorkOrders}
+            />
           )}
           {message != "" && (
             <span className="text-red-500 ml-4">{message}</span>
@@ -335,14 +329,6 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     setIsLoading(false);
   };
 
-  const handleFinalizeWorkOrdersDayBefore = async () => {
-    setIsLoading(true);
-    const today = new Date();
-    await workOrderService.finishWorkOrdersByDate(today);
-    await searchWorkOrders();
-    setIsLoading(false);
-  };
-
   const handleDeleteOrder = (orderId: string) => {
     const isConfirmed = window.confirm(
       `Esteu segurs que voleu eliminar l'ordre de treball?`
@@ -417,7 +403,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 
   return (
     <>
-      {renderFilterWorkOrders()}
+      {enableFilters && renderFilterWorkOrders()}
       <DataTable
         columns={columns}
         data={filteredWorkOrders}

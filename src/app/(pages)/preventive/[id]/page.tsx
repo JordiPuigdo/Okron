@@ -169,7 +169,6 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
   function convertToUpdateWorkOrderRequest(
     preventive: Preventive
   ): UpdatePreventiveRequest {
-    debugger;
     const updatePreventiveRequest: UpdatePreventiveRequest = {
       id: params.id as string,
       code: preventive.code,
