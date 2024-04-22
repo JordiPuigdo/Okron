@@ -2,7 +2,7 @@
 
 import {
   SparePartDetailRequest,
-  SparePartPerMachineResponse,
+  SparePartPerAssetResponse,
 } from "app/interfaces/SparePart";
 import { formatDate, formatDateQuery } from "app/utils/utils";
 import Link from "next/link";
@@ -21,7 +21,7 @@ export default function TableSparePartsConsumed({
 }: {
   sparePartId?: string;
   assetId?: string;
-  sparePartsPerAsset?: SparePartPerMachineResponse[];
+  sparePartsPerAsset?: SparePartPerAssetResponse[];
   searchPlaceHolder: string;
 }) {
   const currentDate = new Date();
@@ -34,7 +34,7 @@ export default function TableSparePartsConsumed({
   const [isLoading, setIsLoading] = useState(false);
 
   const [sparePerMachine, setSparePartPerMachine] = useState<
-    SparePartPerMachineResponse[] | null
+    SparePartPerAssetResponse[] | null
   >(sparePartsPerAsset != null ? sparePartsPerAsset : []);
 
   const sparePartService = new SparePartService(

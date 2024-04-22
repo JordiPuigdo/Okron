@@ -21,8 +21,8 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
   };
 
   return (
-    <div className="mt-4">
-      <li className=" p-4 flex flex-col border-2 bg-slate-50">
+    <div className="mt-4 bg-white rounded-xl">
+      <li className=" p-4 flex flex-col border-2 ">
         <div className="flex items-center mb-2">
           {asset.childs.length > 0 && (
             <button
@@ -46,7 +46,7 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
                   onClick={(e) => {
                     setLoadingAssets({ ...loadingAssets, [asset.id]: true });
                   }}
-                  className="flex items-center mr-2 bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                  className="flex items-center mr-2 bg-okron-btCreate text-white px-2 py-1 rounded hover:bg-okron-btCreateHover"
                 >
                   Afegir subnivell
                   {loadingAssets[asset.id] && (
@@ -62,7 +62,7 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
                 onClick={(e) => {
                   setLoadingAssets({ ...loadingAssets, [asset.id]: true });
                 }}
-                className="flex items-center mr-2 bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                className="flex items-center mr-2 bg-okron-btEdit text-white px-2 py-1 rounded hover:bg-okron-btEditHover"
               >
                 Editar
                 {loadingAssets[asset.id] && (
@@ -73,9 +73,8 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
               </button>
             </Link>
             <button
-              className="flex bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+              className="flex bg-okron-btDelete text-white px-2 py-1 rounded hover:bg-okron-btDeleteHover"
               onClick={(e) => {
-                setLoadingAssets({ ...loadingAssets, [asset.id]: true });
                 onDelete(asset.id);
               }}
             >
@@ -118,6 +117,8 @@ const AssetList: React.FC = () => {
   }, []);
 
   const handleDelete = (id: string) => {
+    const confirm = window.confirm("Segur que voleu eliminar aquest equip?");
+    if (!confirm) return;
     assetService
       .deleteAsset(id)
       .then((data) => {

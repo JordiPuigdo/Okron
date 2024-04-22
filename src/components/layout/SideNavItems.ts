@@ -7,7 +7,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
 
   {
     key: generateKey(),
-    title: 'Preventius',
+    title: 'Revisions',
     path: '',
     submenu: true,
     permission: UserPermission.Administrator,
@@ -26,7 +26,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
   },
   {
     key: generateKey(),
-    title: 'Correctius',
+    title: 'Avaries',
     path: '/corrective',
     permission: UserPermission.Worker
   },

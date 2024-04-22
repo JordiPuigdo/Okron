@@ -31,7 +31,9 @@ export enum ColumnFormat {
     DATE = "DATE",
     BOOLEAN = "BOOLEAN",    
     TEXT = "TEXT",
+    NUMBER = "NUMBER",
     WORKORDERTYPE = "WORKORDERTYPE",
     STATEWORKORDER = "STATEWORKORDER",
+    KEY = "KEY"
 
 }

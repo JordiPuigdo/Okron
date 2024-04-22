@@ -24,6 +24,9 @@ import ChooseInspectionPoint from "components/inspectionPoint/ChooseInspectionPo
 import ChooseOperatorV2 from "components/operator/ChooseOperatorV2";
 import ChooseElement from "components/ChooseElement";
 import machine from "app/interfaces/machine";
+import AssetService from "app/services/assetService";
+import { ElementList } from "components/selector/ElementList";
+import { Asset } from "app/interfaces/Asset";
 
 const PreventiveForm = () => {
   const router = useRouter();
@@ -41,7 +44,7 @@ const PreventiveForm = () => {
   const [selectedInspectionPoints, setSelectedInspectionPoints] = useState<
     string[]
   >([]);
-
+  const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
   const preventiveService = new PreventiveService(apiURL);
   const sparePartService = new SparePartService(apiURL);
   const inspectionPointService = new InspectionPointService(apiURL);
@@ -61,6 +64,8 @@ const PreventiveForm = () => {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [isLoading, setIsLoading] = useState(false);
   const [preventiveDays, setPreventiveDays] = useState(0);
+  const [assets, setAssets] = useState<ElementList[]>([]);
+  const [selectedAssets, setSelectedAsset] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchInspectionPoints = async () => {
@@ -78,18 +83,35 @@ const PreventiveForm = () => {
       });
     };
 
-    const fetchMachines = async () => {
+    const fetchAssets = async () => {
       try {
-        const machines = await machineService.getAllMachines();
-        setAviableMachines(machines.filter((x) => x.active == true));
+        const assets = await assetService.getAll();
+        const elements: ElementList[] = [];
+
+        const addAssetAndChildren = (asset: Asset) => {
+          elements.push({
+            id: asset.id,
+            description: asset.description,
+          });
+
+          asset.childs.forEach((childAsset) => {
+            addAssetAndChildren(childAsset);
+          });
+        };
+
+        assets.forEach((asset) => {
+          addAssetAndChildren(asset);
+        });
+
+        setAssets(elements);
       } catch (error) {
-        console.error("Error fetching spare parts:", error);
+        console.error("Error al obtener activos:", error);
       }
     };
 
     fetchInspectionPoints();
     fetchOperators();
-    fetchMachines();
+    fetchAssets();
     let counter = 1;
     const params = new URLSearchParams(window.location.search);
     const numberPreventive = params.get("counter");
@@ -118,7 +140,7 @@ const PreventiveForm = () => {
       startExecution: startDate!,
       days: preventiveDays,
       counter: 0,
-      machineId: selectedMachines.map((machine) => machine),
+      assetId: selectedAssets.map((asset) => asset),
       inspectionPointId: selectedInspectionPoints.map((point) => point),
       operatorId: selectedOperator.map((operator) => operator),
     };
@@ -183,8 +205,8 @@ const PreventiveForm = () => {
       invalidFields.push("SelectedOperator");
     }
 
-    if (selectedMachines.length === 0) {
-      invalidFields.push("SelectedMachines");
+    if (selectedAssets.length === 0) {
+      invalidFields.push("SelectedAssets");
     }
 
     if (invalidFields.length > 0) {
@@ -222,6 +244,17 @@ const PreventiveForm = () => {
     setSelectedMachines((prevSelected) => [...prevSelected, id]);
   };
 
+  const handleAssetSelected = (id: string) => {
+    if (id == "") return;
+    setSelectedAsset((prevSelected) => [...prevSelected, id]);
+  };
+
+  const handleDeleteSelectedAsset = (assetId: string) => {
+    setSelectedAsset((prevSelected) =>
+      prevSelected.filter((id) => id !== assetId)
+    );
+  };
+
   return (
     <MainLayout>
       <Container>
@@ -231,9 +264,7 @@ const PreventiveForm = () => {
             className="mx-auto bg-white p-8 rounded shadow-md"
             style={{ display: "flex", flexDirection: "column", width: "100%" }}
           >
-            <h2 className="text-2xl font-bold mb-6 text-black">
-              Configurar Nou Preventiu
-            </h2>
+            <h2 className="text-2xl font-bold mb-6 text-black">Nova revisió</h2>
 
             <div className="flex flex-col md:flex-row justify-center gap-8 w-full items-center my-4">
               <label
@@ -280,7 +311,7 @@ const PreventiveForm = () => {
                 className="block text-gray-700 font-bold mb-2 text-lg"
                 htmlFor="startExecution"
               >
-                Primera Execució del Preventiu
+                Primera Execució
               </label>
               <DatePicker
                 id="startDate"
@@ -312,14 +343,14 @@ const PreventiveForm = () => {
 
             <div className="flex flex-row gap-8 w-full my-6">
               <ChooseElement
-                elements={aviableMachines}
-                selectedElements={selectedMachines}
-                onElementSelected={handleMachineSelected}
-                onDeleteElementSelected={handleDeleteSelectedMachine}
-                placeholder="Buscar màquines"
-                mapElement={(machine) => ({
-                  id: machine.id,
-                  description: machine.description,
+                elements={assets}
+                selectedElements={selectedAssets}
+                onElementSelected={handleAssetSelected}
+                onDeleteElementSelected={handleDeleteSelectedAsset}
+                placeholder="Buscar Equip"
+                mapElement={(asset) => ({
+                  id: asset.id,
+                  description: asset.description,
                 })}
               />
             </div>
@@ -341,12 +372,12 @@ const PreventiveForm = () => {
                     : "bg-blue-700"
                 } text-white font-bold py-2 px-4 rounded mt-6 flex items-center justify-center`}
               >
-                Crear Preventiu
+                Crear Revisió
                 {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
               </button>
               {showSuccessMessage && (
                 <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
-                  Preventiu creat correctament
+                  Revisió creada correctament
                 </div>
               )}
               <button
@@ -359,7 +390,7 @@ const PreventiveForm = () => {
 
               {showErrorMessage && (
                 <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
-                  Error al crear preventiu
+                  Error al crear revisió
                 </div>
               )}
             </div>

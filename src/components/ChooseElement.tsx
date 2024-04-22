@@ -66,11 +66,11 @@ const ChooseElement = <T,>({
           setCurrentId={handleElementSelected}
           placeholder={placeholder}
         />
-        <div className="mt-4">
+        <div className="mt-4 p-2">
           {selectedItems.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between mb-2"
+              className="flex items-center justify-between mb-2 border-b-2 border-gray-800 p-2"
             >
               <span className="text-gray-600 font-medium">
                 {item.description}

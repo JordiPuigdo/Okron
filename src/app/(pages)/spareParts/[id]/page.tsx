@@ -4,7 +4,7 @@ import MainLayout from "components/layout/MainLayout";
 import SparePart, {
   SparePartDetailRequest,
   SparePartDetailResponse,
-  SparePartPerMachineResponse,
+  SparePartPerAssetResponse,
 } from "app/interfaces/SparePart";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -37,7 +37,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
   });
   const [sparePart, setSparePart] = useState<SparePart | null>(null);
   const [sparePerMachine, setSparePartPerMachine] = useState<
-    SparePartPerMachineResponse[] | null
+    SparePartPerAssetResponse[] | null
   >([]);
 
   const currentDate = new Date();

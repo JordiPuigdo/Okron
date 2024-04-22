@@ -1,32 +1,47 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import AssetService from "app/services/assetService";
-import { Asset, UpdateAssetRequest } from "app/interfaces/Asset";
+import {
+  Asset,
+  CreateAssetRequest,
+  UpdateAssetRequest,
+} from "app/interfaces/Asset";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
-import { useRouter } from "next/navigation";
-import useRoutes from "app/utils/useRoutes";
 import AssetForm from "../components/assetForm";
 import { SvgSpinner } from "app/icons/icons";
-import TableSparePartsConsumed from "app/(pages)/spareParts/components/tableSparePartsConsumed";
-import TableWorkOrdersPerAsset from "app/(pages)/workOrders/components/tableWorkOrdersPerAsset";
+import TableSparePartPerAsset from "app/(pages)/spareParts/components/tableSparePartsPerAsset";
+import PreventiveService from "app/services/preventiveService";
+import PreventiveTable from "app/(pages)/preventive/preventiveTable/preventiveTable";
+import WorkOrderTable from "app/(pages)/workOrders/components/WorkOrderTable";
+import {
+  Card,
+  Tab,
+  TabGroup,
+  TabList,
+  TabPanel,
+  TabPanels,
+} from "@tremor/react";
+import SparePartTable from "app/(pages)/spareParts/components/SparePartTable";
 
 export default function AssetDetailsPage({
   params,
 }: {
-  params: { id: string };
+  params: { id: string; parentId: string };
 }) {
   const id = params.id;
   const [loading, setLoading] = useState(false);
   const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
+  const preventiveService = new PreventiveService(
+    process.env.NEXT_PUBLIC_API_BASE_URL!
+  );
   const [isloading, setIsloading] = useState(true);
-  const [currentAsset, setCurrentAsset] = useState<Asset | null>(null); // Track current asset data
-  const [level, setLevel] = useState(0);
-  const queryString = window.location.search;
-  const par = new URLSearchParams(queryString);
-  const parentId = par.get("parentId");
-  const levelGetted =
-    par.get("level") != null ? parseInt(par.get("level")!) : 1;
+  const [currentAsset, setCurrentAsset] = useState<Asset | null>(null);
+  const [parentId, setParentId] = useState<string | null>(null);
+  const [levelGetted, setLevelGetted] = useState<number | null>(null);
+  const [message, setMessage] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   useEffect(() => {
     if (id !== "0") {
@@ -34,7 +49,7 @@ export default function AssetDetailsPage({
       assetService
         .getAssetById(id as string)
         .then((asset: Asset) => {
-          setCurrentAsset(asset); // Set current asset data
+          setCurrentAsset(asset);
           setLoading(false);
         })
         .catch((error) => {
@@ -45,26 +60,62 @@ export default function AssetDetailsPage({
     setIsloading(false);
   }, [id]);
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const parentId = urlParams.get("parentId");
+    const level = urlParams.get("level");
+
+    setParentId(parentId);
+    setLevelGetted(level?.toString() ? parseInt(level) : 1);
+  }, []);
+
   const onSubmit = async (data: any) => {
     try {
       setLoading(true);
       if (id !== "0") {
         const newData: UpdateAssetRequest = {
-          ...data,
+          code: data.code,
+          description: data.description,
           id: id,
           active: data.active,
-          creationDate: data.creationDate,
+          level: data.level,
+          parentId: data.parentId,
         };
-        await assetService.updateAsset(id, newData);
+        await assetService.updateAsset(id, newData).then((data) => {
+          if (data) {
+            setMessage("Actualitzat correctament");
+            setTimeout(() => {
+              history.back();
+            }, 2000);
+          } else {
+            setErrorMessage("Error actualitzant l'equip");
+          }
+        });
       } else {
-        await assetService.createAsset(data);
+        const newData: CreateAssetRequest = {
+          code: data.code,
+          description: data.description,
+          level: levelGetted!,
+          parentId: parentId!,
+        };
+        await assetService
+          .createAsset(newData)
+          .then((data) => {
+            if (data) {
+              setMessage("Creat correctament");
+              setTimeout(() => {
+                history.back();
+              }, 2000);
+            } else {
+              setErrorMessage("Error creant l'equip");
+            }
+          })
+          .catch((x) => {
+            setErrorMessage("Error : " + x.message);
+          });
       }
 
-      setTimeout(() => {
-        history.back();
-      }, 2000);
       setLoading(false);
-      // Redirect to assets list after successful action
     } catch (error) {
       console.error("Error submitting form:", error);
       setLoading(false);
@@ -75,7 +126,7 @@ export default function AssetDetailsPage({
     <MainLayout>
       <Container>
         {isloading ? (
-          <SvgSpinner />
+          <SvgSpinner className="items-center justify-center" />
         ) : (
           <>
             <div className="mx-auto max-w-md p-6 bg-white shadow-md rounded-md">
@@ -83,20 +134,63 @@ export default function AssetDetailsPage({
                 id={id}
                 loading={loading}
                 assetData={currentAsset != null ? currentAsset : undefined}
-                level={levelGetted}
+                level={levelGetted!}
                 parentId={parentId != null ? parentId : ""}
                 onSubmit={onSubmit}
               />
+              {message && (
+                <div className="bg-green-200 text-green-800 p-4 rounded my-4">
+                  {message}
+                </div>
+              )}
+              {errorMessage && (
+                <div className="bg-red-200 text-red-800 p-4 rounded my-4">
+                  {errorMessage}
+                </div>
+              )}
             </div>
-            {
-              <div>
-                <TableSparePartsConsumed
-                  assetId={id}
-                  searchPlaceHolder="Buscar per operari"
-                />
-                <TableWorkOrdersPerAsset assetId={id} />
+            {id != "0" && (
+              <div className="flex flex-col gap-4">
+                <div>
+                  <TabGroup>
+                    <TabList className="mt-4">
+                      <Tab>Ordres de treball</Tab>
+                      <Tab>Revisions</Tab>
+                      <Tab>Recanvis</Tab>
+                    </TabList>
+                    <TabPanels>
+                      <TabPanel>
+                        <WorkOrderTable
+                          enableFilters={false}
+                          enableEdit={false}
+                          enableDelete={false}
+                          enableDetail={true}
+                          assetId={id}
+                        />
+                      </TabPanel>
+                      <TabPanel>
+                        <PreventiveTable
+                          enableFilters={true}
+                          enableDelete={false}
+                          enableEdit={false}
+                          assetId={id}
+                        />
+                      </TabPanel>
+                      <TabPanel>
+                        <SparePartTable
+                          enableFilters={true}
+                          enableEdit={false}
+                          enableDelete={false}
+                          enableDetail={true}
+                          enableCreate={false}
+                          assetId={id}
+                        />
+                      </TabPanel>
+                    </TabPanels>
+                  </TabGroup>
+                </div>
               </div>
-            }
+            )}
           </>
         )}
       </Container>

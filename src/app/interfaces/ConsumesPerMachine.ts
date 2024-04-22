@@ -1,11 +1,11 @@
-import Machine from "./machine";
+import { Asset } from "./Asset";
 
-export interface ConsumesPerMachine {
-    machine : Machine
-    spareParts : MachineSparePart[]
+export interface ConsumesPerAsset {
+    asset : Asset
+    spareParts : AssetSparePart[]
 }
 
-interface MachineSparePart {
+interface AssetSparePart {
     quantity: number;
     creationDate : string;
 }

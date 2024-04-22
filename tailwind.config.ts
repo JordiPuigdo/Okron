@@ -75,6 +75,7 @@ const config: Config = {
         },
         okron : {
           btCreate: "#007bff",
+          btCreateHover: "#0056b3",
           btEdit: "#28a745",
           btEditHover: "#1a8031",
           btDelete: "#dc3545",

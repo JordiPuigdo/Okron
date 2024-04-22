@@ -6,6 +6,7 @@ export interface Asset extends BaseModel {
     description : string,
     parentId: string,
     childs : Asset[],
+    path? :string
 }
 
 export interface CreateAssetRequest    {
@@ -16,4 +17,6 @@ export interface CreateAssetRequest    {
 }
 
 export interface UpdateAssetRequest extends CreateAssetRequest {
+  id : string;
+  active : boolean;
 }

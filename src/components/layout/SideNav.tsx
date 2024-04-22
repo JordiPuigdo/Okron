@@ -8,15 +8,6 @@ import { SvgSpinner } from "app/icons/icons";
 const SideNav = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { loginUser } = useSessionStore((state) => state);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const sideBarItems = SIDENAV_ITEMS.filter(
-    (item) =>
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.submenuItems?.some((subItem) =>
-        subItem.title.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-  );
 
   return (
     <div className="flex flex-col md:px-4">
@@ -33,26 +24,12 @@ const SideNav = () => {
         )}
       </Link>
       <div className="pt-4 ">
-        <input
-          type="text"
-          className="md:px-4 w-full my-4 p-2 border border-gray-300 rounded-md"
-          placeholder="Buscar"
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-
-        {sideBarItems.map((item, idx) => {
+        {SIDENAV_ITEMS.map((item, idx) => {
           return (
             <>
               {item.permission <= loginUser?.permission! && (
                 <>
-                  <MenuItem
-                    key={idx}
-                    item={item}
-                    isOpenSubMenu={
-                      sideBarItems.length != SIDENAV_ITEMS.length ? true : false
-                    }
-                    onClick={() => setSearchTerm("")}
-                  />
+                  <MenuItem key={idx} item={item} />
                 </>
               )}
             </>
@@ -65,14 +42,12 @@ const SideNav = () => {
 
 const MenuItem = ({
   item,
-  isOpenSubMenu = false,
   onClick,
 }: {
   item: SideNavItem;
-  isOpenSubMenu: boolean;
   onClick?: () => void;
 }) => {
-  const [subMenuOpen, setSubMenuOpen] = useState(isOpenSubMenu);
+  const [subMenuOpen, setSubMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<{ [key: string]: boolean }>({
     [item.key]: false,
   });

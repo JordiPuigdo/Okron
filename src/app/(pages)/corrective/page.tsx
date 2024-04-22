@@ -223,9 +223,7 @@ function CorrectivePage() {
           </svg>
         </div>
 
-        <h2 className="text-2xl font-bold text-black mx-auto">
-          Crear Correctiu
-        </h2>
+        <h2 className="text-2xl font-bold text-black mx-auto">Crear Avaria</h2>
 
         {errorMessage !== "" && (
           <p className="text-red-500 text-xl">{errorMessage}</p>
@@ -396,7 +394,7 @@ function CorrectivePage() {
                       : "bg-blue-700"
                   } text-white font-bold py-2 px-4 rounded mt-6 mb-4 sm:mb-0 sm:mr-2 flex items-center`}
                 >
-                  Crear Correctiu
+                  Crear Avaria
                   {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
                 </button>
                 <button
@@ -411,13 +409,13 @@ function CorrectivePage() {
 
               {showSuccessMessage && (
                 <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
-                  Correctiu creat correctament
+                  Avaria creada correctament
                 </div>
               )}
 
               {showErrorMessage && (
                 <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
-                  Error al crear Correctiu
+                  Error al crear Avaria
                 </div>
               )}
             </form>

@@ -441,7 +441,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                         : "bg-blue-700"
                     } text-white font-bold py-2 px-4 rounded mt-6 mb-4 sm:mb-0 sm:mr-2 flex items-center`}
                   >
-                    Actualizar Ordre
+                    Actualitzar Ordre
                     {isLoading && (
                       <SvgSpinner style={{ marginLeft: "0.5rem" }} />
                     )}

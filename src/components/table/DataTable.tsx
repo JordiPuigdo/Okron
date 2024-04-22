@@ -14,7 +14,7 @@ import { getStatusClassName, getStatusText } from "./tableUtils";
 import { EntityTable } from "./tableEntitys";
 import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
-import { Table } from "@tremor/react";
+import useRoutes from "app/utils/useRoutes";
 
 interface DataTableProps {
   data: any[];
@@ -24,6 +24,7 @@ interface DataTableProps {
   entity: EntityTable;
   onDelete?: (id: string) => void;
   totalCounts?: boolean;
+  enableFilterActive?: boolean;
 }
 
 const DataTable: React.FC<DataTableProps> = ({
@@ -34,6 +35,7 @@ const DataTable: React.FC<DataTableProps> = ({
   entity,
   onDelete,
   totalCounts = false,
+  enableFilterActive = true,
 }: DataTableProps) => {
   const itemsPerPageOptions = [5, 10, 15, 20, 25, 50];
   const pathName = usePathname();
@@ -47,6 +49,8 @@ const DataTable: React.FC<DataTableProps> = ({
   const [totalCount, setTotalCount] = useState(
     Math.ceil(data.length / itemsPerPage)
   );
+  const ROUTES = useRoutes();
+  const [pathDetail, setPathDetail] = useState<string>("");
 
   const [isLoadingButton, setIsLoadingButton] = useState<{
     [key: string]: boolean;
@@ -76,6 +80,19 @@ const DataTable: React.FC<DataTableProps> = ({
     setCurrentPage(currentPage - 1);
     setIsLoading(false);
   };
+
+  useEffect(() => {
+    switch (entity) {
+      case EntityTable.WORKORDER:
+        setPathDetail(ROUTES.workOrders);
+        break;
+      case EntityTable.PREVENTIVE:
+        setPathDetail(ROUTES.preventive.configuration);
+        break;
+      default:
+        setPathDetail(pathName);
+    }
+  }, []);
 
   /* const handleOnFilterChange = async (e: any) => {
     setIsLoading(true);
@@ -108,19 +125,23 @@ const DataTable: React.FC<DataTableProps> = ({
   useEffect(() => {
     const indexOfLastRecord = currentPage * itemsPerPage;
     const indexOfFirstRecord = indexOfLastRecord - itemsPerPage;
-    setFilteredData(
-      data
-        .filter((record) => {
-          if (typeof record === "object" && record.hasOwnProperty("active")) {
-            if (filterActive) {
-              return record.active === true;
-            } else {
-              return true;
+    if (enableFilterActive) {
+      setFilteredData(
+        data
+          .filter((record) => {
+            if (typeof record === "object" && record.hasOwnProperty("active")) {
+              if (filterActive) {
+                return record.active === true;
+              } else {
+                return true;
+              }
             }
-          }
-        })
-        .slice(indexOfFirstRecord, indexOfLastRecord)
-    );
+          })
+          .slice(indexOfFirstRecord, indexOfLastRecord)
+      );
+    } else {
+      setFilteredData(data);
+    }
     setTotalCount(Math.ceil(data.length / itemsPerPage));
     setIsLoading(false);
   }, [data, currentPage, itemsPerPage, filterActive]);
@@ -158,11 +179,14 @@ const DataTable: React.FC<DataTableProps> = ({
 
     const indexOfLastRecord = currentPage * itemsPerPage;
     const indexOfFirstRecord = indexOfLastRecord - itemsPerPage;
-    setFilteredData(
-      filteredData
-        .filter((x) => x["active"] == filterActive)
-        .slice(indexOfFirstRecord, indexOfLastRecord)
-    );
+    if (enableFilterActive) {
+      setFilteredData(
+        filteredData
+          .filter((x) => x["active"] == filterActive)
+          .slice(indexOfFirstRecord, indexOfLastRecord)
+      );
+    }
+
     setTotalCount(Math.ceil(filteredData.length / itemsPerPage));
   };
 
@@ -196,15 +220,17 @@ const DataTable: React.FC<DataTableProps> = ({
             </select>
             <p className="ml-2">registres per pàgina</p>
           </div>
-          <div className="flex items-center">
-            <span className="mr-2">Veure registres actius</span>
-            <input
-              type="checkbox"
-              checked={filterActive}
-              onChange={() => setFilterActive(!filterActive)}
-              className="ml-2"
-            />
-          </div>
+          {enableFilterActive && (
+            <div className="flex items-center">
+              <span className="mr-2">Veure registres actius</span>
+              <input
+                type="checkbox"
+                checked={filterActive}
+                onChange={() => setFilterActive(!filterActive)}
+                className="ml-2"
+              />
+            </div>
+          )}
 
           <div className="">
             {filters?.length == 0 && (
@@ -249,9 +275,9 @@ const DataTable: React.FC<DataTableProps> = ({
     }
 
     return (
-      <div className="p-4 justify-center flex flex-col sm:flex-row items-center">
+      <div className="justify-center flex flex-col sm:flex-row items-center">
         {loginUser?.permission != UserPermission.Administrator ? (
-          <Link href={`${pathName}/${item[columns[0].key]}`}>
+          <Link href={`${pathDetail}/${item[columns[0].key]}`}>
             <p className="flex items-center font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover">
               Detall
               {isLoadingButton && (
@@ -263,8 +289,8 @@ const DataTable: React.FC<DataTableProps> = ({
           </Link>
         ) : (
           <>
-            {tableButtons.edit && (
-              <td className="p-4 flex flex-col sm:flex-row justify-center items-center text-center gap-4">
+            <td className="p-4 flex flex-col sm:flex-row justify-center items-center text-center gap-4">
+              {tableButtons.edit && (
                 <Link href={`${pathName}/${item[columns[0].key]}`}>
                   <p
                     className="flex items-center font-medium text-white p-2 rounded-xl bg-okron-btEdit hover:bg-okron-btEditHover"
@@ -283,35 +309,34 @@ const DataTable: React.FC<DataTableProps> = ({
                     )}
                   </p>
                 </Link>
-                {tableButtons.delete && (
-                  <button
-                    type="button"
-                    className="flex items-center font-medium text-white p-2 rounded-xl bg-okron-btDelete hover:bg-okron-btDeleteHover"
-                    onClick={() => handleDelete(item[columns[0].key])}
-                  >
-                    Eliminar
-                    {isLoadingButton["Delete"] && (
+              )}
+              {tableButtons.delete && (
+                <button
+                  type="button"
+                  className="flex items-center font-medium text-white p-2 rounded-xl bg-okron-btDelete hover:bg-okron-btDeleteHover"
+                  onClick={() => handleDelete(item[columns[0].key])}
+                >
+                  Eliminar
+                  {isLoadingButton["Delete"] && (
+                    <span className="ml-2 text-white">
+                      <SvgSpinner className="w-6 h-6" />
+                    </span>
+                  )}
+                </button>
+              )}
+              {tableButtons.detail && (
+                <Link href={`${pathDetail}/${item[columns[0].key]}`}>
+                  <p className="font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover">
+                    Detall
+                    {isLoadingButton["Detail"] && (
                       <span className="ml-2 text-white">
                         <SvgSpinner className="w-6 h-6" />
                       </span>
                     )}
-                  </button>
-                )}
-                {tableButtons.detail && (
-                  <button
-                    type="button"
-                    className="font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btDeleteHover"
-                  >
-                    Detall
-                    {isLoadingButton && (
-                      <span className="ml-2 text-xs">
-                        <SvgSpinner className="w-4 h-4" />
-                      </span>
-                    )}
-                  </button>
-                )}
-              </td>
-            )}
+                  </p>
+                </Link>
+              )}
+            </td>
           </>
         )}
       </div>
@@ -378,6 +403,7 @@ const DataTable: React.FC<DataTableProps> = ({
                                 column.key
                               );
                               let className = "font-normal ";
+                              let classNametd = " p-2 relative ";
 
                               const formatColumn =
                                 column.format.toLocaleUpperCase();
@@ -399,6 +425,13 @@ const DataTable: React.FC<DataTableProps> = ({
                               ) {
                                 className = getStatusClassName(value, entity);
                                 value = translateWorkOrderType(value);
+                              }
+
+                              if (
+                                formatColumn.toLocaleUpperCase() ==
+                                ColumnFormat.NUMBER
+                              ) {
+                                classNametd = " text-center ";
                               }
 
                               if (
@@ -429,7 +462,7 @@ const DataTable: React.FC<DataTableProps> = ({
 */
                               const formattedValue = value;
                               return (
-                                <td key={column.key} className="p-2 relative">
+                                <td key={column.key} className={classNametd}>
                                   <label className={className}>
                                     {formatColumn == ColumnFormat.BOOLEAN && (
                                       <>{value ? "Actiu" : "Inactiu"}</>
@@ -443,17 +476,40 @@ const DataTable: React.FC<DataTableProps> = ({
                           {renderTableButtons(rowData)}
                         </tr>
                       ))}
+                    {totalCounts && (
+                      <>
+                        <tr className="bg-gray-100 border-t-2 border-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            Total Unitats Consumides
+                          </td>
+                          <td
+                            colSpan={4}
+                            className="px-6 py-4 whitespace-nowrap text-lg text-gray-900 font-semibold"
+                          >
+                            5
+                          </td>
+                        </tr>
+                      </>
+                    )}
                   </tbody>
                 </table>
               </div>
             )}
           </div>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalCount}
-            onPageChange={handlePageChange}
-            hasNextPage={currentPage < totalCount}
-          />
+          <div className="flex flex-row ">
+            {data.length > 0 && (
+              <p className="mt-auto w-full">Total: {data.length} registres</p>
+            )}
+
+            <div className="justify-end w-full">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalCount}
+                onPageChange={handlePageChange}
+                hasNextPage={currentPage < totalCount}
+              />
+            </div>
+          </div>
         </div>
       </>
     );

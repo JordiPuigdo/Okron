@@ -4,12 +4,10 @@ import Operator from "app/interfaces/Operator";
 import { Preventive, UpdatePreventiveRequest } from "app/interfaces/Preventive";
 import SparePart from "app/interfaces/SparePart";
 import InspectionPoint from "app/interfaces/inspectionPoint";
-import Machine from "app/interfaces/machine";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import InspectionPointService from "app/services/inspectionPointService";
-import MachineService from "app/services/machineService";
 import OperatorService from "app/services/operatorService";
 import PreventiveService from "app/services/preventiveService";
 import SparePartService from "app/services/sparePartService";
@@ -22,14 +20,14 @@ import Container from "components/layout/Container";
 import ChooseInspectionPoint from "components/inspectionPoint/ChooseInspectionPoint";
 import ChooseOperatorV2 from "components/operator/ChooseOperatorV2";
 import ChooseElement from "components/ChooseElement";
+import assetService from "app/services/assetService";
+import AssetService from "app/services/assetService";
+import { Asset } from "app/interfaces/Asset";
+import { ElementList } from "components/selector/ElementList";
 
 export default function EditPreventive({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [preventiveData, setPreventiveData] = useState<Preventive | null>(null);
-  const machineService = new MachineService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
-  );
-  const [machine, setMachine] = useState<Machine | null>(null);
   const { register, handleSubmit, setValue } = useForm<Preventive>();
   const [availableSpareParts, setAvailableSpareParts] = useState<SparePart[]>(
     []
@@ -51,13 +49,15 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
   const operatorService = new OperatorService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
+  const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
 
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
+  const [assets, setAssets] = useState<ElementList[]>([]);
 
-  const fetchPreventiveData = async () => {
+  const fetchPreventiveData = async (): Promise<Preventive> => {
     try {
       const preventiveData = await preventiveService.getPreventive(
         params.id as string
@@ -65,7 +65,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
       return preventiveData;
     } catch (error) {
       console.error("Error fetching machine data:", error);
-      return null;
+      return {} as Preventive;
     }
   };
 
@@ -82,9 +82,30 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
     setSelectedInspectionPoints(selected ?? []);
   };
 
-  const fetchMachine = async (preventive: Preventive) => {
-    const machine = await machineService.getMachineById(preventive.machine.id);
-    setMachine(machine);
+  const fetchAssets = async () => {
+    try {
+      const assets = await assetService.getAll();
+      const elements: ElementList[] = [];
+
+      const addAssetAndChildren = (asset: Asset) => {
+        elements.push({
+          id: asset.id,
+          description: asset.description,
+        });
+
+        asset.childs.forEach((childAsset) => {
+          addAssetAndChildren(childAsset);
+        });
+      };
+
+      assets.forEach((asset) => {
+        addAssetAndChildren(asset);
+      });
+
+      setAssets(elements);
+    } catch (error) {
+      console.error("Error al obtener activos:", error);
+    }
   };
 
   const fetchOperators = async (preventive: Preventive) => {
@@ -107,9 +128,9 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
           setValue("days", data.days);
           setValue("startExecution", data.startExecution);
           const finalData = new Date(data.startExecution);
+          setValue("asset", data.asset);
           setStartDate(finalData);
           await fetchInspectionPoints(data);
-          await fetchMachine(data);
           await fetchOperators(data);
         }
       }
@@ -148,6 +169,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
   function convertToUpdateWorkOrderRequest(
     preventive: Preventive
   ): UpdatePreventiveRequest {
+    debugger;
     const updatePreventiveRequest: UpdatePreventiveRequest = {
       id: params.id as string,
       code: preventive.code,
@@ -155,7 +177,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
       startExecution: startDate!,
       days: preventive.days,
       counter: preventive.counter,
-      machineId: [machine?.id || ""],
+      assetId: [preventive.asset?.id],
       inspectionPointId: selectedInspectionPoints.map((point) => point),
       operatorId: selectedOperator.map((sparePart) => sparePart),
     };
@@ -186,7 +208,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
           onSubmit={handleSubmit(onSubmit)}
           className="mx-auto bg-white p-8 rounded shadow-md"
         >
-          <p className="font-bold text-xl">Editar Preventiu</p>
+          <p className="font-bold text-xl">Editar Revisió</p>
 
           <div className="flex flex-col md:flex-row justify-center gap-8 w-full items-center my-4">
             <label
@@ -231,7 +253,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
               className="block text-gray-700 font-bold mb-2 text-lg"
               htmlFor="startExecution"
             >
-              Primera Execució del Preventiu
+              Primera Execució
             </label>
             <DatePicker
               id="startExecution"
@@ -262,7 +284,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
 
           <div className="flex text-black">
             <p className="font-semibold">
-              Màquina assignada: {machine?.description}
+              Equip assignat: {preventiveData?.asset?.description}
             </p>
           </div>
           <div className="flex flex-row gap-4">
@@ -282,13 +304,8 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
                   : "bg-blue-700"
               } text-white font-bold py-2 px-4 rounded mt-6`}
             >
-              Actualitzar Preventiu
+              Actualitzar Revisió
             </button>
-            {showSuccessMessage && (
-              <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
-                Preventiu actualitzat correctament
-              </div>
-            )}
 
             <button
               type="button"
@@ -297,10 +314,16 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
             >
               Cancelar
             </button>
-
+          </div>
+          <div className="flex my-4 w-full">
+            {showSuccessMessage && (
+              <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
+                Revisió actualitzada correctament
+              </div>
+            )}
             {showErrorMessage && (
               <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
-                Error al crear preventiu
+                Error al actualitzar revisió
               </div>
             )}
           </div>

@@ -17,6 +17,7 @@ import {
   FiltersFormat,
 } from "components/table/interfaceTable";
 import WorkOrderService from "app/services/workOrderService";
+import PreventiveTable from "./preventiveTable/preventiveTable";
 
 function PreventivePage() {
   const preventiveService = new PreventiveService(
@@ -34,57 +35,6 @@ function PreventivePage() {
   const [isLoadingPage, setIsLoadingPage] = useState(true);
   const [message, setMessage] = useState("");
   const router = useRouter();
-
-  const columns: Column[] = [
-    {
-      label: "ID",
-      key: "id",
-      format: ColumnFormat.TEXT,
-    },
-    {
-      label: "Codi",
-      key: "code",
-      format: ColumnFormat.TEXT,
-    },
-    {
-      label: "Descripció",
-      key: "description",
-      format: ColumnFormat.TEXT,
-    },
-    {
-      label: "Màquina",
-      key: "machine.description",
-      format: ColumnFormat.TEXT,
-    },
-    {
-      label: "Última execució",
-      key: "lastExecution",
-      format: ColumnFormat.DATE,
-    },
-  ];
-
-  const filters: Filters[] = [
-    {
-      key: "code",
-      label: "Codi",
-      format: FiltersFormat.TEXT,
-    },
-    {
-      key: "description",
-      label: "Descripció",
-      format: FiltersFormat.TEXT,
-    },
-    {
-      key: "machine.description",
-      label: "Màquina",
-      format: FiltersFormat.TEXT,
-    },
-  ];
-
-  const tableButtons: any = {
-    edit: true,
-    delete: true,
-  };
 
   useEffect(() => {
     const fetchPreventives = async () => {
@@ -123,12 +73,6 @@ function PreventivePage() {
     }
   };
 
-  const filteredPreventives = preventives.filter(
-    (preventive) =>
-      preventive.code.toLowerCase().includes(filterText.toLowerCase()) ||
-      preventive.description.toLowerCase().includes(filterText.toLowerCase())
-  );
-
   const generateWorkOrders = async () => {
     setIsLoading(true);
     const preventives =
@@ -140,7 +84,7 @@ function PreventivePage() {
         setPreventivesCreated([]);
       }, 10000);
     } else {
-      setMessage("Avui no hi ha preventius per crear");
+      setMessage("Avui no hi ha revisions per crear");
       setTimeout(() => {
         setMessage("");
       }, 3000);
@@ -173,7 +117,7 @@ function PreventivePage() {
         </div>
 
         <h2 className="text-2xl font-bold text-black mx-auto">
-          Llista de preventius configurats
+          Llista de revisions configurades
         </h2>
       </div>
     );
@@ -193,7 +137,7 @@ function PreventivePage() {
             className="text-white mb-2 rounded-md bg-blue-500 px-4 py-2 flex"
             onClick={(e) => setIsLoading(true)}
           >
-            Crear Nova Configuració de Preventiu
+            Crear Revisió
             {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </Link>
 
@@ -201,7 +145,7 @@ function PreventivePage() {
             onClick={generateWorkOrders}
             className="bg-orange-500 text-white px-4 py-2 rounded-md flex"
           >
-            Generar Preventius d'Avui {formatDate(new Date(), false, false)}
+            Generar Revisions {formatDate(new Date(), false, false)}
             {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </button>
         </div>
@@ -209,7 +153,7 @@ function PreventivePage() {
 
         <p className="text-black font-bold">
           {(preventivesCreated?.length || 0 > 0) &&
-            "Preventius creats per avui:"}
+            "Revisions creades per avui:"}
         </p>
         {preventivesCreated?.map((preventive, index) => (
           <div key={index}>
@@ -219,13 +163,10 @@ function PreventivePage() {
 
         {isLoadingPage && <SvgSpinner className="flex w-full" />}
         {!isLoadingPage && (
-          <DataTable
-            data={filteredPreventives}
-            columns={columns}
-            filters={filters}
-            tableButtons={tableButtons}
-            entity={EntityTable.PREVENTIVE}
-            onDelete={handleDelete}
+          <PreventiveTable
+            enableFilters={true}
+            enableDelete={true}
+            enableEdit={true}
           />
         )}
       </Container>
