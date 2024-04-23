@@ -144,7 +144,7 @@ const DataTable: React.FC<DataTableProps> = ({
           .slice(indexOfFirstRecord, indexOfLastRecord)
       );
     } else {
-      setFilteredData(data);
+      setFilteredData(data.slice(indexOfFirstRecord, indexOfLastRecord));
     }
     setTotalCount(Math.ceil(data.length / itemsPerPage));
     setIsLoading(false);
@@ -347,7 +347,7 @@ const DataTable: React.FC<DataTableProps> = ({
   if (filteredData)
     return (
       <>
-        <div className="bg-white rounded-lg p-2">
+        <div className="bg-white rounded-lg p-2 shadow-md">
           {renderFilters()}
           <div className="pt-4">
             {isLoading ? (

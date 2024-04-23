@@ -49,10 +49,10 @@ const GeneratePreventive = () => {
       <>
         <button
           onClick={generateWorkOrders}
-          className="bg-orange-500 text-white p-2 rounded-md hover:bg-orange-600 flex items-center"
+          className="bg-orange-500 text-white p-2 rounded-md hover:bg-orange-600 flex items-center gap-2"
         >
           Generar Revisions {formatDate(new Date(), false, false)}
-          {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+          {isLoading && <SvgSpinner className="w-6 h-6" />}
         </button>
 
         <p className="text-black font-bold">

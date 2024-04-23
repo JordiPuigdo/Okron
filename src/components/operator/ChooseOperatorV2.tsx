@@ -46,8 +46,11 @@ const ChooseOperatorV2: React.FC<ChooseOperatorV2Props> = ({
   };
 
   return (
-    <div className="flex flex-row gap-8 w-full my-6">
+    <div className="flex flex-row gap-8 w-full ">
       <div className="w-full">
+        <label className="block text-gray-700 font-bold mb-2 text-lg">
+          Operaris
+        </label>
         <AutocompleteSearchBar
           elements={elementListOperator.filter(
             (x) => !preventiveSelectedOperators.some((y) => y === x.id)

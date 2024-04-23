@@ -192,11 +192,11 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 
   const renderFilterWorkOrders = () => {
     return (
-      <div className="bg-white p-2 my-4 rounded-xl gap-4">
+      <div className="bg-white p-2 my-4 rounded-xl gap-4 shadow-md">
         <div className="flex gap-4 my-4 items-center">
           <div className="flex items-center">
             <label htmlFor="startDate" className="mr-2">
-              Inici:
+              Inici
             </label>
             <DatePicker
               id="startDate"

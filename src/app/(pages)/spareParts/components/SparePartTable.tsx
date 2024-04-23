@@ -26,10 +26,11 @@ interface SparePartTableProps {
   enableFilterAssets?: boolean;
   enableFilters: boolean;
   enableDetail?: boolean;
-  enableEdit: boolean;
-  enableDelete: boolean;
+  enableEdit?: boolean;
+  enableDelete?: boolean;
   assetId?: string | "";
   enableCreate?: boolean;
+  sparePartId?: string;
 }
 
 const columns: Column[] = [
@@ -149,6 +150,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
   enableDelete,
   assetId,
   enableCreate = true,
+  sparePartId,
 }) => {
   const [spareParts, setSpareParts] = useState<SparePart[]>([]);
   const [sparePartsPerAsset, setSparePartsPerAsset] = useState<
@@ -163,7 +165,6 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
   const [endDate, setEndDate] = useState<Date | null>(new Date());
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState("");
 
   const tableButtons: TableButtons = {
     edit: enableEdit,
@@ -183,7 +184,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
       }
     }
 
-    if (assetId == undefined) fetchSpareParts();
+    if (assetId == undefined && sparePartId == undefined) fetchSpareParts();
   }, []);
 
   const handleSparePartActiveChange = async (id: string) => {
@@ -200,6 +201,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
   async function filterSpareParts() {
     const x: SparePartDetailRequest = {
       assetId: assetId,
+      id: sparePartId,
       startDate: formatDateQuery(startDate!, true),
       endDate: formatDateQuery(endDate!, false),
     };
@@ -208,32 +210,35 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
       .getSparePartHistoryByDates(x)
       .then((response) => {
         if (response.length == 0) {
-          setErrorMessage("No hi ha recanvis disponibles amb aquests filtres");
+          setMessage("No hi ha recanvis disponibles amb aquests filtres");
           setTimeout(() => {
-            setErrorMessage("");
+            setMessage("");
           }, 3000);
-          return;
+        } else {
+          setSparePartsPerAsset(response);
         }
-        setSparePartsPerAsset(response);
       })
       .catch((error) => {
-        setErrorMessage(error);
+        setMessage(error);
         setTimeout(() => {
-          setErrorMessage("");
+          setMessage("");
         });
       });
+    setIsLoading(false);
   }
+
   function handleSearch(): void {
+    setIsLoading(true);
     filterSpareParts();
   }
 
   const renderFilter = () => {
     return (
-      <div className="bg-white p-2 my-4 rounded-xl gap-4">
-        <div className="flex gap-4 my-4 items-center">
+      <div className="bg-white p-2 my-4 rounded-xl gap-4 shadow-md">
+        <div className="flex gap-4 p-2 my-4 items-center">
           <div className="flex items-center">
             <label htmlFor="startDate" className="mr-2">
-              Inici:
+              Inici
             </label>
             <DatePicker
               id="startDate"
@@ -299,7 +304,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
           )}
         </>
       )}
-      {assetId != undefined ? (
+      {assetId !== undefined || sparePartId !== undefined ? (
         <>
           {renderFilter()}
           <DataTable

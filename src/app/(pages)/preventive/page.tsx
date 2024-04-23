@@ -5,24 +5,14 @@ import { Preventive } from "app/interfaces/Preventive";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import PreventiveService from "app/services/preventiveService";
-import { formatDate } from "app/utils/utils";
 import Container from "components/layout/Container";
 import { useRouter } from "next/navigation";
-import DataTable from "components/table/DataTable";
-import { EntityTable } from "components/table/tableEntitys";
-import {
-  Column,
-  ColumnFormat,
-  Filters,
-  FiltersFormat,
-} from "components/table/interfaceTable";
-import WorkOrderService from "app/services/workOrderService";
 import PreventiveTable from "./preventiveTable/preventiveTable";
 import GeneratePreventive from "./components/GeneratePreventive";
 
 function PreventivePage() {
   const preventiveService = new PreventiveService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+    process.env.NEXT_PUBLIC_API_BASE_URL!
   );
 
   const [preventives, setPreventives] = useState<Preventive[]>([]);
@@ -44,28 +34,6 @@ function PreventivePage() {
 
     fetchPreventives();
   }, []);
-
-  const handleDelete = async (id: string) => {
-    try {
-      setIsLoading(true);
-      const isConfirmed = window.confirm(
-        `Esteu segurs que voleu eliminar el preventiu?`
-      );
-      if (!isConfirmed) {
-        setIsLoading(false);
-        return;
-      }
-
-      await preventiveService.deletePreventive(id);
-
-      setPreventives((prevPreventives) =>
-        prevPreventives.filter((preventive) => preventive.id !== id)
-      );
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error deleting preventive:", error);
-    }
-  };
 
   const renderHeader = () => {
     return (
@@ -108,11 +76,11 @@ function PreventivePage() {
               pathname: "/preventive/preventiveForm",
               query: { counter: preventives.length },
             }}
-            className="text-white mb-2 rounded-md bg-blue-500 px-4 py-2 flex"
+            className="text-white mb-2 rounded-md bg-okron-btCreate hover:bg-okron-btCreateHover px-4 py-2 flex gap-2"
             onClick={(e) => setIsLoading(true)}
           >
             Crear Revisió
-            {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+            {isLoading && <SvgSpinner className="w-6 h-6" />}
           </Link>
           <GeneratePreventive />
         </div>

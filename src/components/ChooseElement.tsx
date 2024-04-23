@@ -9,6 +9,7 @@ interface ChooseElementProps<T> {
   onDeleteElementSelected: (id: string) => void;
   placeholder: string;
   mapElement: (element: T) => { id: string; description: string };
+  labelText?: string;
 }
 
 const ChooseElement = <T,>({
@@ -18,6 +19,7 @@ const ChooseElement = <T,>({
   onDeleteElementSelected,
   placeholder,
   mapElement,
+  labelText = "",
 }: ChooseElementProps<T>) => {
   const [selectedItems, setSelectedItems] = useState<ElementList[]>([]);
   const [filteredElements, setFilteredElements] = useState<ElementList[]>([]);
@@ -61,6 +63,11 @@ const ChooseElement = <T,>({
   return (
     <div className="flex flex-row gap-8 w-full">
       <div className="w-full">
+        {labelText !== "" && (
+          <label className="block text-gray-700 font-bold mb-2 text-lg">
+            {labelText}
+          </label>
+        )}
         <AutocompleteSearchBar
           elements={filteredElements}
           setCurrentId={handleElementSelected}
@@ -78,7 +85,7 @@ const ChooseElement = <T,>({
               <button
                 type="button"
                 onClick={() => handleDeleteElementSelected(item.id)}
-                className="bg-red-600 hover:bg-red-900 text-white rounded-xl py-2 px-4 text-sm"
+                className="bg-okron-btDelete hover:bg-okron-btDeleteHover text-white rounded-xl py-2 px-4 text-sm"
               >
                 Eliminar
               </button>

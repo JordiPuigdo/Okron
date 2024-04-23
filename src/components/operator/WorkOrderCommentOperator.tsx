@@ -84,7 +84,7 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
   };
 
   return (
-    <>
+    <div className="mx-auto px-4 py-8 mt-12 bg-white rounded-lg">
       <div className="bg-white w-full text-center p-4 rounded-md border-2 border-gray-400">
         <span className="text-xl font-bold">Observacions</span>
       </div>
@@ -165,7 +165,7 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
           currentPage={currentPage}
         />
       </div>
-    </>
+    </div>
   );
 };
 

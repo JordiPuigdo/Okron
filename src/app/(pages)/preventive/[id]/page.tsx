@@ -209,61 +209,67 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
         >
           <p className="font-bold text-xl">Editar Revisió</p>
 
-          <div className="flex flex-col md:flex-row justify-center gap-8 w-full items-center my-4">
-            <label
-              className="block text-gray-700 font-bold mb-2 text-lg"
-              htmlFor="code"
-            >
-              Codi
-            </label>
-            <input
-              {...register("code")}
-              id="code"
-              type="text"
-              className="form-input border border-gray-300 rounded-md w-full"
-            />
-            <label
-              className="block text-gray-700 font-bold mb-2 text-lg"
-              htmlFor="description"
-            >
-              Descripció
-            </label>
-            <input
-              {...register("description")}
-              id="description"
-              type="text"
-              className="form-input border border-gray-300 rounded-md w-full"
-            />
+          <div className="grid grid-cols-4 w-full gap-4 py-4">
+            <div className="col-span-2">
+              <label className="text-gray-700 font-bold text-lg" htmlFor="code">
+                Codi
+              </label>
+              <input
+                {...register("code")}
+                id="code"
+                type="text"
+                className="form-input border border-gray-300 rounded-md w-full"
+              />
+            </div>
+            <div className="col-span-2">
+              <label
+                className="text-gray-700 font-bold mb-2 text-lg"
+                htmlFor="description"
+              >
+                Descripció
+              </label>
+              <input
+                {...register("description")}
+                id="description"
+                type="text"
+                className="form-input border border-gray-300 rounded-md w-full"
+              />
+            </div>
           </div>
-          <div className="flex flex-col md:flex-row justify-center gap-8 w-3/4 items-center my-4">
-            <label
-              className="block text-gray-700 font-bold mb-2 text-lg"
-              htmlFor="days"
-            >
-              Freqüència Dies
-            </label>
-            <input
-              {...register("days")}
-              id="days"
-              type="number"
-              className="form-input border border-gray-300 rounded-md w-full"
-            />
-            <label
-              className="block text-gray-700 font-bold mb-2 text-lg"
-              htmlFor="startExecution"
-            >
-              Primera Execució
-            </label>
-            <DatePicker
-              id="startExecution"
-              selected={startDate}
-              onChange={(date: Date) => setStartDate(date)}
-              dateFormat="dd/MM/yyyy"
-              locale={ca}
-              className="border border-gray-300 p-2 rounded-md mr-4"
-            />
-            {error && <p style={{ color: "red" }}>{error}</p>}
+          <div className="grid grid-cols-4 w-full gap-4 py-4">
+            <div className="col-span-2">
+              <label
+                className="block text-gray-700 font-bold mb-2 text-lg"
+                htmlFor="days"
+              >
+                Freqüència Dies
+              </label>
+              <input
+                {...register("days")}
+                id="days"
+                type="number"
+                className="form-input border border-gray-300 rounded-md w-full"
+              />
+            </div>
+            <div className="col-span-2">
+              <label
+                className="block text-gray-700 font-bold mb-2 text-lg"
+                htmlFor="startExecution"
+              >
+                Primera Execució
+              </label>
+              <DatePicker
+                id="startDate"
+                selected={startDate}
+                onChange={(date: Date) => setStartDate(date)}
+                dateFormat="dd/MM/yyyy"
+                locale={ca}
+                className="border border-gray-300 p-2 rounded-md mr-4 w-full"
+              />
+            </div>
           </div>
+
+          {error && <p style={{ color: "red" }}>{error}</p>}
           <div className="flex flex-row gap-8 w-full my-6">
             <ChooseInspectionPoint
               preventiveInspectionPoints={availableInspectionPoints}

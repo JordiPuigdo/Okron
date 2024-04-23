@@ -43,7 +43,6 @@ function CorrectivePage() {
   const [selectedOperator, setSelectedOperator] = useState<string[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
 
-  const [machines, setMachines] = useState<Machine[]>([]);
   const [assets, setAssets] = useState<ElementList[]>([]);
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -60,7 +59,6 @@ function CorrectivePage() {
 
   async function fetchFormData() {
     await fetchOperators();
-    await fetchMachines();
     await createCode();
     await fetchAssets();
 
@@ -91,17 +89,6 @@ function CorrectivePage() {
       })
       .catch((error) => {
         setErrorMessage("Error Operaris: " + error);
-      });
-  }
-
-  async function fetchMachines() {
-    await machinService
-      .getAllMachines()
-      .then((aviableMachines) => {
-        setMachines(aviableMachines.filter((x) => x.active));
-      })
-      .catch((error) => {
-        setErrorMessage("Error Màquines: " + error);
       });
   }
 
@@ -192,11 +179,11 @@ function CorrectivePage() {
   }
 
   const handleSelectedOperator = (id: string) => {
-    setSelectedOperator([id]);
+    setSelectedOperator([...selectedOperator, id]);
   };
-  const handleDeleteSelectedOperator = (id: string) => {
+  const handleDeleteSelectedOperator = (operatorId: string) => {
     setSelectedOperator((prevSelected) =>
-      prevSelected.filter((id) => id !== id)
+      prevSelected.filter((id) => id !== operatorId)
     );
   };
 
@@ -299,7 +286,7 @@ function CorrectivePage() {
                         ))}
                       <div>
                         <button
-                          className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
+                          className="bg-okron-btDelete hover:bg-okron-btDeleteHover text-white rounded-xl py-2 px-4 text-sm"
                           onClick={(e) => {
                             setSelectedId("");
                           }}

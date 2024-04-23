@@ -125,7 +125,7 @@ export default function AssetDetailsPage({
           <SvgSpinner className="items-center justify-center" />
         ) : (
           <>
-            <div className="mx-auto max-w-md p-6 bg-white shadow-md rounded-md">
+            <div className="p-4 bg-white shadow-md rounded-md w-full">
               <AssetForm
                 id={id}
                 loading={loading}
@@ -157,7 +157,7 @@ export default function AssetDetailsPage({
                     <TabPanels>
                       <TabPanel>
                         <WorkOrderTable
-                          enableFilters={false}
+                          enableFilters={true}
                           enableEdit={false}
                           enableDelete={false}
                           enableDetail={true}

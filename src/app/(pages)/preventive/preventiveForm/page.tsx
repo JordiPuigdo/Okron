@@ -120,15 +120,18 @@ const PreventiveForm = () => {
     }
   }, []);
 
-  const handleDeleteInspectionPointSelected = (id: string) => {
+  const handleDeleteInspectionPointSelected = (inspectionPointId: string) => {
     setSelectedInspectionPoints((prevSelected) =>
-      prevSelected.filter((id) => id !== id)
+      prevSelected.filter((id) => id !== inspectionPointId)
     );
   };
 
-  const handleInspectionPointSelected = (id: string) => {
-    if (id == "") return;
-    setSelectedInspectionPoints((prevSelected) => [...prevSelected, id]);
+  const handleInspectionPointSelected = (inspectionPointId: string) => {
+    if (inspectionPointId == "") return;
+    setSelectedInspectionPoints((prevSelected) => [
+      ...prevSelected,
+      inspectionPointId,
+    ]);
   };
 
   function convertToCreateWorkOrderRequest(
@@ -218,35 +221,24 @@ const PreventiveForm = () => {
     return true;
   }
 
-  const handleDeleteSelectedOperator = (id: string) => {
+  const handleDeleteSelectedOperator = (operatorId: string) => {
     setSelectedOperator((prevSelected) =>
-      prevSelected.filter((id) => id !== id)
+      prevSelected.filter((id) => id !== operatorId)
     );
   };
 
-  const handleSelectedOperator = (id: string) => {
-    if (id == "") return;
-    setSelectedOperator((prevSelected) => [...prevSelected, id]);
+  const handleSelectedOperator = (operatorId: string) => {
+    if (operatorId == "") return;
+    setSelectedOperator((prevSelected) => [...prevSelected, operatorId]);
   };
 
   const handleCancel = () => {
     router.back();
   };
 
-  const handleDeleteSelectedMachine = (idMachine: string) => {
-    setSelectedMachines((prevSelected) =>
-      prevSelected.filter((id) => id !== idMachine)
-    );
-  };
-
-  const handleMachineSelected = (id: string) => {
-    if (id == "") return;
-    setSelectedMachines((prevSelected) => [...prevSelected, id]);
-  };
-
-  const handleAssetSelected = (id: string) => {
-    if (id == "") return;
-    setSelectedAsset((prevSelected) => [...prevSelected, id]);
+  const handleAssetSelected = (assetId: string) => {
+    if (assetId == "") return;
+    setSelectedAsset((prevSelected) => [...prevSelected, assetId]);
   };
 
   const handleDeleteSelectedAsset = (assetId: string) => {
@@ -258,73 +250,81 @@ const PreventiveForm = () => {
   return (
     <MainLayout>
       <Container>
-        <div className="mx-auto w-full">
+        <div className="w-full">
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="mx-auto bg-white p-8 rounded shadow-md"
             style={{ display: "flex", flexDirection: "column", width: "100%" }}
           >
-            <h2 className="text-2xl font-bold mb-6 text-black">Nova revisió</h2>
+            <p className="text-2xl font-bold text-black">Nova revisió</p>
 
-            <div className="flex flex-col md:flex-row justify-center gap-8 w-full items-center my-4">
-              <label
-                className="block text-gray-700 font-bold mb-2 text-lg"
-                htmlFor="code"
-              >
-                Codi
-              </label>
-              <input
-                {...register("code")}
-                id="code"
-                type="text"
-                className="form-input border border-gray-300 rounded-md w-full"
-              />
-              <label
-                className="block text-gray-700 font-bold mb-2 text-lg"
-                htmlFor="description"
-              >
-                Descripció
-              </label>
-              <input
-                {...register("description")}
-                id="description"
-                type="text"
-                className="form-input border border-gray-300 rounded-md w-full"
-              />
+            <div className="grid grid-cols-4 w-full gap-4 py-4">
+              <div className="col-span-2">
+                <label
+                  className="text-gray-700 font-bold text-lg"
+                  htmlFor="code"
+                >
+                  Codi
+                </label>
+                <input
+                  {...register("code")}
+                  id="code"
+                  type="text"
+                  className="form-input border border-gray-300 rounded-md w-full"
+                />
+              </div>
+              <div className="col-span-2">
+                <label
+                  className="text-gray-700 font-bold mb-2 text-lg"
+                  htmlFor="description"
+                >
+                  Descripció
+                </label>
+                <input
+                  {...register("description")}
+                  id="description"
+                  type="text"
+                  className="form-input border border-gray-300 rounded-md w-full"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-4 w-full gap-4 py-4">
+              <div className="col-span-2">
+                <label
+                  className="block text-gray-700 font-bold mb-2 text-lg"
+                  htmlFor="days"
+                >
+                  Freqüència Dies
+                </label>
+                <input
+                  value={preventiveDays}
+                  onChange={(e) => setPreventiveDays(parseInt(e.target.value))}
+                  id="days"
+                  type="number"
+                  className="form-input border border-gray-300 rounded-md w-full"
+                />
+              </div>
+              <div className="col-span-2">
+                <label
+                  className="block text-gray-700 font-bold mb-2 text-lg"
+                  htmlFor="startExecution"
+                >
+                  Primera Execució
+                </label>
+                <DatePicker
+                  id="startDate"
+                  selected={startDate}
+                  onChange={(date: Date) => setStartDate(date)}
+                  dateFormat="dd/MM/yyyy"
+                  locale={ca}
+                  className="border border-gray-300 p-2 rounded-md mr-4 w-full"
+                />
+              </div>
             </div>
 
-            <div className="flex flex-col md:flex-row justify-center gap-8 w-3/4 items-center my-4">
-              <label
-                className="block text-gray-700 font-bold mb-2 text-lg"
-                htmlFor="days"
-              >
-                Freqüència Dies
-              </label>
-              <input
-                value={preventiveDays}
-                onChange={(e) => setPreventiveDays(parseInt(e.target.value))}
-                id="days"
-                type="number"
-                className="form-input border border-gray-300 rounded-md w-full"
-              />
-              <label
-                className="block text-gray-700 font-bold mb-2 text-lg"
-                htmlFor="startExecution"
-              >
-                Primera Execució
-              </label>
-              <DatePicker
-                id="startDate"
-                selected={startDate}
-                onChange={(date: Date) => setStartDate(date)}
-                dateFormat="dd/MM/yyyy"
-                locale={ca}
-                className="border border-gray-300 p-2 rounded-md mr-4"
-              />
-            </div>
             {error && <p style={{ color: "red" }}>{error}</p>}
 
-            <div className="flex flex-row gap-8 w-full my-6">
+            <div className="flex flex-row gap-4 py-4 w-full">
               <ChooseInspectionPoint
                 preventiveInspectionPoints={availableInspectionPoints}
                 onInspectionPointSelected={handleInspectionPointSelected}
@@ -339,9 +339,6 @@ const PreventiveForm = () => {
                 onDeleteSelectedOperator={handleDeleteSelectedOperator}
                 onSelectedOperator={handleSelectedOperator}
               />
-            </div>
-
-            <div className="flex flex-row gap-8 w-full my-6">
               <ChooseElement
                 elements={assets}
                 selectedElements={selectedAssets}
@@ -352,8 +349,10 @@ const PreventiveForm = () => {
                   id: asset.id,
                   description: asset.description,
                 })}
+                labelText="Equips"
               />
             </div>
+
             <div className="flex flex-row gap-4">
               <button
                 type="submit"
@@ -375,11 +374,7 @@ const PreventiveForm = () => {
                 Crear Revisió
                 {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
               </button>
-              {showSuccessMessage && (
-                <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
-                  Revisió creada correctament
-                </div>
-              )}
+
               <button
                 type="button"
                 onClick={handleCancel}
@@ -387,9 +382,16 @@ const PreventiveForm = () => {
               >
                 Cancelar
               </button>
+            </div>
+            <div className="flex flex-row py-4 w-full">
+              {showSuccessMessage && (
+                <div className="bg-green-200 text-green-800 p-4 rounded mb-4 w-1/4">
+                  Revisió creada correctament
+                </div>
+              )}
 
               {showErrorMessage && (
-                <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
+                <div className="  bg-red-200 text-red-800 p-4 rounded mb-4 w-1/4">
                   Error al crear revisió
                 </div>
               )}

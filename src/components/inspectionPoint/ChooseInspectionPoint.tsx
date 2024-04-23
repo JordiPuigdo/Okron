@@ -41,8 +41,11 @@ const ChooseInspectionPoint: React.FC<ChooseInspectionPointProps> = ({
   };
 
   return (
-    <div className="flex flex-row gap-8 w-full my-6">
+    <div className="flex flex-row gap-8 w-full">
       <div className="w-full">
+        <label className="block text-gray-700 font-bold mb-2 text-lg">
+          Punts d'inspecció
+        </label>
         <AutocompleteSearchBar
           elements={preventiveInspectionPoints.filter(
             (x) =>
