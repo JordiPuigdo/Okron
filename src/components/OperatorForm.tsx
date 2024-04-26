@@ -50,7 +50,7 @@ const OperatorForm: React.FC<OperatorFormProps> = ({
 
       <div className="mb-4">
         <label
-          htmlFor="description"
+          htmlFor="name"
           className="block text-sm font-medium text-gray-700"
         >
           Nom

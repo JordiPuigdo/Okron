@@ -10,15 +10,6 @@ import Container from "components/layout/Container";
 import { useRouter } from "next/navigation";
 import Section from "app/interfaces/Section";
 import SectionService from "app/services/sectionService";
-import DataTable from "components/table/DataTable";
-import {
-  Column,
-  ColumnFormat,
-  Filters,
-  FiltersFormat,
-  TableButtons,
-} from "components/table/interfaceTable";
-import { EntityTable } from "components/table/tableEntitys";
 
 export default function MachinesPage() {
   const [machines, setMachines] = useState<Machine[]>([]);
@@ -39,65 +30,6 @@ export default function MachinesPage() {
   const [filterActive, setFilterActive] = useState(true);
   const [selectedSection, setSelectedSection] = useState("");
   const router = useRouter();
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-
-  const columns: Column[] = [
-    {
-      label: "ID",
-      key: "id",
-      format: ColumnFormat.TEXT,
-    },
-    {
-      label: "Codi",
-      key: "code",
-      format: ColumnFormat.TEXT,
-    },
-    {
-      label: "Descripció",
-      key: "description",
-      format: ColumnFormat.TEXT,
-    },
-    {
-      label: "Secció",
-      key: "section.description",
-      format: ColumnFormat.TEXT,
-    },
-    {
-      label: "Numero de Sèrie",
-      key: "serialNumber",
-      format: ColumnFormat.TEXT,
-    },
-    {
-      label: "Activa",
-      key: "active",
-      format: ColumnFormat.BOOLEAN,
-    },
-  ];
-
-  const filters: Filters[] = [
-    {
-      key: "code",
-      label: "Codi",
-      format: FiltersFormat.TEXT,
-    },
-    {
-      key: "description",
-      label: "Descripció",
-      format: FiltersFormat.TEXT,
-    },
-    {
-      key: "section.description",
-      label: "Secció",
-      format: FiltersFormat.TEXT,
-    },
-  ];
-
-  const tableButtons: TableButtons = {
-    edit: true,
-    delete: true,
-  };
 
   const toggleFormVisibility = () => {
     setIsFormVisible(!isFormVisible);
@@ -155,6 +87,17 @@ export default function MachinesPage() {
     }
   };
 
+  const filteredMachines = machines
+    .filter(
+      (machine) =>
+        machine.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        machine.serialNumber.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .filter((machine) => (filterActive ? machine.active : true))
+    .filter((machine) =>
+      selectedSection ? machine.section?.id === selectedSection : true
+    );
+
   if (isLoading) {
     return <div className="container mx-auto py-8">Carregant...</div>;
   }
@@ -194,18 +137,46 @@ export default function MachinesPage() {
         {renderHeader()}
         <button
           onClick={toggleFormVisibility}
-          className="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100 mb-4"
+          className="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100"
         >
           {isFormVisible ? "Tancar" : "Crear una nova màquina"}
         </button>
-
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Buscar màquina per nom o número de sèrie"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border rounded-md w-1/2 px-3 py-2 mt-1 text-gray-700 focus:outline-none focus:border-indigo-500"
+          />
+          <select
+            onChange={(e) => setSelectedSection(e.target.value)}
+            className="border rounded-md px-3 ml-3 py-2 mt-1 text-gray-700 focus:outline-none focus:border-indigo-500"
+          >
+            <option value="">Totes les seccions</option>
+            {sections?.map((section) => (
+              <option key={section.id} value={section.id}>
+                {section.description}
+              </option>
+            ))}
+          </select>
+          <label className="ml-6">
+            Veure màquines actives
+            <input
+              type="checkbox"
+              checked={filterActive}
+              onChange={() => setFilterActive(!filterActive)}
+              className="ml-2"
+            />
+          </label>
+        </div>
         {isFormVisible && (
           <form onSubmit={handleSubmit(onSubmit)} className="mb-4">
             <div className="flex">
               <input
                 type="text"
                 placeholder="Nom"
-                {...register("description", { required: true })}
+                {...register("name", { required: true })}
                 className="border rounded-md w-1/2 px-3 py-2 mt-1 mr-2 text-gray-700 focus:outline-none focus:border-indigo-500"
               />
               <input
@@ -222,7 +193,7 @@ export default function MachinesPage() {
                 {isSubmitting ? "Creant..." : "Crear Màquina"}
               </button>
             </div>
-            {errors.description && (
+            {errors.name && (
               <div className="text-red-600 mt-1">Has d'introduïr un nom</div>
             )}
             {errors.company && (
@@ -230,14 +201,82 @@ export default function MachinesPage() {
             )}
           </form>
         )}
-        <DataTable
-          columns={columns}
-          data={machines}
-          tableButtons={tableButtons}
-          entity={EntityTable.MACHINE}
-          filters={filters}
-          onDelete={handleDeleteMachine}
-        />
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead>
+            <tr>
+              <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                Codi
+              </th>
+              <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                Nom
+              </th>
+              <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                Empresa
+              </th>
+              <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                Numero de Sèrie
+              </th>
+              <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                Secció
+              </th>
+              <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                Hores
+              </th>
+              <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                Any
+              </th>
+              <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                Activa
+              </th>
+              <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                Accions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredMachines.map((machine) => (
+              <tr key={machine.id}>
+                <td className="px-6 py-4 whitespace-no-wrap">{machine.code}</td>
+                <td className="px-6 py-4 whitespace-no-wrap">{machine.name}</td>
+                <td className="px-6 py-4 whitespace-no-wrap">
+                  {machine.company}
+                </td>
+                <td className="px-6 py-4 whitespace-no-wrap">
+                  {machine.serialNumber}
+                </td>
+                <td className="px-6 py-4 whitespace-no-wrap">
+                  {machine.section?.description}
+                </td>
+                <td className="px-6 py-4 whitespace-no-wrap">
+                  {machine.hours}
+                </td>
+                <td className="px-6 py-4 whitespace-no-wrap">{machine.year}</td>
+                <td className="px-6 py-4 whitespace-no-wrap">
+                  <label
+                    className={`px-2 py-1 text-white rounded-md ${
+                      machine.active ? "bg-green-500" : "bg-red-500"
+                    }`}
+                  >
+                    {machine.active ? "Activa" : "Inactiva"}
+                  </label>
+                </td>
+                <td className="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
+                  <div className="text-indigo-600 hover:underline mr-3">
+                    <Link href="/machines/[id]" as={`/machines/${machine.id}`}>
+                      Editar
+                    </Link>
+                  </div>
+                  <button
+                    className="text-red-600 hover:text-red-900"
+                    onClick={() => handleDeleteMachine(machine.id)}
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </Container>
     </MainLayout>
   );

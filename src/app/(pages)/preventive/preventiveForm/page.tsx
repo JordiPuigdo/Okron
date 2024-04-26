@@ -20,13 +20,6 @@ import ca from "date-fns/locale/ca";
 import { SvgSpinner } from "app/icons/icons";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
-import ChooseInspectionPoint from "components/inspectionPoint/ChooseInspectionPoint";
-import ChooseOperatorV2 from "components/operator/ChooseOperatorV2";
-import ChooseElement from "components/ChooseElement";
-import machine from "app/interfaces/machine";
-import AssetService from "app/services/assetService";
-import { ElementList } from "components/selector/ElementList";
-import { Asset } from "app/interfaces/Asset";
 
 const PreventiveForm = () => {
   const router = useRouter();
@@ -44,7 +37,9 @@ const PreventiveForm = () => {
   const [selectedInspectionPoints, setSelectedInspectionPoints] = useState<
     string[]
   >([]);
-  const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
+  const [filteredSpareParts, setFilteredSpareParts] = useState<SparePart[]>([]);
+  const [filterSparePartsText, setFilterSparePartsText] = useState<string>("");
+  const [sparePartsLimit, setSparePartsLimit] = useState(5);
   const preventiveService = new PreventiveService(apiURL);
   const sparePartService = new SparePartService(apiURL);
   const inspectionPointService = new InspectionPointService(apiURL);
@@ -64,10 +59,18 @@ const PreventiveForm = () => {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [isLoading, setIsLoading] = useState(false);
   const [preventiveDays, setPreventiveDays] = useState(0);
-  const [assets, setAssets] = useState<ElementList[]>([]);
-  const [selectedAssets, setSelectedAsset] = useState<string[]>([]);
 
   useEffect(() => {
+    const fetchSpareParts = async () => {
+      try {
+        const parts = await sparePartService.getSpareParts();
+        setAvailableSpareParts(parts);
+        setFilteredSpareParts(parts);
+      } catch (error) {
+        console.error("Error fetching spare parts:", error);
+      }
+    };
+
     const fetchInspectionPoints = async () => {
       try {
         const points = await inspectionPointService.getAllInspectionPoints();
@@ -83,35 +86,19 @@ const PreventiveForm = () => {
       });
     };
 
-    const fetchAssets = async () => {
+    const fetchMachines = async () => {
       try {
-        const assets = await assetService.getAll();
-        const elements: ElementList[] = [];
-
-        const addAssetAndChildren = (asset: Asset) => {
-          elements.push({
-            id: asset.id,
-            description: asset.description,
-          });
-
-          asset.childs.forEach((childAsset) => {
-            addAssetAndChildren(childAsset);
-          });
-        };
-
-        assets.forEach((asset) => {
-          addAssetAndChildren(asset);
-        });
-
-        setAssets(elements);
+        const machines = await machineService.getAllMachines();
+        setAviableMachines(machines.filter((x) => x.active == true));
       } catch (error) {
-        console.error("Error al obtener activos:", error);
+        console.error("Error fetching spare parts:", error);
       }
     };
 
+    fetchSpareParts();
     fetchInspectionPoints();
     fetchOperators();
-    fetchAssets();
+    fetchMachines();
     let counter = 1;
     const params = new URLSearchParams(window.location.search);
     const numberPreventive = params.get("counter");
@@ -120,18 +107,30 @@ const PreventiveForm = () => {
     }
   }, []);
 
-  const handleDeleteInspectionPointSelected = (inspectionPointId: string) => {
-    setSelectedInspectionPoints((prevSelected) =>
-      prevSelected.filter((id) => id !== inspectionPointId)
-    );
-  };
+  useEffect(() => {
+    const filtered = availableSpareParts.filter((sparePart) => {
+      const searchText = filterSparePartsText.toLowerCase();
 
-  const handleInspectionPointSelected = (inspectionPointId: string) => {
-    if (inspectionPointId == "") return;
-    setSelectedInspectionPoints((prevSelected) => [
-      ...prevSelected,
-      inspectionPointId,
-    ]);
+      return [
+        sparePart.code,
+        sparePart.description,
+        sparePart.refProvider,
+        sparePart.family,
+      ].some((field) => field && field.toLowerCase().includes(searchText));
+    });
+
+    setFilteredSpareParts(filtered);
+  }, [filterSparePartsText]);
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const pointId = event.target.value;
+    if (event.target.checked) {
+      setSelectedInspectionPoints((prevSelected) => [...prevSelected, pointId]);
+    } else {
+      setSelectedInspectionPoints((prevSelected) =>
+        prevSelected.filter((id) => id !== pointId)
+      );
+    }
   };
 
   function convertToCreateWorkOrderRequest(
@@ -143,8 +142,9 @@ const PreventiveForm = () => {
       startExecution: startDate!,
       days: preventiveDays,
       counter: 0,
-      assetId: selectedAssets.map((asset) => asset),
+      machineId: selectedMachines.map((machine) => machine),
       inspectionPointId: selectedInspectionPoints.map((point) => point),
+      sparePartId: selectedSpareParts.map((sparePart) => sparePart),
       operatorId: selectedOperator.map((operator) => operator),
     };
     return createPreventiveRequest;
@@ -208,8 +208,8 @@ const PreventiveForm = () => {
       invalidFields.push("SelectedOperator");
     }
 
-    if (selectedAssets.length === 0) {
-      invalidFields.push("SelectedAssets");
+    if (selectedMachines.length === 0) {
+      invalidFields.push("SelectedMachines");
     }
 
     if (invalidFields.length > 0) {
@@ -221,47 +221,55 @@ const PreventiveForm = () => {
     return true;
   }
 
-  const handleDeleteSelectedOperator = (operatorId: string) => {
-    setSelectedOperator((prevSelected) =>
-      prevSelected.filter((id) => id !== operatorId)
-    );
+  const handleCheckboxOperatorChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const operator = event.target.value;
+    if (event.target.checked) {
+      setSelectedOperator((prevSelected) => [...prevSelected, operator]);
+    } else {
+      setSelectedOperator((prevSelected) =>
+        prevSelected.filter((id) => id !== operator)
+      );
+    }
   };
 
-  const handleSelectedOperator = (operatorId: string) => {
-    if (operatorId == "") return;
-    setSelectedOperator((prevSelected) => [...prevSelected, operatorId]);
+  const handleCheckboxMachineChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const machineId = event.target.value;
+    if (event.target.checked) {
+      setSelectedMachines((prevSelected) => [...prevSelected, machineId]);
+    } else {
+      setSelectedMachines((prevSelected) =>
+        prevSelected.filter((id) => id !== machineId)
+      );
+    }
   };
 
   const handleCancel = () => {
     router.back();
   };
 
-  const handleAssetSelected = (assetId: string) => {
-    if (assetId == "") return;
-    setSelectedAsset((prevSelected) => [...prevSelected, assetId]);
-  };
-
-  const handleDeleteSelectedAsset = (assetId: string) => {
-    setSelectedAsset((prevSelected) =>
-      prevSelected.filter((id) => id !== assetId)
-    );
-  };
-
   return (
     <MainLayout>
       <Container>
-        <div className="w-full">
+        <div className="mx-auto w-full">
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="mx-auto bg-white p-8 rounded shadow-md"
             style={{ display: "flex", flexDirection: "column", width: "100%" }}
           >
-            <p className="text-2xl font-bold text-black">Nova revisió</p>
-
-            <div className="grid grid-cols-4 w-full gap-4 py-4">
-              <div className="col-span-2">
+            <h2 className="text-2xl font-bold mb-6 text-black">
+              Configurar Preventiu
+            </h2>
+            <div
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              style={{ flex: "1" }}
+            >
+              <div className="mb-4">
                 <label
-                  className="text-gray-700 font-bold text-lg"
+                  className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="code"
                 >
                   Codi
@@ -273,25 +281,23 @@ const PreventiveForm = () => {
                   className="form-input border border-gray-300 rounded-md w-full"
                 />
               </div>
-              <div className="col-span-2">
+              <div className="mb-4">
                 <label
-                  className="text-gray-700 font-bold mb-2 text-lg"
+                  className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="description"
                 >
                   Descripció
                 </label>
-                <input
+                <textarea
                   {...register("description")}
                   id="description"
-                  type="text"
-                  className="form-input border border-gray-300 rounded-md w-full"
+                  className="form-textarea border border-gray-300 rounded-md w-full"
                 />
               </div>
-            </div>
-            <div className="grid grid-cols-4 w-full gap-4 py-4">
-              <div className="col-span-2">
+
+              <div className="mb-4">
                 <label
-                  className="block text-gray-700 font-bold mb-2 text-lg"
+                  className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="days"
                 >
                   Freqüència Dies
@@ -304,12 +310,12 @@ const PreventiveForm = () => {
                   className="form-input border border-gray-300 rounded-md w-full"
                 />
               </div>
-              <div className="col-span-2">
+              <div className="mb-4">
                 <label
-                  className="block text-gray-700 font-bold mb-2 text-lg"
+                  className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="startExecution"
                 >
-                  Primera Execució
+                  Primera Execució del Preventiu
                 </label>
                 <DatePicker
                   id="startDate"
@@ -317,85 +323,168 @@ const PreventiveForm = () => {
                   onChange={(date: Date) => setStartDate(date)}
                   dateFormat="dd/MM/yyyy"
                   locale={ca}
-                  className="border border-gray-300 p-2 rounded-md mr-4 w-full"
+                  className="border border-gray-300 p-2 rounded-md mr-4"
                 />
+
+                {error && <p style={{ color: "red" }}>{error}</p>}
               </div>
             </div>
 
-            {error && <p style={{ color: "red" }}>{error}</p>}
+            <div style={{ display: "flex", flex: "1" }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div style={{ flex: 1 }}>
+                  <h3 className="text-lg font-medium text-gray-600 mb-2">
+                    Selecciona els punts d'inspecció
+                  </h3>
 
-            <div className="flex flex-row gap-4 py-4 w-full">
-              <ChooseInspectionPoint
-                preventiveInspectionPoints={availableInspectionPoints}
-                onInspectionPointSelected={handleInspectionPointSelected}
-                onDeleteInspectionPointSelected={
-                  handleDeleteInspectionPointSelected
-                }
-                preventiveSelectedInspectionPoints={selectedInspectionPoints}
-              />
-              <ChooseOperatorV2
-                availableOperators={operators}
-                preventiveSelectedOperators={selectedOperator}
-                onDeleteSelectedOperator={handleDeleteSelectedOperator}
-                onSelectedOperator={handleSelectedOperator}
-              />
-              <ChooseElement
-                elements={assets}
-                selectedElements={selectedAssets}
-                onElementSelected={handleAssetSelected}
-                onDeleteElementSelected={handleDeleteSelectedAsset}
-                placeholder="Buscar Equip"
-                mapElement={(asset) => ({
-                  id: asset.id,
-                  description: asset.description,
-                })}
-                labelText="Equips"
-              />
-            </div>
+                  <div className="mb-4">
+                    <input
+                      type="text"
+                      placeholder="Filtrar per descripció"
+                      value={filterText}
+                      onChange={(e) => setFilterText(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+                    />
 
-            <div className="flex flex-row gap-4">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`${
-                  showSuccessMessage
-                    ? "bg-green-500"
-                    : showErrorMessage
-                    ? "bg-red-500"
-                    : "bg-blue-500"
-                } hover:${
-                  showSuccessMessage
-                    ? "bg-green-700"
-                    : showErrorMessage
-                    ? "bg-red-700"
-                    : "bg-blue-700"
-                } text-white font-bold py-2 px-4 rounded mt-6 flex items-center justify-center`}
-              >
-                Crear Revisió
-                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-              </button>
-
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6"
-              >
-                Cancelar
-              </button>
-            </div>
-            <div className="flex flex-row py-4 w-full">
-              {showSuccessMessage && (
-                <div className="bg-green-200 text-green-800 p-4 rounded mb-4 w-1/4">
-                  Revisió creada correctament
+                    {filteredInspectionPoints.map((point) => (
+                      <div key={point.id} className="mb-2">
+                        <label
+                          htmlFor={`inspectionPoint-${point.id}`}
+                          className="block text-gray-600 font-medium"
+                        >
+                          <input
+                            type="checkbox"
+                            id={`inspectionPoint-${point.id}`}
+                            value={point.id}
+                            onChange={handleCheckboxChange}
+                            checked={selectedInspectionPoints.includes(
+                              point.id
+                            )}
+                          />
+                          {point.description}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              )}
 
-              {showErrorMessage && (
-                <div className="  bg-red-200 text-red-800 p-4 rounded mb-4 w-1/4">
-                  Error al crear revisió
+                <div style={{ flex: 1 }}>
+                  <h3 className="text-lg font-medium text-gray-600 mb-2">
+                    Punts d'inspecció seleccionats
+                  </h3>
+
+                  {selectedInspectionPoints.map((selectedPoint) => (
+                    <div key={selectedPoint} className="mb-2 text-black">
+                      {
+                        availableInspectionPoints.find(
+                          (point) => point.id === selectedPoint
+                        )?.description
+                      }
+                    </div>
+                  ))}
                 </div>
-              )}
+              </div>
             </div>
+            <div className="mb-4">
+              <h3 className="text-lg font-medium text-gray-600 mb-2">
+                Operaris
+              </h3>
+              {operators.map((worker) => (
+                <div key={worker.id} className="mb-2">
+                  <label
+                    htmlFor={`operator-${worker.id}`}
+                    className="block text-gray-600 font-medium"
+                  >
+                    <input
+                      type="checkbox"
+                      id={`operator-${worker.id}`}
+                      value={worker.id}
+                      onChange={handleCheckboxOperatorChange}
+                      checked={selectedOperator.includes(worker.id)}
+                    />
+                    {worker.name}
+                  </label>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              {/* Display list of available machines */}
+              <div style={{ flex: 1 }}>
+                <h3 className="text-lg font-medium text-gray-600 mb-2">
+                  Màquines
+                </h3>
+                {aviableMachines.map((machine) => (
+                  <div key={machine.id} className="mb-2">
+                    <label
+                      htmlFor={`machine-${machine.id}`}
+                      className="block text-gray-600 font-medium"
+                    >
+                      <input
+                        type="checkbox"
+                        id={`machine-${machine.id}`}
+                        value={machine.id}
+                        onChange={handleCheckboxMachineChange}
+                        checked={selectedMachines.includes(machine.id)}
+                      />
+                      {machine.name}
+                    </label>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ flex: 1 }}>
+                <h3 className="text-lg font-medium text-gray-600 mb-2">
+                  Màquines seleccionades
+                </h3>
+                {selectedMachines.map((selectedMachine) => (
+                  <div key={selectedMachine} className="mb-2 text-black">
+                    {
+                      aviableMachines.find(
+                        (point) => point.id === selectedMachine
+                      )?.name
+                    }
+                  </div>
+                ))}
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`${
+                showSuccessMessage
+                  ? "bg-green-500"
+                  : showErrorMessage
+                  ? "bg-red-500"
+                  : "bg-blue-500"
+              } hover:${
+                showSuccessMessage
+                  ? "bg-green-700"
+                  : showErrorMessage
+                  ? "bg-red-700"
+                  : "bg-blue-700"
+              } text-white font-bold py-2 px-4 rounded mt-6 flex items-center justify-center`}
+            >
+              Crear Preventiu
+              {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+            </button>
+            {showSuccessMessage && (
+              <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
+                Preventiu creat correctament
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6"
+            >
+              Cancelar
+            </button>
+
+            {showErrorMessage && (
+              <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
+                Error al crear preventiu
+              </div>
+            )}
           </form>
         </div>
       </Container>

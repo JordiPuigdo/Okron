@@ -4,7 +4,7 @@ import WorkOrder from "./workOrder";
 interface Machine {
     id: string;
     code : string;
-    description: string;
+    name: string;
     serialNumber: string;
     company: string;
     year: string;

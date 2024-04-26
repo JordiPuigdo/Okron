@@ -34,9 +34,8 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
-  const [filteredSpareParts, setFilteredSpareParts] = useState<SparePart[]>(
-    availableSpareParts.filter((x) => x.active)
-  );
+  const [filteredSpareParts, setFilteredSpareParts] =
+    useState<SparePart[]>(availableSpareParts);
   const sparePartsLimit = 5;
   const [unitsPerSparePart, setUnitsPerSparePart] = useState<{
     [key: string]: number;
@@ -150,8 +149,8 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
 
   return (
     <>
-      <div className="mx-auto py-8 bg-white rounded-lg">
-        <div className="flex items-center gap-6 px-4">
+      <div className="mx-auto px-4 py-8">
+        <div className="flex items-center gap-6">
           <span className="text-xl font-bold mb-4">
             Seleccionar peçes de recanvi a consumir
           </span>
@@ -169,7 +168,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
           />
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 bg-red-200">
+          <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">

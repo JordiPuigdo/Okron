@@ -84,7 +84,7 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
   };
 
   return (
-    <div className="mx-auto px-4 py-8 mt-12 bg-white rounded-lg">
+    <>
       <div className="bg-white w-full text-center p-4 rounded-md border-2 border-gray-400">
         <span className="text-xl font-bold">Observacions</span>
       </div>
@@ -144,16 +144,10 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
                       </td>
                       <td className="py-3 px-6 text-left">
                         <button
-                          onClick={() =>
-                            !isFinished && handleDeleteComment(comment.id!)
-                          }
+                          onClick={() => handleDeleteComment(comment.id!)}
                           type="button"
-                          className={`${
-                            isFinished
-                              ? "bg-gray-500"
-                              : "bg-red-500 hover:bg-red-600 focus:bg-red-600"
-                          } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
-                          disabled={isLoading || isFinished}
+                          className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600"
+                          disabled={isLoading}
                         >
                           Eliminar
                         </button>
@@ -171,7 +165,7 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
           currentPage={currentPage}
         />
       </div>
-    </div>
+    </>
   );
 };
 

@@ -1,6 +1,6 @@
 export type ElementList = {
   id: string;
-  description: string;
+  name: string;
   image?: string;
 };
 
@@ -21,12 +21,12 @@ const ElementListComponent: React.FC<ElemntListProps> = ({
         <div
           key={element.id}
           id={`element-${index}`}
-          className={`py-2 px-4 flex items-center justify-between gap-8 bg-zinc-100 hover:bg-gray-200 cursor-pointer ${
+          className={`py-2 px-4 flex items-center justify-between gap-8 hover:bg-gray-200 cursor-pointer ${
             selectedElementIndex === index ? "bg-gray-200 " : ""
           }`}
           onClick={() => handleElementClick(element)}
         >
-          <p className="font-medium">{element.description}</p>
+          <p className="font-medium">{element.name}</p>
           <img src={element.image} alt="" className=" w-8" />
         </div>
       ))}

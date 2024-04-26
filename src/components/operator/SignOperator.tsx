@@ -10,6 +10,7 @@ export default function SignOperator() {
   );
   const [codeOperator, setCodeOperator] = useState("");
   const [errorSign, setErrorSign] = useState<string | undefined>("");
+  const [isLoading, setIsLoading] = useState("");
 
   const authService = new AuthenticationService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
@@ -46,7 +47,7 @@ export default function SignOperator() {
   }
 
   return (
-    <div className="flex flex-col gap-4 items-center">
+    <>
       <div>
         Codi Operari:
         <input
@@ -77,6 +78,6 @@ export default function SignOperator() {
           {operatorLogged.nameOperatorLogged}
         </div>
       )}
-    </div>
+    </>
   );
 }

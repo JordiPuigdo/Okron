@@ -65,7 +65,20 @@ class MachineService {
     }
   }
 
-
+  async createMachineWorkOrder(WorkOrder: CreateWorkOrderRequest, machineId : string): Promise<void> {
+    const response = await fetch(`${this.baseUrl}machine-WorkOrder?machineId=${machineId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(WorkOrder),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to create machine WorkOrder');
+    }
+  }
 }
+
+
 
 export default MachineService;

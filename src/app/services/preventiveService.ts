@@ -17,6 +17,7 @@ class PreventiveService {
 
     async createPreventive(createPreventiveRequest: CreatePreventiveRequest | null): Promise<boolean> {
     try {
+      console.log(createPreventiveRequest);
       const url = `${this.baseUrl}preventive`
       const response = await fetch(url, {
         method: 'POST',
@@ -108,28 +109,6 @@ class PreventiveService {
     }
     const responseBody = await response.json(); 
     return responseBody as Preventive[];
-  }
-
-    async getPreventiveByAssetId(id: string): Promise<Preventive[]> {
-    try {
-      const url = `${this.baseUrl}preventive/Asset/${id}`;
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to get preventive`);
-      }
-
-      const responseBody = await response.json(); 
-      return responseBody as Preventive[];
-    } catch (error) {
-      console.error('Error getting preventive by asset id:', error);
-      throw error;
-    }
   }
 
 }

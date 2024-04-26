@@ -2,7 +2,6 @@ import Machine from "./machine";
 import SparePart from "./SparePart";
 import InspectionPoint from "./inspectionPoint";
 import Operator from "./Operator";
-import { Asset } from "./Asset";
 
 export interface Preventive {
     id: string
@@ -17,25 +16,21 @@ export interface Preventive {
     inspectionPoints : InspectionPoint[],
     spareParts : SparePart[]
     operators : Operator[],
-    assetId? : string[],
-    asset : Asset
 }
-
 
 
 export interface CreatePreventiveRequest {
     code : string,
     description : string,
-    machineId? : string[],
+    machineId : string[],
     startExecution : Date,
     days : number,
     counter : number,
     inspectionPointId : string[],
+    sparePartId : string[],
     operatorId : string[]
-    assetId : string[]  
 }
 
 export interface UpdatePreventiveRequest extends CreatePreventiveRequest {
-    id : string,
-    
+    id : string;
 }
