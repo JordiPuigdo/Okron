@@ -6,7 +6,7 @@ class WorkOrderService {
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
   }
-
+ 
   async addWorkOrderOperatorTimes(AddWorkOrderOperatorTimesValues: AddWorkOrderOperatorTimes): Promise<AddWorkOrderOperatorTimes> {
     try {
       const url = `${this.baseUrl}AddWorkOrderOperatorTimes`
