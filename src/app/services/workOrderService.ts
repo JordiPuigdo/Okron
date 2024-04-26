@@ -112,7 +112,7 @@ class WorkOrderService {
     }
   }
 
-
+ 
   async getWorkOrdersByMachine(Id: string): Promise<WorkOrder[]> {
     try {
       const url = `${this.baseUrl}workorder?MachineId=${Id}`
