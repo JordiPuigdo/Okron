@@ -23,6 +23,10 @@ import { translateStateWorkOrder } from "app/utils/utils";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
 import AutocompleteSearchBar from "components/selector/AutocompleteSearchBar";
+import { Asset } from "app/interfaces/Asset";
+import AssetService from "app/services/assetService";
+import { ElementList } from "components/selector/ElementList";
+import ChooseElement from "components/ChooseElement";
 
 function CorrectivePage() {
   const operatorService = new OperatorService(
@@ -34,11 +38,12 @@ function CorrectivePage() {
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
+  const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
   const [operators, setOperators] = useState<Operator[]>([]);
   const [selectedOperator, setSelectedOperator] = useState<string[]>([]);
-  const [selectedMachineId, setSelectedMachineId] = useState<string>("");
+  const [selectedId, setSelectedId] = useState<string>("");
 
-  const [machines, setMachines] = useState<Machine[]>([]);
+  const [assets, setAssets] = useState<ElementList[]>([]);
 
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -54,8 +59,8 @@ function CorrectivePage() {
 
   async function fetchFormData() {
     await fetchOperators();
-    await fetchMachines();
     await createCode();
+    await fetchAssets();
 
     setIsLoadingPage(false);
   }
@@ -87,15 +92,30 @@ function CorrectivePage() {
       });
   }
 
-  async function fetchMachines() {
-    await machinService
-      .getAllMachines()
-      .then((aviableMachines) => {
-        setMachines(aviableMachines.filter((x) => x.active));
-      })
-      .catch((error) => {
-        setErrorMessage("Error Màquines: " + error);
+  async function fetchAssets() {
+    try {
+      const assets = await assetService.getAll();
+      const elements: ElementList[] = [];
+
+      const addAssetAndChildren = (asset: Asset) => {
+        elements.push({
+          id: asset.id,
+          description: asset.description,
+        });
+
+        asset.childs.forEach((childAsset) => {
+          addAssetAndChildren(childAsset);
+        });
+      };
+
+      assets.forEach((asset) => {
+        addAssetAndChildren(asset);
       });
+
+      setAssets(elements);
+    } catch (error) {
+      console.error("Error al obtener activos:", error);
+    }
   }
 
   useEffect(() => {
@@ -109,8 +129,8 @@ function CorrectivePage() {
       code: corrective.code,
       description: corrective.description,
       initialDateTime: corrective.startTime,
-      machineId: selectedMachineId,
-      operatorId: corrective.operators.map((operator) => operator),
+      assetId: selectedId,
+      operatorId: selectedOperator.map((operator) => operator),
       stateWorkOrder: corrective.stateWorkOrder,
       workOrderType: 0,
     };
@@ -129,11 +149,8 @@ function CorrectivePage() {
       return;
     }
     data.startTime = startDate || new Date();
-    await machinService
-      .createMachineWorkOrder(
-        convertToCreateWorkOrderRequest(data),
-        data.machineId
-      )
+    await workOrderService
+      .createWorkOrder(convertToCreateWorkOrderRequest(data), data.machineId)
       .then((aviableMachines) => {
         setShowSuccessMessage(true);
         setTimeout(() => {
@@ -150,16 +167,26 @@ function CorrectivePage() {
     if (
       !corrective.description ||
       corrective.description.trim().length === 0 ||
-      !selectedMachineId
+      !selectedId
     ) {
       return false;
     }
-    if (!corrective.operators) {
+    if (!selectedOperator) {
       return false;
     }
 
     return true;
   }
+
+  const handleSelectedOperator = (id: string) => {
+    setSelectedOperator([...selectedOperator, id]);
+  };
+  const handleDeleteSelectedOperator = (operatorId: string) => {
+    setSelectedOperator((prevSelected) =>
+      prevSelected.filter((id) => id !== operatorId)
+    );
+  };
+
   const renderHeader = () => {
     return (
       <div className="flex px-4 sm:px-12 items-center flex-col sm:flex-row">
@@ -183,9 +210,7 @@ function CorrectivePage() {
           </svg>
         </div>
 
-        <h2 className="text-2xl font-bold text-black mx-auto">
-          Crear Correctiu
-        </h2>
+        <h2 className="text-2xl font-bold text-black mx-auto">Crear Avaria</h2>
 
         {errorMessage !== "" && (
           <p className="text-red-500 text-xl">{errorMessage}</p>
@@ -200,7 +225,7 @@ function CorrectivePage() {
       <MainLayout>
         <Container>
           {renderHeader()}
-          <div className="p-4 sm:p-12">
+          <div className=" bg-white rounded-xl p-4 mt-12">
             <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
               <div className="flex flex-col sm:flex-row">
                 <div className="mb-6 sm:w-1/2">
@@ -243,27 +268,27 @@ function CorrectivePage() {
                     htmlFor="machine"
                     className="block text-xl font-medium text-gray-700 mb-2"
                   >
-                    Màquina
+                    Equip
                   </label>
                   <AutocompleteSearchBar
-                    elements={machines}
-                    setCurrentId={setSelectedMachineId}
-                    placeholder="Buscar Màquines"
+                    elements={assets}
+                    setCurrentId={setSelectedId}
+                    placeholder="Buscar Equip"
                   />
-                  {selectedMachineId.length > 0 && (
+                  {selectedId.length > 0 && (
                     <div className="flex gap-4 items-center mt-4">
-                      {machines
-                        .filter((x) => x.id === selectedMachineId)
+                      {assets
+                        .filter((x) => x.id === selectedId)
                         .map((machine) => (
                           <div key={machine.id}>
-                            <p>Màquina Seleccionada: {machine.name}</p>
+                            <p>Equip Seleccionat: {machine.description}</p>
                           </div>
                         ))}
                       <div>
                         <button
-                          className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
+                          className="bg-okron-btDelete hover:bg-okron-btDeleteHover text-white rounded-xl py-2 px-4 text-sm"
                           onClick={(e) => {
-                            setSelectedMachineId("");
+                            setSelectedId("");
                           }}
                         >
                           Eliminar
@@ -325,24 +350,17 @@ function CorrectivePage() {
                   <label className="block text-xl font-medium text-gray-700 mb-2">
                     Operaris
                   </label>
-                  <div className="flex flex-wrap">
-                    {operators.map((operator) => (
-                      <div key={operator.id} className="mr-4 mb-2">
-                        <input
-                          type="checkbox"
-                          id={`operator-${operator.id}`}
-                          value={operator.id}
-                          {...register("operators")}
-                        />
-                        <label
-                          htmlFor={`operator-${operator.id}`}
-                          className="ml-2 text-lg"
-                        >
-                          {operator.name}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
+                  <ChooseElement
+                    elements={operators}
+                    selectedElements={selectedOperator}
+                    onElementSelected={handleSelectedOperator}
+                    onDeleteElementSelected={handleDeleteSelectedOperator}
+                    placeholder="Buscar Operaris"
+                    mapElement={(operator) => ({
+                      id: operator.id,
+                      description: operator.name,
+                    })}
+                  />
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row mb-8">
@@ -363,7 +381,7 @@ function CorrectivePage() {
                       : "bg-blue-700"
                   } text-white font-bold py-2 px-4 rounded mt-6 mb-4 sm:mb-0 sm:mr-2 flex items-center`}
                 >
-                  Crear Correctiu
+                  Crear Avaria
                   {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
                 </button>
                 <button
@@ -378,13 +396,13 @@ function CorrectivePage() {
 
               {showSuccessMessage && (
                 <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
-                  Correctiu creat correctament
+                  Avaria creada correctament
                 </div>
               )}
 
               {showErrorMessage && (
                 <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
-                  Error al crear Correctiu
+                  Error al crear Avaria
                 </div>
               )}
             </form>

@@ -1,5 +1,7 @@
+import { Asset } from "./Asset";
 import Operator from "./Operator";
 import Machine from "./machine";
+import WorkOrder from "./workOrder";
 
 interface SparePart {
     id: string;
@@ -11,6 +13,8 @@ interface SparePart {
     stock: number;
     brand: string;
     unitsConsum? : number;
+    price : number;
+    active : boolean
 }
 
 export default SparePart;
@@ -37,13 +41,17 @@ export interface CreateSparePartRequest {
 
 export interface SparePartDetailResponse {
     sparePart : SparePart;
-    sparePartPerMachineResponse : SparePartPerMachineResponse[];
+    sparePartPerMachineResponse : SparePartPerAssetResponse[];
 }   
 
-export interface SparePartPerMachineResponse {
-    machine : Machine;
-    workOrderId : string;
-    spareParts : SparePartsConsumeds[];
+export interface SparePartPerAssetResponse {
+    id : string; 
+    operatorName : string;
+    sparePartQuantity : number;
+    sparePartCode :string;
+    sparePartDescription : string;
+    workOrderCode : string;
+    workOrderDescription : string
 }
 
 interface SparePartsConsumeds {
@@ -54,7 +62,9 @@ interface SparePartsConsumeds {
 }
 
 export interface SparePartDetailRequest {
-    id: string;
+    id?: string;
     startDate : string;
     endDate : string;
+    machineId? : string;
+    assetId? : string;
 }

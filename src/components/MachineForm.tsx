@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, set } from "react-hook-form";
 import Machine from "app/interfaces/machine";
 import MachineService from "app/services/machineService";
 import SectionService from "app/services/sectionService";
@@ -35,14 +35,32 @@ const MachineForm: React.FC<MachineFormProps> = ({
       var response = await sectionService.getSections();
       if (response.length > 0) {
         setSections(response);
+        if (machine.section == null) {
+          setSection(response[0]);
+        }
       }
     }
     getSection();
   }, []);
 
+  const [section, setSection] = useState<Section | null>(null);
+
   const handleFormSubmit = async (data: Machine) => {
     try {
-      const response = await machineService.updateMachine(machine.id, data);
+      const machineData: Machine = {
+        ...data,
+        section: section!,
+        serialNumber: data.serialNumber,
+        company: data.company,
+        year: data.year,
+        hours: data.hours,
+        workOrder: data.workOrder,
+        active: data.active,
+      };
+      const response = await machineService.updateMachine(
+        machine.id,
+        machineData
+      );
       if (response) {
         setTimeout(() => {
           history.back();
@@ -81,11 +99,14 @@ const MachineForm: React.FC<MachineFormProps> = ({
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="name" className="block font-medium text-gray-700">
+        <label
+          htmlFor="description"
+          className="block font-medium text-gray-700"
+        >
           Nom
         </label>
         <Controller
-          name="name"
+          name="description"
           control={control}
           render={({ field }) => (
             <input
@@ -147,6 +168,7 @@ const MachineForm: React.FC<MachineFormProps> = ({
                 const selectedSection = sections.find(
                   (section) => section.id === e.target.value
                 );
+                setSection(selectedSection!);
                 setValue("section", selectedSection || null);
               }}
             >

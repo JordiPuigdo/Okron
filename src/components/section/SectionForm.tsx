@@ -52,13 +52,13 @@ const SectionForm: React.FC<SectionFormProps> = ({ id }) => {
         await sectionService.updateSection(data);
         setMessageNotification("Secció actualitzada");
         setTimeout(() => {
-          router.push(ROUTES.section);
+          router.push(ROUTES.configuration.section);
         }, 2000);
       } else {
         await sectionService.createSection(data.code, data.description);
         setMessageNotification("Secció creada");
         setTimeout(() => {
-          router.push(ROUTES.section);
+          router.push(ROUTES.configuration.section);
         }, 2000);
       }
     } catch (error) {
@@ -72,7 +72,7 @@ const SectionForm: React.FC<SectionFormProps> = ({ id }) => {
       await sectionService.deleteSection(section!.id);
       setMessageNotification("Secció eliminada");
       setTimeout(() => {
-        router.push(ROUTES.section);
+        router.push(ROUTES.configuration.section);
       }, 2000);
     } catch (error) {
       console.error("Error:", error);
@@ -128,7 +128,7 @@ const SectionForm: React.FC<SectionFormProps> = ({ id }) => {
             disabled={loading}
             className="bg-gray-500 hover:bg-gray-700 text-white flex items-center font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             onClick={(e) => {
-              router.push(ROUTES.section);
+              router.push(ROUTES.configuration.section);
             }}
           >
             Cancelar

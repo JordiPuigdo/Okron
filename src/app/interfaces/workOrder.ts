@@ -1,9 +1,12 @@
+import { extend } from "dayjs";
+import { Asset } from "./Asset";
 import Operator from "./Operator";
 import SparePart from "./SparePart";
 import InspectionPoint from "./inspectionPoint";
 import Machine from "./machine";
+import { BaseModel } from "./BaseModel";
 
-export interface WorkOrder {
+export interface WorkOrder extends BaseModel {
   id: string;
   code : string;
   description: string;
@@ -11,7 +14,7 @@ export interface WorkOrder {
   endTime: Date;
   stateWorkOrder: StateWorkOrder;
   workOrderType : WorkOrderType;
-  machineId: string
+  machineId?: string
   machine? : Machine;
   workOrderInspectionPoint?: WorkOrderInspectionPoint[];
   workOrderOperatorTimes?: WorkOrderOperatorTimes[]
@@ -19,6 +22,7 @@ export interface WorkOrder {
   operatorId?: string[];
   workOrderSpareParts?: WorkOrderSparePart[]
   workOrderComments? : WorkOrderComment[]
+  asset? : Asset;
 }
 
 export default WorkOrder;
@@ -64,6 +68,7 @@ export interface CreateWorkOrderRequest {
   stateWorkOrder: StateWorkOrder;
   workOrderType?: WorkOrderType;
   machineId?: string
+  assetId?: string
   operatorId?: string[];
   inspectionPointId?: string[];
   sparePartId?: string[]
@@ -96,9 +101,10 @@ export interface DeleteWorkOrderOperatorTimes {
 
 export interface SearchWorkOrderFilters {
   machineId? : string;
-  startTime? : string;
-  endTime? : string;
+  startDateTime? : string;
+  endDateTime? : string;
   operatorId? : string;
+  assetId? : string;
 }
 
 export enum WorkOrderType {

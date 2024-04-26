@@ -6,7 +6,7 @@ const MachineBox = ({ machine }: { machine: Machine }) => {
   return (
     <div className="bg-white p-4 border rounded-lg shadow-m mx-4">
       <Link href={`/machineDetail/${machine.id}`}>
-        <h2 className="text-xl font-semibold">{machine.name}</h2>
+        <h2 className="text-xl font-semibold">{machine.description}</h2>
         <p className="text-gray-600">{machine.company}</p>
       </Link>
     </div>

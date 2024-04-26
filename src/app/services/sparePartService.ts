@@ -1,4 +1,4 @@
-import SparePart, { ConsumeSparePart, CreateSparePartRequest, RestoreSparePart, SparePartDetailRequest, SparePartDetailResponse } from "app/interfaces/SparePart";
+import SparePart, { ConsumeSparePart, CreateSparePartRequest, RestoreSparePart, SparePartDetailRequest, SparePartDetailResponse, SparePartPerAssetResponse } from "app/interfaces/SparePart";
 
 class SparePartService {
   private baseUrl: string;
@@ -72,14 +72,21 @@ class SparePartService {
     return sparePart;
   }
 
-  async getSparePartHistoryByDates(sparePartDetailRequest : SparePartDetailRequest  ): Promise<SparePartDetailResponse> {
-    const response = await fetch(`${this.baseUrl}sparepart/$Detail`);
+  async getSparePartHistoryByDates(sparePartDetailRequest : SparePartDetailRequest  ): Promise<SparePartPerAssetResponse[]> {
+    const url =(`${this.baseUrl}sparepart/ConsumesPerAsset`);
+     const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(sparePartDetailRequest),
+      });
 
     if (!response.ok) {
       throw new Error('Failed to fetch spare part');
     }
 
-    const sparePart: SparePartDetailResponse = await response.json();
+    const sparePart: SparePartPerAssetResponse[]= await response.json();
     return sparePart;
   }
 
@@ -125,6 +132,26 @@ class SparePartService {
     }
   }
 
+  async deleteSparePart(id: string): Promise<boolean> {
+    try {
+      const url = `${this.baseUrl}sparePart/${id}`;
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update sparePart`);
+      }
+      return true;
+    } catch (error) {
+      console.error('Error updating SparePart:', error);
+      throw error;
+    }
+    
+  }
 
 }
 

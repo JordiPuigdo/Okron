@@ -90,11 +90,11 @@ const MachineDetailsPage = () => {
         <div className="flex-none w-1/3 mr-6">
           <img
             src="https://i.machineryhost.com/3a8853b9d4992f13ae173de7ac6abed4/large-used-maszyna-pakujaca-prozniowa-w-ruchu-ciaglym-multivac-m-855-f-pc.jpg"
-            alt={machine.name}
+            alt={machine.description}
           />
         </div>
         <div className="flex-grow mr-6">
-          <h2 className="text-2xl font-semibold mb-4">{machine.name}</h2>
+          <h2 className="text-2xl font-semibold mb-4">{machine.description}</h2>
           <p className="text-gray-600 mb-8">Companyia: {machine.company}</p>
           <p className="text-gray-600 mb-8">Secció: {machine.section}</p>
           <p className="text-gray-600 mb-8">
