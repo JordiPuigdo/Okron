@@ -31,7 +31,7 @@ export const formatDate = (
     hour: includeHours ? "2-digit" : undefined,
     minute: includeHours ? "2-digit" : undefined,
     second: includeSeconds ? "2-digit" : undefined,
-    hour12: false, // Use 24-hour format
+    hour12: false,
   };
   const date = new Date(dateString);
 
@@ -39,7 +39,7 @@ export const formatDate = (
     return null;
   }
 
-  const formattedDate = date.toLocaleDateString("es-ES", options);
+  const formattedDate = new Intl.DateTimeFormat("es-ES", options).format(date);
   return `${formattedDate.replace(",", "")}`;
 };
 

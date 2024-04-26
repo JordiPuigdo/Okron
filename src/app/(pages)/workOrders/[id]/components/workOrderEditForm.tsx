@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import OperatorService from "app/services/operatorService";
 import WorkOrderService from "app/services/workOrderService";
-import { translateStateWorkOrder } from "app/utils/utils";
+import { isOperatorLogged, translateStateWorkOrder } from "app/utils/utils";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -28,6 +28,8 @@ import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspect
 import { SvgSpinner } from "app/icons/icons";
 import WorkOrderOperatorComments from "components/operator/WorkOrderCommentOperator";
 import WorkOrderOperatorTimesComponent from "components/operator/WorkOrderOperatorTimes";
+import { useSessionStore } from "app/stores/globalStore";
+import { UserPermission } from "app/interfaces/User";
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -80,6 +82,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [selectedOperators, setSelectedOperators] = useState<Operator[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [isFinished, setIsFinished] = useState(false);
+  const { loginUser } = useSessionStore((state) => state);
 
   async function fetchWorkOrder() {
     await workOrderService
@@ -300,7 +303,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           </div>
           <div>
             <span className="text-xl font-bold text-black mx-auto">
-              Màquina - {currentWorkOrder?.machine?.name}
+              Equip - {currentWorkOrder?.asset?.description}
             </span>
           </div>
         </div>
@@ -311,11 +314,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     );
   };
 
-  if (!currentWorkOrder) return <>Carregant Dades</>;
-  return (
-    <>
-      {renderHeader()}
-      <div className="p-4 sm:p-12">
+  const renderForm = () => {
+    return (
+      <>
+        {" "}
         <form onSubmit={handleSubmit(onSubmit)} className="mt-12">
           <div className="flex flex-col md:flex-row justify-center items-stretch gap-8 w-full">
             <div className="flex flex-col flex-grow gap-4">
@@ -403,120 +405,122 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               )}
             </div>
           </div>
-          <div>
-            <div className="flex sm:flex-row mb-8 pt-12">
-              {isFinished ? (
-                <button
-                  type="button"
-                  onClick={(e) => handleReopenWorkOrder()}
-                  className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
-                >
-                  Reobrir Ordre
-                  {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-                </button>
-              ) : (
-                <>
-                  {" "}
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className={`${
-                      showSuccessMessage
-                        ? "bg-green-500"
-                        : showErrorMessage
-                        ? "bg-red-500"
-                        : "bg-blue-500"
-                    } hover:${
-                      showSuccessMessage
-                        ? "bg-green-700"
-                        : showErrorMessage
-                        ? "bg-red-700"
-                        : "bg-blue-700"
-                    } text-white font-bold py-2 px-4 rounded mt-6 mb-4 sm:mb-0 sm:mr-2 flex items-center`}
-                  >
-                    Actualizar Ordre
-                    {isLoading && (
-                      <SvgSpinner style={{ marginLeft: "0.5rem" }} />
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => router.back()}
-                    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
-                    disabled={isLoading}
-                  >
-                    Cancelar
-                    {isLoading && (
-                      <SvgSpinner style={{ marginLeft: "0.5rem" }} />
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => finalizeWorkOrder()}
-                    className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
-                  >
-                    Finalitzar Ordre
-                    {isLoading && (
-                      <SvgSpinner style={{ marginLeft: "0.5rem" }} />
-                    )}
-                  </button>
-                </>
-              )}
+          {!isFinished && (
+            <div className="flex">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`${
+                  showSuccessMessage
+                    ? "bg-green-500"
+                    : showErrorMessage
+                    ? "bg-red-500"
+                    : "bg-blue-500"
+                } hover:${
+                  showSuccessMessage
+                    ? "bg-green-700"
+                    : showErrorMessage
+                    ? "bg-red-700"
+                    : "bg-blue-700"
+                } text-white font-bold py-2 px-4 rounded mt-6 mb-4 sm:mb-0 sm:mr-2 flex items-center`}
+              >
+                Actualitzar Ordre
+                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+              </button>
+              <button
+                type="button"
+                onClick={(e) => router.back()}
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
+                disabled={isLoading}
+              >
+                Cancelar
+                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+              </button>
+              <button
+                type="button"
+                onClick={(e) => finalizeWorkOrder()}
+                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
+              >
+                Finalitzar Ordre
+                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+              </button>
+              <div>
+                {showSuccessMessage && (
+                  <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
+                    Ordre actualizada correctament
+                  </div>
+                )}
+
+                {showErrorMessage && (
+                  <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
+                    Error actualitzant ordre de treball
+                  </div>
+                )}
+              </div>
             </div>
-
-            {showSuccessMessage && (
-              <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
-                Ordre actualizada correctament
-              </div>
-            )}
-
-            {showErrorMessage && (
-              <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
-                Error actualitzant ordre de treball
-              </div>
-            )}
-          </div>
-          {availableSpareParts !== undefined &&
-            currentWorkOrder &&
-            currentWorkOrder.workOrderType === WorkOrderType.Corrective && (
-              <ChooseSpareParts
-                availableSpareParts={availableSpareParts}
-                selectedSpareParts={selectedSpareParts}
-                setSelectedSpareParts={setSelectedSpareParts}
-                WordOrderId={currentWorkOrder.id}
-                isFinished={isFinished}
-              />
-            )}
-          {currentWorkOrder &&
-            currentWorkOrder.workOrderType === WorkOrderType.Preventive && (
-              <CompleteInspectionPoints
-                workOrderInspectionPoints={passedInspectionPoints!}
-                setCompletedWorkOrderInspectionPoints={
-                  setPassedInspectionPoints
-                }
-                workOrderId={currentWorkOrder.id}
-                isFinished={isFinished}
-              />
-            )}
-
-          {currentWorkOrder && aviableOperators !== undefined && (
-            <WorkOrderOperatorTimesComponent
-              operators={aviableOperators!}
-              workOrderOperatortimes={workOrderOperatorTimes}
-              setWorkOrderOperatortimes={setworkOrderOperatorTimes}
-              workOrderId={currentWorkOrder.id}
-              isFinished={isFinished}
-            />
-          )}
-          {currentWorkOrder && (
-            <WorkOrderOperatorComments
-              workOrderComments={workOrderComments}
-              workOrderId={currentWorkOrder.id}
-              isFinished={isFinished}
-              setWorkOrderComments={setWorkOrderComments}
-            />
           )}
         </form>
+        <div className="flex sm:flex-row mb-8 pt-12">
+          {isFinished &&
+            loginUser?.permission == UserPermission.Administrator && (
+              <button
+                type="button"
+                onClick={(e) => handleReopenWorkOrder()}
+                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
+              >
+                Reobrir Ordre
+                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+              </button>
+            )}
+        </div>
+      </>
+    );
+  };
+
+  if (!currentWorkOrder) return <>Carregant Dades</>;
+  return (
+    <>
+      {renderHeader()}
+      {renderForm()}
+      <div className="p-4 sm:p-12">
+        {availableSpareParts !== undefined &&
+          currentWorkOrder &&
+          currentWorkOrder.workOrderType === WorkOrderType.Corrective && (
+            <ChooseSpareParts
+              availableSpareParts={availableSpareParts}
+              selectedSpareParts={selectedSpareParts}
+              setSelectedSpareParts={setSelectedSpareParts}
+              WordOrderId={currentWorkOrder.id}
+              isFinished={isFinished}
+            />
+          )}
+        {currentWorkOrder &&
+          currentWorkOrder.workOrderType === WorkOrderType.Preventive && (
+            <CompleteInspectionPoints
+              workOrderInspectionPoints={passedInspectionPoints!}
+              setCompletedWorkOrderInspectionPoints={setPassedInspectionPoints}
+              workOrderId={currentWorkOrder.id}
+              isFinished={isFinished}
+            />
+          )}
+
+        {currentWorkOrder && aviableOperators !== undefined && (
+          <WorkOrderOperatorTimesComponent
+            operators={aviableOperators!}
+            workOrderOperatortimes={workOrderOperatorTimes}
+            setWorkOrderOperatortimes={setworkOrderOperatorTimes}
+            workOrderId={currentWorkOrder.id}
+            isFinished={isFinished}
+          />
+        )}
+        {currentWorkOrder && (
+          <WorkOrderOperatorComments
+            workOrderComments={workOrderComments}
+            workOrderId={currentWorkOrder.id}
+            isFinished={isFinished}
+            setWorkOrderComments={setWorkOrderComments}
+          />
+        )}
       </div>
     </>
   );

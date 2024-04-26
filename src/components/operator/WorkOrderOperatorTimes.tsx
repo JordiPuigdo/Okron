@@ -135,7 +135,9 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
     )}m ${totalTimeInSeconds % 60}s`;
 
     const updatedTimes = workOrderOperatortimes.map((time) =>
-      time.id === last!.id ? { ...time, endTime, totalTime } : time
+      time.operator.id === last!.operator.id
+        ? { ...time, endTime, totalTime }
+        : time
     );
 
     const FinishWorkOrderOperatorTimes: FinishWorkOrderOperatorTimes = {
@@ -308,10 +310,10 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
   }
 
   async function deleteWorkOrderOperatorTimes(operatorTimesId: string) {
-    const confirmation = window.confirm(
-      "Segur que voleu eliminar el registre?"
+    const isConfirmed = window.confirm(
+      "Segur que voleu eliminar el registre d'hores d'operari?"
     );
-    if (!confirmation) return;
+    if (!isConfirmed) return;
     const x: DeleteWorkOrderOperatorTimes = {
       workOrderId: workOrderId,
       workOrderOperatorTimesId: operatorTimesId,
@@ -323,7 +325,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
   }
 
   return (
-    <div className="mx-auto px-4 py-8 mt-12">
+    <div className="mx-auto px-4 py-8 mt-12 bg-white rounded-lg">
       <div className="flex flex-col">
         <div className="bg-white w-full text-center p-4 rounded-md border-2 border-gray-400">
           <span className="text-xl font-bold">Temps d'Operari</span>
@@ -380,8 +382,9 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                 : "bg-orange-500 hover:bg-orange-600 focus:bg-orange-600"
             } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
             onClick={(e) => {
-              setEnterManualTime(!enterManualTime);
+              !isFinished && setEnterManualTime(!enterManualTime);
             }}
+            disabled={isFinished}
           >
             Entrada Manual
           </button>
@@ -503,6 +506,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                             : "bg-green-500 hover:bg-green-600 focus:bg-green-600"
                         } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
                         onClick={() =>
+                          !isFinished &&
                           updateWorkOrderOperatorTimes(
                             index,
                             time.id!,
@@ -510,6 +514,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                             time.endTime != null ? time.endTime?.toString() : ""
                           )
                         }
+                        disabled={isFinished}
                       >
                         {editingIndex === index ? "Guardar" : "Editar"}
                       </button>
@@ -555,19 +560,13 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
             </tbody>
             <tfoot className="bg-white divide-y divide-gray-200">
               <tr>
-                <td
-                  colSpan={
-                    loginUser!.permission == UserPermission.Administrator
-                      ? 3
-                      : 2
-                  }
-                ></td>
+                <td colSpan={2}></td>
                 <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900 font-bold">
                   Temps Total
                 </td>
                 <td
                   colSpan={
-                    loginUser!.permission == UserPermission.Administrator
+                    loginUser?.permission == UserPermission.Administrator
                       ? 3
                       : 2
                   }
@@ -580,7 +579,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                 <tr key={operatorId}>
                   <td
                     colSpan={
-                      loginUser!.permission == UserPermission.Administrator
+                      loginUser?.permission == UserPermission.Administrator
                         ? 4
                         : 3
                     }
