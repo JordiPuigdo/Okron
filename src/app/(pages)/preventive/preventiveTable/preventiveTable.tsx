@@ -86,18 +86,19 @@ const PreventiveTable: React.FC<PreventiveTableProps> = ({
         } else {
           const fetchedPreventives = await preventiveService.getPreventives();
           setPreventives(fetchedPreventives);
-          filters.push({
-            key: "asset.description",
-            label: "Equip",
-            format: FiltersFormat.TEXT,
-          });
+          if (filters.filter((x) => x.key === "asset.description").length == 0)
+            filters.push({
+              key: "asset.description",
+              label: "Equip",
+              format: FiltersFormat.TEXT,
+            });
         }
       } catch (error) {
         console.error("Error fetching preventives:", error);
       }
     };
 
-    fetchPreventives();
+    if (preventives.length == 0) fetchPreventives();
   }, []);
 
   const handleDelete = async (id: string) => {
