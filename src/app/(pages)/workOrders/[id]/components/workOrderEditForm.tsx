@@ -405,22 +405,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               )}
             </div>
           </div>
-        </form>{" "}
-        <div className="flex sm:flex-row mb-8 pt-12">
-          {isFinished &&
-            loginUser?.permission == UserPermission.Administrator && (
-              <button
-                type="button"
-                onClick={(e) => handleReopenWorkOrder()}
-                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
-              >
-                Reobrir Ordre
-                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-              </button>
-            )}
-
           {!isFinished && (
-            <>
+            <div className="flex">
               <button
                 type="submit"
                 disabled={isLoading}
@@ -471,8 +457,21 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                   </div>
                 )}
               </div>
-            </>
+            </div>
           )}
+        </form>
+        <div className="flex sm:flex-row mb-8 pt-12">
+          {isFinished &&
+            loginUser?.permission == UserPermission.Administrator && (
+              <button
+                type="button"
+                onClick={(e) => handleReopenWorkOrder()}
+                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
+              >
+                Reobrir Ordre
+                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+              </button>
+            )}
         </div>
       </>
     );
