@@ -173,6 +173,7 @@ const DataTable: React.FC<DataTableProps> = ({
         (obj, prop) => obj && obj[prop],
         item
       );
+      if (value === "") return true;
       if (nestedPropertyValue) {
         const itemValue = String(nestedPropertyValue);
         const filterValue = String(value);
@@ -188,6 +189,10 @@ const DataTable: React.FC<DataTableProps> = ({
         filteredData
           .filter((x) => x["active"] == filterActive)
           .slice(indexOfFirstRecord, indexOfLastRecord)
+      );
+    } else {
+      setFilteredData(
+        filteredData.slice(indexOfFirstRecord, indexOfLastRecord)
       );
     }
 

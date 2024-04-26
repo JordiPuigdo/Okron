@@ -83,7 +83,7 @@ const columnsPerAsset: Column[] = [
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Codi",
+    label: "Codi OT",
     key: "workOrderCode",
     format: ColumnFormat.TEXT,
   },
@@ -111,6 +111,19 @@ const columnsPerAsset: Column[] = [
     label: "Quantitat",
     key: "sparePartQuantity",
     format: ColumnFormat.NUMBER,
+  },
+];
+
+const filtersPerAsset: Filters[] = [
+  {
+    key: "sparePartCode",
+    label: "Codi Recanvi",
+    format: FiltersFormat.TEXT,
+  },
+  {
+    key: "sparePartDescription",
+    label: "Descripció Recanvi",
+    format: FiltersFormat.TEXT,
   },
 ];
 
@@ -290,11 +303,10 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
             <>
               {loginUser != undefined && loginUser?.permission > 0 && (
                 <div className="mb-4">
-                  {" "}
                   <Link
                     href="/spareParts/sparePartForm"
                     as={`/spareParts/sparePartForm`}
-                    className="bg-blue-500 text-white px-3 py-1 ml-2 rounded-md "
+                    className="text-white mb-2 rounded-md bg-okron-btCreate hover:bg-okron-btCreateHover px-4 py-2 flex gap-2 w-1/6"
                   >
                     Crear
                   </Link>
@@ -311,8 +323,8 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
             columns={columnsPerAsset}
             data={sparePartsPerAsset}
             tableButtons={tableButtons}
-            entity={EntityTable.SPAREPART}
-            filters={enableFilters ? filters : undefined}
+            entity={EntityTable.WORKORDER}
+            filters={enableFilters ? filtersPerAsset : undefined}
             onDelete={handleSparePartActiveChange}
             enableFilterActive={false}
             totalCounts={true}

@@ -310,6 +310,10 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
   }
 
   async function deleteWorkOrderOperatorTimes(operatorTimesId: string) {
+    const isConfirmed = window.confirm(
+      "Segur que voleu eliminar el registre d'hores d'operari?"
+    );
+    if (!isConfirmed) return;
     const x: DeleteWorkOrderOperatorTimes = {
       workOrderId: workOrderId,
       workOrderOperatorTimesId: operatorTimesId,
@@ -378,8 +382,9 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                 : "bg-orange-500 hover:bg-orange-600 focus:bg-orange-600"
             } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
             onClick={(e) => {
-              setEnterManualTime(!enterManualTime);
+              !isFinished && setEnterManualTime(!enterManualTime);
             }}
+            disabled={isFinished}
           >
             Entrada Manual
           </button>
@@ -501,6 +506,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                             : "bg-green-500 hover:bg-green-600 focus:bg-green-600"
                         } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
                         onClick={() =>
+                          !isFinished &&
                           updateWorkOrderOperatorTimes(
                             index,
                             time.id!,
@@ -508,6 +514,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                             time.endTime != null ? time.endTime?.toString() : ""
                           )
                         }
+                        disabled={isFinished}
                       >
                         {editingIndex === index ? "Guardar" : "Editar"}
                       </button>

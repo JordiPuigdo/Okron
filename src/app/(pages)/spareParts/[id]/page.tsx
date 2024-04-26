@@ -21,6 +21,7 @@ import TableSparePartsConsumed from "../components/tableSparePartsConsumed";
 import SimpleDataTable from "components/table/simpleDataTable/SimpleDataTable";
 import SparePartTable from "../components/SparePartTable";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@tremor/react";
+import { SvgSpinner } from "app/icons/icons";
 
 export default function EditSparePart({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -47,6 +48,8 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
 
   const [startDate, setStartDate] = useState<Date | null>(currentDate);
   const [endDate, setEndDate] = useState<Date | null>(new Date());
+
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchSparePart = async () => {
@@ -231,31 +234,37 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                   className="mt-1 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                 />
               </div>
-              <button
-                type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300"
-              >
-                Guardar
-              </button>
+              <div className="flex gap-4">
+                <button
+                  type="submit"
+                  className="flex bg-okron-btCreate text-white px-4 py-2 rounded-md hover:bg-okron-btCreateHover focus:outline-none focus:ring focus:border-blue-300"
+                  onClick={(e) => setIsLoading(true)}
+                >
+                  Guardar
+                  {isLoading && <SvgSpinner className="2-6 h-6" />}
+                </button>
 
-              <button
-                type="button"
-                onClick={handleBack}
-                className="bg-gray-500 text-white ml-4 px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring focus:border-gray-300"
-              >
-                Cancelar
-              </button>
-
-              {showSuccessMessage && (
-                <p className="mt-4 text-green-600">
-                  Recanvi actualitzat correctament!
-                </p>
-              )}
-              {showErrorMessage && (
-                <p className="mt-4 text-red-600">
-                  Error actualitzant el recanvi.
-                </p>
-              )}
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="flex bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring focus:border-gray-300"
+                >
+                  Cancelar
+                  {isLoading && <SvgSpinner className="2-6 h-6" />}
+                </button>
+              </div>
+              <div className="py-4">
+                {showSuccessMessage && (
+                  <p className="bg-green-200 text-green-800 p-4 rounded mb-4">
+                    Recanvi actualitzat correctament
+                  </p>
+                )}
+                {showErrorMessage && (
+                  <p className="bg-red-200 text-red-800 p-4 rounded mb-4">
+                    Error actualitzant el recanvi
+                  </p>
+                )}
+              </div>
             </form>
           </div>
           <div className="py-4">

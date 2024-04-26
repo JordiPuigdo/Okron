@@ -80,7 +80,7 @@ export default function AuthenticationPage() {
             href={{
               pathname: "/section/id",
             }}
-            className="text-white mb-2 rounded-md bg-blue-500 px-4 py-2 flex"
+            className="text-white mb-2 rounded-md bg-okron-btCreate hover:bg-okron-btCreateHover px-4 py-2 flex gap-2"
             onClick={(e) => setIsLoading(true)}
           >
             Crear Secció

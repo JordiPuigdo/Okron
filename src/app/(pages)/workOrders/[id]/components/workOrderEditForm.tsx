@@ -482,6 +482,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   return (
     <>
       {renderHeader()}
+      {renderForm()}
       <div className="p-4 sm:p-12">
         {availableSpareParts !== undefined &&
           currentWorkOrder &&
