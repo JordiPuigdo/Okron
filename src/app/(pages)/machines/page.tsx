@@ -70,6 +70,11 @@ export default function MachinesPage() {
       format: ColumnFormat.TEXT,
     },
     {
+      label: "Empresa",
+      key: "company",
+      format: ColumnFormat.TEXT,
+    },
+    {
       label: "Activa",
       key: "active",
       format: ColumnFormat.BOOLEAN,

@@ -48,7 +48,7 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
                   }}
                   className="flex items-center mr-2 bg-okron-btCreate text-white px-2 py-1 rounded hover:bg-okron-btCreateHover"
                 >
-                  Afegir subnivell
+                  Afegir actiu
                   {loadingAssets[asset.id] && (
                     <span className="items-center ml-2 text-white">
                       <SvgSpinner className="w-6 h-6" />
@@ -88,7 +88,7 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
           </div>
         </div>
         {expanded && asset.childs.length > 0 && (
-          <ul className="pl-4">
+          <ul className="pl-4 ">
             {asset.childs.map((child) => (
               <AssetListItem key={child.id} asset={child} onDelete={onDelete} />
             ))}
@@ -156,7 +156,7 @@ const AssetList: React.FC = () => {
   const filteredAssets = filterAssetsRecursive(assets, searchTerm);
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="w-full mx-auto py-4">
       <h2 className="text-2xl font-semibold mb-6">Llistat d'actius i equips</h2>
       <input
         type="text"

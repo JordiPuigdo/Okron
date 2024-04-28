@@ -46,14 +46,15 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
   const filterSpareParts = (searchTerm: string) => {
     const filtered = availableSpareParts.filter((sparePart) => {
       const searchText = searchTerm.toLowerCase();
-
-      return [
-        sparePart.code,
-        sparePart.description,
-        sparePart.refProvider,
-        sparePart.family,
-        sparePart.ubication,
-      ].some((field) => field && field.toLowerCase().includes(searchText));
+      if (sparePart.active) {
+        return [
+          sparePart.code,
+          sparePart.description,
+          sparePart.refProvider,
+          sparePart.family,
+          sparePart.ubication,
+        ].some((field) => field && field.toLowerCase().includes(searchText));
+      }
     });
 
     setFilteredSpareParts(filtered);
@@ -199,68 +200,71 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredSpareParts.slice(0, sparePartsLimit).map((sparePart) => (
-                <tr key={sparePart.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {sparePart.code}
-                  </td>
-                  <td className="px-6 py-4 whitespace-normal break-all">
-                    {sparePart.description}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {sparePart.refProvider}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {sparePart.stock}
-                  </td>
-                  <td className="px-6 py-4 whitespace-normal break-all">
-                    {sparePart.family}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {sparePart.ubication}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <input
-                      disabled={isFinished}
-                      type="number"
-                      className="p-2 border border-gray-300 rounded-md w-20"
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                        }
-                      }}
-                      value={unitsPerSparePart[sparePart.id] || ""}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        setUnitsPerSparePart((prevUnits) => ({
-                          ...prevUnits,
-                          [sparePart.id]: value,
-                        }));
-                      }}
-                    />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <button
-                      disabled={isFinished}
-                      type="button"
-                      className={` ${
-                        isFinished
-                          ? "bg-gray-400"
-                          : "bg-orange-400 hover:bg-orange-600"
-                      } ml-4 text-white font-semibold py-2 px-4 rounded-md ${
-                        selectedSpareParts.find(
-                          (part) => part.id === sparePart.id
-                        ) !== undefined
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
-                      }`}
-                      onClick={(e) => consumeSparePart(sparePart)}
-                    >
-                      Consumir
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filteredSpareParts
+                .filter((x) => x.active)
+                .slice(0, sparePartsLimit)
+                .map((sparePart) => (
+                  <tr key={sparePart.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {sparePart.code}
+                    </td>
+                    <td className="px-6 py-4 whitespace-normal break-all">
+                      {sparePart.description}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {sparePart.refProvider}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {sparePart.stock}
+                    </td>
+                    <td className="px-6 py-4 whitespace-normal break-all">
+                      {sparePart.family}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {sparePart.ubication}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <input
+                        disabled={isFinished}
+                        type="number"
+                        className="p-2 border border-gray-300 rounded-md w-20"
+                        onKeyPress={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                          }
+                        }}
+                        value={unitsPerSparePart[sparePart.id] || ""}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value, 10);
+                          setUnitsPerSparePart((prevUnits) => ({
+                            ...prevUnits,
+                            [sparePart.id]: value,
+                          }));
+                        }}
+                      />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button
+                        disabled={isFinished}
+                        type="button"
+                        className={` ${
+                          isFinished
+                            ? "bg-gray-400"
+                            : "bg-orange-400 hover:bg-orange-600"
+                        } ml-4 text-white font-semibold py-2 px-4 rounded-md ${
+                          selectedSpareParts.find(
+                            (part) => part.id === sparePart.id
+                          ) !== undefined
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                        onClick={(e) => consumeSparePart(sparePart)}
+                      >
+                        Consumir
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

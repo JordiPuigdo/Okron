@@ -76,6 +76,7 @@ export default function AssetDetailsPage({
           active: data.active,
           level: data.level,
           parentId: data.parentId,
+          createWorkOrder: data.createWorkOrder,
         };
         await assetService.updateAsset(id, newData).then((data) => {
           if (data) {
@@ -93,6 +94,7 @@ export default function AssetDetailsPage({
           description: data.description,
           level: levelGetted!,
           parentId: parentId!,
+          createWorkOrder: data.createWorkOrder,
         };
         await assetService
           .createAsset(newData)
