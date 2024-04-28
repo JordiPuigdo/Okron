@@ -1,5 +1,5 @@
 "use client";
-import ChooseOperator from "components/operator/ChooseOperator";
+
 import Operator from "app/interfaces/Operator";
 import WorkOrder, {
   StateWorkOrder,
@@ -13,10 +13,10 @@ import WorkOrder, {
 import { Averia_Sans_Libre } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, set, useForm } from "react-hook-form";
 import OperatorService from "app/services/operatorService";
 import WorkOrderService from "app/services/workOrderService";
-import { isOperatorLogged, translateStateWorkOrder } from "app/utils/utils";
+import { translateStateWorkOrder } from "app/utils/utils";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -30,6 +30,8 @@ import WorkOrderOperatorComments from "components/operator/WorkOrderCommentOpera
 import WorkOrderOperatorTimesComponent from "components/operator/WorkOrderOperatorTimes";
 import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
+import ChooseElement from "components/ChooseElement";
+import { CostsWorkOrder } from "components/Costs/Costs";
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -83,6 +85,9 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [isFinished, setIsFinished] = useState(false);
   const { loginUser } = useSessionStore((state) => state);
+  const [totalCosts, setTotalCosts] = useState<number>(0);
+  const [sparePartCosts, setSparePartCosts] = useState<number>(0);
+  const [operatorCosts, setOperatorCosts] = useState<number>(0);
 
   async function fetchWorkOrder() {
     await workOrderService
@@ -183,6 +188,45 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           return [...prevworkOrderOperatorTimes, ...newworkOrderOperatorTimes];
         });
       }
+
+      const operatorTimes = responseWorkOrder.workOrderOperatorTimes;
+      const spareParts = responseWorkOrder.workOrderSpareParts;
+      if (
+        responseWorkOrder.workOrderOperatorTimes?.length ||
+        0 > 0 ||
+        responseWorkOrder.workOrderSpareParts?.length ||
+        0 > 0
+      ) {
+        const costsOperator: number[] = [];
+        operatorTimes?.forEach((x) => {
+          const startTime = new Date(x.startTime).getTime();
+          if (x.endTime != undefined) {
+            const endTime = new Date(x.endTime).getTime();
+
+            if (endTime != undefined) {
+              const hoursWorked = (endTime - startTime) / (1000 * 60 * 60);
+              const costForOperator = hoursWorked * x.operator.priceHour;
+              costsOperator.push(costForOperator);
+            }
+          }
+        });
+        const totalCostOperators = costsOperator?.reduce(
+          (acc, x) => acc + x,
+          0
+        );
+
+        const sparePartCosts = spareParts?.map((x) => x.sparePart.price);
+        const totalCostSpareParts =
+          sparePartCosts?.length || 0 > 0
+            ? sparePartCosts?.reduce((acc, price) => acc + price, 0)
+            : 0;
+
+        setSparePartCosts(parseFloat(totalCostSpareParts!.toFixed(2)));
+        setOperatorCosts(parseFloat(totalCostOperators?.toFixed(2)));
+        const total = totalCostOperators + totalCostSpareParts!;
+
+        setTotalCosts(parseFloat(total.toFixed(2)));
+      }
     }
   }
 
@@ -273,6 +317,17 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         setShowErrorMessage(true);
       });
   }
+
+  function handleSelectOperator(operatorId: string) {
+    const operator = aviableOperators?.find((x) => x.id === operatorId);
+    setSelectedOperators([...selectedOperators, operator!]);
+  }
+
+  function handleDeleteSelectedOperator(operatorId: string) {
+    setSelectedOperators((prevSelected) =>
+      prevSelected.filter((x) => x.id !== operatorId)
+    );
+  }
   const renderHeader = () => {
     return (
       <div className="flex px-4 sm:px-12 pt-12 items-center flex-col sm:flex-row">
@@ -318,92 +373,105 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     return (
       <>
         {" "}
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-12">
-          <div className="flex flex-col md:flex-row justify-center items-stretch gap-8 w-full">
-            <div className="flex flex-col flex-grow gap-4">
-              <div>
-                <label
-                  htmlFor="description"
-                  className="block text-xl font-medium text-gray-700 mb-2 w-full"
-                >
-                  Descripció
-                </label>
-                <input
-                  {...register("description")}
-                  type="text"
-                  id="description"
-                  name="description"
-                  className="p-3 border border-gray-300 rounded-md w-full"
-                  disabled={isFinished}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                    }
-                  }}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="stateWorkOrder"
-                  className="block text-xl font-medium text-gray-700 mb-2"
-                >
-                  Estat
-                </label>
-                <select
-                  {...register("stateWorkOrder", { valueAsNumber: true })}
-                  id="stateWorkOrder"
-                  name="stateWorkOrder"
-                  className="p-3 border border-gray-300 rounded-md w-full"
-                  disabled={isFinished}
-                >
-                  {Object.values(StateWorkOrder)
-                    .filter(
-                      (value) =>
-                        typeof value === "number" &&
-                        (isFinished || value !== StateWorkOrder.Finished)
-                    )
-                    .map((state) => (
-                      <option
-                        key={state}
-                        value={
-                          typeof state === "string"
-                            ? parseInt(state, 10)
-                            : state
-                        }
-                      >
-                        {translateStateWorkOrder(state)}
-                      </option>
-                    ))}
-                </select>
-              </div>
-              <div>
-                <label
-                  htmlFor="stateWorkOrder"
-                  className="block text-xl font-medium text-gray-700 mb-2"
-                >
-                  Data Inici
-                </label>
-                <DatePicker
-                  disabled={isFinished}
-                  id="startDate"
-                  selected={startDate}
-                  onChange={(date: Date) => setStartDate(date)}
-                  dateFormat="dd/MM/yyyy"
-                  locale={ca}
-                  className="p-3 border border-gray-300 rounded-md text-lg"
-                />
-              </div>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="mt-12 bg-white rounded-lg p-8 shadow-md"
+        >
+          <div className="flex flex-row gap-8 w-full">
+            <div className="w-full">
+              <label
+                htmlFor="description"
+                className="block text-xl font-medium text-gray-700 mb-2"
+              >
+                Descripció
+              </label>
+              <input
+                {...register("description")}
+                type="text"
+                id="description"
+                name="description"
+                className="p-3 border border-gray-300 rounded-md w-full"
+                disabled={isFinished}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                  }
+                }}
+              />
             </div>
-            <div className="flex flex-col flex-grow">
-              {aviableOperators !== undefined && currentWorkOrder && (
-                <ChooseOperator
-                  aviableOperators={aviableOperators}
-                  selectedOperators={selectedOperators}
-                  setSelectedOperators={setSelectedOperators}
-                  isFinished={isFinished}
+            <div className="w-full">
+              <label
+                htmlFor="stateWorkOrder"
+                className="block text-xl font-medium text-gray-700 mb-2"
+              >
+                Estat
+              </label>
+              <select
+                {...register("stateWorkOrder", { valueAsNumber: true })}
+                id="stateWorkOrder"
+                name="stateWorkOrder"
+                className="p-3 border border-gray-300 rounded-md w-full"
+                disabled={isFinished}
+              >
+                {Object.values(StateWorkOrder)
+                  .filter(
+                    (value) =>
+                      typeof value === "number" &&
+                      (isFinished || value !== StateWorkOrder.Finished)
+                  )
+                  .map((state) => (
+                    <option
+                      key={state}
+                      value={
+                        typeof state === "string" ? parseInt(state, 10) : state
+                      }
+                    >
+                      {translateStateWorkOrder(state)}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div className="w-full">
+              <label
+                htmlFor="stateWorkOrder"
+                className="block text-xl font-medium text-gray-700 mb-2"
+              >
+                Data Inici
+              </label>
+              <DatePicker
+                disabled={isFinished}
+                id="startDate"
+                selected={startDate}
+                onChange={(date: Date) => setStartDate(date)}
+                dateFormat="dd/MM/yyyy"
+                locale={ca}
+                className="p-3 border border-gray-300 rounded-md text-lg"
+              />
+            </div>
+          </div>
+          <div className="py-4 px-12 w-full">
+            <ChooseElement
+              elements={aviableOperators!.map((x) => ({
+                id: x.id,
+                description: x.name,
+              }))}
+              onDeleteElementSelected={handleDeleteSelectedOperator}
+              onElementSelected={handleSelectOperator}
+              placeholder={"Selecciona un Operari"}
+              selectedElements={selectedOperators.map((x) => x.id)}
+              mapElement={(aviableOperators) => ({
+                id: aviableOperators.id,
+                description: aviableOperators.description,
+              })}
+            />
+            {totalCosts > 0 &&
+              loginUser!.permission == UserPermission.Administrator && (
+                <CostsWorkOrder
+                  operatorCosts={operatorCosts}
+                  sparePartCosts={sparePartCosts}
+                  totalCosts={totalCosts}
                 />
               )}
-            </div>
           </div>
           {!isFinished && (
             <div className="flex">
@@ -482,6 +550,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     <>
       {renderHeader()}
       {renderForm()}
+
       <div className="p-4 sm:p-12">
         {availableSpareParts !== undefined &&
           currentWorkOrder &&

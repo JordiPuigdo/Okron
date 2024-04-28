@@ -1,5 +1,3 @@
-import Operator from "./Operator";
-import Machine from "./machine";
 import { WorkOrderType, StateWorkOrder } from "./workOrder";
 
 export interface Corrective {

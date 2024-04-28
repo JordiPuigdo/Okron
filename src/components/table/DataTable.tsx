@@ -43,6 +43,7 @@ const DataTable: React.FC<DataTableProps> = ({
   const [sortColumn, setSortColumn] = useState("");
   const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("ASC");
   const [itemsPerPage, setItemsPerPage] = useState(itemsPerPageOptions[1]);
+
   const [filteredData, setFilteredData] = useState<any[]>([...data]);
   const [isLoading, setIsLoading] = useState(true);
   const [filterActive, setFilterActive] = useState(true);

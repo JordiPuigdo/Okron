@@ -124,10 +124,12 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
         const elements: ElementList[] = [];
 
         const addAssetAndChildren = (asset: Asset) => {
-          elements.push({
-            id: asset.id,
-            description: asset.description,
-          });
+          if (asset.createWorkOrder) {
+            elements.push({
+              id: asset.id,
+              description: asset.description,
+            });
+          }
 
           asset.childs.forEach((childAsset) => {
             addAssetAndChildren(childAsset);
