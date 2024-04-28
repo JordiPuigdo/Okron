@@ -7,6 +7,7 @@ export interface Asset extends BaseModel {
     parentId: string,
     childs : Asset[],
     path? :string
+    createWorkOrder: boolean
 }
 
 export interface CreateAssetRequest    {
@@ -14,6 +15,7 @@ export interface CreateAssetRequest    {
   description: string,
   level: number,
   parentId: string,
+  createWorkOrder: boolean
 }
 
 export interface UpdateAssetRequest extends CreateAssetRequest {
