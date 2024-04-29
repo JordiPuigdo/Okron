@@ -215,7 +215,9 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           0
         );
 
-        const sparePartCosts = spareParts?.map((x) => x.sparePart.price);
+        const sparePartCosts = spareParts?.map(
+          (x) => x.sparePart.price * x.quantity
+        );
         const totalCostSpareParts =
           sparePartCosts?.length || 0 > 0
             ? sparePartCosts?.reduce((acc, price) => acc + price, 0)
