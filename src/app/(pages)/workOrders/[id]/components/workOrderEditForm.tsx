@@ -1,6 +1,6 @@
 "use client";
 
-import Operator from "app/interfaces/Operator";
+import Operator, { OperatorType } from "app/interfaces/Operator";
 import WorkOrder, {
   StateWorkOrder,
   UpdateWorkOrderRequest,
@@ -465,10 +465,12 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 Operaris
               </label>
               <ChooseElement
-                elements={aviableOperators!.map((x) => ({
-                  id: x.id,
-                  description: x.name,
-                }))}
+                elements={aviableOperators!
+                  .filter((x) => x.operatorType == OperatorType.Maintenance)
+                  .map((x) => ({
+                    id: x.id,
+                    description: x.name,
+                  }))}
                 onDeleteElementSelected={handleDeleteSelectedOperator}
                 onElementSelected={handleSelectOperator}
                 placeholder={"Selecciona un Operari"}
