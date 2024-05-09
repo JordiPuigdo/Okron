@@ -110,14 +110,10 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
   };
 
   return (
-    <div className="mx-auto px-4 py-8 mt-12 bg-white rounded-lg">
-      <div className="bg-white w-full text-center p-4 rounded-md border-2 border-gray-400">
-        <span className="text-xl font-bold">Passar Punts d'Inspecció</span>
-      </div>
-      <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
-      <div className="mt-6 overflow-x-auto">
+    <div className="mx-auto p-4 bg-white rounded-lg shadow-md">
+      <div className="mt-6 overflow-x-auto shadow-md">
         <table className="w-full table-auto">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-100">
             <tr>
               <th className="py-2 px-4 font-bold text-lg">Check</th>
               <th className="py-2 px-4 font-bold text-lg">Punt de inspecció</th>

@@ -84,14 +84,8 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
   };
 
   return (
-    <div className="mx-auto px-4 py-8 mt-12 bg-white rounded-lg">
-      <div className="bg-white w-full text-center p-4 rounded-md border-2 border-gray-400">
-        <span className="text-xl font-bold">Observacions</span>
-      </div>
-
-      <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
-
-      <div className="bg-white shadow-md rounded my-6">
+    <div className="mx-auto p-4 bg-white rounded-lg">
+      <div className="bg-white shadow-md rounded mt-6">
         <div className="p-6">
           <div className="mb-6 flex items-center justify-between">
             <input

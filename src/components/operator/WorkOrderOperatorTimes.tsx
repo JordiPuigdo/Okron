@@ -325,14 +325,9 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
   }
 
   return (
-    <div className="mx-auto px-4 py-8 mt-12 bg-white rounded-lg">
-      <div className="flex flex-col">
-        <div className="bg-white w-full text-center p-4 rounded-md border-2 border-gray-400">
-          <span className="text-xl font-bold">Temps d'Operari</span>
-        </div>
-
-        <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
-        <div className="flex space-x-4 mt-6 items-center">
+    <div className="mx-auto p-4 bg-white rounded-lg">
+      <div className=" flex flex-col mt-6 ">
+        <div className="flex space-x-4 py-4 items-center">
           <span className="text-lg font-bold">Codi Operari</span>
           <input
             type="text"

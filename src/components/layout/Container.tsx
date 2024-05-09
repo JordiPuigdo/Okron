@@ -7,7 +7,7 @@ export default function Container({
 }) {
   return (
     <div
-      className={`bg-gray-100 h-screen overflow-y-auto ${
+      className={`bg-gray-100 h-screen overflow-y-auto pb-12 ${
         enablePading ? "px-8 pt-28" : ""
       } `}
     >

@@ -153,9 +153,6 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
     <>
       <div className="mx-auto py-8 bg-white rounded-lg">
         <div className="flex items-center gap-6 px-4">
-          <span className="text-xl font-bold mb-4">
-            Seleccionar peçes de recanvi a consumir
-          </span>
           <input
             disabled={isFinished}
             type="text"

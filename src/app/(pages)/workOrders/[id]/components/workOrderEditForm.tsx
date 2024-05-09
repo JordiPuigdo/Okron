@@ -36,6 +36,13 @@ type WorkOrdeEditFormProps = {
   id: string;
 };
 
+enum Tab {
+  OPERATORTIMES = "Temps Operaris",
+  COMMENTS = "Comentaris",
+  SPAREPARTS = "Recanvis",
+  INSPECTIONPOINTS = "Punts d'Inspecció",
+}
+
 const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const { register, handleSubmit, setValue } = useForm<WorkOrder>({});
   const router = useRouter();
@@ -87,6 +94,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [totalCosts, setTotalCosts] = useState<number>(0);
   const [sparePartCosts, setSparePartCosts] = useState<number>(0);
   const [operatorCosts, setOperatorCosts] = useState<number>(0);
+
+  const [activeTab, setActiveTab] = useState<Tab>(Tab.OPERATORTIMES);
 
   async function fetchWorkOrder() {
     await workOrderService
@@ -331,7 +340,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   }
   const renderHeader = () => {
     return (
-      <div className="flex px-4 sm:px-12 pt-12 items-center flex-col sm:flex-row">
+      <div className="flex p-4 items-center flex-col sm:flex-row bg-white rounded-xl shadow-md">
         <div
           className="cursor-pointer mb-4 sm:mb-0"
           onClick={() => router.back()}
@@ -373,7 +382,6 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const renderForm = () => {
     return (
       <>
-        {" "}
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="mt-12 bg-white rounded-lg p-8 shadow-md"
@@ -432,7 +440,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                   ))}
               </select>
             </div>
-            <div className="w-full">
+            <div className="">
               <label
                 htmlFor="stateWorkOrder"
                 className="block text-xl font-medium text-gray-700 mb-2"
@@ -449,29 +457,33 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 className="p-3 border border-gray-300 rounded-md text-lg"
               />
             </div>
+            <div className="w-full pt-10">
+              <ChooseElement
+                elements={aviableOperators!.map((x) => ({
+                  id: x.id,
+                  description: x.name,
+                }))}
+                onDeleteElementSelected={handleDeleteSelectedOperator}
+                onElementSelected={handleSelectOperator}
+                placeholder={"Selecciona un Operari"}
+                selectedElements={selectedOperators.map((x) => x.id)}
+                mapElement={(aviableOperators) => ({
+                  id: aviableOperators.id,
+                  description: aviableOperators.description,
+                })}
+              />
+            </div>
           </div>
-          <div className="flex flex-row gap-4 py-4 px-12 justify-between">
-            <ChooseElement
-              elements={aviableOperators!.map((x) => ({
-                id: x.id,
-                description: x.name,
-              }))}
-              onDeleteElementSelected={handleDeleteSelectedOperator}
-              onElementSelected={handleSelectOperator}
-              placeholder={"Selecciona un Operari"}
-              selectedElements={selectedOperators.map((x) => x.id)}
-              mapElement={(aviableOperators) => ({
-                id: aviableOperators.id,
-                description: aviableOperators.description,
-              })}
-            />
+          <div className="sticky gap-4 py-4 z-10">
             {totalCosts > 0 &&
               loginUser!.permission == UserPermission.Administrator && (
-                <CostsObject
-                  operatorCosts={operatorCosts}
-                  sparePartCosts={sparePartCosts}
-                  totalCosts={totalCosts}
-                />
+                <div className="w-[26%]">
+                  <CostsObject
+                    operatorCosts={operatorCosts}
+                    sparePartCosts={sparePartCosts}
+                    totalCosts={totalCosts}
+                  />
+                </div>
               )}
           </div>
           {!isFinished && (
@@ -546,14 +558,42 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     );
   };
 
+  const handleTabClick = (tab: Tab) => {
+    setActiveTab(tab);
+  };
+
+  const availableTabs = Object.values(Tab).filter((tab) => {
+    if (currentWorkOrder?.workOrderType === WorkOrderType.Corrective) {
+      return tab !== Tab.INSPECTIONPOINTS;
+    } else if (currentWorkOrder?.workOrderType === WorkOrderType.Preventive) {
+      return tab !== Tab.SPAREPARTS;
+    }
+    return true;
+  });
+
   if (!currentWorkOrder) return <>Carregant Dades</>;
   return (
     <>
       {renderHeader()}
       {renderForm()}
 
-      <div className="p-4 sm:p-12">
+      <div className="bg-white rounded-xl">
+        <div className=" p-4 flex gap-1 border-black border-b-2">
+          {availableTabs.map((tab) => (
+            <p
+              key={tab}
+              className={`p-4 border-blue-500 border-2 rounded-xl hover:cursor-pointer ${
+                activeTab === tab ? "border-t-4" : ""
+              }`}
+              onClick={() => handleTabClick(tab)}
+            >
+              {tab}
+            </p>
+          ))}
+        </div>
+
         {availableSpareParts !== undefined &&
+          activeTab === Tab.SPAREPARTS &&
           currentWorkOrder &&
           currentWorkOrder.workOrderType === WorkOrderType.Corrective && (
             <ChooseSpareParts
@@ -565,6 +605,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             />
           )}
         {currentWorkOrder &&
+          activeTab === Tab.INSPECTIONPOINTS &&
           currentWorkOrder.workOrderType === WorkOrderType.Preventive && (
             <CompleteInspectionPoints
               workOrderInspectionPoints={passedInspectionPoints!}
@@ -574,16 +615,18 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             />
           )}
 
-        {currentWorkOrder && aviableOperators !== undefined && (
-          <WorkOrderOperatorTimesComponent
-            operators={aviableOperators!}
-            workOrderOperatortimes={workOrderOperatorTimes}
-            setWorkOrderOperatortimes={setworkOrderOperatorTimes}
-            workOrderId={currentWorkOrder.id}
-            isFinished={isFinished}
-          />
-        )}
-        {currentWorkOrder && (
+        {currentWorkOrder &&
+          activeTab === Tab.OPERATORTIMES &&
+          aviableOperators !== undefined && (
+            <WorkOrderOperatorTimesComponent
+              operators={aviableOperators!}
+              workOrderOperatortimes={workOrderOperatorTimes}
+              setWorkOrderOperatortimes={setworkOrderOperatorTimes}
+              workOrderId={currentWorkOrder.id}
+              isFinished={isFinished}
+            />
+          )}
+        {currentWorkOrder && activeTab === Tab.COMMENTS && (
           <WorkOrderOperatorComments
             workOrderComments={workOrderComments}
             workOrderId={currentWorkOrder.id}
