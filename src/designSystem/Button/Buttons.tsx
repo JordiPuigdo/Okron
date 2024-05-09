@@ -42,12 +42,17 @@ export const Button = ({
   id = "",
   ...rest
 }: ButtonProps) => {
+  const handleClick = () => {
+    if (!disabled && onClick) {
+      onClick();
+    }
+  };
   if (href) {
     return (
       <Link
         href={href}
         className={`${className} ${customStyles}`}
-        onClick={onClick}
+        onClick={handleClick}
       >
         <ButtonBody
           type={type}
@@ -64,7 +69,7 @@ export const Button = ({
   return (
     <button
       className={`transition-all relative group overflow-visible ${className}`}
-      onClick={onClick}
+      onClick={handleClick}
       type={rest?.isSubmit ? "submit" : "button"}
     >
       <ButtonBody
@@ -98,7 +103,7 @@ const ButtonBody = ({
   id?: string;
 }) => {
   const DISABLED_STYLES =
-    "cursor-default pointer-events-none border-none bg-white text-hg-black300 hover:bg-hg-black100 hover:text-hg-black300 active:bg-hg-black100 active:text-hg-black300";
+    "pointer-events-none border border-gray-300 bg-gray-200 text-gray-500 hover:bg-gray-200 hover:text-gray-500 active:bg-gray-200 active:text-gray-500 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500";
 
   const STYLES: any = {
     create:

@@ -42,23 +42,25 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
   const [manualTime, setManualTime] = useState(
     formatDate(new Date(), true, false)
   );
-  const { loginUser } = useSessionStore((state) => state);
+  const { loginUser, operatorLogged } = useSessionStore((state) => state);
   const [editingIndex, setEditingIndex] = useState(-1);
   const [editedStartTime, setEditedStartTime] = useState("");
   const [editedEndTime, setEditedEndTime] = useState("");
 
   const addWorkOrderTime = async () => {
     setIsLoading(true);
-    const op = operators.find((x) => x.code === codeOperator);
-    if (!op) {
+    let op = operators.find((x) => x.code === codeOperator);
+    if (!op && operatorLogged == undefined) {
       alert("Codi Operari Incorrecte");
       setIsLoading(false);
       return;
+    } else {
+      op = operators.find((x) => x.code === operatorLogged!.codeOperatorLogged);
     }
 
     const last = workOrderOperatortimes.find(
       (time) =>
-        time.operator.id === op.id &&
+        time.operator.id === op!.id &&
         (time.endTime === undefined || time.endTime === null)
     );
 
@@ -73,7 +75,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
       return;
     }
     const x: AddWorkOrderOperatorTimes = {
-      operatorId: op.id,
+      operatorId: op!.id,
       startTime: startTime,
       WorkOrderId: workOrderId,
     };
@@ -83,7 +85,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
         const newworkOrderOperatortimes: WorkOrderOperatorTimes = {
           startTime: startTime,
           endTime: undefined,
-          operator: op,
+          operator: op!,
           id: x.workOrderOperatorTimesId,
         };
         setWorkOrderOperatortimes((prevSelected) => [
@@ -103,16 +105,18 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
 
   const finishWorkOrderTime = async () => {
     setIsLoading(true);
-    const op = operators.find((x) => x.code === codeOperator);
-    if (!op) {
+    let op = operators.find((x) => x.code === codeOperator);
+    if (!op && operatorLogged == undefined) {
       alert("Codi Operari Incorrecte");
       setIsLoading(false);
       return;
+    } else {
+      op = operators.find((x) => x.code === operatorLogged!.codeOperatorLogged);
     }
 
     const last = workOrderOperatortimes.find(
       (time) =>
-        time.operator.id === op.id &&
+        time.operator.id === op!.id &&
         (time.endTime === undefined || time.endTime === null)
     );
 
@@ -141,7 +145,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
     );
 
     const FinishWorkOrderOperatorTimes: FinishWorkOrderOperatorTimes = {
-      operatorId: op.id,
+      operatorId: op!.id,
       finishTime: endTime,
       WorkOrderId: workOrderId,
     };

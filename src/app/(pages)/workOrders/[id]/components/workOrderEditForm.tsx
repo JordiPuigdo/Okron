@@ -23,7 +23,7 @@ import ca from "date-fns/locale/ca";
 import ChooseSpareParts from "components/sparePart/ChooseSpareParts";
 import SparePartService from "app/services/sparePartService";
 import SparePart from "app/interfaces/SparePart";
-import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspectionPoint";
+
 import { SvgSpinner } from "app/icons/icons";
 import WorkOrderOperatorComments from "components/operator/WorkOrderCommentOperator";
 import WorkOrderOperatorTimesComponent from "components/operator/WorkOrderOperatorTimes";
@@ -31,6 +31,7 @@ import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
 import ChooseElement from "components/ChooseElement";
 import { CostsObject } from "components/Costs/CostsObject";
+import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspectionPoint";
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -484,7 +485,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           </div>
           <div className="sticky gap-4 py-4 z-10">
             {totalCosts > 0 &&
-              loginUser!.permission == UserPermission.Administrator && (
+              loginUser?.permission == UserPermission.Administrator && (
                 <div className="w-[26%]">
                   <CostsObject
                     operatorCosts={operatorCosts}

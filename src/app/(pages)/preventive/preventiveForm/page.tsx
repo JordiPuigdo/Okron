@@ -140,6 +140,10 @@ const PreventiveForm = () => {
     return createPreventiveRequest;
   }
 
+  const handleSubmitForm = async () => {
+    handleSubmit(onSubmit)();
+  };
+
   const onSubmit: SubmitHandler<Preventive> = async (data) => {
     setIsLoading(true);
     try {
@@ -343,12 +347,12 @@ const PreventiveForm = () => {
               />
             </div>
 
-            <div className="flex flex-row gap-4">
+            <div className="flex gap-4">
               <Button
                 type="create"
-                onClick={onSubmit}
+                onClick={handleSubmitForm}
                 disabled={isLoading}
-                className="flex"
+                customStyles="flex gap-2"
               >
                 Crear Revisió
                 {isLoading && <SvgSpinner className="w-6 h-6" />}
@@ -357,7 +361,7 @@ const PreventiveForm = () => {
                 type="cancel"
                 onClick={handleCancel}
                 disabled={isLoading}
-                className="flex"
+                customStyles="flex gap-2"
               >
                 Cancelar
                 {isLoading && <SvgSpinner className="w-6 h-6" />}

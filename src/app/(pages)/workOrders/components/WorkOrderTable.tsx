@@ -147,6 +147,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 
     if (assetId == undefined) fetchAssets();
     if (operatorId !== undefined) handleSearch();
+    searchWorkOrders();
   }, []);
 
   const searchWorkOrders = async () => {

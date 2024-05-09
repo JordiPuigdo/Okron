@@ -16,6 +16,8 @@ import { EntityTable } from "./tableEntitys";
 import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
 import useRoutes from "app/utils/useRoutes";
+import { Button } from "designSystem/Button/Buttons";
+import WorkOrderOperationsInTable from "./WorkOrderOperationsInTable";
 
 interface DataTableProps {
   data: any[];
@@ -37,6 +39,8 @@ export enum ButtonTypesTable {
   Edit,
   Delete,
   Detail,
+  Sign,
+  PassInspectionPoints,
 }
 const DataTable: React.FC<DataTableProps> = ({
   data,
@@ -297,6 +301,15 @@ const DataTable: React.FC<DataTableProps> = ({
                 )}
               </p>
             </Link>
+            {EntityTable.WORKORDER == entity &&
+              loginUser?.permission == UserPermission.Worker && (
+                <>
+                  <WorkOrderOperationsInTable
+                    workOrderId={item[columns[0].key]}
+                    workOrder={item}
+                  />
+                </>
+              )}
           </td>
         ) : (
           <>

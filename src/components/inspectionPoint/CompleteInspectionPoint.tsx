@@ -7,8 +7,9 @@ import {
 import WorkOrderService from "app/services/workOrderService";
 import { SvgSpinner } from "app/icons/icons";
 import { useSessionStore } from "app/stores/globalStore";
+import { checkAllInspectionPoints } from "app/utils/utilsInspectionPoints";
 
-interface CompleteInspectionPoints {
+interface CompleteInspectionPointsProps {
   workOrderInspectionPoints: WorkOrderInspectionPoint[];
   setCompletedWorkOrderInspectionPoints: React.Dispatch<
     React.SetStateAction<WorkOrderInspectionPoint[]>
@@ -17,7 +18,7 @@ interface CompleteInspectionPoints {
   isFinished: boolean;
 }
 
-const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
+const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
   workOrderInspectionPoints,
   setCompletedWorkOrderInspectionPoints,
   workOrderId,
@@ -27,6 +28,7 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
+
   const { operatorLogged } = useSessionStore((state) => state);
 
   const handleSelectInspectionPoint = async (
@@ -109,8 +111,33 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
     }));
   };
 
+  function handleAllChecksOk() {
+    setIsLoading((prevLoadingMap) => ({
+      ...prevLoadingMap,
+      ["OK"]: true,
+    }));
+    const result = checkAllInspectionPoints(
+      workOrderInspectionPoints,
+      workOrderId
+    );
+    setCompletedWorkOrderInspectionPoints(result);
+    setIsLoading((prevLoadingMap) => ({
+      ...prevLoadingMap,
+      ["OK"]: false,
+    }));
+  }
+
   return (
     <div className="mx-auto p-4 bg-white rounded-lg shadow-md">
+      <div
+        className="flex gap-2 p-2 bg-green-500 rounded-xl justify-center font-semibold text-white w-[12%] hover:bg-green-700 cursor-pointer "
+        onClick={(e) => {
+          handleAllChecksOk();
+        }}
+      >
+        Marcar tots OK
+        {isLoading["OK"] && <SvgSpinner className="w-6 h-6" />}
+      </div>
       <div className="mt-6 overflow-x-auto shadow-md">
         <table className="w-full table-auto">
           <thead className="bg-gray-100">
