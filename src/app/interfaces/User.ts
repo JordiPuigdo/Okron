@@ -16,7 +16,8 @@ export enum UserPermission
 {
    Worker,
    OfficeUser,
-   Administrator
+   Administrator,
+   SuperAdministrator
 }
 
 export interface OperatorLogged {

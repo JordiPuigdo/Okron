@@ -77,12 +77,12 @@ export default function WorkOrderOperationsInTable({
   }, []);
 
   return (
-    <div className="flex gap-2 items-center ">
+    <div className="flex gap-2 items-center bg-">
       <Button
         customStyles={`${
-          isOperatorInWorkOrder ? "bg-green-500" : "bg-red-500"
+          isOperatorInWorkOrder ? "bg-emerald-700" : "bg-rose-700"
         } hover:${
-          isOperatorInWorkOrder ? "bg-green-700" : "bg-red-700"
+          isOperatorInWorkOrder ? "bg-emerald-900" : "bg-rose-900"
         } text-white py-2 px-4 rounded flex gap-2`}
         onClick={() => {
           signOrLogoutOperator(workOrderId);
