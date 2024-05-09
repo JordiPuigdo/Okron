@@ -29,6 +29,7 @@ import {
 } from "app/interfaces/Documentation";
 import { useSessionStore } from "app/stores/globalStore";
 import DocumentationService from "app/services/documentationService";
+import { UserPermission } from "app/interfaces/User";
 
 export default function EditSparePart({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -174,7 +175,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
   function handleDeleteDocumentation(id: string, fileName: string) {
     toggleLoading("DELETEDOCUMENTATION");
     const request: DeleteDocumentationRequest = {
-      userId: "65d8cae3567750628478d06b",
+      userId: loginUser?.agentId || "",
       objectId: sparePart!.id,
       object: ObjectToInsert.SparePart,
       fileId: id,
@@ -311,25 +312,27 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                   />
                 </div>
               </div>
-              <div className="flex gap-4">
-                <button
-                  type="submit"
-                  className="flex bg-okron-btCreate text-white px-4 py-2 rounded-md hover:bg-okron-btCreateHover focus:outline-none focus:ring focus:border-blue-300"
-                  onClick={(e) => toggleLoading("SAVE")}
-                >
-                  Guardar
-                  {loadingMap["SAVE"] && <SvgSpinner className="2-6 h-6" />}
-                </button>
+              {loginUser?.permission == UserPermission.Administrator && (
+                <div className="flex gap-4">
+                  <button
+                    type="submit"
+                    className="flex bg-okron-btCreate text-white px-4 py-2 rounded-md hover:bg-okron-btCreateHover focus:outline-none focus:ring focus:border-blue-300"
+                    onClick={(e) => toggleLoading("SAVE")}
+                  >
+                    Guardar
+                    {loadingMap["SAVE"] && <SvgSpinner className="2-6 h-6" />}
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  className="flex bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring focus:border-gray-300"
-                >
-                  Cancelar
-                  {loadingMap["CANCEL"] && <SvgSpinner className="2-6 h-6" />}
-                </button>
-              </div>
+                  <button
+                    type="button"
+                    onClick={handleBack}
+                    className="flex bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring focus:border-gray-300"
+                  >
+                    Cancelar
+                    {loadingMap["CANCEL"] && <SvgSpinner className="2-6 h-6" />}
+                  </button>
+                </div>
+              )}
               <div className="py-4">
                 {showSuccessMessage && (
                   <p className="bg-green-200 text-green-800 p-4 rounded mb-4">
@@ -373,46 +376,49 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                 </div>
               ))}
             </div>
-            <div className="pt-4">
-              <input
-                type="file"
-                id="fileInput"
-                accept=".pdf"
-                style={{ display: "none" }}
-                onChange={handleFileChange}
-              />
-              <button
-                type="button"
-                className="flex bg-okron-btCreate text-white px-4 py-2 rounded-md hover:bg-okron-btCreateHover focus:outline-none focus:ring focus:border-blue-300"
-                onClick={handleDocumentationAdd}
-              >
-                Afegir Documentació
-                {loadingMap["DOCUMENTATION"] && (
-                  <SvgSpinner className="2-6 h-6" />
-                )}
-              </button>
+            {loginUser?.permission == UserPermission.Administrator && (
+              <div className="pt-4">
+                <input
+                  type="file"
+                  id="fileInput"
+                  accept=".pdf"
+                  style={{ display: "none" }}
+                  onChange={handleFileChange}
+                />
+                <button
+                  type="button"
+                  className="flex bg-okron-btCreate text-white px-4 py-2 rounded-md hover:bg-okron-btCreateHover focus:outline-none focus:ring focus:border-blue-300"
+                  onClick={handleDocumentationAdd}
+                >
+                  Afegir Documentació
+                  {loadingMap["DOCUMENTATION"] && (
+                    <SvgSpinner className="2-6 h-6" />
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+          {loginUser?.permission == UserPermission.Administrator && (
+            <div className="py-4">
+              <TabGroup>
+                <TabList className="mt-4">
+                  <Tab>Històric de consums</Tab>
+                  <Tab>Històric de comandes</Tab>
+                </TabList>
+                <TabPanels>
+                  <TabPanel>
+                    <SparePartTable
+                      sparePartId={params.id}
+                      enableFilters={false}
+                      enableDetail={true}
+                      enableCreate={false}
+                    />
+                  </TabPanel>
+                  <TabPanel></TabPanel>
+                </TabPanels>
+              </TabGroup>
             </div>
-          </div>
-
-          <div className="py-4">
-            <TabGroup>
-              <TabList className="mt-4">
-                <Tab>Històric de consums</Tab>
-                <Tab>Històric de comandes</Tab>
-              </TabList>
-              <TabPanels>
-                <TabPanel>
-                  <SparePartTable
-                    sparePartId={params.id}
-                    enableFilters={false}
-                    enableDetail={true}
-                    enableCreate={false}
-                  />
-                </TabPanel>
-                <TabPanel></TabPanel>
-              </TabPanels>
-            </TabGroup>
-          </div>
+          )}
         </Container>
       </MainLayout>
     );

@@ -32,7 +32,7 @@ const FinalizeWorkOrdersDaysBefore: React.FC<
   return (
     <button
       type="button"
-      className="bg-orange-500 text-white p-2 rounded-md hover:bg-orange-600 flex items-center"
+      className="bg-orange-500 text-white p-2 rounded-md font-semibold hover:bg-orange-600 flex items-center"
       onClick={(e) => handleFinalizeWorkOrdersDayBefore()}
     >
       Finalitzar Ordres del{" "}

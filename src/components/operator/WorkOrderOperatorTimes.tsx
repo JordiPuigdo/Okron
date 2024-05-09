@@ -111,9 +111,11 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
       setIsLoading(false);
       return;
     } else {
-      op = operators.find((x) => x.code === operatorLogged!.codeOperatorLogged);
+      if (!op)
+        op = operators.find(
+          (x) => x.code === operatorLogged!.codeOperatorLogged
+        );
     }
-
     const last = workOrderOperatortimes.find(
       (time) =>
         time.operator.id === op!.id &&

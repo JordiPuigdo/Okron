@@ -1,5 +1,8 @@
 import { SvgSpinner } from "app/icons/icons";
-import WorkOrder, { WorkOrderType } from "app/interfaces/workOrder";
+import WorkOrder, {
+  StateWorkOrder,
+  WorkOrderType,
+} from "app/interfaces/workOrder";
 import { useSessionStore } from "app/stores/globalStore";
 import { checkAllInspectionPoints } from "app/utils/utilsInspectionPoints";
 import { startOrFinalizeTimeOperation } from "app/utils/utilsOperator";
@@ -53,6 +56,7 @@ export default function WorkOrderOperationsInTable({
   };
 
   useEffect(() => {
+    if (workOrder.stateWorkOrder == StateWorkOrder.Finished) return;
     if (workOrder.workOrderType == WorkOrderType.Preventive) {
       const allInspectionPointsChecked =
         workOrder.workOrderInspectionPoint !== undefined
@@ -75,42 +79,45 @@ export default function WorkOrderOperationsInTable({
       setIsOperatorInWorkOrder(isInWorkOrder);
     }
   }, []);
-
-  return (
-    <div className="flex gap-2 items-center bg-">
-      <Button
-        customStyles={`${
-          isOperatorInWorkOrder ? "bg-emerald-700" : "bg-rose-700"
-        } hover:${
-          isOperatorInWorkOrder ? "bg-emerald-900" : "bg-rose-900"
-        } text-white py-2 px-4 rounded flex gap-2`}
-        onClick={() => {
-          signOrLogoutOperator(workOrderId);
-        }}
-      >
-        {isOperatorInWorkOrder ? "S" : "E"}
-        {isLoading[workOrderId + "_Sign"] && <SvgSpinner className="w-6 h-6" />}
-      </Button>
-      {workOrder.workOrderType == WorkOrderType.Preventive && (
+  if (workOrder.stateWorkOrder != StateWorkOrder.Finished)
+    return (
+      <div className="flex gap-2 items-center bg-">
         <Button
-          disabled={isPassInspectionPoints}
-          onClick={() => {
-            handleInspectionPoints(workOrderId);
-          }}
           customStyles={`${
-            isPassInspectionPoints ? "bg-lime-700" : "bg-red-500"
+            isOperatorInWorkOrder ? "bg-emerald-700" : "bg-rose-700"
           } hover:${
-            isPassInspectionPoints
-              ? "bg-gray-700 cursor-not-allowed"
-              : "bg-red-700"
-          } text-white  py-2 px-4 rounded  flex gap-2`}
+            isOperatorInWorkOrder ? "bg-emerald-900" : "bg-rose-900"
+          } text-white py-2 px-4 rounded flex gap-2`}
+          onClick={() => {
+            signOrLogoutOperator(workOrderId);
+          }}
         >
-          {isPassInspectionPoints ? "OK" : "KO"}
-          {isLoading[workOrderId + "_InspectionPoints"] && (
+          {isOperatorInWorkOrder ? "S" : "E"}
+          {isLoading[workOrderId + "_Sign"] && (
             <SvgSpinner className="w-6 h-6" />
           )}
         </Button>
-      )}
-    </div>
-  );
+        {workOrder.workOrderType == WorkOrderType.Preventive && (
+          <Button
+            disabled={isPassInspectionPoints}
+            onClick={() => {
+              handleInspectionPoints(workOrderId);
+            }}
+            customStyles={`${
+              isPassInspectionPoints ? "bg-lime-700" : "bg-red-500"
+            } hover:${
+              isPassInspectionPoints
+                ? "bg-gray-700 cursor-not-allowed"
+                : "bg-red-700"
+            } text-white  py-2 px-4 rounded  flex gap-2`}
+          >
+            {isPassInspectionPoints ? "OK" : "KO"}
+            {isLoading[workOrderId + "_InspectionPoints"] && (
+              <SvgSpinner className="w-6 h-6" />
+            )}
+          </Button>
+        )}
+      </div>
+    );
+  else return <></>;
 }

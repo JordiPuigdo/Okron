@@ -587,12 +587,12 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       {renderForm()}
 
       <div className="bg-white rounded-xl">
-        <div className=" p-4 flex gap-1 border-black border-b-2">
+        <div className="p-4 flex gap-1 border-black border-b-2">
           {availableTabs.map((tab) => (
             <p
               key={tab}
-              className={`p-4 border-blue-500 border-2 rounded-xl hover:cursor-pointer ${
-                activeTab === tab ? "border-t-4" : ""
+              className={`p-2 border-blue-500  border-2 rounded-xl hover:cursor-pointer ${
+                activeTab === tab ? "border-t-4 " : ""
               }`}
               onClick={() => handleTabClick(tab)}
             >
