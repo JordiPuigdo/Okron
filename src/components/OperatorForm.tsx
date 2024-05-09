@@ -1,4 +1,5 @@
-import Operator from "app/interfaces/Operator";
+import Operator, { OperatorType } from "app/interfaces/Operator";
+import { translateOperatorType } from "app/utils/utils";
 import React from "react";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 
@@ -91,7 +92,30 @@ const OperatorForm: React.FC<OperatorFormProps> = ({
           )}
         />
       </div>
-
+      <div className="mb-4">
+        <Controller
+          name="operatorType"
+          control={control}
+          render={({ field }) => (
+            <select
+              {...field}
+              className="border rounded-md w-full px-3 py-2 mt-1 text-gray-700 focus:outline-none focus:border-indigo-500"
+              onChange={(e) => {
+                const selectedValue = parseInt(e.target.value, 10);
+                field.onChange(selectedValue);
+              }}
+            >
+              {Object.values(OperatorType)
+                .filter((value) => typeof value === "number")
+                .map((operatorType) => (
+                  <option key={operatorType} value={Number(operatorType)}>
+                    {translateOperatorType(operatorType as OperatorType)}
+                  </option>
+                ))}
+            </select>
+          )}
+        />
+      </div>
       <div className="flex items-center space-x-4">
         <button
           type="submit"

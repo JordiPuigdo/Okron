@@ -10,7 +10,6 @@ import WorkOrder, {
   WorkOrderSparePart,
   WorkOrderType,
 } from "app/interfaces/workOrder";
-import { Averia_Sans_Libre } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, set, useForm } from "react-hook-form";
@@ -31,7 +30,7 @@ import WorkOrderOperatorTimesComponent from "components/operator/WorkOrderOperat
 import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
 import ChooseElement from "components/ChooseElement";
-import { CostsWorkOrder } from "components/Costs/Costs";
+import { CostsObject } from "components/Costs/CostsObject";
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -451,7 +450,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               />
             </div>
           </div>
-          <div className="py-4 px-12 w-full">
+          <div className="flex flex-row gap-4 py-4 px-12 justify-between">
             <ChooseElement
               elements={aviableOperators!.map((x) => ({
                 id: x.id,
@@ -468,7 +467,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             />
             {totalCosts > 0 &&
               loginUser!.permission == UserPermission.Administrator && (
-                <CostsWorkOrder
+                <CostsObject
                   operatorCosts={operatorCosts}
                   sparePartCosts={sparePartCosts}
                   totalCosts={totalCosts}

@@ -1,4 +1,5 @@
 import { Asset } from "./Asset";
+import { Documentation } from "./Documentation";
 import Operator from "./Operator";
 import Machine from "./machine";
 import WorkOrder from "./workOrder";
@@ -15,6 +16,7 @@ interface SparePart {
     unitsConsum? : number;
     price : number;
     active : boolean
+    documentation : Documentation[];
 }
 
 export default SparePart;

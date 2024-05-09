@@ -1,3 +1,4 @@
+import { OperatorType } from "app/interfaces/Operator";
 import { StateWorkOrder, WorkOrderType } from "app/interfaces/workOrder";
 import { useSessionStore } from "app/stores/globalStore";
 
@@ -128,3 +129,16 @@ export function formatDateQuery(date: Date, startDate: boolean) {
     formated.getTime() - formated.getTimezoneOffset() * 60000
   ).toISOString();
 }
+
+export const translateOperatorType = (operatorType: any): string => {
+  switch (operatorType) {
+    case OperatorType.Maintenance:
+      return "Manteniment";
+    case OperatorType.Production:
+      return "Producció";
+    case OperatorType.Quality:
+      return "Qualitat";
+    default:
+      return "";
+  }
+};

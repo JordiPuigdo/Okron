@@ -3,9 +3,9 @@ import LoginChecker from "components/layout/LoginChecker";
 import MainLayout from "components/layout/MainLayout";
 import SignOperator from "components/operator/SignOperator";
 import WorkOrderComponent from "components/workOrders/WorkOrderComponent";
-import DasboardPage from "./dasboard/page";
 import GeneratePreventive from "../preventive/components/GeneratePreventive";
 import FinalizeWorkOrdersDaysBefore from "../workOrders/components/FinalizeWorkOrdersDaysBefore";
+import DashboardPage from "./dashboard/page";
 
 export default function MenuPage() {
   return (
@@ -22,7 +22,7 @@ export default function MenuPage() {
               <WorkOrderComponent />
             </div>
             <div>
-              <DasboardPage />
+              <DashboardPage />
             </div>
           </div>
         </LoginChecker>

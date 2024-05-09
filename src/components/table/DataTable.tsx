@@ -7,6 +7,7 @@ import { Column, ColumnFormat, Filters, TableButtons } from "./interfaceTable";
 import FiltersComponent from "./FiltersComponent";
 import {
   formatDate,
+  translateOperatorType,
   translateStateWorkOrder,
   translateWorkOrderType,
 } from "app/utils/utils";
@@ -27,6 +28,16 @@ interface DataTableProps {
   enableFilterActive?: boolean;
 }
 
+export interface LoadingState {
+  [key: string]: boolean;
+}
+
+export enum ButtonTypesTable {
+  Create,
+  Edit,
+  Delete,
+  Detail,
+}
 const DataTable: React.FC<DataTableProps> = ({
   data,
   columns,
@@ -53,13 +64,7 @@ const DataTable: React.FC<DataTableProps> = ({
   const ROUTES = useRoutes();
   const [pathDetail, setPathDetail] = useState<string>("");
 
-  const [isLoadingButton, setIsLoadingButton] = useState<{
-    [key: string]: boolean;
-  }>({
-    ["Edit"]: false,
-    ["Delete"]: false,
-    ["Detail"]: false,
-  });
+  const [loadingState, setLoadingState] = useState<LoadingState>({});
   const { loginUser } = useSessionStore((state) => state);
 
   const handlePageChange = (page: number) => {
@@ -200,48 +205,28 @@ const DataTable: React.FC<DataTableProps> = ({
     setTotalCount(Math.ceil(filteredData.length / itemsPerPage));
   };
 
+  const toggleLoading = (
+    id: string,
+    buttonType: ButtonTypesTable,
+    isLoading: boolean
+  ) => {
+    const loadingKey = `${id}_${buttonType}`;
+    setLoadingState((prevLoadingState) => ({
+      ...prevLoadingState,
+      [loadingKey]: isLoading,
+    }));
+  };
+
   const handleDelete = async (id: string) => {
-    setIsLoadingButton((prevState) => ({
-      ...prevState,
-      ["Delete"]: true,
-    }));
+    toggleLoading(id, ButtonTypesTable.Delete, true);
     onDelete && onDelete(id);
-    setIsLoadingButton((prevState) => ({
-      ...prevState,
-      ["Delete"]: false,
-    }));
+    toggleLoading(id, ButtonTypesTable.Delete, false);
   };
 
   const renderFilters = () => {
     return (
       <>
         <div className="flex gap-4 p-1 justify-between">
-          <div className="flex items-center">
-            <select
-              value={itemsPerPage}
-              onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-              className="text-sm bg-blue-gray-100 rounded-lg border border-gray-500"
-            >
-              {itemsPerPageOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-            <p className="ml-2">registres per pàgina</p>
-          </div>
-          {enableFilterActive && (
-            <div className="flex items-center">
-              <span className="mr-2">Veure registres actius</span>
-              <input
-                type="checkbox"
-                checked={filterActive}
-                onChange={() => setFilterActive(!filterActive)}
-                className="ml-2"
-              />
-            </div>
-          )}
-
           <div className="">
             {filters?.length == 0 && (
               <input
@@ -252,10 +237,26 @@ const DataTable: React.FC<DataTableProps> = ({
             )}
           </div>
         </div>
-        <FiltersComponent
-          filters={filters}
-          onFilterChange={handleFilterChange}
-        />
+        <div className="flex justify-between items-center">
+          <FiltersComponent
+            filters={filters}
+            onFilterChange={handleFilterChange}
+          />
+          {enableFilterActive && (
+            <div
+              className="flex items-center hover:cursor-pointer"
+              onClick={() => setFilterActive(!filterActive)}
+            >
+              <span className="mr-2">Veure registres actius</span>
+              <input
+                type="checkbox"
+                checked={filterActive}
+                onChange={() => setFilterActive(!filterActive)}
+                className="ml-2"
+              />
+            </div>
+          )}
+        </div>
       </>
     );
   };
@@ -279,14 +280,17 @@ const DataTable: React.FC<DataTableProps> = ({
               <p
                 className="flex items-center font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover"
                 onClick={() => {
-                  setIsLoadingButton((prevState) => ({
-                    ...prevState,
-                    ["Detail"]: true,
-                  }));
+                  toggleLoading(
+                    item[columns[0].key],
+                    ButtonTypesTable.Detail,
+                    true
+                  );
                 }}
               >
                 Detall
-                {isLoadingButton["Detail"] && (
+                {loadingState[
+                  item[columns[0].key] + "_" + ButtonTypesTable.Detail
+                ] && (
                   <span className="ml-2 text-xs">
                     <SvgSpinner className="w-6 h-6" />
                   </span>
@@ -302,14 +306,17 @@ const DataTable: React.FC<DataTableProps> = ({
                   <p
                     className="flex items-center font-medium text-white p-2 rounded-xl bg-okron-btEdit hover:bg-okron-btEditHover"
                     onClick={() => {
-                      setIsLoadingButton((prevState) => ({
-                        ...prevState,
-                        ["Edit"]: true,
-                      }));
+                      toggleLoading(
+                        item[columns[0].key],
+                        ButtonTypesTable.Edit,
+                        true
+                      );
                     }}
                   >
                     Editar
-                    {isLoadingButton["Edit"] && (
+                    {loadingState[
+                      item[columns[0].key] + "_" + ButtonTypesTable.Edit
+                    ] && (
                       <span className="ml-2 text-white">
                         <SvgSpinner className="w-6 h-6" />
                       </span>
@@ -324,7 +331,9 @@ const DataTable: React.FC<DataTableProps> = ({
                   onClick={() => handleDelete(item[columns[0].key])}
                 >
                   Eliminar
-                  {isLoadingButton["Delete"] && (
+                  {loadingState[
+                    item[columns[0].key] + "_" + ButtonTypesTable.Delete
+                  ] && (
                     <span className="ml-2 text-white">
                       <SvgSpinner className="w-6 h-6" />
                     </span>
@@ -335,7 +344,9 @@ const DataTable: React.FC<DataTableProps> = ({
                 <Link href={`${pathDetail}/${item[columns[0].key]}`}>
                   <p className="font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover">
                     Detall
-                    {isLoadingButton["Detail"] && (
+                    {loadingState[
+                      item[columns[0].key] + "_" + ButtonTypesTable.Detail
+                    ] && (
                       <span className="ml-2 text-white">
                         <SvgSpinner className="w-6 h-6" />
                       </span>
@@ -359,7 +370,7 @@ const DataTable: React.FC<DataTableProps> = ({
             {isLoading ? (
               <SvgSpinner className="w-full justify-center" />
             ) : (
-              <div className="relative overflow-x-auto ">
+              <div className="flex-grow overflow-auto">
                 <table className="w-full text-left text-lg">
                   <thead>
                     <tr className="border-t border-gray-200 pt-2">
@@ -441,6 +452,14 @@ const DataTable: React.FC<DataTableProps> = ({
 
                               if (
                                 formatColumn.toLocaleUpperCase() ==
+                                ColumnFormat.OPERATORTYPE
+                              ) {
+                                className = getStatusClassName(value, entity);
+                                value = translateOperatorType(value);
+                              }
+
+                              if (
+                                formatColumn.toLocaleUpperCase() ==
                                 ColumnFormat.NUMBER
                               ) {
                                 totalQuantity += parseInt(value);
@@ -457,7 +476,13 @@ const DataTable: React.FC<DataTableProps> = ({
                                 );
                                 value = translateStateWorkOrder(value);
                               }
-
+                              if (
+                                formatColumn.toLocaleUpperCase() ==
+                                ColumnFormat.BOOLEAN
+                              ) {
+                                className +=
+                                  " text-white rounded-full py-1 px-2 text-sm text-center ";
+                              }
                               /* if (column.key === "status") {
                             className = getStatusClassName(value, entity);
                           } else if (formatColumn === "DATE") {
@@ -508,10 +533,26 @@ const DataTable: React.FC<DataTableProps> = ({
               </div>
             )}
           </div>
-          <div className="flex flex-row ">
+          <div className="flex flex-row">
             {data.length > 0 && (
               <p className="mt-auto w-full">Total: {data.length} registres</p>
             )}
+            <div className="flex align-bottom items-center mt-auto w-full">
+              <select
+                value={itemsPerPage}
+                onChange={(e) =>
+                  handleItemsPerPageChange(Number(e.target.value))
+                }
+                className="text-sm bg-blue-gray-100 rounded-lg border border-gray-500"
+              >
+                {itemsPerPageOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              <p className="ml-2">registres per pàgina</p>
+            </div>
 
             <div className="justify-end w-full">
               <Pagination

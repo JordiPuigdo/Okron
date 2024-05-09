@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Asset } from "app/interfaces/Asset";
 import AssetService from "app/services/assetService";
 import { SvgSpinner } from "app/icons/icons";
+import { ButtonTypesTable, LoadingState } from "components/table/DataTable";
 
 interface Props {
   asset: Asset;
@@ -12,9 +13,25 @@ interface Props {
 
 const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
   const [expanded, setExpanded] = useState<boolean>(false);
-  const [loadingAssets, setLoadingAssets] = useState<{
-    [key: string]: boolean;
-  }>({});
+
+  const [loadingState, setLoadingState] = useState<LoadingState>({});
+
+  const handleDelete = async (id: string) => {
+    toggleLoading(id, ButtonTypesTable.Delete, true);
+    onDelete && onDelete(id);
+    toggleLoading(id, ButtonTypesTable.Delete, false);
+  };
+  const toggleLoading = (
+    id: string,
+    buttonType: ButtonTypesTable,
+    isLoading: boolean
+  ) => {
+    const loadingKey = `${id}_${buttonType}`;
+    setLoadingState((prevLoadingState) => ({
+      ...prevLoadingState,
+      [loadingKey]: isLoading,
+    }));
+  };
 
   const toggleExpanded = () => {
     setExpanded(!expanded);
@@ -44,12 +61,12 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
               >
                 <button
                   onClick={(e) => {
-                    setLoadingAssets({ ...loadingAssets, [asset.id]: true });
+                    toggleLoading(asset.id, ButtonTypesTable.Create, true);
                   }}
                   className="flex items-center mr-2 bg-okron-btCreate text-white px-2 py-1 rounded hover:bg-okron-btCreateHover"
                 >
                   Afegir actiu
-                  {loadingAssets[asset.id] && (
+                  {loadingState[`${asset.id}_${ButtonTypesTable.Create}`] && (
                     <span className="items-center ml-2 text-white">
                       <SvgSpinner className="w-6 h-6" />
                     </span>
@@ -60,12 +77,12 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
             <Link href={`/assets/${asset.id}`} passHref>
               <button
                 onClick={(e) => {
-                  setLoadingAssets({ ...loadingAssets, [asset.id]: true });
+                  toggleLoading(asset.id, ButtonTypesTable.Edit, true);
                 }}
                 className="flex items-center mr-2 bg-okron-btEdit text-white px-2 py-1 rounded hover:bg-okron-btEditHover"
               >
                 Editar
-                {loadingAssets[asset.id] && (
+                {loadingState[`${asset.id}_${ButtonTypesTable.Edit}`] && (
                   <span className="items-center ml-2 text-white">
                     <SvgSpinner className="w-6 h-6" />
                   </span>
@@ -75,11 +92,11 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
             <button
               className="flex bg-okron-btDelete text-white px-2 py-1 rounded hover:bg-okron-btDeleteHover"
               onClick={(e) => {
-                onDelete(asset.id);
+                handleDelete(asset.id);
               }}
             >
               Eliminar
-              {loadingAssets[asset.id] && (
+              {loadingState[`${asset.id}_${ButtonTypesTable.Delete}`] && (
                 <span className="items-center ml-2 text-white">
                   <SvgSpinner className="w-6 h-6" />
                 </span>

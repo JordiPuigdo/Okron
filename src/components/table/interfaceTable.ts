@@ -34,6 +34,7 @@ export enum ColumnFormat {
     NUMBER = "NUMBER",
     WORKORDERTYPE = "WORKORDERTYPE",
     STATEWORKORDER = "STATEWORKORDER",
-    KEY = "KEY"
+    KEY = "KEY",
+    OPERATORTYPE = "OPERATORTYPE"
 
 }

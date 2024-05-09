@@ -153,6 +153,20 @@ class SparePartService {
     
   }
 
+  async cleanCache(): Promise<boolean> {
+    try {
+      const url = `${this.baseUrl}sparepart/CleanCache`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      throw error;
+    }
+  }
+
 }
 
 export default SparePartService;

@@ -78,6 +78,8 @@ const config: Config = {
           btCreateHover: "#0056b3",
           btEdit: "#28a745",
           btEditHover: "#1a8031",
+          btnCancel: "#697384",
+          btnCancelHover: "#4b5664",
           btDelete: "#dc3545",
           btDeleteHover: "#9b212d",
           btDetail: "#58a971",

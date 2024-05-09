@@ -7,6 +7,7 @@ import PreventiveService from "app/services/preventiveService";
 import WorkOrderService from "app/services/workOrderService";
 import { useSessionStore } from "app/stores/globalStore";
 import { formatDate } from "app/utils/utils";
+import { Button } from "designSystem/Button/Buttons";
 import { useState } from "react";
 
 const GeneratePreventive = () => {
@@ -47,14 +48,10 @@ const GeneratePreventive = () => {
   if (loginUser?.permission == UserPermission.Administrator)
     return (
       <>
-        <button
-          onClick={generateWorkOrders}
-          className="bg-orange-500 text-white p-2 rounded-md hover:bg-orange-600 flex items-center gap-2"
-        >
+        <Button type="others" onClick={generateWorkOrders} customStyles="flex">
           Generar Revisions {formatDate(new Date(), false, false)}
           {isLoading && <SvgSpinner className="w-6 h-6" />}
-        </button>
-
+        </Button>
         <p className="text-black font-bold">
           {(preventivesCreated?.length || 0 > 0) &&
             "Revisions creades per avui:"}

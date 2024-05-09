@@ -1,7 +1,7 @@
 "use client";
 
 import { Corrective } from "app/interfaces/Corrective";
-import Operator from "app/interfaces/Operator";
+import Operator, { OperatorType } from "app/interfaces/Operator";
 import Machine from "app/interfaces/machine";
 import {
   CreateWorkOrderRequest,
@@ -27,6 +27,8 @@ import { Asset } from "app/interfaces/Asset";
 import AssetService from "app/services/assetService";
 import { ElementList } from "components/selector/ElementList";
 import ChooseElement from "components/ChooseElement";
+import { log } from "console";
+import { useSessionStore } from "app/stores/globalStore";
 
 function CorrectivePage() {
   const operatorService = new OperatorService(
@@ -53,6 +55,8 @@ function CorrectivePage() {
   const router = useRouter();
 
   const [startDate, setStartDate] = useState<Date | null>(new Date());
+
+  const { loginUser } = useSessionStore((state) => state);
 
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
@@ -85,7 +89,11 @@ function CorrectivePage() {
     await operatorService
       .getOperators()
       .then((aviableOperators) => {
-        setOperators(aviableOperators);
+        setOperators(
+          aviableOperators.filter(
+            (x) => x.operatorType == OperatorType.Maintenance
+          )
+        );
       })
       .catch((error) => {
         setErrorMessage("Error Operaris: " + error);
@@ -136,6 +144,7 @@ function CorrectivePage() {
       operatorId: selectedOperator.map((operator) => operator),
       stateWorkOrder: corrective.stateWorkOrder,
       workOrderType: 0,
+      userId: loginUser?.agentId,
     };
     return createWorkOrderRequest;
   }
@@ -227,8 +236,7 @@ function CorrectivePage() {
     return (
       <MainLayout>
         <Container>
-          {renderHeader()}
-          <div className=" bg-white rounded-xl p-4 mt-12">
+          <div className=" bg-white rounded-xl p-4 mt-6">
             <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
               <div className="flex flex-col sm:flex-row">
                 <div className="mb-6 sm:w-1/2">
