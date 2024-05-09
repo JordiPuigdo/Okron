@@ -384,7 +384,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       <>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="mt-12 bg-white rounded-lg p-8 shadow-md"
+          className="bg-white rounded-lg my-8 p-8 shadow-md"
         >
           <div className="flex flex-row gap-8 w-full">
             <div className="w-full">
@@ -457,7 +457,13 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 className="p-3 border border-gray-300 rounded-md text-lg"
               />
             </div>
-            <div className="w-full pt-10">
+            <div className="w-full">
+              <label
+                htmlFor="operators"
+                className="block text-xl font-medium text-gray-700 mb-2"
+              >
+                Operaris
+              </label>
               <ChooseElement
                 elements={aviableOperators!.map((x) => ({
                   id: x.id,
@@ -540,20 +546,20 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               </div>
             </div>
           )}
+          <div className="flex sm:flex-row py-4">
+            {isFinished &&
+              loginUser?.permission == UserPermission.Administrator && (
+                <button
+                  type="button"
+                  onClick={(e) => handleReopenWorkOrder()}
+                  className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded sm:ml-2 flex items-center"
+                >
+                  Reobrir Ordre
+                  {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+                </button>
+              )}
+          </div>
         </form>
-        <div className="flex sm:flex-row mb-8 pt-12">
-          {isFinished &&
-            loginUser?.permission == UserPermission.Administrator && (
-              <button
-                type="button"
-                onClick={(e) => handleReopenWorkOrder()}
-                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
-              >
-                Reobrir Ordre
-                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-              </button>
-            )}
-        </div>
       </>
     );
   };
