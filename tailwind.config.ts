@@ -93,7 +93,12 @@ const config: Config = {
           waiting: "#cc0014",
           onGoing : "#ffad00",
           createold: "#38a0ad",
-          editOld : "ffb72c"
+          editOld : "ffb72c",
+          hoverPending: "#b40516",
+          hoverOnGoing: "#e29900",
+          hoverWaiting: "#3f4858",
+          hoverPendingToValidate: "#105a27",
+
         }
       },
       boxShadow: {

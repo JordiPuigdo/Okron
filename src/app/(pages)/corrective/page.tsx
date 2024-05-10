@@ -320,22 +320,13 @@ function CorrectivePage() {
                     id="stateWorkOrder"
                     name="stateWorkOrder"
                     className="p-3 border border-gray-300 rounded-md w-full"
-                    value={StateWorkOrder.OnGoing}
                   >
-                    {Object.values(StateWorkOrder)
-                      .filter((value) => typeof value === "number")
-                      .map((state) => (
-                        <option
-                          key={state}
-                          value={
-                            typeof state === "string"
-                              ? parseInt(state, 10)
-                              : state
-                          }
-                        >
-                          {translateStateWorkOrder(state)}
-                        </option>
-                      ))}
+                    <option value={StateWorkOrder.OnGoing}>
+                      {translateStateWorkOrder(StateWorkOrder.OnGoing)}
+                    </option>
+                    <option value={StateWorkOrder.Waiting}>
+                      {translateStateWorkOrder(StateWorkOrder.Waiting)}
+                    </option>
                   </select>
                 </div>
               </div>

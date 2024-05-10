@@ -23,6 +23,7 @@ export interface WorkOrder extends BaseModel {
   workOrderSpareParts?: WorkOrderSparePart[]
   workOrderComments? : WorkOrderComment[]
   asset? : Asset;
+  workOrderEvents? : WorkOrderEvents[];
 }
 
 export default WorkOrder;
@@ -148,4 +149,19 @@ export interface UpdateStateWorkOrder{
   state : StateWorkOrder;
   operatorId? : string;
   userId? : string; 
+}
+
+export interface WorkOrderEvents{
+  id : string;
+  date : string;
+  workOrderEventType : WorkOrderEventType;
+  operator : Operator;
+}
+
+export enum WorkOrderEventType {
+  Requested,
+  Started,
+  Paused,
+  PendingToValidate,
+  Finished,
 }

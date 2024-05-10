@@ -38,7 +38,6 @@ export async function startOrFinalizeTimeOperation(
   stateWorkOrder?: StateWorkOrder
 ): Promise<void> {
   
-  debugger;
   const finishTime = new Date();
   const lastOperation = workOrderOperatorTimes.find(
     (time) => time.operator.id === operatorId && (time.endTime === undefined || time.endTime === null)

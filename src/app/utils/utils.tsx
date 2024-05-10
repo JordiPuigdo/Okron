@@ -1,5 +1,9 @@
 import { OperatorType } from "app/interfaces/Operator";
-import { StateWorkOrder, WorkOrderType } from "app/interfaces/workOrder";
+import {
+  StateWorkOrder,
+  WorkOrderEventType,
+  WorkOrderType,
+} from "app/interfaces/workOrder";
 import { useSessionStore } from "app/stores/globalStore";
 
 export const translateStateWorkOrder = (state: any): string => {
@@ -16,6 +20,25 @@ export const translateStateWorkOrder = (state: any): string => {
       return "Pendent Validar";
     case StateWorkOrder.Requested:
       return "Sol·licitat";
+    default:
+      return "";
+  }
+};
+
+export const translateWorkOrderEventType = (
+  eventType: WorkOrderEventType
+): string => {
+  switch (eventType) {
+    case WorkOrderEventType.Requested:
+      return "Solicitada";
+    case WorkOrderEventType.Started:
+      return "En curs";
+    case WorkOrderEventType.Paused:
+      return "En pausa";
+    case WorkOrderEventType.PendingToValidate:
+      return "Pendent Validar";
+    case WorkOrderEventType.Finished:
+      return "Finalitzada";
     default:
       return "";
   }

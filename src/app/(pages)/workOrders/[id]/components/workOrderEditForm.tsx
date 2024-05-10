@@ -5,6 +5,7 @@ import WorkOrder, {
   StateWorkOrder,
   UpdateWorkOrderRequest,
   WorkOrderComment,
+  WorkOrderEvents,
   WorkOrderInspectionPoint,
   WorkOrderOperatorTimes,
   WorkOrderSparePart,
@@ -15,7 +16,11 @@ import { useEffect, useState } from "react";
 import { SubmitHandler, set, useForm } from "react-hook-form";
 import OperatorService from "app/services/operatorService";
 import WorkOrderService from "app/services/workOrderService";
-import { translateStateWorkOrder } from "app/utils/utils";
+import {
+  formatDate,
+  translateStateWorkOrder,
+  translateWorkOrderEventType,
+} from "app/utils/utils";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -43,6 +48,7 @@ enum Tab {
   COMMENTS = "Comentaris",
   SPAREPARTS = "Recanvis",
   INSPECTIONPOINTS = "Punts d'Inspecció",
+  EVENTSWORKORDER = "Events",
 }
 
 const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
@@ -88,6 +94,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [workOrderComments, setWorkOrderComments] = useState<
     WorkOrderComment[]
   >([]);
+  const [workOrderEvents, setWorkOrderEvents] = useState<WorkOrderEvents[]>([]);
 
   const [selectedOperators, setSelectedOperators] = useState<Operator[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
@@ -143,6 +150,11 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   }
 
   async function loadForm(responseWorkOrder: WorkOrder | null) {
+    setSelectedSpareParts([]);
+    setworkOrderOperatorTimes([]);
+    setWorkOrderComments([]);
+    setWorkOrderEvents([]);
+
     if (responseWorkOrder) {
       setValue("code", responseWorkOrder.code);
       setValue("description", responseWorkOrder.description);
@@ -158,6 +170,15 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       setSelectedOperators((prevSelected) => [
         ...prevSelected,
         ...operatorsToAdd!,
+      ]);
+
+      setWorkOrderEvents((prevSelected) => [
+        ...prevSelected,
+        ...(responseWorkOrder.workOrderEvents || []).sort((a, b) => {
+          const dateA = new Date(a.date) as Date;
+          const dateB = new Date(b.date) as Date;
+          return dateB.getTime() - dateA.getTime();
+        }),
       ]);
 
       if (
@@ -597,6 +618,39 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             setWorkOrderComments={setWorkOrderComments}
           />
         )}
+        {currentWorkOrder &&
+          activeTab === Tab.EVENTSWORKORDER &&
+          loginUser?.permission == UserPermission.Administrator && (
+            <div className="flex flex-col  bg-gray-100 rounded-lg shadow-md justify-start ">
+              <div className="flex flex-row gap-4 p-4">
+                <div className="text-gray-600 font-semibold w-[10%]">
+                  Data Acció
+                </div>
+                <div className="text-gray-600 font-semibold w-[10%]">Acció</div>
+                <div className="text-gray-600 font-semibold w-[10%]">
+                  Operari
+                </div>
+              </div>
+              {workOrderEvents.map((x, index) => {
+                return (
+                  <div
+                    key={index}
+                    className={`flex flex-row gap-4 p-4 rounded-lg ${
+                      index % 2 == 0 ? "bg-gray-200" : ""
+                    }`}
+                  >
+                    <div className="text-gray-600 w-[10%]">
+                      {formatDate(x.date)}
+                    </div>
+                    <div className=" w-[10%]">
+                      {translateWorkOrderEventType(x.workOrderEventType)}
+                    </div>
+                    <div className="w-[10%]">{x.operator.name}</div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
       </div>
     </>
   );

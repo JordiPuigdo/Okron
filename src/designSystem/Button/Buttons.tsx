@@ -69,7 +69,9 @@ export const Button = ({
 
   return (
     <button
-      className={`transition-all relative group overflow-visible ${className}`}
+      className={`transition-all relative group overflow-visible ${className} ${
+        disabled && "hover:cursor-default"
+      }`}
       onClick={handleClick}
       type={rest?.isSubmit ? "submit" : "button"}
     >
@@ -104,7 +106,7 @@ const ButtonBody = ({
   id?: string;
 }) => {
   const DISABLED_STYLES =
-    "pointer-events-none border border-gray-300 bg-gray-200 text-gray-500 hover:bg-gray-200 hover:text-gray-500 active:bg-gray-200 active:text-gray-500 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500";
+    "bg-gray-200 text-gray-500 hover:bg-gray-200 hover:text-gray-500 cursor:default";
 
   const STYLES: any = {
     none: "",
@@ -124,8 +126,8 @@ const ButtonBody = ({
   };
   const styles = twMerge(
     `${STYLES.common} ${STYLES[type]} ${STYLES[size]} ${customStyles} ${
-      disabled ? DISABLED_STYLES : ""
+      disabled ? DISABLED_STYLES : customStyles
     }`
   );
-  return <div className={`${styles} ${customStyles}`}>{children}</div>;
+  return <div className={`${styles} `}>{children}</div>;
 };
