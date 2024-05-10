@@ -39,6 +39,9 @@ export enum StateWorkOrder {
   OnGoing = 1,
   Paused = 2,
   Finished = 3,
+  Requested,
+  PendingToValidate
+
 }
 
 
@@ -138,4 +141,11 @@ export interface AddCommentToWorkOrderRequest {
   comment : string;
   operatorId : string;
   workOrderId : string;
+}
+
+export interface UpdateStateWorkOrder{
+  workOrderId : string;
+  state : StateWorkOrder;
+  operatorId? : string;
+  userId? : string; 
 }

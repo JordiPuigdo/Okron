@@ -3,6 +3,7 @@ import { OperatorLogged } from "app/interfaces/User";
 import { useSessionStore } from "app/stores/globalStore";
 import AuthenticationService from "app/services/authentication";
 import { useState } from "react";
+import { Button } from "designSystem/Button/Buttons";
 
 export default function SignOperator() {
   const { setOperatorLogged, operatorLogged } = useSessionStore(
@@ -16,6 +17,10 @@ export default function SignOperator() {
   );
 
   function signOperator() {
+    if (operatorLogged?.codeOperatorLogged) {
+      setOperatorLogged(undefined);
+      return;
+    }
     if (!/^\d+$/.test(codeOperator) || codeOperator == "") {
       setCodeOperator("");
       alert("Codi de operari només pot ser númeric");
@@ -46,37 +51,25 @@ export default function SignOperator() {
   }
 
   return (
-    <div className="flex flex-col gap-4 items-center">
-      <div>
-        Codi Operari:
-        <input
-          type="text"
-          className="ml-4 rounded-sm"
-          value={codeOperator}
-          onChange={(e) => setCodeOperator(e.target.value)}
-        />
-        <button
-          type="button"
-          className="ml-4 bg-blue-500 rounded-md p-1 text-white"
-          onClick={signOperator}
-        >
-          Fitxar
-        </button>
-        <button
-          type="button"
-          className="ml-4 bg-red-500 rounded-md p-1 text-white"
-          onClick={(e) => setOperatorLogged(undefined)}
-        >
-          Desfitxar
-        </button>
-        <p className="text-red-500">{errorSign && errorSign}</p>
-      </div>
-      {operatorLogged && (
-        <div>
-          Operari Entrat: {operatorLogged.codeOperatorLogged} -{" "}
-          {operatorLogged.nameOperatorLogged}
-        </div>
-      )}
+    <div className="flex flex-row gap-4 items-center bg-white rounded-xl p-4 font-semibold">
+      Codi
+      <input
+        type="text"
+        className="rounded-sm"
+        value={codeOperator}
+        onChange={(e) => setCodeOperator(e.target.value)}
+      />
+      <Button
+        customStyles={` ${
+          operatorLogged?.codeOperatorLogged ? "bg-blue-500 " : "bg-red-500 "
+        } rounded-md p-2 text-white hover:${
+          operatorLogged?.codeOperatorLogged ? "bg-blue-700" : "bg-red-700"
+        }`}
+        onClick={signOperator}
+      >
+        {operatorLogged?.codeOperatorLogged ? "Desfitxar" : "Fitxar"}
+      </Button>
+      <p className="text-red-500">{errorSign && errorSign}</p>
     </div>
   );
 }

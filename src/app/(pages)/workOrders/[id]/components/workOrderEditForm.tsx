@@ -32,6 +32,7 @@ import { UserPermission } from "app/interfaces/User";
 import ChooseElement from "components/ChooseElement";
 import { CostsObject } from "components/Costs/CostsObject";
 import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspectionPoint";
+import WorkOrderButtons from "./WorkOrderButtons";
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -289,7 +290,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     }, 2000);
   };
 
-  async function finalizeWorkOrder() {
+  /*async function finalizeWorkOrder() {
     setIsLoading(true);
 
     await workOrderService
@@ -327,7 +328,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         setErrorMessage(error);
         setShowErrorMessage(true);
       });
-  }
+  }*/
 
   function handleSelectOperator(operatorId: string) {
     const operator = aviableOperators?.find((x) => x.id === operatorId);
@@ -495,66 +496,19 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 </div>
               )}
           </div>
-          {!isFinished && (
-            <div className="flex">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`${
-                  showSuccessMessage
-                    ? "bg-green-500"
-                    : showErrorMessage
-                    ? "bg-red-500"
-                    : "bg-blue-500"
-                } hover:${
-                  showSuccessMessage
-                    ? "bg-green-700"
-                    : showErrorMessage
-                    ? "bg-red-700"
-                    : "bg-blue-700"
-                } text-white font-bold py-2 px-4 rounded mt-6 mb-4 sm:mb-0 sm:mr-2 flex items-center`}
-              >
-                Actualitzar Ordre
-                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-              </button>
-              <button
-                type="button"
-                onClick={(e) => router.back()}
-                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
-                disabled={isLoading}
-              >
-                Cancelar
-                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-              </button>
-              <button
-                type="button"
-                onClick={(e) => finalizeWorkOrder()}
-                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
-              >
-                Finalitzar Ordre
-                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-              </button>
-              <div>
-                {showSuccessMessage && (
-                  <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
-                    Ordre actualizada correctament
-                  </div>
-                )}
-
-                {showErrorMessage && (
-                  <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
-                    Error actualitzant ordre de treball
-                  </div>
-                )}
-              </div>
-            </div>
+          {!isFinished && currentWorkOrder && (
+            <>
+              <WorkOrderButtons
+                workOrder={currentWorkOrder}
+                handleReload={fetchWorkOrder}
+              />
+            </>
           )}
           <div className="flex sm:flex-row py-4">
             {isFinished &&
               loginUser?.permission == UserPermission.Administrator && (
                 <button
                   type="button"
-                  onClick={(e) => handleReopenWorkOrder()}
                   className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded sm:ml-2 flex items-center"
                 >
                   Reobrir Ordre

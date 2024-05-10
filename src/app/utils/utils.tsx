@@ -12,6 +12,10 @@ export const translateStateWorkOrder = (state: any): string => {
       return "En pausa";
     case StateWorkOrder.Finished:
       return "Finalitzada";
+    case StateWorkOrder.PendingToValidate:
+      return "Pendent Validar";
+    case StateWorkOrder.Requested:
+      return "Sol·licitat";
     default:
       return "";
   }

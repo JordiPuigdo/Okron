@@ -9,7 +9,8 @@ type ButtonTypes =
   | "cancel"
   | "detail"
   | "save"
-  | "others";
+  | "others"
+  | "none";
 type ButtonSizes = "sm" | "md" | "lg" | "xl";
 
 type ButtonProps = {
@@ -106,6 +107,7 @@ const ButtonBody = ({
     "pointer-events-none border border-gray-300 bg-gray-200 text-gray-500 hover:bg-gray-200 hover:text-gray-500 active:bg-gray-200 active:text-gray-500 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500";
 
   const STYLES: any = {
+    none: "",
     create:
       "bg-okron-btCreate text-white px-4 py-2 rounded-md hover:bg-okron-btCreateHover focus:outline-none focus:ring focus:border-blue-300",
     edit: "bg-okron-btEdit text-white px-4 py-2 rounded-md hover:bg-okron-btEditHover focus:outline-none focus:ring focus:border-blue-300",

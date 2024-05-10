@@ -1,4 +1,4 @@
-import WorkOrder, { AddCommentToWorkOrderRequest, AddWorkOrderOperatorTimes, CreateWorkOrderRequest, DeleteWorkOrderOperatorTimes, FinishWorkOrderOperatorTimes, SaveInspectionResultPointRequest, SearchWorkOrderFilters, StateWorkOrder, UpdateWorkOrderOperatorTimes, WorkOrderComment, WorkOrderType } from 'app/interfaces/workOrder';
+import WorkOrder, { AddCommentToWorkOrderRequest, AddWorkOrderOperatorTimes, CreateWorkOrderRequest, DeleteWorkOrderOperatorTimes, FinishWorkOrderOperatorTimes, SaveInspectionResultPointRequest, SearchWorkOrderFilters, StateWorkOrder, UpdateStateWorkOrder, UpdateWorkOrderOperatorTimes, WorkOrderComment, WorkOrderType } from 'app/interfaces/workOrder';
 
 class WorkOrderService {
   private baseUrl: string;
@@ -280,9 +280,9 @@ class WorkOrderService {
   }
 
   
-  async updateStateWorkOrder(id : string, workOrderState : StateWorkOrder): Promise<boolean> {
+  async updateStateWorkOrder(updateStateWorkOrder: UpdateStateWorkOrder): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}workorder/${id}?state=${workOrderState}`;
+      const url = `${this.baseUrl}workorder/state`;
 
       
       const response = await fetch(url, {
@@ -290,6 +290,7 @@ class WorkOrderService {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify(updateStateWorkOrder),
       });
 
       if (!response.ok) {

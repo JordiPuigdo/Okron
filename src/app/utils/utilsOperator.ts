@@ -1,66 +1,82 @@
-import Operator from "app/interfaces/Operator";
-import { AddWorkOrderOperatorTimes, FinishWorkOrderOperatorTimes, UpdateWorkOrderOperatorTimes, WorkOrderOperatorTimes } from "app/interfaces/workOrder";
 import OperatorService from "app/services/operatorService";
 import WorkOrderService from "app/services/workOrderService";
+import { AddWorkOrderOperatorTimes, FinishWorkOrderOperatorTimes, StateWorkOrder, WorkOrderOperatorTimes } from "app/interfaces/workOrder";
 
+const workOrderService = new WorkOrderService(process.env.NEXT_PUBLIC_API_BASE_URL!);
 
+async function clockInOperator(workOrderId: string, operatorId: string): Promise<void> {
+  const startTime = new Date();
+  const newOperationData: AddWorkOrderOperatorTimes = {
+    WorkOrderId: workOrderId,
+    operatorId: operatorId,
+    startTime: startTime,
+  };
 
-export async function startOrFinalizeTimeOperation(
-  workOrderOperatortimes: WorkOrderOperatorTimes[],
-  workOrderId: string,
-  operatorId: string
-): Promise<void> {
-  const workOrderService = new WorkOrderService(
-    process.env.NEXT_PUBLIC_API_BASE_URL!
-  );
-
-
-  const lastOperation = workOrderOperatortimes.find(
-    (time) =>
-      time.operator.id === operatorId &&
-      (time.endTime === undefined || time.endTime === null)
-  );
-
-  if (lastOperation) {
-    const finishTime = new Date();
-    const finishData: FinishWorkOrderOperatorTimes = {
-      WorkOrderId: workOrderId,
-      operatorId: operatorId,
-      finishTime: finishTime,
-    };
-
-    workOrderService
-      .finishWorkOrderOperatorTimes(finishData)
-      .then(() => {
-        // Update the last operation in the local array
-        const updatedOperations = workOrderOperatortimes.map((time) =>
-          time.id === lastOperation.id
-            ? { ...time, endTime: finishTime }
-            : time
-        );
-        // Update the state with the updated array of operations
-        // setWorkOrderOperatorTimes(updatedOperations);
-      })
-      .catch((error) => {
-        console.log('Error finishing operation:', error);
-      });
-  } else {
-    // Start a new operation
-    const startTime = new Date();
-    const newOperationData: AddWorkOrderOperatorTimes = {
-      WorkOrderId: workOrderId,
-      operatorId: operatorId,
-      startTime: startTime,
-    };
-
-    
-    workOrderService
-      .addWorkOrderOperatorTimes(newOperationData)
-      .then((response) => {
-       
-      })
-      .catch((error) => {
-        console.log('Error starting new operation:', error);
-      });
+  try {
+    const response = await workOrderService.addWorkOrderOperatorTimes(newOperationData);
+  } catch (error) {
+    console.log('Error starting new operation:', error);
+    throw error;
   }
 }
+
+async function clockOutOperator( finishWorkOrderOperatorTimes : FinishWorkOrderOperatorTimes) {
+
+  try {
+      await workOrderService.finishWorkOrderOperatorTimes(finishWorkOrderOperatorTimes);
+    } catch (error) {
+      console.log('Error finishing operation:', error);
+      throw error; // Propagate the error if necessary
+    }
+
+}
+
+export async function startOrFinalizeTimeOperation(
+  workOrderOperatorTimes: WorkOrderOperatorTimes[],
+  workOrderId: string,
+  operatorId: string,
+  stateWorkOrder?: StateWorkOrder
+): Promise<void> {
+  
+  debugger;
+  const finishTime = new Date();
+  const lastOperation = workOrderOperatorTimes.find(
+    (time) => time.operator.id === operatorId && (time.endTime === undefined || time.endTime === null)
+  );
+
+  if(stateWorkOrder === StateWorkOrder.OnGoing) {
+    await clockInOperator(workOrderId, operatorId);
+    return;
+  }
+  
+  if (stateWorkOrder === StateWorkOrder.Paused || stateWorkOrder === StateWorkOrder.Finished || 
+      stateWorkOrder === StateWorkOrder.PendingToValidate || stateWorkOrder === StateWorkOrder.Waiting) {
+    
+
+    if (lastOperation) {
+      const finishData: FinishWorkOrderOperatorTimes = {
+        WorkOrderId: workOrderId,
+        operatorId: operatorId,
+        finishTime: finishTime,
+      };
+      await clockOutOperator(finishData);
+    }
+    return;
+  }
+
+  if (lastOperation) {
+      const finishData: FinishWorkOrderOperatorTimes = {
+        WorkOrderId: workOrderId,
+        operatorId: operatorId,
+        finishTime: finishTime,
+      };
+      await clockOutOperator(finishData);
+  } else{
+    clockInOperator(workOrderId, operatorId);
+  }
+
+  
+
+}
+
+ 
