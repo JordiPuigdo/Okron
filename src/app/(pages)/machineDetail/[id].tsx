@@ -34,6 +34,8 @@ const MachineDetailsPage = () => {
     [StateWorkOrder.OnGoing]: "En Curs",
     [StateWorkOrder.Paused]: "Pausada",
     [StateWorkOrder.Finished]: "Acabada",
+    [StateWorkOrder.Requested]: "Sol·licitat",
+    [StateWorkOrder.PendingToValidate]: "Pendent Validar",
   };
 
   useEffect(() => {
