@@ -116,7 +116,7 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
             {isLoading[StateWorkOrder.PendingToValidate] ? (
               <SvgSpinner className="text-white" />
             ) : (
-              "Pendent Validar"
+              "Validació Pendent"
             )}
           </Button>
         </>
