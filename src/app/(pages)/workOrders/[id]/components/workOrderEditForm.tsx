@@ -282,6 +282,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     if (aviableOperators && availableSpareParts.length > 0) fetchWorkOrder();
   }, [aviableOperators, availableSpareParts]);
 
+  const handleSubmitForm = async () => {
+    handleSubmit(onSubmit)();
+  };
+
   const onSubmit: SubmitHandler<WorkOrder> = async (data) => {
     setIsLoading(true);
     try {
@@ -310,46 +314,6 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       window.location.reload();
     }, 2000);
   };
-
-  /*async function finalizeWorkOrder() {
-    setIsLoading(true);
-
-    await workOrderService
-      .updateStateWorkOrder(currentWorkOrder!.id, StateWorkOrder.Finished)
-      .then((response) => {
-        if (response) {
-          setTimeout(() => {
-            setIsLoading(false);
-            window.location.reload();
-          }, 1000);
-        }
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        setErrorMessage(error);
-        setShowErrorMessage(true);
-      });
-  }
-
-  async function handleReopenWorkOrder() {
-    setIsLoading(true);
-
-    await workOrderService
-      .updateStateWorkOrder(currentWorkOrder!.id, StateWorkOrder.Waiting)
-      .then((response) => {
-        if (response) {
-          setTimeout(() => {
-            setIsLoading(false);
-            window.location.reload();
-          }, 1000);
-        }
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        setErrorMessage(error);
-        setShowErrorMessage(true);
-      });
-  }*/
 
   function handleSelectOperator(operatorId: string) {
     const operator = aviableOperators?.find((x) => x.id === operatorId);
@@ -517,11 +481,12 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 </div>
               )}
           </div>
-          {!isFinished && currentWorkOrder && (
+          {currentWorkOrder && (
             <>
               <WorkOrderButtons
                 workOrder={currentWorkOrder}
                 handleReload={fetchWorkOrder}
+                handleSubmit={() => handleSubmitForm()}
               />
             </>
           )}

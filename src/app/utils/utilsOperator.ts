@@ -13,7 +13,14 @@ async function clockInOperator(workOrderId: string, operatorId: string): Promise
   };
 
   try {
-    const response = await workOrderService.addWorkOrderOperatorTimes(newOperationData);
+    await workOrderService.addWorkOrderOperatorTimes(newOperationData).then((response) => {
+      if (response) {
+        //return response;
+      }
+    }).catch((error) => {
+      console.log('Error starting new operation:', error);
+      throw error;
+    });
   } catch (error) {
     console.log('Error starting new operation:', error);
     throw error;
@@ -26,7 +33,7 @@ async function clockOutOperator( finishWorkOrderOperatorTimes : FinishWorkOrderO
       await workOrderService.finishWorkOrderOperatorTimes(finishWorkOrderOperatorTimes);
     } catch (error) {
       console.log('Error finishing operation:', error);
-      throw error; // Propagate the error if necessary
+      throw error;
     }
 
 }

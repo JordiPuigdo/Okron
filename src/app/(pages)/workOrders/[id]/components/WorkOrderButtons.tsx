@@ -14,11 +14,13 @@ import { useState } from "react";
 interface WorkOrderButtonsProps {
   workOrder: WorkOrder;
   handleReload: () => void;
+  handleSubmit: () => void;
 }
 
 const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
   workOrder,
   handleReload,
+  handleSubmit,
 }: WorkOrderButtonsProps) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -44,12 +46,12 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
       return;
     }
     toggleLoading(state);
-    startOrFinalizeTimeOperation(
+    /*    startOrFinalizeTimeOperation(
       workOrder.workOrderOperatorTimes!,
       workOrder.id,
       operatorLogged.idOperatorLogged,
       state
-    );
+    );*/
     const update: UpdateStateWorkOrder = {
       workOrderId: workOrder.id,
       state: state,
@@ -124,6 +126,15 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
             )}
           </Button>
         </>
+      )}
+      {loginUser?.permission == UserPermission.Administrator && (
+        <Button
+          onClick={() => handleSubmit()}
+          type="create"
+          customStyles="flex justify-center items-center h-24 w-24 rounded-xl shadow-md text-white font-semibold "
+        >
+          Actualitzar
+        </Button>
       )}
       {workOrder.stateWorkOrder == StateWorkOrder.Finished &&
         loginUser?.permission == UserPermission.Administrator && (
