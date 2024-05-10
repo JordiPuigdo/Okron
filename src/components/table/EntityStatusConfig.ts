@@ -36,10 +36,12 @@ export const entityStatusConfig: Record<string, StatusConfig> = {
       Predictive: 'Finalitzada',
     },
     colors: {
-      "1": 'bg-okron-onGoing',
       "0": 'bg-okron-waiting',
-      "2": 'bg-okron-waiting',
+      "1": 'bg-okron-onGoing',
+      "2": 'bg-okron-paused',
       "3": 'bg-okron-finished',
+      "4": 'bg-okron-finished',
+      "5": 'bg-okron-pendingValidate',
     }
   },
   OPERATOR:{

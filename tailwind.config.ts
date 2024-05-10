@@ -98,6 +98,9 @@ const config: Config = {
           hoverOnGoing: "#e29900",
           hoverWaiting: "#3f4858",
           hoverPendingToValidate: "#105a27",
+          paused : "#4b5664",
+          pendingValidate : "#8d000e",
+          requested: "#ff5c6b",
 
         }
       },
