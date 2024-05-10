@@ -46,12 +46,6 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
       return;
     }
     toggleLoading(state);
-    /*    startOrFinalizeTimeOperation(
-      workOrder.workOrderOperatorTimes!,
-      workOrder.id,
-      operatorLogged.idOperatorLogged,
-      state
-    );*/
     const update: UpdateStateWorkOrder = {
       workOrderId: workOrder.id,
       state: state,
@@ -133,7 +127,11 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
           type="create"
           customStyles="flex justify-center items-center h-24 w-24 rounded-xl shadow-md text-white font-semibold "
         >
-          Actualitzar
+          {isLoading["UPDATE"] ? (
+            <SvgSpinner className="text-white" />
+          ) : (
+            "Actualitzar"
+          )}
         </Button>
       )}
       {workOrder.stateWorkOrder == StateWorkOrder.Finished &&
