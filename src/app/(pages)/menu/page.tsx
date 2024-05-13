@@ -12,7 +12,7 @@ export default function MenuPage() {
     <MainLayout>
       <Container>
         <LoginChecker>
-          <div className="flex flex-col gap-8 w-full">
+          <div className="flex flex-col gap-2 w-full">
             <div className="flex flex-row gap-4 items-start">
               <SignOperator />
               <GeneratePreventive />

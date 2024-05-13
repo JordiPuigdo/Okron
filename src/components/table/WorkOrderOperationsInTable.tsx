@@ -125,7 +125,7 @@ export default function WorkOrderOperationsInTable({
   if (workOrder.stateWorkOrder !== StateWorkOrder.Finished)
     return (
       <div className="flex flex-row items-center px-2 w-full gap-2">
-        <div className="flex-grow bg-red-400 rounded items-center text-center justify-end">
+        <div className="flex-grow rounded items-center text-center justify-end ">
           <Button
             customStyles={`${
               isOperatorInWorkOrder ? "bg-emerald-700" : "bg-rose-700"
@@ -150,7 +150,7 @@ export default function WorkOrderOperationsInTable({
             )}
           </Button>
         </div>
-        <div className="flex-grow bg-red-400 rounded items-center text-center justify-end">
+        <div className="flex-grow rounded items-center text-center justify-end">
           <Button
             customStyles={`${
               workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
@@ -182,7 +182,7 @@ export default function WorkOrderOperationsInTable({
         </div>
 
         {workOrder.workOrderType == WorkOrderType.Corrective && (
-          <div className="flex-grow bg-red-400 rounded items-center text-center justify-end">
+          <div className="flex-grow rounded items-center text-center justify-end">
             <Button
               disabled={isPassInspectionPoints}
               onClick={() => {
@@ -202,7 +202,7 @@ export default function WorkOrderOperationsInTable({
         )}
 
         {workOrder.workOrderType == WorkOrderType.Preventive && (
-          <div className="flex-grow bg-red-400 rounded items-center text-center justify-end">
+          <div className="flex-grow rounded items-center text-center justify-end">
             <Button
               disabled={isPassInspectionPoints}
               onClick={() => {
@@ -227,18 +227,19 @@ export default function WorkOrderOperationsInTable({
           </div>
         )}
 
-        <div className="flex-grow bg-red-400 rounded items-center text-center justify-end">
+        <div className="flex-grow rounded items-center text-center justify-end">
           <Button
-            customStyles={`bg-okron-btDetail hover:bg-okron-btnDetailHover text-white rounded py-1 px-1 flex gap-2 justify-center`}
+            customStyles={`bg-okron-btDetail hover:bg-okron-btnDetailHover rounded items-center text-center justify-end`}
             onClick={() => {
               toggleLoading(workOrderId + "_Detail");
             }}
+            href={`${Routes.workOrders + "/" + workOrder.id}`}
           >
             {isLoading[workOrderId + "_Detail"] ? (
               <SvgSpinner className="w-6 h-6" />
             ) : (
               <div className="flex">
-                <SvgDetail className="w-6 h-6" />
+                <SvgDetail />
               </div>
             )}
           </Button>

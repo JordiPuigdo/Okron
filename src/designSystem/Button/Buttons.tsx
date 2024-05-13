@@ -52,7 +52,9 @@ export const Button = ({
     return (
       <Link
         href={href}
-        className={`${className} ${customStyles}`}
+        className={twMerge(
+          `relative overflow-visible inline-block ${className}`
+        )}
         onClick={handleClick}
       >
         <ButtonBody
@@ -121,7 +123,7 @@ const ButtonBody = ({
     others:
       "bg-orange-500 text-white p-2 rounded-md hover:bg-orange-600 items-center gap-2",
     detail:
-      "text-center text-white p-1 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover",
+      "text-center text-white bg-okron-btDetail hover:bg-okron-btnDetailHover",
     sm: "items-center text-xs font-medium h-[32px] px-4",
     md: "items-center font-medium h-[40px] px-4",
     lg: "items-center text-md font-semibold h-[48px] px-6",

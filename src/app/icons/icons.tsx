@@ -182,9 +182,9 @@ export const SvgCheck = (props: SVGProps<SVGSVGElement>) => (
 export const SvgDetail = (props: SVGProps<SVGSVGElement>) => (
   <svg
     fill="#ffffff"
-    width={35}
+    width={20}
     height={22}
-    viewBox="0 0 24 24"
+    viewBox="2 2 20 20"
     xmlns="http://www.w3.org/2000/svg"
     stroke="#ffffff"
     stroke-width="0.72"
