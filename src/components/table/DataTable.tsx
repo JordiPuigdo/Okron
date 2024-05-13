@@ -269,7 +269,7 @@ const DataTable: React.FC<DataTableProps> = ({
       tableButtons.detail ||
       tableButtons.edit ||
       entity === EntityTable.WORKORDER ? (
-      <th className="text-center border-b border-blue-gray-100 bg-blue-gray-50 p-4 cursor-pointer">
+      <th className="text-center border-b border-blue-gray-100 bg-blue-gray-50 ">
         Accions
       </th>
     ) : (
@@ -279,9 +279,9 @@ const DataTable: React.FC<DataTableProps> = ({
 
   const renderTableButtons = (item: any) => {
     return (
-      <div className="justify-center flex flex-col sm:flex-row items-center">
-        <td className="py-2 flex flex-col sm:flex-row justify-center items-center text-center gap-4">
-          <div className="flex flex-col items-center">
+      <td className="flex-col justify-center items-center text-center py-5">
+        {loginUser?.permission == UserPermission.Administrator && (
+          <div className="flex flex-row gap-2 p-2 justify-center border-b-2">
             {tableButtons.edit && (
               <Link href={`${pathName}/${item[columns[0].key]}`}>
                 <p
@@ -335,19 +335,18 @@ const DataTable: React.FC<DataTableProps> = ({
                 </p>
               </Link>
             )}
-
-            {EntityTable.WORKORDER == entity && (
-              <>
-                <WorkOrderOperationsInTable
-                  workOrderId={item[columns[0].key]}
-                  workOrder={item}
-                  onChangeStateWorkOrder={() => setFilterActive(!filterActive)}
-                />
-              </>
-            )}
           </div>
-        </td>
-      </div>
+        )}
+        {EntityTable.WORKORDER == entity && (
+          <>
+            <WorkOrderOperationsInTable
+              workOrderId={item[columns[0].key]}
+              workOrder={item}
+              onChangeStateWorkOrder={() => setFilterActive(!filterActive)}
+            />
+          </>
+        )}
+      </td>
     );
   };
 

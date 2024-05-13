@@ -124,14 +124,14 @@ export default function WorkOrderOperationsInTable({
 
   if (workOrder.stateWorkOrder !== StateWorkOrder.Finished)
     return (
-      <div className="flex flex-row items-center px-2 w-full gap-2">
-        <div className="flex-grow rounded items-center text-center justify-end ">
+      <div className="flex flex-row py-2 px-2 w-full gap-2 justify-center">
+        <div className="flex-grow rounded">
           <Button
             customStyles={`${
               isOperatorInWorkOrder ? "bg-emerald-700" : "bg-rose-700"
             } hover:${
               isOperatorInWorkOrder ? "bg-emerald-900" : "bg-rose-900"
-            } text-white py-1 px-1 rounded flex gap-1 `}
+            } text-white px-1 rounded flex gap-1 `}
             onClick={() => {
               isOperatorInWorkOrder
                 ? handleChangeStateWorkOrder(StateWorkOrder.Paused)
@@ -160,7 +160,7 @@ export default function WorkOrderOperationsInTable({
               workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
                 ? "bg-emerald-900 pointer-events-none"
                 : "bg-rose-900"
-            } text-white py-1 px-1 rounded flex gap-1 `}
+            } text-white px-1 rounded flex gap-1 `}
             className={`${
               workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate &&
               "pointer-events-none"
@@ -236,7 +236,9 @@ export default function WorkOrderOperationsInTable({
             href={`${Routes.workOrders + "/" + workOrder.id}`}
           >
             {isLoading[workOrderId + "_Detail"] ? (
-              <SvgSpinner className="w-6 h-6" />
+              <div className="flex">
+                <SvgSpinner className="w-6 h-6" />
+              </div>
             ) : (
               <div className="flex">
                 <SvgDetail />
