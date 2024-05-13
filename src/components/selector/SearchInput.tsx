@@ -6,6 +6,7 @@ type SearchInputProps = {
   onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   inputRef: React.RefObject<HTMLInputElement>;
   placeholder?: string;
+  disabled?: boolean;
 };
 
 const SearchInput: React.FC<SearchInputProps> = ({
@@ -14,6 +15,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   onKeyDown,
   inputRef,
   placeholder = "Buscar",
+  disabled = false,
 }) => {
   return (
     <input
@@ -24,6 +26,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
       onKeyDown={onKeyDown}
       ref={inputRef}
       placeholder={placeholder}
+      disabled={disabled}
     />
   );
 };

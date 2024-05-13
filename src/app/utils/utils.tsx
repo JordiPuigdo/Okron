@@ -29,8 +29,10 @@ export const translateWorkOrderEventType = (
   eventType: WorkOrderEventType
 ): string => {
   switch (eventType) {
-    case WorkOrderEventType.Requested:
-      return "Solicitada";
+    /*case WorkOrderEventType.Requested:
+      return "Sol·licitud";*/
+    case WorkOrderEventType.Waiting:
+      return "Pendent";
     case WorkOrderEventType.Started:
       return "En curs";
     case WorkOrderEventType.Paused:

@@ -18,6 +18,7 @@ export default function SignOperator() {
 
   function signOperator() {
     if (operatorLogged?.codeOperatorLogged) {
+      setCodeOperator("");
       setOperatorLogged(undefined);
       return;
     }
@@ -58,6 +59,11 @@ export default function SignOperator() {
         className="rounded-sm"
         value={codeOperator}
         onChange={(e) => setCodeOperator(e.target.value)}
+        onKeyUp={(e) => {
+          if (e.key === "Enter") {
+            signOperator();
+          }
+        }}
       />
       <Button
         customStyles={` ${

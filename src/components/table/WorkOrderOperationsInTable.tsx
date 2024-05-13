@@ -1,8 +1,10 @@
-import { SvgSpinner } from "app/icons/icons";
+import { SvgCheck, SvgPause, SvgSpinner, SvgStart } from "app/icons/icons";
 import WorkOrder, {
   StateWorkOrder,
+  UpdateStateWorkOrder,
   WorkOrderType,
 } from "app/interfaces/workOrder";
+import WorkOrderService from "app/services/workOrderService";
 import { useSessionStore } from "app/stores/globalStore";
 import { checkAllInspectionPoints } from "app/utils/utilsInspectionPoints";
 import { startOrFinalizeTimeOperation } from "app/utils/utilsOperator";
@@ -12,20 +14,26 @@ import React, { useEffect, useState } from "react";
 interface WorkOrderOperationsInTableProps {
   workOrderId: string;
   workOrder: WorkOrder;
+  onChangeStateWorkOrder?: () => void;
 }
 
 export default function WorkOrderOperationsInTable({
   workOrderId,
   workOrder,
+  onChangeStateWorkOrder,
 }: WorkOrderOperationsInTableProps) {
   const [isPassInspectionPoints, setIsPassInspectionPoints] =
     React.useState(false);
   const [isOperatorInWorkOrder, setIsOperatorInWorkOrder] =
     React.useState(false);
 
+  const workOrderService = new WorkOrderService(
+    process.env.NEXT_PUBLIC_API_BASE_URL!
+  );
+
   const [isLoading, setIsLoading] = useState<{ [key: string]: boolean }>({});
 
-  const { operatorLogged } = useSessionStore((state) => state);
+  const { operatorLogged, loginUser } = useSessionStore((state) => state);
 
   function handleInspectionPoints(workOrderId: string) {
     toggleLoading(workOrderId + "_InspectionPoints");
@@ -33,19 +41,6 @@ export default function WorkOrderOperationsInTable({
     setIsPassInspectionPoints(!isPassInspectionPoints);
     toggleLoading(workOrderId + "_InspectionPoints");
     setIsPassInspectionPoints(!isPassInspectionPoints);
-  }
-
-  function signOrLogoutOperator(workOrderId: string) {
-    toggleLoading(workOrderId + "_Sign");
-    if (operatorLogged !== undefined) {
-      startOrFinalizeTimeOperation(
-        workOrder.workOrderOperatorTimes!,
-        workOrderId,
-        operatorLogged.idOperatorLogged
-      );
-      setIsOperatorInWorkOrder(!isOperatorInWorkOrder);
-    }
-    toggleLoading(workOrderId + "_Sign");
   }
 
   const toggleLoading = (id: string) => {
@@ -73,13 +68,52 @@ export default function WorkOrderOperationsInTable({
     ) {
       const isInWorkOrder = workOrder.workOrderOperatorTimes?.some(
         (time) =>
-          time.operator.id == operatorLogged!.idOperatorLogged &&
+          time.operator.id == operatorLogged?.idOperatorLogged &&
           (time.endTime == undefined || time.endTime == null)
       );
       setIsOperatorInWorkOrder(isInWorkOrder);
     }
   }, []);
-  if (workOrder.stateWorkOrder != StateWorkOrder.Finished)
+
+  async function handleChangeStateWorkOrder(state: StateWorkOrder) {
+    toggleLoading(
+      workOrderId +
+        (state === StateWorkOrder.PendingToValidate ? "_Validate" : "_Sign")
+    );
+
+    if (!operatorLogged) {
+      alert("Has de tenir un operari fitxat per fer aquesta acció");
+      return;
+    }
+    if (workOrder.stateWorkOrder == state) {
+      return;
+    }
+
+    const update: UpdateStateWorkOrder = {
+      workOrderId: workOrder.id,
+      state: state,
+      operatorId: operatorLogged?.idOperatorLogged,
+      userId: loginUser?.agentId,
+    };
+    await workOrderService.updateStateWorkOrder(update).then((response) => {
+      if (response) {
+        if (state !== StateWorkOrder.PendingToValidate) {
+          setIsOperatorInWorkOrder(!isOperatorInWorkOrder);
+        }
+
+        workOrder.stateWorkOrder = state;
+        onChangeStateWorkOrder && onChangeStateWorkOrder();
+      } else {
+        //     setErrorMessage("Error actualitzant el treball");
+      }
+    });
+    toggleLoading(
+      workOrderId +
+        (state === StateWorkOrder.PendingToValidate ? "_Validate" : "_Sign")
+    );
+  }
+
+  if (workOrder.stateWorkOrder !== StateWorkOrder.Finished)
     return (
       <div className="flex gap-2 items-center bg-">
         <Button
@@ -87,14 +121,49 @@ export default function WorkOrderOperationsInTable({
             isOperatorInWorkOrder ? "bg-emerald-700" : "bg-rose-700"
           } hover:${
             isOperatorInWorkOrder ? "bg-emerald-900" : "bg-rose-900"
-          } text-white py-2 px-4 rounded flex gap-2`}
+          } text-white py-1 px-1 rounded flex gap-1StateWorkOrder`}
           onClick={() => {
-            signOrLogoutOperator(workOrderId);
+            isOperatorInWorkOrder
+              ? handleChangeStateWorkOrder(StateWorkOrder.Paused)
+              : handleChangeStateWorkOrder(StateWorkOrder.OnGoing);
+          }}
+          disabled={
+            workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
+          }
+        >
+          {isLoading[workOrderId + "_Sign"] ? (
+            <SvgSpinner className="w-6 h-6 text-white" />
+          ) : isOperatorInWorkOrder ? (
+            <SvgPause />
+          ) : (
+            <SvgStart />
+          )}
+        </Button>
+
+        <Button
+          customStyles={`${
+            workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
+              ? "bg-emerald-700"
+              : "bg-rose-700"
+          } hover:${
+            workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
+              ? "bg-emerald-900 pointer-events-none"
+              : "bg-rose-900"
+          } text-white py-1 px-1 rounded flex gap-1`}
+          className={`${
+            workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate &&
+            "pointer-events-none"
+          }`}
+          onClick={() => {
+            if (workOrder.stateWorkOrder != StateWorkOrder.PendingToValidate) {
+              handleChangeStateWorkOrder(StateWorkOrder.PendingToValidate);
+            }
           }}
         >
-          {isOperatorInWorkOrder ? "S" : "E"}
-          {isLoading[workOrderId + "_Sign"] && (
+          {isLoading[workOrderId + "_Validate"] ? (
             <SvgSpinner className="w-6 h-6" />
+          ) : (
+            <SvgCheck />
           )}
         </Button>
         {workOrder.workOrderType == WorkOrderType.Preventive && (
@@ -111,9 +180,12 @@ export default function WorkOrderOperationsInTable({
                 : "bg-red-700"
             } text-white  py-2 px-4 rounded  flex gap-2`}
           >
-            {isPassInspectionPoints ? "OK" : "KO"}
-            {isLoading[workOrderId + "_InspectionPoints"] && (
+            {isLoading[workOrderId + "_InspectionPoints"] ? (
               <SvgSpinner className="w-6 h-6" />
+            ) : isPassInspectionPoints ? (
+              "OK"
+            ) : (
+              "KO"
             )}
           </Button>
         )}

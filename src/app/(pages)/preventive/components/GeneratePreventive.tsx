@@ -10,11 +10,17 @@ import { formatDate } from "app/utils/utils";
 import { Button } from "designSystem/Button/Buttons";
 import { useState } from "react";
 
+interface PreventiveCreateds {
+  key: Preventive;
+  value: number;
+}
+
 const GeneratePreventive = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [preventivesCreated, setPreventivesCreated] = useState<
     Preventive[] | null
   >([]);
+
   const preventiveService = new PreventiveService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
@@ -31,7 +37,15 @@ const GeneratePreventive = () => {
     const preventives =
       await preventiveService.CreateWorkOrderPreventivePerDay();
     if (preventives?.length! > 0) {
-      setPreventivesCreated(preventives);
+      const prevCreat: PreventiveCreateds[] = [];
+      preventives?.forEach((x) => {
+        if (prevCreat.find((y) => y.key.id === x.id)) {
+          prevCreat.find((y) => y.key.id === x.id)!.value++;
+        } else {
+          prevCreat.push({ key: x, value: 0 });
+        }
+      });
+      setPreventivesCreated(prevCreat.map((x) => x.key));
       workOrderService.cleanCache();
       setTimeout(() => {
         setPreventivesCreated([]);
@@ -48,19 +62,26 @@ const GeneratePreventive = () => {
   if (loginUser?.permission == UserPermission.Administrator)
     return (
       <>
-        <Button type="others" onClick={generateWorkOrders} customStyles="flex">
-          Generar Revisions {formatDate(new Date(), false, false)}
-          {isLoading && <SvgSpinner className="w-6 h-6" />}
-        </Button>
-        <p className="text-black font-bold">
-          {(preventivesCreated?.length || 0 > 0) &&
-            "Revisions creades per avui:"}
-        </p>
-        {preventivesCreated?.map((preventive, index) => (
-          <div key={index}>
-            {preventive.code} - {preventive.description}
-          </div>
-        ))}
+        <div className="flex flex-col gap-1 ">
+          <Button
+            type="others"
+            onClick={generateWorkOrders}
+            customStyles="flex"
+          >
+            Generar Revisions {formatDate(new Date(), false, false)}
+            {isLoading && <SvgSpinner className="w-6 h-6" />}
+          </Button>
+
+          <p className="text-black font-semibold">
+            {(preventivesCreated?.length || 0 > 0) &&
+              "Revisions creades per avui:"}
+          </p>
+          {preventivesCreated?.map((preventive, index) => (
+            <div key={index}>
+              {preventive.code} - {preventive.description}
+            </div>
+          ))}
+        </div>
         {message != "" && <span className="text-red-500">{message}</span>}
       </>
     );

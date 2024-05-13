@@ -268,7 +268,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
             >
               <option value="">-</option>
               {Object.values(StateWorkOrder)
-                .filter((value) => typeof value === "number")
+                .filter((value) => typeof value === "number" && value !== 4)
                 .map((state) => (
                   <option
                     key={state}

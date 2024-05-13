@@ -160,6 +160,7 @@ export interface WorkOrderEvents{
 
 export enum WorkOrderEventType {
   Requested,
+  Waiting,
   Started,
   Paused,
   PendingToValidate,

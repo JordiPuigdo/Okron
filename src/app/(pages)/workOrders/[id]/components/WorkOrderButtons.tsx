@@ -1,4 +1,4 @@
-import { SvgSpinner } from "app/icons/icons";
+import { SvgSpinner, SvgStart } from "app/icons/icons";
 import { UserPermission } from "app/interfaces/User";
 import {
   StateWorkOrder,
@@ -67,18 +67,20 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
     <div className="flex flex-row w-full py-4 justify-start gap-2">
       {workOrder.stateWorkOrder != StateWorkOrder.Finished && (
         <>
-          <Button
-            disabled={workOrder.stateWorkOrder == StateWorkOrder.Waiting}
-            onClick={() => handleChangeStateWorkOrder(StateWorkOrder.Waiting)}
-            type="none"
-            customStyles="flex justify-center items-center bg-okron-waiting h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverPending "
-          >
-            {isLoading[StateWorkOrder.Waiting] ? (
-              <SvgSpinner className="text-white" />
-            ) : (
-              "Pendent"
-            )}
-          </Button>
+          {loginUser?.permission == UserPermission.Administrator && (
+            <Button
+              disabled={workOrder.stateWorkOrder == StateWorkOrder.Waiting}
+              onClick={() => handleChangeStateWorkOrder(StateWorkOrder.Waiting)}
+              type="none"
+              customStyles="flex justify-center items-center bg-okron-waiting h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverPending "
+            >
+              {isLoading[StateWorkOrder.Waiting] ? (
+                <SvgSpinner className="text-white" />
+              ) : (
+                "Pendent"
+              )}
+            </Button>
+          )}
           <Button
             disabled={workOrder.stateWorkOrder == StateWorkOrder.OnGoing}
             onClick={() => handleChangeStateWorkOrder(StateWorkOrder.OnGoing)}
@@ -88,7 +90,7 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
             {isLoading[StateWorkOrder.OnGoing] ? (
               <SvgSpinner className="text-white" />
             ) : (
-              "En Curs"
+              <SvgStart />
             )}
           </Button>
           <Button
@@ -141,7 +143,11 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
             type="none"
             customStyles="flex justify-center items-center bg-orange-500 h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-orange-600 "
           >
-            Reobrir
+            {isLoading[StateWorkOrder.Waiting] ? (
+              <SvgSpinner className="text-white" />
+            ) : (
+              "Reobrir"
+            )}
           </Button>
         )}
     </div>

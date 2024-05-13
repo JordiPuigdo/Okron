@@ -42,7 +42,10 @@ import WorkOrderButtons from "./WorkOrderButtons";
 type WorkOrdeEditFormProps = {
   id: string;
 };
-
+interface TabWO {
+  key: string;
+  permission: UserPermission;
+}
 enum Tab {
   OPERATORTIMES = "Temps Operaris",
   COMMENTS = "Comentaris",
@@ -387,7 +390,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 id="description"
                 name="description"
                 className="p-3 border border-gray-300 rounded-md w-full"
-                disabled={isFinished}
+                disabled={
+                  isFinished ||
+                  loginUser?.permission != UserPermission.Administrator
+                }
                 onKeyPress={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
@@ -407,7 +413,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 id="stateWorkOrder"
                 name="stateWorkOrder"
                 className="p-3 border border-gray-300 rounded-md w-full"
-                disabled={isFinished}
+                disabled={
+                  isFinished ||
+                  loginUser?.permission != UserPermission.Administrator
+                }
               >
                 {Object.values(StateWorkOrder)
                   .filter(
@@ -435,7 +444,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 Data Inici
               </label>
               <DatePicker
-                disabled={isFinished}
+                disabled={
+                  isFinished ||
+                  loginUser?.permission != UserPermission.Administrator
+                }
                 id="startDate"
                 selected={startDate}
                 onChange={(date: Date) => setStartDate(date)}
@@ -466,6 +478,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                   id: aviableOperators.id,
                   description: aviableOperators.description,
                 })}
+                disabled={
+                  isFinished ||
+                  loginUser?.permission != UserPermission.Administrator
+                }
               />
             </div>
           </div>
@@ -490,18 +506,6 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               />
             </>
           )}
-          <div className="flex sm:flex-row py-4">
-            {isFinished &&
-              loginUser?.permission == UserPermission.Administrator && (
-                <button
-                  type="button"
-                  className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded sm:ml-2 flex items-center"
-                >
-                  Reobrir Ordre
-                  {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-                </button>
-              )}
-          </div>
         </form>
       </>
     );
@@ -517,7 +521,23 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     } else if (currentWorkOrder?.workOrderType === WorkOrderType.Preventive) {
       return tab !== Tab.SPAREPARTS;
     }
-    return true;
+  });
+
+  const [sortOrder, setSortOrder] = useState("asc");
+  const toggleSortOrder = () => {
+    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
+    setSortOrder(newSortOrder);
+  };
+
+  const sortedEvents = [...workOrderEvents].sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+
+    if (sortOrder === "asc") {
+      return dateA - dateB;
+    } else {
+      return dateB - dateA;
+    }
   });
 
   if (!currentWorkOrder) return <>Carregant Dades</>;
@@ -586,31 +606,36 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         {currentWorkOrder &&
           activeTab === Tab.EVENTSWORKORDER &&
           loginUser?.permission == UserPermission.Administrator && (
-            <div className="flex flex-col  bg-gray-100 rounded-lg shadow-md justify-start ">
+            <div
+              className="flex flex-col  bg-gray-100 rounded-lg shadow-md justify-start"
+              onClick={toggleSortOrder}
+            >
               <div className="flex flex-row gap-4 p-4">
-                <div className="text-gray-600 font-semibold w-[10%]">
-                  Data Acció
+                <div className="text-gray-600 font-semibold text-lg w-[20%]">
+                  Data Acció {sortOrder === "asc" ? "▲" : "▼"}
                 </div>
-                <div className="text-gray-600 font-semibold w-[10%]">Acció</div>
-                <div className="text-gray-600 font-semibold w-[10%]">
+                <div className="text-gray-600 font-semibold w-[20%] text-lg">
+                  Acció
+                </div>
+                <div className="text-gray-600 font-semibold w-[20%] text-lg">
                   Operari
                 </div>
               </div>
-              {workOrderEvents.map((x, index) => {
+              {sortedEvents.map((x, index) => {
                 return (
                   <div
                     key={index}
-                    className={`flex flex-row gap-4 p-4 rounded-lg ${
+                    className={`flex flex-row gap-4 p-4 rounded-lg items-center ${
                       index % 2 == 0 ? "bg-gray-200" : ""
                     }`}
                   >
-                    <div className="text-gray-600 w-[10%]">
+                    <div className="text-gray-600 w-[20%]">
                       {formatDate(x.date)}
                     </div>
-                    <div className=" w-[10%]">
+                    <div className=" w-[20%]">
                       {translateWorkOrderEventType(x.workOrderEventType)}
                     </div>
-                    <div className="w-[10%]">{x.operator.name}</div>
+                    <div className="w-[20%]">{x.operator.name}</div>
                   </div>
                 );
               })}

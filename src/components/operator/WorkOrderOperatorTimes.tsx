@@ -55,7 +55,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
       setIsLoading(false);
       return;
     } else {
-      op = operators.find((x) => x.code === operatorLogged!.codeOperatorLogged);
+      op = operators.find((x) => x.code === operatorLogged?.codeOperatorLogged);
     }
 
     const last = workOrderOperatortimes.find(
@@ -113,7 +113,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
     } else {
       if (!op)
         op = operators.find(
-          (x) => x.code === operatorLogged!.codeOperatorLogged
+          (x) => x.code === operatorLogged?.codeOperatorLogged
         );
     }
     const last = workOrderOperatortimes.find(

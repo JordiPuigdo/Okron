@@ -111,12 +111,12 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
     }));
   };
 
-  function handleAllChecksOk() {
+  async function handleAllChecksOk() {
     setIsLoading((prevLoadingMap) => ({
       ...prevLoadingMap,
       ["OK"]: true,
     }));
-    const result = checkAllInspectionPoints(
+    const result = await checkAllInspectionPoints(
       workOrderInspectionPoints,
       workOrderId
     );
