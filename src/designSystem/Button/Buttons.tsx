@@ -109,6 +109,7 @@ const ButtonBody = ({
     "bg-gray-200 text-gray-500 hover:bg-gray-200 hover:text-gray-500 cursor:default";
 
   const STYLES: any = {
+    common: "transition-all relative text-center rounded-full",
     none: "",
     create:
       "bg-okron-btCreate text-white px-4 py-2 rounded-md hover:bg-okron-btCreateHover focus:outline-none focus:ring focus:border-blue-300",
@@ -119,15 +120,24 @@ const ButtonBody = ({
       "bg-okron-btnCancel text-white px-4 py-2 rounded-md hover:bg-okron-btnCancelHover focus:outline-none focus:ring focus:border-blue-300",
     others:
       "bg-orange-500 text-white p-2 rounded-md hover:bg-orange-600 items-center gap-2",
+    detail:
+      "text-center text-white p-1 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover",
     sm: "items-center text-xs font-medium h-[32px] px-4",
     md: "items-center font-medium h-[40px] px-4",
     lg: "items-center text-md font-semibold h-[48px] px-6",
-    xl: "items-center h-[60px] text-md font-semibold px-6",
+    xl: `${
+      type === "create" ? "h-[64px] text-lg" : "h-[60px] text-md"
+    } font-semibold px-6`,
   };
+
   const styles = twMerge(
     `${STYLES.common} ${STYLES[type]} ${STYLES[size]} ${customStyles} ${
       disabled ? DISABLED_STYLES : customStyles
     }`
   );
-  return <div className={`${styles} `}>{children}</div>;
+  return (
+    <div id={id} className={`justify-center items-center ${styles} `} {...rest}>
+      {children}
+    </div>
+  );
 };

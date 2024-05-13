@@ -21,7 +21,7 @@ export default function WorkOrderComponent() {
           enableEdit={false}
           enableFilters={false}
           operatorId={operatorId}
-          enableDetail={true}
+          enableDetail={false}
         />
       ) : (
         <></>
