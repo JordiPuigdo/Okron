@@ -174,6 +174,7 @@ const SparePartForm: React.FC<SparePartForm> = ({ sparePartLoaded }) => {
             Preu
           </label>
           <input
+            defaultValue={sparePart?.price || 0}
             {...register("price")}
             className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
           />
@@ -194,6 +195,7 @@ const SparePartForm: React.FC<SparePartForm> = ({ sparePartLoaded }) => {
           </label>
           <input
             type="checkbox"
+            defaultChecked={sparePart?.active || true}
             {...register("active")}
             className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
           />
