@@ -1,11 +1,13 @@
 import {
   SvgCheck,
+  SvgDelete,
   SvgDetail,
   SvgPause,
   SvgSparePart,
   SvgSpinner,
   SvgStart,
 } from "app/icons/icons";
+import { UserPermission } from "app/interfaces/User";
 import WorkOrder, {
   StateWorkOrder,
   UpdateStateWorkOrder,
@@ -246,6 +248,27 @@ export default function WorkOrderOperationsInTable({
             )}
           </Button>
         </div>
+        {loginUser?.permission == UserPermission.Administrator && (
+          <div className="flex-grow rounded items-center text-center justify-end">
+            <Button
+              type="delete"
+              onClick={() => {
+                toggleLoading(workOrderId + "_Detail");
+              }}
+              href={`${Routes.workOrders + "/" + workOrder.id}`}
+            >
+              {isLoading[workOrderId + "_Detail"] ? (
+                <div className="flex">
+                  <SvgSpinner className="w-6 h-6" />
+                </div>
+              ) : (
+                <div className="flex">
+                  <SvgDelete />
+                </div>
+              )}
+            </Button>
+          </div>
+        )}
       </div>
     );
   else return <></>;

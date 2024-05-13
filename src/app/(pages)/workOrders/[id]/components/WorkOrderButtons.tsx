@@ -64,7 +64,7 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
   }
 
   return (
-    <div className="flex flex-row w-full py-4 justify-start gap-2">
+    <div className="flex flex-row w-full py-4 justify-center gap-2">
       {workOrder.stateWorkOrder != StateWorkOrder.Finished && (
         <>
           {loginUser?.permission == UserPermission.Administrator && (
@@ -123,19 +123,7 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
           </Button>
         </>
       )}
-      {loginUser?.permission == UserPermission.Administrator && (
-        <Button
-          onClick={() => handleSubmit()}
-          type="create"
-          customStyles="flex justify-center items-center h-24 w-24 rounded-xl shadow-md text-white font-semibold "
-        >
-          {isLoading["UPDATE"] ? (
-            <SvgSpinner className="text-white" />
-          ) : (
-            "Actualitzar"
-          )}
-        </Button>
-      )}
+
       {workOrder.stateWorkOrder == StateWorkOrder.Finished &&
         loginUser?.permission == UserPermission.Administrator && (
           <Button

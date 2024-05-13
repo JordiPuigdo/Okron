@@ -38,6 +38,7 @@ import ChooseElement from "components/ChooseElement";
 import { CostsObject } from "components/Costs/CostsObject";
 import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspectionPoint";
 import WorkOrderButtons from "./WorkOrderButtons";
+import { Button } from "designSystem/Button/Buttons";
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -330,7 +331,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   }
   const renderHeader = () => {
     return (
-      <div className="flex p-4 items-center flex-col sm:flex-row bg-white rounded-xl shadow-md">
+      <div className="flex p-4 items-center flex-col sm:flex-row bg-white rounded shadow-md border-2 border-blue-900">
         <div
           className="cursor-pointer mb-4 sm:mb-0"
           onClick={() => router.back()}
@@ -374,7 +375,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       <>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="bg-white rounded-lg my-8 p-8 shadow-md"
+          className="bg-white flex-grow rounded-lg p-4 shadow-md"
         >
           <div className="flex flex-row gap-8 w-full">
             <div className="w-full">
@@ -400,8 +401,6 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                   }
                 }}
               />
-            </div>
-            <div className="w-full">
               <label
                 htmlFor="stateWorkOrder"
                 className="block text-xl font-medium text-gray-700 mb-2"
@@ -485,27 +484,17 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               />
             </div>
           </div>
-          <div className="sticky gap-4 py-4 z-10">
-            {totalCosts > 0 &&
-              loginUser?.permission == UserPermission.Administrator && (
-                <div className="w-[26%]">
-                  <CostsObject
-                    operatorCosts={operatorCosts}
-                    sparePartCosts={sparePartCosts}
-                    totalCosts={totalCosts}
-                  />
-                </div>
-              )}
+          <div className="py-4">
+            {loginUser?.permission == UserPermission.Administrator && (
+              <Button onClick={() => handleSubmit} type="create">
+                {isLoading ? (
+                  <SvgSpinner className="text-white" />
+                ) : (
+                  "Actualitzar"
+                )}
+              </Button>
+            )}
           </div>
-          {currentWorkOrder && (
-            <>
-              <WorkOrderButtons
-                workOrder={currentWorkOrder}
-                handleReload={fetchWorkOrder}
-                handleSubmit={() => handleSubmitForm()}
-              />
-            </>
-          )}
         </form>
       </>
     );
@@ -544,7 +533,44 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   return (
     <>
       {renderHeader()}
-      {renderForm()}
+      <div className="flex flex-row gap-4 w-full bg-blue-900 p-4 rounded">
+        <div className="py-3 flex-grow">
+          <div>{renderForm()}</div>
+          <div className="flex flex-grow py-3">
+            {totalCosts > 0 &&
+              loginUser?.permission == UserPermission.Administrator && (
+                <div className="flex flex-grow">
+                  <CostsObject
+                    operatorCosts={operatorCosts}
+                    sparePartCosts={sparePartCosts}
+                    totalCosts={totalCosts}
+                  />
+                </div>
+              )}
+          </div>
+        </div>
+        <div className="py-3 gap-2">
+          <div className="bg-white rounded-lg shadow-md p-2">
+            {currentWorkOrder && (
+              <>
+                <WorkOrderButtons
+                  workOrder={currentWorkOrder}
+                  handleReload={fetchWorkOrder}
+                  handleSubmit={() => handleSubmitForm()}
+                />
+              </>
+            )}
+          </div>
+          <div className="pt-2 shadow-md">
+            <WorkOrderOperatorComments
+              workOrderComments={workOrderComments}
+              workOrderId={currentWorkOrder.id}
+              isFinished={isFinished}
+              setWorkOrderComments={setWorkOrderComments}
+            />
+          </div>
+        </div>
+      </div>
 
       <div className="bg-white rounded-xl">
         <div className="p-4 flex gap-1 border-black border-b-2">
