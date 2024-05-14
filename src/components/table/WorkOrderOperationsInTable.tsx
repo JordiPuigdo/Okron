@@ -2,6 +2,7 @@ import {
   SvgCheck,
   SvgDelete,
   SvgDetail,
+  SvgInspectionPoints,
   SvgPause,
   SvgSparePart,
   SvgSpinner,
@@ -126,44 +127,46 @@ export default function WorkOrderOperationsInTable({
 
   if (workOrder.stateWorkOrder !== StateWorkOrder.Finished)
     return (
-      <div className="flex flex-row py-2 px-2 w-full gap-2 justify-center">
-        <div className="flex-grow rounded">
+      <div className="flex w-full gap-2">
+        <Button
+          type="none"
+          onClick={() => {
+            isOperatorInWorkOrder
+              ? handleChangeStateWorkOrder(StateWorkOrder.Paused)
+              : handleChangeStateWorkOrder(StateWorkOrder.OnGoing);
+          }}
+          disabled={
+            workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
+          }
+          className={`${
+            isOperatorInWorkOrder ? "bg-emerald-700" : "bg-rose-700"
+          } hover:${
+            isOperatorInWorkOrder ? "bg-emerald-900" : "bg-rose-900"
+          } text-white p-4 rounded flex gap-1 w-full justify-center items-center `}
+        >
+          {isLoading[workOrderId + "_Sign"] ? (
+            <SvgSpinner className="w-6 h-6 text-white" />
+          ) : isOperatorInWorkOrder ? (
+            <SvgPause className="text-white" />
+          ) : (
+            <SvgStart />
+          )}
+        </Button>
+
+        <div
+          className={`${
+            workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
+              ? "bg-emerald-700"
+              : "bg-rose-700"
+          } hover:${
+            workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
+              ? "bg-emerald-900 pointer-events-none"
+              : "bg-rose-900"
+          } text-white p-4 rounded flex gap-1 w-full justify-center `}
+        >
           <Button
+            type="none"
             customStyles={`${
-              isOperatorInWorkOrder ? "bg-emerald-700" : "bg-rose-700"
-            } hover:${
-              isOperatorInWorkOrder ? "bg-emerald-900" : "bg-rose-900"
-            } text-white px-1 rounded flex gap-1 `}
-            onClick={() => {
-              isOperatorInWorkOrder
-                ? handleChangeStateWorkOrder(StateWorkOrder.Paused)
-                : handleChangeStateWorkOrder(StateWorkOrder.OnGoing);
-            }}
-            disabled={
-              workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
-            }
-          >
-            {isLoading[workOrderId + "_Sign"] ? (
-              <SvgSpinner className="w-6 h-6 text-white" />
-            ) : isOperatorInWorkOrder ? (
-              <SvgPause />
-            ) : (
-              <SvgStart />
-            )}
-          </Button>
-        </div>
-        <div className="flex-grow rounded items-center text-center justify-end">
-          <Button
-            customStyles={`${
-              workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
-                ? "bg-emerald-700"
-                : "bg-rose-700"
-            } hover:${
-              workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
-                ? "bg-emerald-900 pointer-events-none"
-                : "bg-rose-900"
-            } text-white px-1 rounded flex gap-1 `}
-            className={`${
               workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate &&
               "pointer-events-none"
             }`}
@@ -184,54 +187,53 @@ export default function WorkOrderOperationsInTable({
         </div>
 
         {workOrder.workOrderType == WorkOrderType.Corrective && (
-          <div className="flex-grow rounded items-center text-center justify-end">
+          <div className="bg-gray-500 p-4 w-full text-white rounded flex gap-1 justify-center">
             <Button
               disabled={isPassInspectionPoints}
               onClick={() => {
                 handleInspectionPoints(workOrderId);
               }}
-              customStyles={` text-white py-1 px-1 rounded flex gap-1 `}
+              type="none"
             >
               {isLoading[workOrderId + "_InspectionPoints"] ? (
                 <SvgSpinner className="w-6 h-6" />
               ) : (
-                <div className="flex">
-                  <SvgSparePart />
-                </div>
+                <SvgSparePart />
               )}
             </Button>
           </div>
         )}
-
         {workOrder.workOrderType == WorkOrderType.Preventive && (
-          <div className="flex-grow rounded items-center text-center justify-end">
+          <div
+            className={`${
+              isPassInspectionPoints ? "bg-lime-700" : "bg-red-500"
+            } hover:${
+              isPassInspectionPoints
+                ? "bg-gray-700 cursor-not-allowed"
+                : "bg-red-700"
+            } text-white rounded p-4 flex gap-2 justify-center align-middle w-full`}
+          >
             <Button
               disabled={isPassInspectionPoints}
               onClick={() => {
                 handleInspectionPoints(workOrderId);
               }}
-              customStyles={`${
-                isPassInspectionPoints ? "bg-lime-700" : "bg-red-500"
-              } hover:${
-                isPassInspectionPoints
-                  ? "bg-gray-700 cursor-not-allowed"
-                  : "bg-red-700"
-              } text-white rounded py-1 px-2 flex gap-2 justify-center align-middle`}
+              type="none"
+              customStyles="text-xl"
             >
               {isLoading[workOrderId + "_InspectionPoints"] ? (
                 <SvgSpinner className="w-6 h-6" />
-              ) : isPassInspectionPoints ? (
-                "OK"
               ) : (
-                "KO"
+                <SvgInspectionPoints />
               )}
             </Button>
           </div>
         )}
-
-        <div className="flex-grow rounded items-center text-center justify-end">
+        <div
+          className={`bg-okron-btDetail hover:bg-okron-btnDetailHover rounded text-center p-4 w-full`}
+        >
           <Button
-            customStyles={`bg-okron-btDetail hover:bg-okron-btnDetailHover rounded items-center text-center justify-end`}
+            type="none"
             onClick={() => {
               toggleLoading(workOrderId + "_Detail");
             }}
@@ -242,33 +244,10 @@ export default function WorkOrderOperationsInTable({
                 <SvgSpinner className="w-6 h-6" />
               </div>
             ) : (
-              <div className="flex">
-                <SvgDetail />
-              </div>
+              <SvgDetail />
             )}
           </Button>
         </div>
-        {loginUser?.permission == UserPermission.Administrator && (
-          <div className="flex-grow rounded items-center text-center justify-end">
-            <Button
-              type="delete"
-              onClick={() => {
-                toggleLoading(workOrderId + "_Detail");
-              }}
-              href={`${Routes.workOrders + "/" + workOrder.id}`}
-            >
-              {isLoading[workOrderId + "_Detail"] ? (
-                <div className="flex">
-                  <SvgSpinner className="w-6 h-6" />
-                </div>
-              ) : (
-                <div className="flex">
-                  <SvgDelete />
-                </div>
-              )}
-            </Button>
-          </div>
-        )}
       </div>
     );
   else return <></>;

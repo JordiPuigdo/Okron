@@ -160,9 +160,6 @@ export default function InspectionPointsPage() {
   return (
     <MainLayout>
       <Container>
-        <h1 className="text-3xl font-semibold mb-4">
-          Llista de punts d'inspecció
-        </h1>
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
           onClick={toggleFormVisibility}

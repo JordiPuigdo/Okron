@@ -24,6 +24,7 @@ export interface  TableButtons {
     edit? : boolean
     delete? : boolean,
     detail? : boolean
+    
 }
 
 export enum ColumnFormat {

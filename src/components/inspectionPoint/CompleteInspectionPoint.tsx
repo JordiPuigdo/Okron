@@ -128,9 +128,9 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
   }
 
   return (
-    <div className="mx-auto p-4 bg-white rounded-lg shadow-md">
+    <div className="mx-auto p-4 bg-white rounded-lg shadow-md w-full">
       <div
-        className="flex gap-2 p-2 bg-green-500 rounded-xl justify-center font-semibold text-white w-[12%] hover:bg-green-700 cursor-pointer "
+        className="flex gap-2 p-2 bg-green-500 rounded-xl justify-center font-semibold text-white w-[20%] hover:bg-green-700 cursor-pointer "
         onClick={(e) => {
           handleAllChecksOk();
         }}

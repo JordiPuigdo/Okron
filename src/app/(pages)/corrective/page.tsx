@@ -237,6 +237,7 @@ function CorrectivePage() {
       <MainLayout>
         <Container>
           <div className=" bg-white rounded-xl p-4 mt-6">
+            <p className="text-2xl font-bold text-black">Nova Avaria</p>
             <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
               <div className="flex flex-col sm:flex-row">
                 <div className="mb-6 sm:w-1/2">

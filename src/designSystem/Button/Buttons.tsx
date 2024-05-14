@@ -71,10 +71,10 @@ export const Button = ({
 
   return (
     <button
-      className={`transition-all relative group overflow-visible ${className} ${
-        disabled && "hover:cursor-default"
-      }`}
-      onClick={handleClick}
+      className={twMerge(
+        `transition-all relative group overflow-visible ${className}`
+      )}
+      onClick={onClick}
       type={rest?.isSubmit ? "submit" : "button"}
     >
       <ButtonBody
@@ -112,7 +112,7 @@ const ButtonBody = ({
 
   const STYLES: any = {
     common: "transition-all relative text-center rounded-full",
-    none: "",
+    none: " ",
     create:
       "bg-okron-btCreate text-white px-4 py-2 rounded-md hover:bg-okron-btCreateHover focus:outline-none focus:ring focus:border-blue-300",
     edit: "bg-okron-btEdit text-white px-4 py-2 rounded-md hover:bg-okron-btEditHover focus:outline-none focus:ring focus:border-blue-300",
@@ -134,11 +134,11 @@ const ButtonBody = ({
 
   const styles = twMerge(
     `${STYLES.common} ${STYLES[type]} ${STYLES[size]} ${customStyles} ${
-      disabled ? DISABLED_STYLES : customStyles
+      disabled ? DISABLED_STYLES : ""
     }`
   );
   return (
-    <div id={id} className={`justify-center items-center ${styles} `} {...rest}>
+    <div id={id} className={` ${styles} `} {...rest}>
       {children}
     </div>
   );

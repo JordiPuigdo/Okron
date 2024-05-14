@@ -2,7 +2,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Pagination from "./Pagination";
 import Link from "next/link";
-import { SvgSpinner } from "app/icons/icons";
+import { SvgDelete, SvgDetail, SvgSpinner } from "app/icons/icons";
 import { Column, ColumnFormat, Filters, TableButtons } from "./interfaceTable";
 import FiltersComponent from "./FiltersComponent";
 import {
@@ -279,14 +279,14 @@ const DataTable: React.FC<DataTableProps> = ({
 
   const renderTableButtons = (item: any) => {
     return (
-      <td className="flex-col justify-center items-center text-center py-5">
+      <td className="p-2">
         {loginUser?.permission == UserPermission.Administrator &&
           entity !== EntityTable.WORKORDER && (
-            <div className="flex flex-row gap-2 p-2 justify-center border-b-2">
+            <div className="flex flex-row gap-2 justify-center">
               {tableButtons.edit && (
                 <Link href={`${pathName}/${item[columns[0].key]}`}>
                   <p
-                    className="flex items-center font-medium text-white p-2 rounded-xl bg-okron-btEdit hover:bg-okron-btEditHover"
+                    className="flex items-center font-medium text-white rounded-xl bg-okron-btEdit hover:bg-okron-btEditHover"
                     onClick={() => {
                       toggleLoading(
                         item[columns[0].key],
@@ -295,32 +295,29 @@ const DataTable: React.FC<DataTableProps> = ({
                       );
                     }}
                   >
-                    Editar
                     {loadingState[
                       item[columns[0].key] + "_" + ButtonTypesTable.Edit
-                    ] && (
-                      <span className="ml-2 text-white">
-                        <SvgSpinner className="w-6 h-6" />
-                      </span>
+                    ] ? (
+                      <SvgSpinner className="p-2" />
+                    ) : (
+                      <SvgDetail className="p-2" />
                     )}
                   </p>
                 </Link>
               )}
               {tableButtons.delete && (
-                <button
-                  type="button"
-                  className="flex items-center font-medium text-white p-2 rounded-xl bg-okron-btDelete hover:bg-okron-btDeleteHover"
+                <div
+                  className="flex items-center text-white rounded-xl bg-okron-btDelete hover:bg-okron-btDeleteHover"
                   onClick={() => handleDelete(item[columns[0].key])}
                 >
-                  Eliminar
                   {loadingState[
                     item[columns[0].key] + "_" + ButtonTypesTable.Delete
-                  ] && (
-                    <span className="ml-2 text-white">
-                      <SvgSpinner className="w-6 h-6" />
-                    </span>
+                  ] ? (
+                    <SvgSpinner className="p-2" />
+                  ) : (
+                    <SvgDelete className="p-2" />
                   )}
-                </button>
+                </div>
               )}
               {tableButtons.detail && (
                 <Link href={`${pathDetail}/${item[columns[0].key]}`}>
@@ -361,9 +358,9 @@ const DataTable: React.FC<DataTableProps> = ({
               <SvgSpinner className="w-full justify-center" />
             ) : (
               <div className="flex-grow overflow-auto">
-                <table className="w-full text-left text-lg">
+                <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="border-t border-gray-200 pt-2">
+                    <tr className="border-t border-gray-200 flex-grow">
                       {columns.map((column) => {
                         if (column.key.toLocaleUpperCase() !== "ID") {
                           let classname = "flex";
@@ -416,7 +413,7 @@ const DataTable: React.FC<DataTableProps> = ({
                                 column.key
                               );
                               let className = "font-normal ";
-                              let classNametd = " p-4 relative ";
+                              let classNametd = "p-2";
 
                               const formatColumn =
                                 column.format.toLocaleUpperCase();

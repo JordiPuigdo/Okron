@@ -572,7 +572,38 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl">
+      <div className="bg-blue-900 p-4 rounded-lg shadow-md flex gap-2 my-2">
+        <div>
+          <WorkOrderOperatorTimesComponent
+            operators={aviableOperators!}
+            workOrderOperatortimes={workOrderOperatorTimes}
+            setWorkOrderOperatortimes={setworkOrderOperatorTimes}
+            workOrderId={currentWorkOrder.id}
+            isFinished={isFinished}
+          />
+        </div>
+        <div className="flex-grow">
+          {currentWorkOrder.workOrderType === WorkOrderType.Preventive && (
+            <CompleteInspectionPoints
+              workOrderInspectionPoints={passedInspectionPoints!}
+              setCompletedWorkOrderInspectionPoints={setPassedInspectionPoints}
+              workOrderId={currentWorkOrder.id}
+              isFinished={isFinished}
+            />
+          )}
+          {currentWorkOrder.workOrderType === WorkOrderType.Corrective && (
+            <ChooseSpareParts
+              availableSpareParts={availableSpareParts}
+              selectedSpareParts={selectedSpareParts}
+              setSelectedSpareParts={setSelectedSpareParts}
+              WordOrderId={currentWorkOrder.id}
+              isFinished={isFinished}
+            />
+          )}
+        </div>
+      </div>
+
+      {/*  <div className="bg-white rounded-xl">
         <div className="p-4 flex gap-1 border-black border-b-2">
           {availableTabs.map((tab) => (
             <p
@@ -667,7 +698,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               })}
             </div>
           )}
-      </div>
+      </div>*/}
     </>
   );
 };
