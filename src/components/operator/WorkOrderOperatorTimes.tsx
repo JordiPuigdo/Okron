@@ -9,7 +9,11 @@ import {
 import Operator from "app/interfaces/Operator";
 import { formatDate } from "app/utils/utils";
 import WorkOrderService from "app/services/workOrderService";
-import { SvgSpinner } from "app/icons/icons";
+import {
+  SvgLoginOperator,
+  SvgLogoutOperator,
+  SvgSpinner,
+} from "app/icons/icons";
 import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
 import { set } from "react-hook-form";
@@ -334,7 +338,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
     <div className="mx-auto p-4 bg-white rounded-lg">
       <div className=" flex flex-col mt-6 ">
         <div className="flex space-x-4 py-4 items-center">
-          <span className="text-lg font-bold">Codi Operari</span>
+          <span className="text-sm font-bold">Codi</span>
           <input
             type="text"
             value={codeOperator}
@@ -359,7 +363,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                 : "bg-blue-500  hover:bg-blue-600 focus:bg-blue-600"
             } px-4 py-2 text-white rounded-md focus:outline-none  flex items-center`}
           >
-            Entrar
+            <SvgLoginOperator className="w-6 h-6" />
             {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </button>
           <button
@@ -372,7 +376,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                 : "bg-red-500 hover:bg-red-600 focus:bg-red-600"
             } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
           >
-            Sortir
+            <SvgLogoutOperator className="w-6 h-6" />
             {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
           </button>
           <button
@@ -387,7 +391,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
             }}
             disabled={isFinished}
           >
-            Entrada Manual
+            Manual
           </button>
           {enterManualTime && (
             <>
@@ -404,9 +408,6 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
         </div>
       </div>
       <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
-      <div className="bg-white w-full text-center p-4 rounded-md border-2 border-gray-40 mt-6">
-        <span className="text-xl font-bold">Registres</span>
-      </div>
       <div className="mt-6">
         <div className="overflow-x-auto mt-6">
           <table className="min-w-full divide-y divide-gray-200">
@@ -414,32 +415,32 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
               <tr>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider"
+                  className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Entrada
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider"
+                  className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Sortida
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider"
+                  className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Temps Total
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider"
+                  className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Operari
                 </th>
                 {loginUser?.permission == UserPermission.Administrator && (
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider"
+                    className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Accions
                   </th>
@@ -456,13 +457,13 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                       : "bg-gray-300"
                   }`}
                 >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-lg text-gray-900 flex flex-col">
+                  <td className="p-2 whitespace-nowrap">
+                    <div className="text-sm text-gray-900 flex flex-col">
                       {formatDate(time.startTime.toLocaleString())}
                       {editingIndex === index && (
                         <input
                           type="text"
-                          className="text-lg text-gray-900 w-full border-0"
+                          className="text-sm text-gray-900 w-full border-0"
                           value={editedStartTime}
                           onChange={(e) => {
                             setEditedStartTime(e.target.value);
@@ -471,8 +472,8 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-lg text-gray-900 flex flex-col">
+                  <td className="p-2 whitespace-nowrap">
+                    <div className="text-sm text-gray-900 flex flex-col">
                       {formatDate(time.endTime?.toLocaleString())}
                       {editingIndex === index &&
                         formatDate(time.endTime?.toLocaleString()) !== null && (
@@ -487,13 +488,13 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                         )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-lg text-gray-900">
+                  <td className="p-2 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
                       {time.totalTime}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-lg text-gray-900 font-bold">
+                  <td className="p-2 whitespace-nowrap">
+                    <div className="text-sm text-gray-900 font-bold">
                       {time.operator.name}
                     </div>
                   </td>
@@ -562,7 +563,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
             <tfoot className="bg-white divide-y divide-gray-200">
               <tr>
                 <td colSpan={2}></td>
-                <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900 font-bold">
+                <td className=" whitespace-nowrap text-sm text-gray-900 font-bold">
                   Temps Total
                 </td>
                 <td
@@ -571,7 +572,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                       ? 3
                       : 2
                   }
-                  className="px-6 py-4 whitespace-nowrap text-lg text-gray-900 font-bold"
+                  className="p-2 whitespace-nowrap text-sm text-gray-900 font-bold"
                 >
                   {totalFormatted}
                 </td>
@@ -585,7 +586,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                         : 3
                     }
                   ></td>
-                  <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-900 font-bold">
+                  <td className="p-2 whitespace-nowrap text-sm text-gray-900 font-bold">
                     {operators.find((op) => op.id === operatorId)?.name}:{" "}
                     {totalTimes[operatorId]}
                   </td>

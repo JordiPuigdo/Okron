@@ -128,9 +128,9 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
   }
 
   return (
-    <div className="mx-auto p-4 bg-white rounded-lg shadow-md w-full">
+    <div className="mx-auto p-2 bg-white rounded-lg shadow-md w-full">
       <div
-        className="flex gap-2 p-2 bg-green-500 rounded-xl justify-center font-semibold text-white w-[20%] hover:bg-green-700 cursor-pointer "
+        className="flex gap-2 p-2 bg-green-500 rounded-xl justify-center font-semibold text-white  hover:bg-green-700 cursor-pointer "
         onClick={(e) => {
           handleAllChecksOk();
         }}
@@ -142,9 +142,9 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
         <table className="w-full table-auto">
           <thead className="bg-gray-100">
             <tr>
-              <th className="py-2 px-4 font-bold text-lg">Check</th>
-              <th className="py-2 px-4 font-bold text-lg">Punt de inspecció</th>
-              <th className="py-2 px-4 font-bold text-lg">Reset</th>
+              <th className="p-2 font-bold text-sm">Check</th>
+              <th className="p-2 font-bold text-sm">Punt de inspecció</th>
+              <th className="p-2 font-bold text-sm">Reset</th>
             </tr>
           </thead>
 
@@ -160,7 +160,7 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
                     : "bg-orange-100"
                 }
               >
-                <td className="py-2 px-4 text-center align-middle">
+                <td className="p-2 text-center align-middle">
                   <input
                     disabled={isFinished}
                     type="checkbox"
@@ -174,11 +174,11 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
                     className="w-6 h-6 cursor-pointer"
                   />
                 </td>
-                <td className="py-2 px-4 text-center align-middle text-lg">
+                <td className="p-2 text-center align-middle text-sm">
                   {inspectionPoint.inspectionPoint.description}
                 </td>
                 <td
-                  className="py-2 px-4 text-center align-middle"
+                  className="p-2 text-center align-middle"
                   onClick={() => {
                     handleResetInspectionPoint(inspectionPoint);
                   }}
