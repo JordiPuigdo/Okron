@@ -1,4 +1,4 @@
-import { SvgSpinner, SvgStart } from "app/icons/icons";
+import { SvgCheck, SvgPause, SvgSpinner, SvgStart } from "app/icons/icons";
 import { UserPermission } from "app/interfaces/User";
 import {
   StateWorkOrder,
@@ -64,7 +64,7 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
   }
 
   return (
-    <div className="flex flex-row w-full py-4 justify-center gap-2">
+    <div className="flex gap-2">
       {workOrder.stateWorkOrder != StateWorkOrder.Finished && (
         <>
           {loginUser?.permission == UserPermission.Administrator && (
@@ -102,7 +102,7 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
             {isLoading[StateWorkOrder.Paused] ? (
               <SvgSpinner className="text-white" />
             ) : (
-              "Pausar"
+              <SvgPause />
             )}
           </Button>
           <Button
@@ -118,7 +118,7 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
             {isLoading[StateWorkOrder.PendingToValidate] ? (
               <SvgSpinner className="text-white" />
             ) : (
-              "Validació Pendent"
+              <SvgCheck />
             )}
           </Button>
         </>

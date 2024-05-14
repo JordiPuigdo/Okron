@@ -377,7 +377,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           onSubmit={handleSubmit(onSubmit)}
           className="bg-white flex-grow rounded-lg p-4 shadow-md"
         >
-          <div className="flex flex-row gap-8 w-full">
+          <div className="flex flex-col gap-8 w-full">
             <div className="w-full">
               <label
                 htmlFor="description"
@@ -401,6 +401,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                   }
                 }}
               />
+            </div>
+            <div>
               <label
                 htmlFor="stateWorkOrder"
                 className="block text-xl font-medium text-gray-700 mb-2"
@@ -533,7 +535,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   return (
     <>
       {renderHeader()}
-      <div className="flex flex-row gap-4 w-full bg-blue-900 p-4 rounded">
+      <div className="flex flex-row gap-2 w-full rounded">
         <div className="py-3 flex-grow">
           <div>{renderForm()}</div>
           <div className="flex flex-grow py-3">
@@ -549,7 +551,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               )}
           </div>
         </div>
-        <div className="py-3 gap-2">
+        <div className="py-3 ">
           <div className="bg-white rounded-lg shadow-md p-2">
             {currentWorkOrder && (
               <>
@@ -558,16 +560,15 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                   handleReload={fetchWorkOrder}
                   handleSubmit={() => handleSubmitForm()}
                 />
+
+                <WorkOrderOperatorComments
+                  workOrderComments={workOrderComments}
+                  workOrderId={currentWorkOrder.id}
+                  isFinished={isFinished}
+                  setWorkOrderComments={setWorkOrderComments}
+                />
               </>
             )}
-          </div>
-          <div className="pt-2 shadow-md">
-            <WorkOrderOperatorComments
-              workOrderComments={workOrderComments}
-              workOrderId={currentWorkOrder.id}
-              isFinished={isFinished}
-              setWorkOrderComments={setWorkOrderComments}
-            />
           </div>
         </div>
       </div>
