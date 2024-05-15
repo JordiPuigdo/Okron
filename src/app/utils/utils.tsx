@@ -17,7 +17,7 @@ export const translateStateWorkOrder = (state: any): string => {
     case StateWorkOrder.Finished:
       return "Finalitzada";
     case StateWorkOrder.PendingToValidate:
-      return "Pdt. Validació";
+      return "Pendent Validar";
     case StateWorkOrder.Requested:
       return "Sol·licitat";
     default:

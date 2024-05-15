@@ -18,7 +18,6 @@ import WorkOrderService from "app/services/workOrderService";
 import { useSessionStore } from "app/stores/globalStore";
 import useRoutes from "app/utils/useRoutes";
 import { checkAllInspectionPoints } from "app/utils/utilsInspectionPoints";
-import { startOrFinalizeTimeOperation } from "app/utils/utilsOperator";
 import { Button } from "designSystem/Button/Buttons";
 import React, { useEffect, useState } from "react";
 
@@ -34,8 +33,6 @@ export default function WorkOrderOperationsInTable({
   onChangeStateWorkOrder,
 }: WorkOrderOperationsInTableProps) {
   const [isPassInspectionPoints, setIsPassInspectionPoints] =
-    React.useState(false);
-  const [isOperatorInWorkOrder, setIsOperatorInWorkOrder] =
     React.useState(false);
 
   const workOrderService = new WorkOrderService(
@@ -73,18 +70,6 @@ export default function WorkOrderOperationsInTable({
           : false;
       setIsPassInspectionPoints(allInspectionPointsChecked ?? false);
     }
-
-    if (
-      workOrder.workOrderOperatorTimes !== undefined &&
-      workOrder.workOrderOperatorTimes.filter((x) => x.endTime !== undefined)
-    ) {
-      const isInWorkOrder = workOrder.workOrderOperatorTimes?.some(
-        (time) =>
-          time.operator.id == operatorLogged?.idOperatorLogged &&
-          (time.endTime == undefined || time.endTime == null)
-      );
-      setIsOperatorInWorkOrder(isInWorkOrder);
-    }
   }, []);
 
   async function handleChangeStateWorkOrder(state: StateWorkOrder) {
@@ -109,10 +94,6 @@ export default function WorkOrderOperationsInTable({
     };
     await workOrderService.updateStateWorkOrder(update).then((response) => {
       if (response) {
-        if (state !== StateWorkOrder.PendingToValidate) {
-          setIsOperatorInWorkOrder(!isOperatorInWorkOrder);
-        }
-
         workOrder.stateWorkOrder = state;
         onChangeStateWorkOrder && onChangeStateWorkOrder();
       } else {
@@ -125,13 +106,19 @@ export default function WorkOrderOperationsInTable({
     );
   }
 
-  if (workOrder.stateWorkOrder !== StateWorkOrder.Finished)
+  const validStates = [
+    StateWorkOrder.Waiting,
+    StateWorkOrder.OnGoing,
+    StateWorkOrder.Paused,
+  ];
+
+  if (validStates.includes(workOrder.stateWorkOrder))
     return (
       <div className="flex w-full gap-2">
         <Button
           type="none"
           onClick={() => {
-            isOperatorInWorkOrder
+            workOrder.stateWorkOrder == StateWorkOrder.OnGoing
               ? handleChangeStateWorkOrder(StateWorkOrder.Paused)
               : handleChangeStateWorkOrder(StateWorkOrder.OnGoing);
           }}
@@ -139,14 +126,18 @@ export default function WorkOrderOperationsInTable({
             workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
           }
           className={`${
-            isOperatorInWorkOrder ? "bg-emerald-700" : "bg-rose-700"
+            workOrder.stateWorkOrder == StateWorkOrder.OnGoing
+              ? "bg-emerald-700"
+              : "bg-rose-700"
           } hover:${
-            isOperatorInWorkOrder ? "bg-emerald-900" : "bg-rose-900"
-          } text-white p-4 rounded flex gap-1 w-full justify-center items-center `}
+            workOrder.stateWorkOrder == StateWorkOrder.OnGoing
+              ? "bg-emerald-900"
+              : "bg-rose-900"
+          } text-white p-2 rounded flex gap-1 w-full justify-center items-center `}
         >
           {isLoading[workOrderId + "_Sign"] ? (
-            <SvgSpinner className="w-6 h-6 text-white" />
-          ) : isOperatorInWorkOrder ? (
+            <SvgSpinner className="text-white" />
+          ) : workOrder.stateWorkOrder == StateWorkOrder.OnGoing ? (
             <SvgPause className="text-white" />
           ) : (
             <SvgStart />
@@ -162,7 +153,7 @@ export default function WorkOrderOperationsInTable({
             workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
               ? "bg-emerald-900 pointer-events-none"
               : "bg-rose-900"
-          } text-white p-4 rounded flex gap-1 w-full justify-center `}
+          } text-white p-2 rounded flex gap-1 w-full justify-center `}
         >
           <Button
             type="none"
@@ -179,7 +170,7 @@ export default function WorkOrderOperationsInTable({
             }}
           >
             {isLoading[workOrderId + "_Validate"] ? (
-              <SvgSpinner className="w-6 h-6" />
+              <SvgSpinner />
             ) : (
               <SvgCheck />
             )}
@@ -187,7 +178,7 @@ export default function WorkOrderOperationsInTable({
         </div>
 
         {workOrder.workOrderType == WorkOrderType.Corrective && (
-          <div className="bg-gray-500 p-4 w-full text-white rounded flex gap-1 justify-center">
+          <div className="bg-gray-500 p-2 w-full text-white rounded flex gap-1 justify-center">
             <Button
               disabled={isPassInspectionPoints}
               onClick={() => {
@@ -195,8 +186,8 @@ export default function WorkOrderOperationsInTable({
               }}
               type="none"
             >
-              {isLoading[workOrderId + "_InspectionPoints"] ? (
-                <SvgSpinner className="w-6 h-6" />
+              {isLoading[workOrderId + "_SpareParts"] ? (
+                <SvgSpinner />
               ) : (
                 <SvgSparePart />
               )}
@@ -208,21 +199,21 @@ export default function WorkOrderOperationsInTable({
             className={`${
               isPassInspectionPoints ? "bg-lime-700" : "bg-red-500"
             } hover:${
-              isPassInspectionPoints
-                ? "bg-gray-700 cursor-not-allowed"
-                : "bg-red-700"
-            } text-white rounded p-4 flex gap-2 justify-center align-middle w-full`}
+              isPassInspectionPoints ? "cursor-not-allowed" : "bg-red-700"
+            } text-white rounded p-2 flex gap-2 justify-center align-middle w-full`}
           >
             <Button
-              disabled={isPassInspectionPoints}
               onClick={() => {
                 handleInspectionPoints(workOrderId);
               }}
               type="none"
-              customStyles="text-xl"
+              customStyles={`${
+                isPassInspectionPoints ? "cursor-not-allowed" : ""
+              }`}
+              disabled={isPassInspectionPoints}
             >
               {isLoading[workOrderId + "_InspectionPoints"] ? (
-                <SvgSpinner className="w-6 h-6" />
+                <SvgSpinner />
               ) : (
                 <SvgInspectionPoints />
               )}
@@ -230,7 +221,7 @@ export default function WorkOrderOperationsInTable({
           </div>
         )}
         <div
-          className={`bg-okron-btDetail hover:bg-okron-btnDetailHover rounded text-center p-4 w-full`}
+          className={`bg-okron-btDetail hover:bg-okron-btnDetailHover rounded text-center p-2 w-full text-white`}
         >
           <Button
             type="none"
@@ -240,9 +231,7 @@ export default function WorkOrderOperationsInTable({
             href={`${Routes.workOrders + "/" + workOrder.id}`}
           >
             {isLoading[workOrderId + "_Detail"] ? (
-              <div className="flex">
-                <SvgSpinner className="w-6 h-6" />
-              </div>
+              <SvgSpinner />
             ) : (
               <SvgDetail />
             )}
@@ -250,5 +239,20 @@ export default function WorkOrderOperationsInTable({
         </div>
       </div>
     );
-  else return <></>;
+  else
+    return (
+      <div
+        className={`bg-okron-btDetail hover:bg-okron-btnDetailHover rounded text-center p-2 text-white justify-end`}
+      >
+        <Button
+          type="none"
+          onClick={() => {
+            toggleLoading(workOrderId + "_Detail");
+          }}
+          href={`${Routes.workOrders + "/" + workOrder.id}`}
+        >
+          {isLoading[workOrderId + "_Detail"] ? <SvgSpinner /> : <SvgDetail />}
+        </Button>
+      </div>
+    );
 }

@@ -540,7 +540,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           <div>{renderForm()}</div>
           {totalCosts > 0 &&
             loginUser?.permission == UserPermission.Administrator && (
-              <div className="flex flex-grow">
+              <div className="flex flex-grow pt-2">
                 <CostsObject
                   operatorCosts={operatorCosts}
                   sparePartCosts={sparePartCosts}
@@ -570,7 +570,13 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         </div>
       </div>
 
-      <div className="bg-blue-900 p-2 rounded-lg shadow-md flex flex-col md:flex-row gap-2 my-2">
+      <div
+        className={`bg-blue-900 p-2 rounded-lg shadow-md flex gap-2 my-2 ${
+          currentWorkOrder.workOrderType === WorkOrderType.Preventive
+            ? "flex-col md:flex-row "
+            : "flex-col "
+        }`}
+      >
         <div className="flex">
           <WorkOrderOperatorTimesComponent
             operators={aviableOperators!}

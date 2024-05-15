@@ -1,4 +1,10 @@
-import { SvgCheck, SvgPause, SvgSpinner, SvgStart } from "app/icons/icons";
+import {
+  SvgCheck,
+  SvgPause,
+  SvgPending,
+  SvgSpinner,
+  SvgStart,
+} from "app/icons/icons";
 import { UserPermission } from "app/interfaces/User";
 import {
   StateWorkOrder,
@@ -77,7 +83,7 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
               {isLoading[StateWorkOrder.Waiting] ? (
                 <SvgSpinner className="text-white" />
               ) : (
-                "Pendent"
+                <SvgPending />
               )}
             </Button>
           )}

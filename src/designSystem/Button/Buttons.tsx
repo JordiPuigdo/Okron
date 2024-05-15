@@ -74,7 +74,7 @@ export const Button = ({
       className={twMerge(
         `transition-all relative group overflow-visible ${className}`
       )}
-      onClick={onClick}
+      onClick={handleClick}
       type={rest?.isSubmit ? "submit" : "button"}
     >
       <ButtonBody
@@ -108,7 +108,7 @@ const ButtonBody = ({
   id?: string;
 }) => {
   const DISABLED_STYLES =
-    "bg-gray-200 text-gray-500 hover:bg-gray-200 hover:text-gray-500 cursor:default";
+    "bg-gray-200 text-gray-500 hover:bg-gray-200 hover:text-gray-500 cursor:default w-full";
 
   const STYLES: any = {
     common: "transition-all relative text-center rounded-full",

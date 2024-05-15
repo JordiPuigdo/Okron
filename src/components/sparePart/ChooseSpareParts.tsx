@@ -10,6 +10,7 @@ import SparePartService from "app/services/sparePartService";
 import { checkOperatorCreated, isOperatorLogged } from "app/utils/utils";
 import { useSessionStore } from "app/stores/globalStore";
 import WorkOrderService from "app/services/workOrderService";
+import { SvgConsumeSparePart, SvgRestoreSparePart } from "app/icons/icons";
 
 interface ChooseSparePartsProps {
   availableSpareParts: SparePart[];
@@ -151,13 +152,13 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
 
   return (
     <>
-      <div className="mx-auto py-8 bg-white rounded-lg">
-        <div className="flex items-center gap-6 px-4">
+      <div className="flex flex-col flex-grow bg-white rounded-lg p-2 w-full">
+        <div className="flex items-center">
           <input
             disabled={isFinished}
             type="text"
             placeholder="Buscador"
-            className="p-3 mb-4 border border-gray-300 rounded-md"
+            className="p-2 mb-4 border border-gray-300 rounded-md"
             onChange={(e) => filterSpareParts(e.target.value)}
             onKeyPress={(e) => {
               if (e.key === "Enter") {
@@ -166,32 +167,32 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
             }}
           />
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 bg-red-200">
+        <div className="">
+          <table className="min-w-full divide-y divide-gray-200 border-b-2 ">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
+                <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                   Codi
                 </th>
-                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
+                <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                   Descripció
                 </th>
-                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
+                <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                   Proveïdor
                 </th>
-                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
+                <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                   Stock
                 </th>
-                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
+                <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                   Família
                 </th>
-                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
+                <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                   Ubicació
                 </th>
-                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
+                <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                   Unitats
                 </th>
-                <th className="px-6 py-3 text-left text-lg font-medium text-gray-500 uppercase tracking-wider">
+                <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                   Accions
                 </th>
               </tr>
@@ -200,27 +201,26 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
               {filteredSpareParts
                 .filter((x) => x.active)
                 .slice(0, sparePartsLimit)
-                .map((sparePart) => (
-                  <tr key={sparePart.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {sparePart.code}
-                    </td>
-                    <td className="px-6 py-4 whitespace-normal break-all">
+                .map((sparePart, index) => (
+                  <tr
+                    key={sparePart.id}
+                    className={`${index % 2 === 0 ? "" : "bg-gray-100"}`}
+                  >
+                    <td className="p-2 whitespace-nowrap">{sparePart.code}</td>
+                    <td className="p-2 whitespace-normal break-all">
                       {sparePart.description}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="p-2 whitespace-nowrap">
                       {sparePart.refProvider}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {sparePart.stock}
-                    </td>
-                    <td className="px-6 py-4 whitespace-normal break-all">
+                    <td className="p-2 whitespace-nowrap">{sparePart.stock}</td>
+                    <td className="p-2 whitespace-normal break-all">
                       {sparePart.family}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="p-2 whitespace-nowrap">
                       {sparePart.ubication}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="p-2 whitespace-nowrap">
                       <input
                         disabled={isFinished}
                         type="number"
@@ -240,7 +240,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
                         }}
                       />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="p-2 text-center whitespace-nowrap">
                       <button
                         disabled={isFinished}
                         type="button"
@@ -248,7 +248,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
                           isFinished
                             ? "bg-gray-400"
                             : "bg-orange-400 hover:bg-orange-600"
-                        } ml-4 text-white font-semibold py-2 px-4 rounded-md ${
+                        }  text-white font-semibold p-1 rounded-md ${
                           selectedSpareParts.find(
                             (part) => part.id === sparePart.id
                           ) !== undefined
@@ -257,7 +257,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
                         }`}
                         onClick={(e) => consumeSparePart(sparePart)}
                       >
-                        Consumir
+                        <SvgConsumeSparePart className="w-8 h-8" />
                       </button>
                     </td>
                   </tr>
@@ -265,25 +265,28 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
             </tbody>
           </table>
         </div>
-        <div className="text-black ml-4 mt-8">
-          <span className="text-xl font-bold">
+        <div className="text-black p-2">
+          <p className="text-sm font-bold border-b-2 py-2">
             Peçes de recanvi consumides a la ordre
-          </span>
-          <div className="mt-6">
+          </p>
+          <div className="p-2">
             {selectedSpareParts.map((selectedPart) => (
-              <div key={selectedPart.id} className="mb-2 text-black">
-                <span>{selectedPart.sparePart.code}</span>
-                <span>{" - "}</span>
-                <span>{selectedPart.sparePart.description}</span>
-                <span>{" - "}</span>
-                <span className="font-bold">{" Unitats Consumides:"} </span>
+              <div
+                key={selectedPart.id}
+                className=" flex flex-row items-center gap-2"
+              >
+                <p>{selectedPart.sparePart.code}</p>
+                <p>{" - "}</p>
+                <p>{selectedPart.sparePart.description}</p>
+                <p>{" - "}</p>
+                <p className="font-bold">{" Unitats Consumides:"} </p>
                 {selectedPart.quantity}
                 <button
                   disabled={isFinished}
                   type="button"
                   className={`${
                     isFinished ? "bg-gray-400" : " bg-red-600 hover:bg-red-400"
-                  }ml-4 text-white font-semibold py-2 px-4 rounded-md`}
+                  } text-white font-semibold m-2 p-2 rounded-md`}
                   onClick={(e) =>
                     cancelSparePartConsumption(
                       selectedPart.sparePart,
@@ -291,7 +294,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
                     )
                   }
                 >
-                  X
+                  <SvgRestoreSparePart className="w-8 h-8" />
                 </button>
               </div>
             ))}
