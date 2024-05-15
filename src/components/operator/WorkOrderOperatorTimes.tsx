@@ -335,7 +335,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
   }
 
   return (
-    <div className="mx-auto p-4 bg-white rounded-lg">
+    <div className="p-2 bg-white rounded-lg w-full">
       <div className=" flex flex-col mt-6 ">
         <div className="flex space-x-4 py-4 items-center">
           <span className="text-sm font-bold">Codi</span>
@@ -407,196 +407,188 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
           )}
         </div>
       </div>
-      <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
-      <div className="mt-6">
-        <div className="overflow-x-auto mt-6">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
+      <div className="overflow-x-auto ">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th
+                scope="col"
+                className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Entrada
+              </th>
+              <th
+                scope="col"
+                className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Sortida
+              </th>
+              <th
+                scope="col"
+                className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Temps Total
+              </th>
+              <th
+                scope="col"
+                className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Operari
+              </th>
+              {loginUser?.permission == UserPermission.Administrator && (
                 <th
                   scope="col"
                   className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Entrada
+                  Accions
                 </th>
-                <th
-                  scope="col"
-                  className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Sortida
-                </th>
-                <th
-                  scope="col"
-                  className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Temps Total
-                </th>
-                <th
-                  scope="col"
-                  className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Operari
-                </th>
-                {loginUser?.permission == UserPermission.Administrator && (
-                  <th
-                    scope="col"
-                    className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Accions
-                  </th>
-                )}
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {workOrderOperatortimes.map((time, index) => (
-                <tr
-                  key={time.id}
-                  className={` ${
-                    time.endTime === undefined || time.endTime === null
-                      ? "bg-green-300"
-                      : "bg-gray-300"
-                  }`}
-                >
-                  <td className="p-2 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 flex flex-col">
-                      {formatDate(time.startTime.toLocaleString())}
-                      {editingIndex === index && (
+              )}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {workOrderOperatortimes.map((time, index) => (
+              <tr
+                key={time.id}
+                className={` ${
+                  time.endTime === undefined || time.endTime === null
+                    ? "bg-green-300"
+                    : "bg-gray-300"
+                }`}
+              >
+                <td className="p-2 whitespace-nowrap">
+                  <div className="text-sm text-gray-900 flex flex-col">
+                    {formatDate(time.startTime.toLocaleString())}
+                    {editingIndex === index && (
+                      <input
+                        type="text"
+                        className="text-sm text-gray-900 w-full border-0"
+                        value={editedStartTime}
+                        onChange={(e) => {
+                          setEditedStartTime(e.target.value);
+                        }}
+                      />
+                    )}
+                  </div>
+                </td>
+                <td className="p-2 whitespace-nowrap">
+                  <div className="text-sm text-gray-900 flex flex-col">
+                    {formatDate(time.endTime?.toLocaleString())}
+                    {editingIndex === index &&
+                      formatDate(time.endTime?.toLocaleString()) !== null && (
                         <input
                           type="text"
-                          className="text-sm text-gray-900 w-full border-0"
-                          value={editedStartTime}
+                          className="text-lg text-gray-900 w-full border-0"
+                          value={editedEndTime}
                           onChange={(e) => {
-                            setEditedStartTime(e.target.value);
+                            setEditedEndTime(e.target.value);
                           }}
                         />
                       )}
-                    </div>
-                  </td>
-                  <td className="p-2 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 flex flex-col">
-                      {formatDate(time.endTime?.toLocaleString())}
-                      {editingIndex === index &&
-                        formatDate(time.endTime?.toLocaleString()) !== null && (
-                          <input
-                            type="text"
-                            className="text-lg text-gray-900 w-full border-0"
-                            value={editedEndTime}
-                            onChange={(e) => {
-                              setEditedEndTime(e.target.value);
-                            }}
-                          />
-                        )}
-                    </div>
-                  </td>
-                  <td className="p-2 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {time.totalTime}
-                    </div>
-                  </td>
-                  <td className="p-2 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 font-bold">
-                      {time.operator.name}
-                    </div>
-                  </td>
-                  {loginUser?.permission == UserPermission.Administrator && (
-                    <td className="px-6 py-4 whitespace-nowrap align-center flex flex-row gap-4">
-                      <button
-                        type="button"
-                        className={`${
-                          isFinished
-                            ? "bg-gray-500"
-                            : "bg-green-500 hover:bg-green-600 focus:bg-green-600"
-                        } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
-                        onClick={() =>
-                          !isFinished &&
-                          updateWorkOrderOperatorTimes(
-                            index,
-                            time.id!,
-                            time.startTime.toString(),
-                            time.endTime != null ? time.endTime?.toString() : ""
-                          )
-                        }
-                        disabled={isFinished}
-                      >
-                        {editingIndex === index ? "Guardar" : "Editar"}
-                      </button>
-                      {editingIndex === index && (
-                        <>
-                          <button
-                            type="button"
-                            className={`${
-                              isFinished
-                                ? "bg-gray-500"
-                                : "bg-gray-500 hover:bg-gray-600 focus:bg-gray-600"
-                            } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
-                            onClick={(e) => {
-                              setEditingIndex(-1);
-                              setEditedEndTime("");
-                              setEditedStartTime("");
-                            }}
-                          >
-                            {"Cancelar"}
-                          </button>
-                          <button
-                            type="button"
-                            className={`${
-                              isFinished
-                                ? "bg-gray-500"
-                                : "bg-red-500 hover:bg-red-600 focus:bg-red-600"
-                            } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
-                            onClick={(e) => {
-                              setEditingIndex(-1);
-                              setEditedEndTime("");
-                              setEditedStartTime("");
-                              deleteWorkOrderOperatorTimes(time.id!);
-                            }}
-                          >
-                            {"Eliminar"}
-                          </button>
-                        </>
-                      )}
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-            <tfoot className="bg-white divide-y divide-gray-200">
-              <tr>
-                <td colSpan={2}></td>
-                <td className=" whitespace-nowrap text-sm text-gray-900 font-bold">
-                  Temps Total
+                  </div>
                 </td>
+                <td className="p-2 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">{time.totalTime}</div>
+                </td>
+                <td className="p-2 whitespace-nowrap">
+                  <div className="text-sm text-gray-900 font-bold">
+                    {time.operator.name}
+                  </div>
+                </td>
+                {loginUser?.permission == UserPermission.Administrator && (
+                  <td className="px-6 py-4 whitespace-nowrap align-center flex flex-row gap-4">
+                    <button
+                      type="button"
+                      className={`${
+                        isFinished
+                          ? "bg-gray-500"
+                          : "bg-green-500 hover:bg-green-600 focus:bg-green-600"
+                      } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
+                      onClick={() =>
+                        !isFinished &&
+                        updateWorkOrderOperatorTimes(
+                          index,
+                          time.id!,
+                          time.startTime.toString(),
+                          time.endTime != null ? time.endTime?.toString() : ""
+                        )
+                      }
+                      disabled={isFinished}
+                    >
+                      {editingIndex === index ? "Guardar" : "Editar"}
+                    </button>
+                    {editingIndex === index && (
+                      <>
+                        <button
+                          type="button"
+                          className={`${
+                            isFinished
+                              ? "bg-gray-500"
+                              : "bg-gray-500 hover:bg-gray-600 focus:bg-gray-600"
+                          } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
+                          onClick={(e) => {
+                            setEditingIndex(-1);
+                            setEditedEndTime("");
+                            setEditedStartTime("");
+                          }}
+                        >
+                          {"Cancelar"}
+                        </button>
+                        <button
+                          type="button"
+                          className={`${
+                            isFinished
+                              ? "bg-gray-500"
+                              : "bg-red-500 hover:bg-red-600 focus:bg-red-600"
+                          } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
+                          onClick={(e) => {
+                            setEditingIndex(-1);
+                            setEditedEndTime("");
+                            setEditedStartTime("");
+                            deleteWorkOrderOperatorTimes(time.id!);
+                          }}
+                        >
+                          {"Eliminar"}
+                        </button>
+                      </>
+                    )}
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+          <tfoot className="bg-white divide-y divide-gray-200">
+            <tr>
+              <td colSpan={2}></td>
+              <td className=" whitespace-nowrap text-sm text-gray-900 font-bold">
+                Temps Total
+              </td>
+              <td
+                colSpan={
+                  loginUser?.permission == UserPermission.Administrator ? 3 : 2
+                }
+                className="p-2 whitespace-nowrap text-sm text-gray-900 font-bold"
+              >
+                {totalFormatted}
+              </td>
+            </tr>
+            {Object.keys(totalTimes).map((operatorId) => (
+              <tr key={operatorId}>
                 <td
                   colSpan={
                     loginUser?.permission == UserPermission.Administrator
-                      ? 3
-                      : 2
+                      ? 4
+                      : 3
                   }
-                  className="p-2 whitespace-nowrap text-sm text-gray-900 font-bold"
-                >
-                  {totalFormatted}
+                ></td>
+                <td className="p-2 whitespace-nowrap text-sm text-gray-900 font-bold">
+                  {operators.find((op) => op.id === operatorId)?.name}:{" "}
+                  {totalTimes[operatorId]}
                 </td>
               </tr>
-              {Object.keys(totalTimes).map((operatorId) => (
-                <tr key={operatorId}>
-                  <td
-                    colSpan={
-                      loginUser?.permission == UserPermission.Administrator
-                        ? 4
-                        : 3
-                    }
-                  ></td>
-                  <td className="p-2 whitespace-nowrap text-sm text-gray-900 font-bold">
-                    {operators.find((op) => op.id === operatorId)?.name}:{" "}
-                    {totalTimes[operatorId]}
-                  </td>
-                </tr>
-              ))}
-            </tfoot>
-          </table>
-        </div>
+            ))}
+          </tfoot>
+        </table>
       </div>
-      <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
     </div>
   );
 };

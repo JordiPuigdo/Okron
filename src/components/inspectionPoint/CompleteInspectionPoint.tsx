@@ -128,7 +128,7 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
   }
 
   return (
-    <div className="mx-auto p-2 bg-white rounded-lg shadow-md w-full">
+    <div className=" p-2 bg-white rounded-lg shadow-md w-full">
       <div
         className="flex gap-2 p-2 bg-green-500 rounded-xl justify-center font-semibold text-white  hover:bg-green-700 cursor-pointer "
         onClick={(e) => {
@@ -197,7 +197,6 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
           </tbody>
         </table>
       </div>
-      <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
     </div>
   );
 };

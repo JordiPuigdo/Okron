@@ -381,7 +381,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             <div className="w-full">
               <label
                 htmlFor="description"
-                className="block text-xl font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 mb-2"
               >
                 Descripció
               </label>
@@ -390,7 +390,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 type="text"
                 id="description"
                 name="description"
-                className="p-3 border border-gray-300 rounded-md w-full"
+                className="p-3 border text-sm border-gray-300 rounded-md w-full"
                 disabled={
                   isFinished ||
                   loginUser?.permission != UserPermission.Administrator
@@ -405,7 +405,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             <div>
               <label
                 htmlFor="stateWorkOrder"
-                className="block text-xl font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 mb-2"
               >
                 Estat
               </label>
@@ -413,7 +413,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 {...register("stateWorkOrder", { valueAsNumber: true })}
                 id="stateWorkOrder"
                 name="stateWorkOrder"
-                className="p-3 border border-gray-300 rounded-md w-full"
+                className="p-3 text-sm border border-gray-300 rounded-md w-full"
                 disabled={
                   isFinished ||
                   loginUser?.permission != UserPermission.Administrator
@@ -440,7 +440,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             <div className="">
               <label
                 htmlFor="stateWorkOrder"
-                className="block text-xl font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 mb-2"
               >
                 Data Inici
               </label>
@@ -454,13 +454,13 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 onChange={(date: Date) => setStartDate(date)}
                 dateFormat="dd/MM/yyyy"
                 locale={ca}
-                className="p-3 border border-gray-300 rounded-md text-lg"
+                className="p-3 border border-gray-300 rounded-md text-sm"
               />
             </div>
             <div className="w-full">
               <label
                 htmlFor="operators"
-                className="block text-xl font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 mb-2"
               >
                 Operaris
               </label>
@@ -538,43 +538,40 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       <div className="flex flex-row gap-2 w-full rounded">
         <div className="py-3 flex-grow">
           <div>{renderForm()}</div>
-          <div className="flex flex-grow py-3">
-            {totalCosts > 0 &&
-              loginUser?.permission == UserPermission.Administrator && (
-                <div className="flex flex-grow">
-                  <CostsObject
-                    operatorCosts={operatorCosts}
-                    sparePartCosts={sparePartCosts}
-                    totalCosts={totalCosts}
-                  />
-                </div>
-              )}
-          </div>
-        </div>
-        <div className="py-3 ">
-          <div className="bg-white rounded-lg shadow-md p-2">
-            {currentWorkOrder && (
-              <>
-                <WorkOrderButtons
-                  workOrder={currentWorkOrder}
-                  handleReload={fetchWorkOrder}
-                  handleSubmit={() => handleSubmitForm()}
+          {totalCosts > 0 &&
+            loginUser?.permission == UserPermission.Administrator && (
+              <div className="flex flex-grow">
+                <CostsObject
+                  operatorCosts={operatorCosts}
+                  sparePartCosts={sparePartCosts}
+                  totalCosts={totalCosts}
                 />
-
-                <WorkOrderOperatorComments
-                  workOrderComments={workOrderComments}
-                  workOrderId={currentWorkOrder.id}
-                  isFinished={isFinished}
-                  setWorkOrderComments={setWorkOrderComments}
-                />
-              </>
+              </div>
             )}
-          </div>
+        </div>
+
+        <div className="my-3 p-2 bg-white rounded-lg shadow-md">
+          {currentWorkOrder && (
+            <>
+              <WorkOrderButtons
+                workOrder={currentWorkOrder}
+                handleReload={fetchWorkOrder}
+                handleSubmit={() => handleSubmitForm()}
+              />
+
+              <WorkOrderOperatorComments
+                workOrderComments={workOrderComments}
+                workOrderId={currentWorkOrder.id}
+                isFinished={isFinished}
+                setWorkOrderComments={setWorkOrderComments}
+              />
+            </>
+          )}
         </div>
       </div>
 
-      <div className="bg-blue-900 p-4 rounded-lg shadow-md flex flex-col md:flex-row gap-2 my-2">
-        <div>
+      <div className="bg-blue-900 p-2 rounded-lg shadow-md flex flex-col md:flex-row gap-2 my-2">
+        <div className="flex">
           <WorkOrderOperatorTimesComponent
             operators={aviableOperators!}
             workOrderOperatortimes={workOrderOperatorTimes}
@@ -583,7 +580,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             isFinished={isFinished}
           />
         </div>
-        <div className="flex-grow">
+        <div className="flex flex-grow">
           {currentWorkOrder.workOrderType === WorkOrderType.Preventive && (
             <CompleteInspectionPoints
               workOrderInspectionPoints={passedInspectionPoints!}

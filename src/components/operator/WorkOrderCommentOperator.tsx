@@ -43,12 +43,11 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
 
   const handleAddComment = async () => {
     try {
-      setIsLoading(true);
       if (operatorLogged?.idOperatorLogged == undefined) {
         alert("Has de fitxar un operari per fer aquesta acció");
         return;
       }
-
+      setIsLoading(true);
       const commentToAdd: AddCommentToWorkOrderRequest = {
         comment: newComment,
         operatorId: operatorLogged.idOperatorLogged,
@@ -97,7 +96,7 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
         <button
           type="button"
           onClick={handleAddComment}
-          className={`p-4 flex text-white rounded-md ${
+          className={`p-2 flex text-white text-sm rounded-md ${
             isFinished
               ? "bg-gray-500"
               : "bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:bg-indigo-600"
