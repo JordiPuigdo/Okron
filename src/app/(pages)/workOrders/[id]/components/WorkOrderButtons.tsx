@@ -78,7 +78,8 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
               disabled={workOrder.stateWorkOrder == StateWorkOrder.Waiting}
               onClick={() => handleChangeStateWorkOrder(StateWorkOrder.Waiting)}
               type="none"
-              customStyles="flex justify-center items-center bg-okron-waiting h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverPending "
+              customStyles="flex justify-center items-center bg-okron-waiting h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverPending w-full"
+              className="w-full"
             >
               {isLoading[StateWorkOrder.Waiting] ? (
                 <SvgSpinner className="text-white" />
@@ -91,7 +92,8 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
             disabled={workOrder.stateWorkOrder == StateWorkOrder.OnGoing}
             onClick={() => handleChangeStateWorkOrder(StateWorkOrder.OnGoing)}
             type="none"
-            customStyles="flex justify-center items-center bg-okron-onGoing h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverOnGoing "
+            className="w-full"
+            customStyles="flex justify-center items-center bg-okron-onGoing h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverOnGoing w-full"
           >
             {isLoading[StateWorkOrder.OnGoing] ? (
               <SvgSpinner className="text-white" />
@@ -103,7 +105,8 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
             disabled={workOrder.stateWorkOrder == StateWorkOrder.Paused}
             onClick={() => handleChangeStateWorkOrder(StateWorkOrder.Paused)}
             type="none"
-            customStyles="flex justify-center items-center bg-gray-500 h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverWaiting "
+            className="w-full"
+            customStyles="flex justify-center items-center bg-gray-500 h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverWaiting w-full"
           >
             {isLoading[StateWorkOrder.Paused] ? (
               <SvgSpinner className="text-white" />
@@ -119,7 +122,8 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
               handleChangeStateWorkOrder(StateWorkOrder.PendingToValidate)
             }
             type="none"
-            customStyles="flex justify-center items-center bg-okron-finished h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverPendingToValidate "
+            className="w-full"
+            customStyles="flex justify-center items-center bg-okron-finished h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverPendingToValidate w-full"
           >
             {isLoading[StateWorkOrder.PendingToValidate] ? (
               <SvgSpinner className="text-white" />
@@ -129,7 +133,6 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
           </Button>
         </>
       )}
-
       {workOrder.stateWorkOrder == StateWorkOrder.Finished &&
         loginUser?.permission == UserPermission.Administrator && (
           <Button

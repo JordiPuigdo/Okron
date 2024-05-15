@@ -47,6 +47,10 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
         alert("Has de fitxar un operari per fer aquesta acció");
         return;
       }
+      if (newComment.trim().length === 0) {
+        alert("No hi ha cap comentari per afegir");
+        return;
+      }
       setIsLoading(true);
       const commentToAdd: AddCommentToWorkOrderRequest = {
         comment: newComment,
@@ -84,10 +88,9 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
 
   return (
     <>
-      <div className="py-2 flex flex-col items-start gap-2">
-        <input
+      <div className="py-2 flex flex-row gap-2">
+        <textarea
           disabled={isFinished}
-          type="text"
           placeholder="Afegir comentari aquí..."
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
@@ -96,7 +99,7 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
         <button
           type="button"
           onClick={handleAddComment}
-          className={`p-2 flex text-white text-sm rounded-md ${
+          className={`p-2 flex text-white text-sm rounded-md items-center ${
             isFinished
               ? "bg-gray-500"
               : "bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:bg-indigo-600"
@@ -118,36 +121,33 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
-            {currentComments
-              .slice(0)
-              .reverse()
-              .map((comment, index) => (
-                <tr key={index} className="border-b border-gray-200">
-                  <td className="p-2 text-left whitespace-nowrap">
-                    {comment.operator.name}
-                  </td>
-                  <td className="p-2  text-left">{comment.comment}</td>
-                  <td className="p-2  text-left">
-                    {formatDate(comment.creationDate)}
-                  </td>
-                  <td className="p-2 text-left">
-                    <button
-                      onClick={() =>
-                        !isFinished && handleDeleteComment(comment.id!)
-                      }
-                      type="button"
-                      className={`${
-                        isFinished
-                          ? "bg-gray-500"
-                          : "bg-red-500 hover:bg-red-600 focus:bg-red-600"
-                      } p-2 text-white rounded-md focus:outline-none  flex items-center`}
-                      disabled={isLoading || isFinished}
-                    >
-                      <SvgDelete className="w-6 h-6" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+            {currentComments.slice(0).map((comment, index) => (
+              <tr key={index} className="border-b border-gray-200">
+                <td className="p-2 text-left whitespace-nowrap">
+                  {comment.operator.name}
+                </td>
+                <td className="p-2  text-left">{comment.comment}</td>
+                <td className="p-2  text-left">
+                  {formatDate(comment.creationDate)}
+                </td>
+                <td className="p-2 text-left">
+                  <button
+                    onClick={() =>
+                      !isFinished && handleDeleteComment(comment.id!)
+                    }
+                    type="button"
+                    className={`${
+                      isFinished
+                        ? "bg-gray-500"
+                        : "bg-red-500 hover:bg-red-600 focus:bg-red-600"
+                    } p-2 text-white rounded-md focus:outline-none  flex items-center`}
+                    disabled={isLoading || isFinished}
+                  >
+                    <SvgDelete className="w-6 h-6" />
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

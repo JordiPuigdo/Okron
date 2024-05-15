@@ -32,3 +32,33 @@ export const useSessionStore = create(
         }
     )
 );
+
+
+
+interface GlobalStore {
+  isModalOpen: boolean;
+  showModalBackground: boolean;
+  isMainScrollEnabled: boolean;
+}
+
+interface GlobalActions {
+  setIsModalOpen: (value: boolean) => void;
+  setShowModalBackground: (value: boolean) => void;
+  setIsMainScrollEnabled: (value: boolean) => void;
+}
+
+
+export const useGlobalStore = create<GlobalStore & GlobalActions>(set => ({
+    isModalOpen: false,
+    showModalBackground: false,
+    isMainScrollEnabled: true,
+    setIsModalOpen: (value: boolean) => {
+        set({ isModalOpen: value });
+    },
+    setShowModalBackground: (value: boolean) => {
+        set({ showModalBackground: value });
+    },
+    setIsMainScrollEnabled: (value: boolean) => {
+        set({ isMainScrollEnabled: value });
+    }
+}));

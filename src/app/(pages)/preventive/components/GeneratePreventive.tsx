@@ -66,23 +66,30 @@ const GeneratePreventive = () => {
           <Button
             type="others"
             onClick={generateWorkOrders}
+            className="bg-orange-500 text-sm text-white p-2 rounded-md font-semibold hover:bg-orange-600 "
             customStyles="flex"
           >
             Generar Revisions {formatDate(new Date(), false, false)}
             {isLoading && <SvgSpinner className="w-6 h-6" />}
           </Button>
-
-          <p className="text-black font-semibold">
-            {(preventivesCreated?.length || 0 > 0) &&
-              "Revisions creades per avui:"}
-          </p>
-          {preventivesCreated?.map((preventive, index) => (
-            <div key={index}>
-              {preventive.code} - {preventive.description}
-            </div>
-          ))}
+          {preventivesCreated != undefined &&
+            preventivesCreated?.length > 0 && (
+              <>
+                <p className="text-black font-semibold">
+                  {(preventivesCreated?.length || 0 > 0) &&
+                    "Revisions creades per avui:"}
+                </p>
+                {preventivesCreated?.map((preventive, index) => (
+                  <div key={index}>
+                    {preventive.code} - {preventive.description}
+                  </div>
+                ))}
+                {message != "" && (
+                  <span className="text-red-500">{message}</span>
+                )}
+              </>
+            )}
         </div>
-        {message != "" && <span className="text-red-500">{message}</span>}
       </>
     );
   else return <></>;

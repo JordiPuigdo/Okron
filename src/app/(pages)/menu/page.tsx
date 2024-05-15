@@ -10,6 +10,7 @@ import DashboardPage from "./dashboard/page";
 import FilterWOType from "../workOrders/[id]/components/FilterWOType";
 import { WorkOrderType } from "app/interfaces/workOrder";
 import { useState } from "react";
+import { HeaderMenu } from "./dashboard/components/HeaderMenu";
 
 export default function MenuPage() {
   const [type, setType] = useState<WorkOrderType>(WorkOrderType.Corrective);
@@ -22,15 +23,7 @@ export default function MenuPage() {
       <Container>
         <LoginChecker>
           <div className="flex flex-col gap-2 w-full">
-            <div className="flex flex-row gap-4">
-              <SignOperator />
-              <GeneratePreventive />
-              <FinalizeWorkOrdersDaysBefore />
-              <FilterWOType onClick={() => handleFilterWOType} />
-            </div>
-            <div>
-              <WorkOrderComponent />
-            </div>
+            <HeaderMenu />
             <div>
               <DashboardPage />
             </div>

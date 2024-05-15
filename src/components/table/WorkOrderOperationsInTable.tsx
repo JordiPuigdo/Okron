@@ -15,10 +15,17 @@ import WorkOrder, {
   WorkOrderType,
 } from "app/interfaces/workOrder";
 import WorkOrderService from "app/services/workOrderService";
-import { useSessionStore } from "app/stores/globalStore";
+import { useGlobalStore, useSessionStore } from "app/stores/globalStore";
 import useRoutes from "app/utils/useRoutes";
 import { checkAllInspectionPoints } from "app/utils/utilsInspectionPoints";
+import ChooseSpareParts from "components/sparePart/ChooseSpareParts";
 import { Button } from "designSystem/Button/Buttons";
+import {
+  Modal,
+  Modal2,
+  ModalBackground,
+  SwipeModal,
+} from "designSystem/Modals/Modal";
 import React, { useEffect, useState } from "react";
 
 interface WorkOrderOperationsInTableProps {
@@ -43,6 +50,8 @@ export default function WorkOrderOperationsInTable({
   const [isLoading, setIsLoading] = useState<{ [key: string]: boolean }>({});
 
   const { operatorLogged, loginUser } = useSessionStore((state) => state);
+  const { isModalOpen } = useGlobalStore((state) => state);
+  const [showModal, setShowModal] = useState(false);
 
   function handleInspectionPoints(workOrderId: string) {
     toggleLoading(workOrderId + "_InspectionPoints");
@@ -106,6 +115,16 @@ export default function WorkOrderOperationsInTable({
     );
   }
 
+  function handleSparePartsModal() {
+    setShowModal(true);
+  }
+
+  useEffect(() => {
+    if (!isModalOpen) {
+      setShowModal(false);
+    }
+  }, [isModalOpen]);
+
   const validStates = [
     StateWorkOrder.Waiting,
     StateWorkOrder.OnGoing,
@@ -115,6 +134,9 @@ export default function WorkOrderOperationsInTable({
   if (validStates.includes(workOrder.stateWorkOrder))
     return (
       <div className="flex w-full gap-2">
+        {showModal && (
+          <SparePartsModal workOrder={workOrder} isFinished={false} />
+        )}
         <Button
           type="none"
           onClick={() => {
@@ -182,7 +204,7 @@ export default function WorkOrderOperationsInTable({
             <Button
               disabled={isPassInspectionPoints}
               onClick={() => {
-                handleInspectionPoints(workOrderId);
+                handleSparePartsModal();
               }}
               type="none"
             >
@@ -256,3 +278,39 @@ export default function WorkOrderOperationsInTable({
       </div>
     );
 }
+
+interface SparePartsModalProps {
+  workOrder: WorkOrder;
+  isFinished: boolean;
+}
+
+export const SparePartsModal = ({
+  workOrder,
+  isFinished,
+}: SparePartsModalProps) => {
+  console.log("show");
+
+  function setSelectedSpareParts(x: any) {}
+
+  return (
+    <>
+      <Modal
+        isVisible={true}
+        type="center"
+        height="h-auto"
+        width="w-full"
+        className="max-w-sm mx-auto"
+      >
+        <div className="">
+          <ChooseSpareParts
+            availableSpareParts={[]}
+            selectedSpareParts={[]}
+            setSelectedSpareParts={setSelectedSpareParts}
+            WordOrderId={workOrder.id}
+            isFinished={isFinished}
+          />
+        </div>
+      </Modal>
+    </>
+  );
+};

@@ -53,10 +53,10 @@ export default function SignOperator() {
 
   return (
     <div className="flex flex-row gap-4 items-center bg-white rounded-xl p-4 font-semibold">
-      Codi
       <input
         type="text"
-        className="rounded-sm"
+        placeholder="Codi Operari"
+        className="rounded-sm text-sm"
         value={codeOperator}
         onChange={(e) => setCodeOperator(e.target.value)}
         onKeyUp={(e) => {
@@ -68,7 +68,7 @@ export default function SignOperator() {
       <Button
         customStyles={` ${
           operatorLogged?.codeOperatorLogged ? "bg-blue-500 " : "bg-red-500 "
-        } rounded-md p-2 text-white hover:${
+        } rounded-md p-2 text-white text-sm hover:${
           operatorLogged?.codeOperatorLogged ? "bg-blue-700" : "bg-red-700"
         }`}
         onClick={signOperator}

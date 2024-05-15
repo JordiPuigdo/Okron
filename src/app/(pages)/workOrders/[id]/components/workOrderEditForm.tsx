@@ -535,9 +535,9 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   return (
     <>
       {renderHeader()}
-      <div className="flex flex-row gap-2 w-full rounded">
-        <div className="py-3 flex-grow">
-          <div>{renderForm()}</div>
+      <div className="flex gap-2 rounded bg-blue-900 my-2 p-2">
+        <div className=" w-full">
+          {renderForm()}
           {totalCosts > 0 &&
             loginUser?.permission == UserPermission.Administrator && (
               <div className="flex flex-grow pt-2">
@@ -550,7 +550,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             )}
         </div>
 
-        <div className="my-3 p-2 bg-white rounded-lg shadow-md">
+        <div className="p-2 bg-white rounded-lg shadow-md w-full">
           {currentWorkOrder && (
             <>
               <WorkOrderButtons
@@ -558,13 +558,14 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 handleReload={fetchWorkOrder}
                 handleSubmit={() => handleSubmitForm()}
               />
-
-              <WorkOrderOperatorComments
-                workOrderComments={workOrderComments}
-                workOrderId={currentWorkOrder.id}
-                isFinished={isFinished}
-                setWorkOrderComments={setWorkOrderComments}
-              />
+              <div className="py-2">
+                <WorkOrderOperatorComments
+                  workOrderComments={workOrderComments}
+                  workOrderId={currentWorkOrder.id}
+                  isFinished={isFinished}
+                  setWorkOrderComments={setWorkOrderComments}
+                />
+              </div>
             </>
           )}
         </div>

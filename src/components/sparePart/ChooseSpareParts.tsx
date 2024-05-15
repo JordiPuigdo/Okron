@@ -286,7 +286,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
                   type="button"
                   className={`${
                     isFinished ? "bg-gray-400" : " bg-red-600 hover:bg-red-400"
-                  } text-white font-semibold m-2 p-2 rounded-md`}
+                  } text-white font-semibold p-1 rounded-md`}
                   onClick={(e) =>
                     cancelSparePartConsumption(
                       selectedPart.sparePart,

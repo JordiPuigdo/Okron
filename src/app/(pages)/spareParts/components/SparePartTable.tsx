@@ -89,6 +89,11 @@ const columnsPerAsset: Column[] = [
     format: ColumnFormat.TEXT,
   },
   {
+    label: "Data Consum",
+    key: "dateConsume",
+    format: ColumnFormat.DATE,
+  },
+  {
     label: "Descripció OT",
     key: "workOrderDescription",
     format: ColumnFormat.TEXT,

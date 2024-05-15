@@ -232,60 +232,58 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
           <div className="flex flex-row gap-2 w-full">
             <div className="gap-4 p-4 bg-white shadow-md rounded-md">
               <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="flex flex-row gap-4 items-start w-full">
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-600">
-                      Codi
-                    </label>
-                    <input
-                      {...register("code")}
-                      id="code"
-                      type="text"
-                      className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                    />
-                  </div>
-
-                  <div className="flex-grow mb-4">
-                    <label className="block text-sm font-medium text-gray-600">
-                      Descripció
-                    </label>
-                    <input
-                      {...register("description")}
-                      className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                    />
-                  </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-600">
+                    Codi
+                  </label>
+                  <input
+                    {...register("code")}
+                    id="code"
+                    type="text"
+                    className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                  />
                 </div>
-                <div className="flex flex-row gap-4 items-start w-full">
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-600">
-                      Ubicació
-                    </label>
-                    <input
-                      {...register("ubication")}
-                      className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                    />
-                  </div>
 
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-600">
-                      Ref Proveïdor
-                    </label>
-                    <input
-                      {...register("refProvider")}
-                      className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                    />
-                  </div>
-
-                  <div className="flex-grow mb-4">
-                    <label className="block text-sm font-medium text-gray-600">
-                      Família
-                    </label>
-                    <input
-                      {...register("family")}
-                      className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                    />
-                  </div>
+                <div className="flex-grow mb-4">
+                  <label className="block text-sm font-medium text-gray-600">
+                    Descripció
+                  </label>
+                  <input
+                    {...register("description")}
+                    className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                  />
                 </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-600">
+                    Ubicació
+                  </label>
+                  <input
+                    {...register("ubication")}
+                    className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-600">
+                    Ref Proveïdor
+                  </label>
+                  <input
+                    {...register("refProvider")}
+                    className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                  />
+                </div>
+
+                <div className="flex-grow mb-4">
+                  <label className="block text-sm font-medium text-gray-600">
+                    Família
+                  </label>
+                  <input
+                    {...register("family")}
+                    className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                  />
+                </div>
+
                 <div className="flex flex-row gap-4 items-start w-full">
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-600">
@@ -353,57 +351,6 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                   )}
                 </div>
               </form>
-              <span className="text-xl font-bold">Documentació</span>
-              <div className="pt-4">
-                {sparePart?.documentation?.map((document) => (
-                  <div
-                    key={document.id}
-                    className="flex py-2 gap-4 items-center border-2 p-2"
-                  >
-                    <a href={document.url} target="_blank">
-                      <span className="block text-sm text-blue-500 hover:text-blue-800 underline">
-                        {document.fileName}
-                      </span>
-                    </a>
-                    <button
-                      type="button"
-                      className="flex bg-okron-btDelete text-white px-4 py-2 rounded-md hover:bg-okron-btDeleteHover focus:outline-none focus:ring focus:border-gray-300"
-                      onClick={() =>
-                        handleDeleteDocumentation(
-                          document.id!,
-                          document.fileName!
-                        )
-                      }
-                    >
-                      Eliminar
-                      {loadingMap["DELETEDOCUMENTATION"] && (
-                        <SvgSpinner className="2-6 h-6" />
-                      )}
-                    </button>
-                  </div>
-                ))}
-              </div>
-              {loginUser?.permission == UserPermission.Administrator && (
-                <div className="pt-4">
-                  <input
-                    type="file"
-                    id="fileInput"
-                    accept=".pdf"
-                    style={{ display: "none" }}
-                    onChange={handleFileChange}
-                  />
-                  <button
-                    type="button"
-                    className="flex bg-okron-btCreate text-white px-4 py-2 rounded-md hover:bg-okron-btCreateHover focus:outline-none focus:ring focus:border-blue-300"
-                    onClick={handleDocumentationAdd}
-                  >
-                    Afegir Documentació
-                    {loadingMap["DOCUMENTATION"] && (
-                      <SvgSpinner className="2-6 h-6" />
-                    )}
-                  </button>
-                </div>
-              )}
             </div>
             {loginUser?.permission == UserPermission.Administrator && (
               <div className="p-4 flex-grow rounded-md bg-blue-950">
@@ -414,6 +361,59 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                   enableDetail={true}
                   enableCreate={false}
                 />
+              </div>
+            )}
+          </div>
+          <div className="my-4 p-2 bg-white shadow-md rounded-md">
+            <span className="text-xl font-bold">Documentació</span>
+            <div className="pt-4">
+              {sparePart?.documentation?.map((document) => (
+                <div
+                  key={document.id}
+                  className="flex py-2 gap-4 items-center border-2 p-2"
+                >
+                  <a href={document.url} target="_blank">
+                    <span className="block text-sm text-blue-500 hover:text-blue-800 underline">
+                      {document.fileName}
+                    </span>
+                  </a>
+                  <button
+                    type="button"
+                    className="flex bg-okron-btDelete text-white px-4 py-2 rounded-md hover:bg-okron-btDeleteHover focus:outline-none focus:ring focus:border-gray-300"
+                    onClick={() =>
+                      handleDeleteDocumentation(
+                        document.id!,
+                        document.fileName!
+                      )
+                    }
+                  >
+                    Eliminar
+                    {loadingMap["DELETEDOCUMENTATION"] && (
+                      <SvgSpinner className="2-6 h-6" />
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+            {loginUser?.permission == UserPermission.Administrator && (
+              <div className="pt-4">
+                <input
+                  type="file"
+                  id="fileInput"
+                  accept=".pdf"
+                  style={{ display: "none" }}
+                  onChange={handleFileChange}
+                />
+                <button
+                  type="button"
+                  className="flex bg-okron-btCreate text-white px-4 py-2 rounded-md hover:bg-okron-btCreateHover focus:outline-none focus:ring focus:border-blue-300"
+                  onClick={handleDocumentationAdd}
+                >
+                  Afegir Documentació
+                  {loadingMap["DOCUMENTATION"] && (
+                    <SvgSpinner className="2-6 h-6" />
+                  )}
+                </button>
               </div>
             )}
           </div>

@@ -250,7 +250,7 @@ const DataTable: React.FC<DataTableProps> = ({
               className="flex items-center hover:cursor-pointer"
               onClick={() => setFilterActive(!filterActive)}
             >
-              <span className="mr-2">Veure registres actius</span>
+              <span className="mr-2 text-sm">Actius</span>
               <input
                 type="checkbox"
                 checked={filterActive}
@@ -522,7 +522,9 @@ const DataTable: React.FC<DataTableProps> = ({
           </div>
           <div className="flex flex-row">
             {data.length > 0 && (
-              <p className="mt-auto w-full">Total: {data.length} registres</p>
+              <p className="mt-auto text-sm w-full">
+                Total: {data.length} registres
+              </p>
             )}
             <div className="flex align-bottom items-center mt-auto w-full">
               <select
@@ -538,7 +540,7 @@ const DataTable: React.FC<DataTableProps> = ({
                   </option>
                 ))}
               </select>
-              <p className="ml-2">registres per pàgina</p>
+              <p className="ml-2 text-sm">registres per pàgina</p>
             </div>
 
             <div className="justify-end w-full">

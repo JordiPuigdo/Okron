@@ -40,6 +40,8 @@ interface WorkOrderTableProps {
   assetId?: string | "";
   enableFinalizeWorkOrdersDayBefore?: boolean;
   operatorId?: string | "";
+  workOrderType?: WorkOrderType;
+  refresh?: boolean;
 }
 
 const columns: Column[] = [
@@ -89,6 +91,8 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   assetId,
   enableFinalizeWorkOrdersDayBefore = false,
   operatorId,
+  workOrderType,
+  refresh,
 }) => {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
@@ -149,6 +153,12 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     if (operatorId !== undefined) handleSearch();
     searchWorkOrders();
   }, []);
+
+  useEffect(() => {
+    if (refresh) {
+      setSelectedTypeFilter(workOrderType);
+    }
+  }, [refresh, workOrderType]);
 
   const searchWorkOrders = async () => {
     const startDateTime = startDate ? new Date(startDate) : null;
@@ -280,30 +290,16 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
                   </option>
                 ))}
             </select>
-            <span>Tipus: </span>
-            <select
-              id="workOrderType"
-              name="workOrderType"
-              className="p-3 border border-gray-300 rounded-md w-full"
-              value={selectedTypeFilter !== undefined ? selectedTypeFilter : ""}
-              onChange={handleTypeFilterChange}
+            <span
+              className="text-white rounded-full p-3 w-full text-center bg-okron-corrective font-semibold hover:cursor-pointer"
+              onClick={() => {
+                if (selectedTypeFilter == WorkOrderType.Corrective) {
+                  setSelectedTypeFilter(undefined);
+                  return;
+                }
+                setSelectedTypeFilter(WorkOrderType.Corrective);
+              }}
             >
-              <option value="">-</option>
-              {Object.values(WorkOrderType)
-                .filter((value) => typeof value === "number")
-                .map((state) => (
-                  <option
-                    key={state}
-                    value={
-                      typeof state === "string" ? parseInt(state, 10) : state
-                    }
-                  >
-                    {translateWorkOrderType(state)}
-                  </option>
-                ))}
-            </select>
-
-            <span className="text-white rounded-full p-3 w-full text-center bg-okron-corrective font-semibold">
               Correctius:{" "}
               {
                 filteredWorkOrders.filter(
@@ -311,7 +307,16 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
                 ).length
               }
             </span>
-            <span className="text-white rounded-full p-3 w-full text-center bg-okron-preventive font-semibold">
+            <span
+              className="text-white rounded-full p-3 w-full text-center bg-okron-preventive font-semibold hover:cursor-pointer"
+              onClick={() => {
+                if (selectedTypeFilter == WorkOrderType.Preventive) {
+                  setSelectedTypeFilter(undefined);
+                  return;
+                }
+                setSelectedTypeFilter(WorkOrderType.Preventive);
+              }}
+            >
               Preventius:{" "}
               {
                 filteredWorkOrders.filter(
