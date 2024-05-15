@@ -1,5 +1,6 @@
 import {
   SvgCheck,
+  SvgClose,
   SvgDelete,
   SvgDetail,
   SvgInspectionPoints,
@@ -8,24 +9,20 @@ import {
   SvgSpinner,
   SvgStart,
 } from "app/icons/icons";
-import { UserPermission } from "app/interfaces/User";
+import SparePart from "app/interfaces/SparePart";
 import WorkOrder, {
   StateWorkOrder,
   UpdateStateWorkOrder,
   WorkOrderType,
 } from "app/interfaces/workOrder";
+import SparePartService from "app/services/sparePartService";
 import WorkOrderService from "app/services/workOrderService";
 import { useGlobalStore, useSessionStore } from "app/stores/globalStore";
 import useRoutes from "app/utils/useRoutes";
 import { checkAllInspectionPoints } from "app/utils/utilsInspectionPoints";
 import ChooseSpareParts from "components/sparePart/ChooseSpareParts";
 import { Button } from "designSystem/Button/Buttons";
-import {
-  Modal,
-  Modal2,
-  ModalBackground,
-  SwipeModal,
-} from "designSystem/Modals/Modal";
+import { Modal } from "designSystem/Modals/Modal";
 import React, { useEffect, useState } from "react";
 
 interface WorkOrderOperationsInTableProps {
@@ -288,9 +285,23 @@ export const SparePartsModal = ({
   workOrder,
   isFinished,
 }: SparePartsModalProps) => {
-  console.log("show");
-
+  const { setIsModalOpen } = useGlobalStore((state) => state);
   function setSelectedSpareParts(x: any) {}
+  const sparePartService = new SparePartService(
+    process.env.NEXT_PUBLIC_API_BASE_URL!
+  );
+  const [availableSpareParts, setAvailableSpareParts] = useState<SparePart[]>(
+    []
+  );
+
+  useEffect(() => {
+    async function fetchSpareParts() {
+      await sparePartService.getSpareParts().then((x) => {
+        setAvailableSpareParts(x);
+      });
+    }
+    fetchSpareParts();
+  }, []);
 
   return (
     <>
@@ -299,16 +310,29 @@ export const SparePartsModal = ({
         type="center"
         height="h-auto"
         width="w-full"
-        className="max-w-sm mx-auto"
+        className="max-w-md mx-auto"
       >
-        <div className="">
-          <ChooseSpareParts
-            availableSpareParts={[]}
-            selectedSpareParts={[]}
-            setSelectedSpareParts={setSelectedSpareParts}
-            WordOrderId={workOrder.id}
-            isFinished={isFinished}
-          />
+        <div className="bg-blue-950 p-4 rounded-lg shadow-md w-full">
+          <div className="relative bg-white">
+            <div className="absolute p-2 top-0 right-0 justify-end">
+              <SvgClose
+                onClick={() => {
+                  setIsModalOpen(false);
+                }}
+              />
+            </div>
+            {availableSpareParts.length > 0 ? (
+              <ChooseSpareParts
+                availableSpareParts={availableSpareParts}
+                selectedSpareParts={workOrder.workOrderSpareParts!}
+                setSelectedSpareParts={setSelectedSpareParts}
+                WordOrderId={workOrder.id}
+                isFinished={isFinished}
+              />
+            ) : (
+              <SvgSpinner />
+            )}
+          </div>
         </div>
       </Modal>
     </>

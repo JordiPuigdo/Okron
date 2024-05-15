@@ -152,23 +152,18 @@ export const Modal = ({
 
   if (type === "center") {
     return (
-      <div
-        className={`transition-all fixed inset-0 z-50 ${animationStyles}`}
-        onClick={() => setIsModalOpen(false)}
-      >
-        <Container className="h-full relative">
-          <div
-            className={twMerge(
-              `transition-all mx-auto bg-white rounded-2xl relative top-1/2 -translate-y-1/2
+      <div className={`transition-all fixed inset-0 z-50 ${animationStyles}`}>
+        <div
+          className={twMerge(
+            `transition-all mx-auto bg-white rounded-2xl relative top-1/2 -translate-y-1/2
               ${width ? width : "w-full"}
               ${height ? height : "h-full"}
               ${className ? className : ""}`
-            )}
-            {...rest}
-          >
-            {children}
-          </div>
-        </Container>
+          )}
+          {...rest}
+        >
+          {children}
+        </div>
       </div>
     );
   }
