@@ -13,7 +13,7 @@ export const translateStateWorkOrder = (state: any): string => {
     case StateWorkOrder.OnGoing:
       return "En curs";
     case StateWorkOrder.Paused:
-      return "En pausa";
+      return "Pausada";
     case StateWorkOrder.Finished:
       return "Finalitzada";
     case StateWorkOrder.PendingToValidate:
@@ -36,7 +36,7 @@ export const translateWorkOrderEventType = (
     case WorkOrderEventType.Started:
       return "En curs";
     case WorkOrderEventType.Paused:
-      return "En pausa";
+      return "Pausada";
     case WorkOrderEventType.PendingToValidate:
       return "Validació Pendent";
     case WorkOrderEventType.Finished:
