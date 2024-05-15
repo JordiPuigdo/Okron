@@ -338,9 +338,9 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
     <div className="p-2 bg-white rounded-lg w-full">
       <div className=" flex flex-col mt-6 ">
         <div className="flex space-x-4 py-4 items-center">
-          <span className="text-sm font-bold">Codi</span>
           <input
             type="text"
+            placeholder="Codi Operari"
             value={codeOperator}
             onChange={(e) => {
               setCodeOperator(e.target.value);
