@@ -27,6 +27,7 @@ import { Asset } from "app/interfaces/Asset";
 import AssetService from "app/services/assetService";
 import { ElementList } from "components/selector/ElementList";
 import ChooseElement from "components/ChooseElement";
+import { useSessionStore } from "app/stores/globalStore";
 
 function CorrectivePage() {
   const operatorService = new OperatorService(
@@ -56,6 +57,7 @@ function CorrectivePage() {
 
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const { loginUser } = useSessionStore((state) => state);
 
   async function fetchFormData() {
     await fetchOperators();
@@ -136,6 +138,7 @@ function CorrectivePage() {
       operatorId: selectedOperator.map((operator) => operator),
       stateWorkOrder: corrective.stateWorkOrder,
       workOrderType: 0,
+      userId: loginUser?.agentId,
     };
     return createWorkOrderRequest;
   }
