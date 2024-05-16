@@ -140,3 +140,10 @@ export interface AddCommentToWorkOrderRequest {
   operatorId : string;
   workOrderId : string;
 }
+
+export interface UpdateStateWorkOrder{
+  workOrderId : string;
+  state : StateWorkOrder;
+  operatorId? : string;
+  userId? : string; 
+}

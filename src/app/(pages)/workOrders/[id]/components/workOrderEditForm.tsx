@@ -3,6 +3,7 @@
 import Operator from "app/interfaces/Operator";
 import WorkOrder, {
   StateWorkOrder,
+  UpdateStateWorkOrder,
   UpdateWorkOrderRequest,
   WorkOrderComment,
   WorkOrderInspectionPoint,
@@ -88,6 +89,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [totalCosts, setTotalCosts] = useState<number>(0);
   const [sparePartCosts, setSparePartCosts] = useState<number>(0);
   const [operatorCosts, setOperatorCosts] = useState<number>(0);
+  const { operatorLogged } = useSessionStore((state) => state);
 
   async function fetchWorkOrder() {
     await workOrderService
@@ -282,9 +284,14 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
 
   async function finalizeWorkOrder() {
     setIsLoading(true);
-
+    const update: UpdateStateWorkOrder = {
+      workOrderId: currentWorkOrder!.id,
+      state: StateWorkOrder.Finished,
+      operatorId: operatorLogged?.idOperatorLogged,
+      userId: loginUser?.agentId,
+    };
     await workOrderService
-      .updateStateWorkOrder(currentWorkOrder!.id, StateWorkOrder.Finished)
+      .updateStateWorkOrder(update)
       .then((response) => {
         if (response) {
           setTimeout(() => {
@@ -302,9 +309,14 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
 
   async function handleReopenWorkOrder() {
     setIsLoading(true);
-
+    const update: UpdateStateWorkOrder = {
+      workOrderId: currentWorkOrder!.id,
+      state: StateWorkOrder.Waiting,
+      operatorId: operatorLogged?.idOperatorLogged,
+      userId: loginUser?.agentId,
+    };
     await workOrderService
-      .updateStateWorkOrder(currentWorkOrder!.id, StateWorkOrder.Waiting)
+      .updateStateWorkOrder(update)
       .then((response) => {
         if (response) {
           setTimeout(() => {
