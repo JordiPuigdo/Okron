@@ -19,6 +19,7 @@ export interface Preventive {
     operators : Operator[],
     assetId? : string[],
     asset : Asset
+    active : boolean
 }
 
 
@@ -37,5 +38,12 @@ export interface CreatePreventiveRequest {
 
 export interface UpdatePreventiveRequest extends CreatePreventiveRequest {
     id : string,
+    active : boolean
     
+}
+
+export interface GetWOByPreventiveIdRequest {
+    preventiveId : string
+    startTime : Date,
+    endTime : Date  
 }

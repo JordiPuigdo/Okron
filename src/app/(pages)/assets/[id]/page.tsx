@@ -250,7 +250,7 @@ export default function AssetDetailsPage({
                         <PreventiveTable
                           enableFilters={true}
                           enableDelete={false}
-                          enableEdit={false}
+                          enableEdit={true}
                           assetId={id}
                         />
                       </TabPanel>

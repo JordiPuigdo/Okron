@@ -2,7 +2,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Pagination from "./Pagination";
 import Link from "next/link";
-import { SvgDelete, SvgDetail, SvgSpinner } from "app/icons/icons";
+import { SvgDelete, SvgDetail, SvgRepeat, SvgSpinner } from "app/icons/icons";
 import { Column, ColumnFormat, Filters, TableButtons } from "./interfaceTable";
 import FiltersComponent from "./FiltersComponent";
 import {
@@ -17,6 +17,8 @@ import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
 import useRoutes from "app/utils/useRoutes";
 import WorkOrderOperationsInTable from "./WorkOrderOperationsInTable";
+import { Button } from "designSystem/Button/Buttons";
+import { PreventiveButtons } from "./components/PreventiveButtons";
 
 interface DataTableProps {
   data: any[];
@@ -64,6 +66,7 @@ const DataTable: React.FC<DataTableProps> = ({
   const [totalCount, setTotalCount] = useState(
     Math.ceil(data.length / itemsPerPage)
   );
+  const [totalRecords, setTotalRecords] = useState(data.length);
   const ROUTES = useRoutes();
   const [pathDetail, setPathDetail] = useState<string>("");
 
@@ -152,9 +155,21 @@ const DataTable: React.FC<DataTableProps> = ({
           })
           .slice(indexOfFirstRecord, indexOfLastRecord)
       );
+      setTotalRecords(
+        data.filter((record) => {
+          if (typeof record === "object" && record.hasOwnProperty("active")) {
+            if (filterActive) {
+              return record.active === true;
+            } else {
+              return true;
+            }
+          }
+        }).length
+      );
     } else {
       setFilteredData(data.slice(indexOfFirstRecord, indexOfLastRecord));
     }
+
     setTotalCount(Math.ceil(data.length / itemsPerPage));
     setIsLoading(false);
   }, [data, currentPage, itemsPerPage, filterActive]);
@@ -204,7 +219,7 @@ const DataTable: React.FC<DataTableProps> = ({
         filteredData.slice(indexOfFirstRecord, indexOfLastRecord)
       );
     }
-
+    //setTotalRecords(filteredData.length);
     setTotalCount(Math.ceil(filteredData.length / itemsPerPage));
   };
 
@@ -307,7 +322,7 @@ const DataTable: React.FC<DataTableProps> = ({
               )}
               {tableButtons.delete && (
                 <div
-                  className="flex items-center text-white rounded-xl bg-okron-btDelete hover:bg-okron-btDeleteHover"
+                  className="flex items-center text-white rounded-xl bg-okron-btDelete hover:bg-okron-btDeleteHover hover:cursor-pointer"
                   onClick={() => handleDelete(item[columns[0].key])}
                 >
                   {loadingState[
@@ -332,6 +347,9 @@ const DataTable: React.FC<DataTableProps> = ({
                     )}
                   </p>
                 </Link>
+              )}
+              {entity == EntityTable.PREVENTIVE && (
+                <PreventiveButtons preventive={item} />
               )}
             </div>
           )}
@@ -389,7 +407,8 @@ const DataTable: React.FC<DataTableProps> = ({
                           );
                         }
                       })}
-                      {renderHeadTableActions()}
+                      {(tableButtons.detail || tableButtons.edit) &&
+                        renderHeadTableActions()}
                     </tr>
                   </thead>
                   <tbody className="border-b">
@@ -523,7 +542,7 @@ const DataTable: React.FC<DataTableProps> = ({
           <div className="flex flex-row">
             {data.length > 0 && (
               <p className="mt-auto text-sm w-full">
-                Total: {data.length} registres
+                Total: {totalRecords} registres
               </p>
             )}
             <div className="flex align-bottom items-center mt-auto w-full">

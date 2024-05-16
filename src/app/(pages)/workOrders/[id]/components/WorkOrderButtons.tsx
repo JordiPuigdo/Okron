@@ -89,7 +89,12 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
             </Button>
           )}
           <Button
-            disabled={workOrder.stateWorkOrder == StateWorkOrder.OnGoing}
+            disabled={
+              workOrder.stateWorkOrder == StateWorkOrder.OnGoing ||
+              workOrder.stateWorkOrder ==
+                (StateWorkOrder.Finished as StateWorkOrder) ||
+              workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
+            }
             onClick={() => handleChangeStateWorkOrder(StateWorkOrder.OnGoing)}
             type="none"
             className="w-full"
@@ -102,7 +107,12 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
             )}
           </Button>
           <Button
-            disabled={workOrder.stateWorkOrder == StateWorkOrder.Paused}
+            disabled={
+              workOrder.stateWorkOrder == StateWorkOrder.Paused ||
+              workOrder.stateWorkOrder ==
+                (StateWorkOrder.Finished as StateWorkOrder) ||
+              workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
+            }
             onClick={() => handleChangeStateWorkOrder(StateWorkOrder.Paused)}
             type="none"
             className="w-full"

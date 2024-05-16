@@ -336,78 +336,76 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
 
   return (
     <div className="p-2 bg-white rounded-lg w-full">
-      <div className=" flex flex-col mt-6 ">
-        <div className="flex space-x-4 py-4 items-center">
-          <input
-            type="text"
-            placeholder="Codi Operari"
-            value={codeOperator}
-            onChange={(e) => {
-              setCodeOperator(e.target.value);
-            }}
-            className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:border-blue-500"
-            onKeyPress={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-              }
-            }}
-            disabled={isFinished}
-          />
-          <button
-            type="button"
-            disabled={isLoading || isFinished}
-            onClick={addWorkOrderTime}
-            className={`${
-              isFinished
-                ? "bg-gray-500"
-                : "bg-blue-500  hover:bg-blue-600 focus:bg-blue-600"
-            } px-4 py-2 text-white rounded-md focus:outline-none  flex items-center`}
-          >
-            <SvgLoginOperator className="w-6 h-6" />
-            {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-          </button>
-          <button
-            type="button"
-            disabled={isLoading || isFinished}
-            onClick={finishWorkOrderTime}
-            className={`${
-              isFinished
-                ? "bg-gray-500"
-                : "bg-red-500 hover:bg-red-600 focus:bg-red-600"
-            } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
-          >
-            <SvgLogoutOperator className="w-6 h-6" />
-            {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-          </button>
-          <button
-            type="button"
-            className={`${
-              isFinished
-                ? "bg-gray-500"
-                : "bg-orange-500 hover:bg-orange-600 focus:bg-orange-600"
-            } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
-            onClick={(e) => {
-              !isFinished && setEnterManualTime(!enterManualTime);
-            }}
-            disabled={isFinished}
-          >
-            Manual
-          </button>
-          {enterManualTime && (
-            <>
-              <input
-                type="text"
-                pattern="\d{2}/\d{2}/\d{4} \d{2}:\d{2}"
-                placeholder="dd/mm/yyyy hh:mm"
-                value={manualTime!}
-                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:border-blue-500"
-                onChange={handleManualTimeChange}
-              />
-            </>
-          )}
-        </div>
+      <div className="flex space-x-4 items-center">
+        <input
+          type="text"
+          placeholder="Codi Operari"
+          value={codeOperator}
+          onChange={(e) => {
+            setCodeOperator(e.target.value);
+          }}
+          className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:border-blue-500"
+          onKeyPress={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+            }
+          }}
+          disabled={isFinished}
+        />
+        <button
+          type="button"
+          disabled={isLoading || isFinished}
+          onClick={addWorkOrderTime}
+          className={`${
+            isFinished
+              ? "bg-gray-500"
+              : "bg-blue-500  hover:bg-blue-600 focus:bg-blue-600"
+          } px-4 py-2 text-white rounded-md focus:outline-none  flex items-center`}
+        >
+          <SvgLoginOperator className="w-6 h-6" />
+          {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+        </button>
+        <button
+          type="button"
+          disabled={isLoading || isFinished}
+          onClick={finishWorkOrderTime}
+          className={`${
+            isFinished
+              ? "bg-gray-500"
+              : "bg-red-500 hover:bg-red-600 focus:bg-red-600"
+          } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
+        >
+          <SvgLogoutOperator className="w-6 h-6" />
+          {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+        </button>
+        <button
+          type="button"
+          className={`${
+            isFinished
+              ? "bg-gray-500"
+              : "bg-orange-500 hover:bg-orange-600 focus:bg-orange-600"
+          } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
+          onClick={(e) => {
+            !isFinished && setEnterManualTime(!enterManualTime);
+          }}
+          disabled={isFinished}
+        >
+          Manual
+        </button>
+        {enterManualTime && (
+          <>
+            <input
+              type="text"
+              pattern="\d{2}/\d{2}/\d{4} \d{2}:\d{2}"
+              placeholder="dd/mm/yyyy hh:mm"
+              value={manualTime!}
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:border-blue-500"
+              onChange={handleManualTimeChange}
+            />
+          </>
+        )}
       </div>
-      <div className="overflow-x-auto ">
+      <div className="overflow-x-auto py-4">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>

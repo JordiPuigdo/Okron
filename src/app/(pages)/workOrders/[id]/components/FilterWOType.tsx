@@ -1,6 +1,7 @@
 "use client";
 import { WorkOrderType } from "app/interfaces/workOrder";
 import { useSessionStore } from "app/stores/globalStore";
+import { useState } from "react";
 
 interface FilterWOTypeProps {
   onClick: (type: WorkOrderType) => void;
@@ -8,18 +9,39 @@ interface FilterWOTypeProps {
 
 export default function FilterWOType({ onClick }: FilterWOTypeProps) {
   const { operatorLogged } = useSessionStore((state) => state);
+  const [workOrderType, setWorkOrderType] = useState<WorkOrderType | undefined>(
+    undefined
+  );
   if (operatorLogged == undefined) return <></>;
+
+  function handleChange(type: WorkOrderType) {
+    if (type == workOrderType) {
+      setWorkOrderType(undefined);
+      onClick(type);
+    } else {
+      setWorkOrderType(type);
+      onClick(type);
+    }
+  }
   return (
     <div className="flex flex-row gap-4 items-center bg-white rounded-xl p-4 font-semibold  hover:cursor-pointer">
       <span
-        className="text-white rounded-full p-3 w-full text-center bg-okron-corrective font-semibold"
-        onClick={() => onClick(WorkOrderType.Corrective)}
+        className={`text-white rounded-full p-3 w-full text-center hover:bg-okron-btDeleteHover font-semibold  ${
+          workOrderType == WorkOrderType.Corrective
+            ? "bg-okron-btDeleteHover"
+            : "bg-okron-corrective"
+        }`}
+        onClick={() => handleChange(WorkOrderType.Corrective)}
       >
         Correctius
       </span>
       <span
-        className="text-white rounded-full p-3 w-full text-center bg-okron-preventive font-semibold hover:cursor-pointer"
-        onClick={() => onClick(WorkOrderType.Preventive)}
+        className={`text-white rounded-full p-3 w-full text-center hover:bg-okron-btCreateHover font-semibold hover:cursor-pointer ${
+          workOrderType == WorkOrderType.Preventive
+            ? "bg-okron-btCreateHover"
+            : "bg-okron-preventive"
+        }`}
+        onClick={() => handleChange(WorkOrderType.Preventive)}
       >
         Preventius
       </span>

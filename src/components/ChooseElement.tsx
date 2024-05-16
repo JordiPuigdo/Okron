@@ -76,7 +76,7 @@ const ChooseElement = <T,>({
           placeholder={placeholder}
           disabled={disabled}
         />
-        <div className="mt-4 p-2">
+        <div className="p-2">
           {selectedItems.map((item) => (
             <div
               key={item.id}

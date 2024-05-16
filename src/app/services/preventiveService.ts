@@ -1,4 +1,5 @@
-import { CreatePreventiveRequest, Preventive, UpdatePreventiveRequest } from "app/interfaces/Preventive";
+import { CreatePreventiveRequest, GetWOByPreventiveIdRequest, Preventive, UpdatePreventiveRequest } from "app/interfaces/Preventive";
+import { WorkOrder } from "app/interfaces/workOrder";
 
 class PreventiveService {
   private baseUrl: string;
@@ -132,6 +133,53 @@ class PreventiveService {
     }
   }
 
+  async ForceExecutePreventive(id: string): Promise<Preventive> {
+
+    try {
+      const url = `${this.baseUrl}preventive/ForceExecutePreventive/${id}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to get preventive`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Error getting preventive:', error);
+      throw error;
+    }
+  }
+
+  async getWOByPreventiveId(request: GetWOByPreventiveIdRequest): Promise<WorkOrder[]> {
+
+    try {
+      const url = `${this.baseUrl}preventive/GetWOByPreventiveId`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to get preventive`);
+      }
+
+      const responseBody = await response.json(); 
+      return responseBody as WorkOrder[];
+    } catch (error) {
+      console.error('Error getting preventive by asset id:', error);
+      throw error;
+   }
+  }
 }
+  
+
 
 export default PreventiveService;

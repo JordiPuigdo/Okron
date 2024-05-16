@@ -50,7 +50,7 @@ const ChooseOperatorV2: React.FC<ChooseOperatorV2Props> = ({
   return (
     <div className="flex flex-row gap-8 w-full ">
       <div className="w-full">
-        <label className="block text-gray-700 font-bold mb-2 text-lg">
+        <label className="block text-gray-700 font-bold mb-2 text-sm">
           Operaris
         </label>
         <AutocompleteSearchBar

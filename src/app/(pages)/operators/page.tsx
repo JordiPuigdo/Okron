@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import OperatorForm from "../../../components/OperatorForm";
 import OperatorService from "app/services/operatorService";
-import Operator from "app/interfaces/Operator";
+import Operator, { OperatorType } from "app/interfaces/Operator";
 import Link from "next/link";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
@@ -97,6 +97,8 @@ function OperatorsPage() {
     if (existingOperator) {
       alert(`Operari amb codi ${operator.code} ja existeix.`);
     } else {
+      if (operator.operatorType == null)
+        operator.operatorType = OperatorType.Maintenance;
       const data = await operatorService.createOperator(operator);
       setIsOperatorCreated(true);
       setIsFormVisible(false);

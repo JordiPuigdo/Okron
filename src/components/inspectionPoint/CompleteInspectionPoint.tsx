@@ -128,23 +128,33 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
   }
 
   return (
-    <div className=" p-2 bg-white rounded-lg shadow-md w-full">
+    <div className="p-2 bg-white rounded-lg shadow-md w-full">
       <div
-        className="flex gap-2 p-2 bg-green-500 rounded-xl justify-center font-semibold text-white  hover:bg-green-700 cursor-pointer "
+        className={`flex gap-2 p-2  rounded-xl justify-center font-semibold text-white   ${
+          isFinished
+            ? "bg-gray-500 cursor-default"
+            : "bg-green-500 hover:bg-green-700 cursor-pointer "
+        }`}
         onClick={(e) => {
-          handleAllChecksOk();
+          !isFinished && handleAllChecksOk();
         }}
       >
         Marcar tots OK
         {isLoading["OK"] && <SvgSpinner className="w-6 h-6" />}
       </div>
-      <div className="mt-6 overflow-x-auto shadow-md">
+      <div className="py-4 overflow-x-auto rounded-sm">
         <table className="w-full table-auto">
-          <thead className="bg-gray-100">
+          <thead className="bg-gray-50">
             <tr>
-              <th className="p-2 font-bold text-sm">Check</th>
-              <th className="p-2 font-bold text-sm">Punt de inspecció</th>
-              <th className="p-2 font-bold text-sm">Reset</th>
+              <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                Check
+              </th>
+              <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                Punt de inspecció
+              </th>
+              <th className="p-2 text-center text-sm font-medium text-gray-500 uppercase tracking-wider">
+                Reset
+              </th>
             </tr>
           </thead>
 
@@ -160,7 +170,7 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
                     : "bg-orange-100"
                 }
               >
-                <td className="p-2 text-center align-middle">
+                <td className="p-2 text-left align-middle">
                   <input
                     disabled={isFinished}
                     type="checkbox"
@@ -174,11 +184,11 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
                     className="w-6 h-6 cursor-pointer"
                   />
                 </td>
-                <td className="p-2 text-center align-middle text-sm">
+                <td className="p-2 text-left align-middle text-lg">
                   {inspectionPoint.inspectionPoint.description}
                 </td>
                 <td
-                  className="p-2 text-center align-middle"
+                  className="p-2 text-left align-middle"
                   onClick={() => {
                     handleResetInspectionPoint(inspectionPoint);
                   }}

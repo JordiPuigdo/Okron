@@ -36,10 +36,10 @@ export interface WorkOrderSparePart
 }
 
 export enum StateWorkOrder {
-  Waiting = 0,
-  OnGoing = 1,
-  Paused = 2,
-  Finished = 3,
+  Waiting,
+  OnGoing,
+  Paused,
+  Finished,
   Requested,
   PendingToValidate
 

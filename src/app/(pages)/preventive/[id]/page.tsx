@@ -24,6 +24,8 @@ import assetService from "app/services/assetService";
 import AssetService from "app/services/assetService";
 import { Asset } from "app/interfaces/Asset";
 import { ElementList } from "components/selector/ElementList";
+import { WorkOrder } from "app/interfaces/workOrder";
+import { WorkOrderPerPreventive } from "./components/WorkOrderPerPreventive";
 
 export default function EditPreventive({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -56,6 +58,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [assets, setAssets] = useState<ElementList[]>([]);
+  const [active, setActive] = useState<boolean>(true);
 
   const fetchPreventiveData = async (): Promise<Preventive> => {
     try {
@@ -129,6 +132,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
           setValue("startExecution", data.startExecution);
           const finalData = new Date(data.startExecution);
           setValue("asset", data.asset);
+          setValue("active", data.active);
           setStartDate(finalData);
           await fetchInspectionPoints(data);
           await fetchOperators(data);
@@ -144,6 +148,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
 
   const onSubmit: SubmitHandler<Preventive> = async (data: any) => {
     try {
+      debugger;
       const response = await preventiveService.updatePreventive(
         convertToUpdateWorkOrderRequest(data)
       );
@@ -179,6 +184,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
       assetId: [preventive.asset?.id],
       inspectionPointId: selectedInspectionPoints.map((point) => point),
       operatorId: selectedOperator.map((sparePart) => sparePart),
+      active: preventive.active,
     };
     return updatePreventiveRequest;
   }
@@ -203,136 +209,149 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
   return (
     <MainLayout>
       <Container>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="mx-auto bg-white p-8 rounded shadow-md"
-        >
-          <p className="font-bold text-xl">Editar Revisió</p>
-
-          <div className="grid grid-cols-4 w-full gap-4 py-4">
-            <div className="col-span-2">
-              <label className="text-gray-700 font-bold text-lg" htmlFor="code">
-                Codi
-              </label>
-              <input
-                {...register("code")}
-                id="code"
-                type="text"
-                className="form-input border border-gray-300 rounded-md w-full"
-              />
-            </div>
-            <div className="col-span-2">
-              <label
-                className="text-gray-700 font-bold mb-2 text-lg"
-                htmlFor="description"
-              >
-                Descripció
-              </label>
-              <input
-                {...register("description")}
-                id="description"
-                type="text"
-                className="form-input border border-gray-300 rounded-md w-full"
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-4 w-full gap-4 py-4">
-            <div className="col-span-2">
-              <label
-                className="block text-gray-700 font-bold mb-2 text-lg"
-                htmlFor="days"
-              >
-                Freqüència Dies
-              </label>
-              <input
-                {...register("days")}
-                id="days"
-                type="number"
-                className="form-input border border-gray-300 rounded-md w-full"
-              />
-            </div>
-            <div className="col-span-2">
-              <label
-                className="block text-gray-700 font-bold mb-2 text-lg"
-                htmlFor="startExecution"
-              >
-                Primera Execució
-              </label>
-              <DatePicker
-                id="startDate"
-                selected={startDate}
-                onChange={(date: Date) => setStartDate(date)}
-                dateFormat="dd/MM/yyyy"
-                locale={ca}
-                className="border border-gray-300 p-2 rounded-md mr-4 w-full"
-              />
-            </div>
-          </div>
-
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          <div className="flex flex-row gap-8 w-full my-6">
-            <ChooseInspectionPoint
-              preventiveInspectionPoints={availableInspectionPoints}
-              onInspectionPointSelected={handleInspectionPointSelected}
-              onDeleteInspectionPointSelected={
-                handleDeleteInspectionPointSelected
-              }
-              preventiveSelectedInspectionPoints={selectedInspectionPoints}
-            />
-            <ChooseOperatorV2
-              availableOperators={operators}
-              preventiveSelectedOperators={selectedOperator}
-              onDeleteSelectedOperator={handleDeleteSelectedOperator}
-              onSelectedOperator={handleSelectedOperator}
-            />
-          </div>
-
-          <div className="flex text-black">
-            <p className="font-semibold">
-              Equip assignat: {preventiveData?.asset?.description}
-            </p>
-          </div>
-          <div className="flex flex-row gap-4">
-            <button
-              type="submit"
-              className={`${
-                showSuccessMessage
-                  ? "bg-green-500"
-                  : showErrorMessage
-                  ? "bg-red-500"
-                  : "bg-okron-btCreate"
-              } hover:${
-                showSuccessMessage
-                  ? "bg-green-700"
-                  : showErrorMessage
-                  ? "bg-red-700"
-                  : "bg-blue-700"
-              } text-white font-bold py-2 px-4 rounded mt-6`}
-            >
-              Actualitzar Revisió
-            </button>
-
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6"
-            >
-              Cancelar
-            </button>
-          </div>
-          <div className="flex my-4 w-full">
-            {showSuccessMessage && (
-              <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
-                Revisió actualitzada correctament
+        <div className="flex gap-2">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="mx-auto bg-white p-4 rounded shadow-md w-full"
+          >
+            <p className="text-lg font-semibold mb-2">Editar Revisió</p>
+            <div className="grid grid-cols-4 w-full gap-4 py-4">
+              <div className="col-span-2">
+                <label
+                  className="text-gray-700 font-bold text-sm"
+                  htmlFor="code"
+                >
+                  Codi
+                </label>
+                <input
+                  {...register("code")}
+                  id="code"
+                  type="text"
+                  className="form-input border border-gray-300 rounded-md w-full"
+                />
               </div>
-            )}
-            {showErrorMessage && (
-              <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
-                Error al actualitzar revisió
+              <div className="col-span-2">
+                <label
+                  className="text-gray-700 font-bold mb-2 text-sm"
+                  htmlFor="description"
+                >
+                  Descripció
+                </label>
+                <input
+                  {...register("description")}
+                  id="description"
+                  type="text"
+                  className="form-input border border-gray-300 rounded-md w-full"
+                />
               </div>
-            )}
-          </div>
-        </form>
+            </div>
+            <div className="grid grid-cols-4 w-full gap-4 py-4">
+              <div className="col-span-2">
+                <label
+                  className="block text-gray-700 font-bold mb-2 text-sm"
+                  htmlFor="days"
+                >
+                  Freqüència Dies
+                </label>
+                <input
+                  {...register("days")}
+                  id="days"
+                  type="number"
+                  className="form-input border border-gray-300 rounded-md w-full"
+                />
+              </div>
+              <div className="col-span-2">
+                <label
+                  className="block text-gray-700 font-bold mb-2 text-sm"
+                  htmlFor="startExecution"
+                >
+                  Primera Execució
+                </label>
+                <DatePicker
+                  id="startDate"
+                  selected={startDate}
+                  onChange={(date: Date) => setStartDate(date)}
+                  dateFormat="dd/MM/yyyy"
+                  locale={ca}
+                  className="border border-gray-300 p-2 rounded-md mr-4 w-full"
+                />
+              </div>
+            </div>
+
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            <div className="flex flex-row gap-8 w-full ">
+              <ChooseInspectionPoint
+                preventiveInspectionPoints={availableInspectionPoints}
+                onInspectionPointSelected={handleInspectionPointSelected}
+                onDeleteInspectionPointSelected={
+                  handleDeleteInspectionPointSelected
+                }
+                preventiveSelectedInspectionPoints={selectedInspectionPoints}
+              />
+              <ChooseOperatorV2
+                availableOperators={operators}
+                preventiveSelectedOperators={selectedOperator}
+                onDeleteSelectedOperator={handleDeleteSelectedOperator}
+                onSelectedOperator={handleSelectedOperator}
+              />
+            </div>
+            <div className="gap-2 flex items-center jusitfy-center py-4">
+              <p className="text-gray-700 font-bold text-sm">Activa:</p>
+              <input
+                {...register("active")}
+                id="active"
+                className="flex"
+                type="checkbox"
+              />
+            </div>
+            <div className="flex text-black">
+              <p className="font-semibold">
+                Equip assignat: {preventiveData?.asset?.description}
+              </p>
+            </div>
+            <div className="flex flex-row gap-4">
+              <button
+                type="submit"
+                className={`${
+                  showSuccessMessage
+                    ? "bg-green-500"
+                    : showErrorMessage
+                    ? "bg-red-500"
+                    : "bg-okron-btCreate"
+                } hover:${
+                  showSuccessMessage
+                    ? "bg-green-700"
+                    : showErrorMessage
+                    ? "bg-red-700"
+                    : "bg-blue-700"
+                } text-white font-bold py-2 px-4 rounded mt-6`}
+              >
+                Actualitzar Revisió
+              </button>
+
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6"
+              >
+                Cancelar
+              </button>
+            </div>
+            <div className="flex my-4 w-full">
+              {showSuccessMessage && (
+                <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
+                  Revisió actualitzada correctament
+                </div>
+              )}
+              {showErrorMessage && (
+                <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
+                  Error al actualitzar revisió
+                </div>
+              )}
+            </div>
+          </form>
+          <WorkOrderPerPreventive id={params.id} />
+        </div>
       </Container>
     </MainLayout>
   );

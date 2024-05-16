@@ -146,12 +146,12 @@ export default function WorkOrderOperationsInTable({
           }
           className={`${
             workOrder.stateWorkOrder == StateWorkOrder.OnGoing
-              ? "bg-emerald-700"
-              : "bg-rose-700"
+              ? "bg-gray-500"
+              : " bg-okron-onGoing "
           } hover:${
             workOrder.stateWorkOrder == StateWorkOrder.OnGoing
-              ? "bg-emerald-900"
-              : "bg-rose-900"
+              ? "bg-okron-hoverWaiting"
+              : "bg-okron-hoverOnGoing"
           } text-white p-2 rounded flex gap-1 w-full justify-center items-center `}
         >
           {isLoading[workOrderId + "_Sign"] ? (
@@ -163,116 +163,94 @@ export default function WorkOrderOperationsInTable({
           )}
         </Button>
 
-        <div
+        <Button
+          type="none"
+          customStyles={`${
+            workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate &&
+            "pointer-events-none"
+          }`}
           className={`${
             workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
               ? "bg-emerald-700"
-              : "bg-rose-700"
+              : "bg-okron-finished "
           } hover:${
             workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
               ? "bg-emerald-900 pointer-events-none"
-              : "bg-rose-900"
+              : "bg-okron-hoverPendingToValidate"
           } text-white p-2 rounded flex gap-1 w-full justify-center `}
+          onClick={() => {
+            if (workOrder.stateWorkOrder != StateWorkOrder.PendingToValidate) {
+              handleChangeStateWorkOrder(StateWorkOrder.PendingToValidate);
+            }
+          }}
         >
-          <Button
-            type="none"
-            customStyles={`${
-              workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate &&
-              "pointer-events-none"
-            }`}
-            onClick={() => {
-              if (
-                workOrder.stateWorkOrder != StateWorkOrder.PendingToValidate
-              ) {
-                handleChangeStateWorkOrder(StateWorkOrder.PendingToValidate);
-              }
-            }}
-          >
-            {isLoading[workOrderId + "_Validate"] ? (
-              <SvgSpinner />
-            ) : (
-              <SvgCheck />
-            )}
-          </Button>
-        </div>
+          {isLoading[workOrderId + "_Validate"] ? <SvgSpinner /> : <SvgCheck />}
+        </Button>
 
         {workOrder.workOrderType == WorkOrderType.Corrective && (
-          <div className="bg-gray-500 p-2 w-full text-white rounded flex gap-1 justify-center">
-            <Button
-              disabled={isPassInspectionPoints}
-              onClick={() => {
-                handleSparePartsModal();
-              }}
-              type="none"
-            >
-              {isLoading[workOrderId + "_SpareParts"] ? (
-                <SvgSpinner />
-              ) : (
-                <SvgSparePart />
-              )}
-            </Button>
-          </div>
+          <Button
+            onClick={() => {
+              handleSparePartsModal();
+            }}
+            type="none"
+            className="bg-gray-500 p-2 w-full text-white rounded flex gap-1 justify-center"
+          >
+            {isLoading[workOrderId + "_SpareParts"] ? (
+              <SvgSpinner />
+            ) : (
+              <SvgSparePart />
+            )}
+          </Button>
         )}
         {workOrder.workOrderType == WorkOrderType.Preventive && (
-          <div
+          <Button
+            onClick={() => {
+              !isPassInspectionPoints && handleInspectionPoints(workOrderId);
+            }}
+            type="none"
+            customStyles={`${
+              isPassInspectionPoints ? "cursor-not-allowed" : ""
+            }`}
             className={`${
               isPassInspectionPoints ? "bg-lime-700" : "bg-red-500"
             } hover:${
               isPassInspectionPoints ? "cursor-not-allowed" : "bg-red-700"
             } text-white rounded p-2 flex gap-2 justify-center align-middle w-full`}
           >
-            <Button
-              onClick={() => {
-                handleInspectionPoints(workOrderId);
-              }}
-              type="none"
-              customStyles={`${
-                isPassInspectionPoints ? "cursor-not-allowed" : ""
-              }`}
-              disabled={isPassInspectionPoints}
-            >
-              {isLoading[workOrderId + "_InspectionPoints"] ? (
-                <SvgSpinner />
-              ) : (
-                <SvgInspectionPoints />
-              )}
-            </Button>
-          </div>
-        )}
-        <div
-          className={`bg-okron-btDetail hover:bg-okron-btnDetailHover rounded text-center p-2 w-full text-white`}
-        >
-          <Button
-            type="none"
-            onClick={() => {
-              toggleLoading(workOrderId + "_Detail");
-            }}
-            href={`${Routes.workOrders + "/" + workOrder.id}`}
-          >
-            {isLoading[workOrderId + "_Detail"] ? (
+            {isLoading[workOrderId + "_InspectionPoints"] ? (
               <SvgSpinner />
             ) : (
-              <SvgDetail />
+              <SvgInspectionPoints />
             )}
           </Button>
-        </div>
-      </div>
-    );
-  else
-    return (
-      <div
-        className={`bg-okron-btDetail hover:bg-okron-btnDetailHover rounded text-center p-2 text-white justify-end`}
-      >
+        )}
+
         <Button
           type="none"
           onClick={() => {
             toggleLoading(workOrderId + "_Detail");
           }}
           href={`${Routes.workOrders + "/" + workOrder.id}`}
+          className={`bg-okron-btDetail hover:bg-okron-btnDetailHover rounded flex text-center p-2 w-full justify-center align-middle text-white`}
+          customStyles="justify-center align-middle"
         >
           {isLoading[workOrderId + "_Detail"] ? <SvgSpinner /> : <SvgDetail />}
         </Button>
       </div>
+    );
+  else
+    return (
+      <Button
+        type="none"
+        onClick={() => {
+          toggleLoading(workOrderId + "_Detail");
+        }}
+        href={`${Routes.workOrders + "/" + workOrder.id}`}
+        className={`bg-okron-btDetail hover:bg-okron-btnDetailHover rounded flex text-center p-2 w-full justify-center align-middle text-white`}
+        customStyles="justify-center align-middle"
+      >
+        {isLoading[workOrderId + "_Detail"] ? <SvgSpinner /> : <SvgDetail />}
+      </Button>
     );
 }
 
@@ -314,7 +292,7 @@ export const SparePartsModal = ({
       >
         <div className="bg-blue-950 p-4 rounded-lg shadow-md w-full">
           <div className="relative bg-white">
-            <div className="absolute p-2 top-0 right-0 justify-end">
+            <div className="absolute p-2 top-0 right-0 justify-end hover:cursor-pointer">
               <SvgClose
                 onClick={() => {
                   setIsModalOpen(false);

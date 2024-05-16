@@ -20,7 +20,7 @@ export default function SignOperator() {
     if (operatorLogged?.codeOperatorLogged) {
       setCodeOperator("");
       setOperatorLogged(undefined);
-      return;
+      if (codeOperator == "") return;
     }
     if (!/^\d+$/.test(codeOperator) || codeOperator == "") {
       setCodeOperator("");

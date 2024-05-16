@@ -29,7 +29,7 @@ export default function WorkOrderComponent({
       {operatorId !== "" ? (
         <WorkOrderTable
           enableDelete={false}
-          enableEdit={false}
+          enableEdit={true}
           enableFilters={false}
           operatorId={operatorId}
           enableDetail={false}

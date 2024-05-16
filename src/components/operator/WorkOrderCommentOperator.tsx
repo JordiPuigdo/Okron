@@ -87,7 +87,7 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
   };
 
   return (
-    <>
+    <div>
       <div className="py-2 flex flex-row gap-2">
         <textarea
           disabled={isFinished}
@@ -114,10 +114,16 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
         <table className="table-auto w-full">
           <thead>
             <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-              <th className="p-2 text-left">Op</th>
-              <th className="p-2 text-left">Comentari</th>
-              <th className="p-2 text-left">Data</th>
-              <th className="p-2 text-left"></th>
+              <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                Operari
+              </th>
+              <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase w-full tracking-wider">
+                Comentari
+              </th>
+              <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase w-full tracking-wider">
+                Data
+              </th>
+              <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"></th>
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
@@ -157,7 +163,7 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
         paginate={paginate}
         currentPage={currentPage}
       />
-    </>
+    </div>
   );
 };
 

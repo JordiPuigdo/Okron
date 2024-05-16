@@ -116,7 +116,9 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       .then((responseWorkOrder) => {
         if (responseWorkOrder) {
           setIsFinished(
-            responseWorkOrder.stateWorkOrder == StateWorkOrder.Finished
+            responseWorkOrder.stateWorkOrder == StateWorkOrder.Finished ||
+              responseWorkOrder.stateWorkOrder ==
+                StateWorkOrder.PendingToValidate
               ? true
               : false
           );
@@ -170,7 +172,6 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       const operatorsToAdd = aviableOperators?.filter((operator: any) =>
         responseWorkOrder.operatorId!.includes(operator.id)
       );
-
       setSelectedOperators((prevSelected) => [
         ...prevSelected,
         ...operatorsToAdd!,
@@ -377,11 +378,11 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           onSubmit={handleSubmit(onSubmit)}
           className="bg-white flex-grow rounded-lg p-4 shadow-md"
         >
-          <div className="flex flex-col gap-8 w-full">
+          <div className="flex flex-col w-full">
             <div className="w-full">
               <label
                 htmlFor="description"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 py-2"
               >
                 Descripció
               </label>
@@ -405,7 +406,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             <div>
               <label
                 htmlFor="stateWorkOrder"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 py-2"
               >
                 Estat
               </label>
@@ -440,7 +441,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             <div className="">
               <label
                 htmlFor="stateWorkOrder"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 py-2"
               >
                 Data Inici
               </label>
@@ -460,30 +461,33 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             <div className="w-full">
               <label
                 htmlFor="operators"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 py-2"
               >
                 Operaris
               </label>
-              <ChooseElement
-                elements={aviableOperators!
-                  .filter((x) => x.operatorType == OperatorType.Maintenance)
-                  .map((x) => ({
-                    id: x.id,
-                    description: x.name,
-                  }))}
-                onDeleteElementSelected={handleDeleteSelectedOperator}
-                onElementSelected={handleSelectOperator}
-                placeholder={"Selecciona un Operari"}
-                selectedElements={selectedOperators.map((x) => x.id)}
-                mapElement={(aviableOperators) => ({
-                  id: aviableOperators.id,
-                  description: aviableOperators.description,
-                })}
-                disabled={
-                  isFinished ||
-                  loginUser?.permission != UserPermission.Administrator
-                }
-              />
+              {aviableOperators !== undefined &&
+                aviableOperators?.length > 0 && (
+                  <ChooseElement
+                    elements={aviableOperators!
+                      .filter((x) => x.operatorType == OperatorType.Maintenance)
+                      .map((x) => ({
+                        id: x.id,
+                        description: x.name,
+                      }))}
+                    onDeleteElementSelected={handleDeleteSelectedOperator}
+                    onElementSelected={handleSelectOperator}
+                    placeholder={"Selecciona un Operari"}
+                    selectedElements={selectedOperators.map((x) => x.id)}
+                    mapElement={(aviableOperators) => ({
+                      id: aviableOperators.id,
+                      description: aviableOperators.description,
+                    })}
+                    disabled={
+                      isFinished ||
+                      loginUser?.permission != UserPermission.Administrator
+                    }
+                  />
+                )}
             </div>
           </div>
           <div className="py-4">
@@ -550,14 +554,16 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             )}
         </div>
 
-        <div className="p-2 bg-white rounded-lg shadow-md w-full">
+        <div className="p-2 bg-white rounded-lg shadow-md  w-full  flex flex-col">
           {currentWorkOrder && (
             <>
-              <WorkOrderButtons
-                workOrder={currentWorkOrder}
-                handleReload={fetchWorkOrder}
-                handleSubmit={() => handleSubmitForm()}
-              />
+              <div>
+                <WorkOrderButtons
+                  workOrder={currentWorkOrder}
+                  handleReload={fetchWorkOrder}
+                  handleSubmit={() => handleSubmitForm()}
+                />
+              </div>
               <div className="py-2">
                 <WorkOrderOperatorComments
                   workOrderComments={workOrderComments}
@@ -578,7 +584,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             : "flex-col "
         }`}
       >
-        <div className="flex">
+        <div className="flex w-full">
           <WorkOrderOperatorTimesComponent
             operators={aviableOperators!}
             workOrderOperatortimes={workOrderOperatorTimes}
@@ -587,7 +593,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             isFinished={isFinished}
           />
         </div>
-        <div className="flex flex-grow">
+        <div className="flex flex-grow w-full">
           {currentWorkOrder.workOrderType === WorkOrderType.Preventive && (
             <CompleteInspectionPoints
               workOrderInspectionPoints={passedInspectionPoints!}
