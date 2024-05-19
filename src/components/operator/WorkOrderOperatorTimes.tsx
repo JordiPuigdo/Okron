@@ -16,8 +16,6 @@ import {
 } from "app/icons/icons";
 import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
-import { set } from "react-hook-form";
-import { start } from "repl";
 
 interface IWorkOrderOperatorTimes {
   operators: Operator[];

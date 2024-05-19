@@ -90,7 +90,7 @@ const PreventiveTable: React.FC<PreventiveTableProps> = ({
           setPreventives(fetchedPreventives);
         } else {
           const fetchedPreventives = await preventiveService.getPreventives();
-          debugger;
+
           setPreventives(fetchedPreventives);
           if (filters.filter((x) => x.key === "asset.description").length == 0)
             filters.push({

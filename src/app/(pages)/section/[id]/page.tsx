@@ -5,7 +5,7 @@ import SectionForm from "components/section/SectionForm";
 export default function Page({ params }: { params: { id: string } }) {
   return (
     <MainLayout>
-      <Container enablePading={false}>
+      <Container>
         <SectionForm id={params.id} />
       </Container>
     </MainLayout>

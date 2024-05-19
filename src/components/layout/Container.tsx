@@ -8,11 +8,7 @@ export default function Container({
   className?: string;
 }) {
   return (
-    <div
-      className={`bg-gray-100 h-screen overflow-y-auto pb-12 ${
-        enablePading ? "px-2 pt-24" : ""
-      } `}
-    >
+    <div className={`bg-gray-100 h-screen overflow-y-auto p-8 py-20`}>
       {children}
     </div>
   );

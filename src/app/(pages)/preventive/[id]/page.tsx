@@ -148,7 +148,6 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
 
   const onSubmit: SubmitHandler<Preventive> = async (data: any) => {
     try {
-      debugger;
       const response = await preventiveService.updatePreventive(
         convertToUpdateWorkOrderRequest(data)
       );

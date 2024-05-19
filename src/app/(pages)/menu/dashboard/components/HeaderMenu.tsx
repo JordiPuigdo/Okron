@@ -1,3 +1,4 @@
+"use client";
 import GeneratePreventive from "app/(pages)/preventive/components/GeneratePreventive";
 import FilterWOType from "app/(pages)/workOrders/[id]/components/FilterWOType";
 import FinalizeWorkOrdersDaysBefore from "app/(pages)/workOrders/components/FinalizeWorkOrdersDaysBefore";
@@ -22,10 +23,10 @@ export const HeaderMenu = () => {
   }
   return (
     <>
-      <div className="flex flex-row gap-4 bg-blue-950 p-1 rounded-xl">
+      <div className="flex flex-row gap-4 bg-white p-1 rounded-xl">
         <SignOperator />
         {loginUser?.permission == UserPermission.Administrator && (
-          <div className="flex flex-col gap-2 bg-white rounded-xl p-2">
+          <div className="flex flex-row gap-2 bg-white rounded-xl p-2">
             <FinalizeWorkOrdersDaysBefore />
             <GeneratePreventive />
           </div>

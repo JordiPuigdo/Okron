@@ -64,7 +64,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
+
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
@@ -153,6 +154,21 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       .catch((e) => {
         setErrorMessage("Error carregant les dades " + e.message);
       });
+  }
+
+  async function handleDeleteWordOrder() {
+    toggleLoading("DELETE");
+    const isConfirmed = window.confirm(
+      "Segur que voleu eliminar aquest ordre de treball?"
+    );
+    if (isConfirmed) {
+      await workOrderService.deleteWorkOrder(id);
+      setShowSuccessMessage(true);
+      setTimeout(() => {
+        history.back();
+      }, 2000);
+    }
+    toggleLoading("DELETE");
   }
 
   async function loadForm(responseWorkOrder: WorkOrder | null) {
@@ -291,8 +307,12 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     handleSubmit(onSubmit)();
   };
 
+  function toggleLoading(id: string) {
+    setIsLoading((prevLoading) => ({ ...prevLoading, [id]: !prevLoading[id] }));
+  }
+
   const onSubmit: SubmitHandler<WorkOrder> = async (data) => {
-    setIsLoading(true);
+    toggleLoading("SAVE");
     try {
       const updatedWorkOrderData: UpdateWorkOrderRequest = {
         id: id,
@@ -308,14 +328,14 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       setShowErrorMessage(false);
     } catch (error) {
       setTimeout(() => {
-        setIsLoading(false);
+        toggleLoading("SAVE");
         setShowErrorMessage(false);
       }, 3000);
       setShowSuccessMessage(false);
       setShowErrorMessage(true);
     }
     setTimeout(() => {
-      setIsLoading(false);
+      toggleLoading("SAVE");
       window.location.reload();
     }, 2000);
   };
@@ -490,13 +510,30 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 )}
             </div>
           </div>
-          <div className="py-4">
+          <div className="py-4 flex gap-2">
             {loginUser?.permission == UserPermission.Administrator && (
-              <Button onClick={() => handleSubmit} type="create">
-                {isLoading ? (
+              <Button
+                onClick={() => handleSubmit}
+                type="create"
+                customStyles="flex"
+              >
+                {isLoading["SAVE"] ? (
                   <SvgSpinner className="text-white" />
                 ) : (
                   "Actualitzar"
+                )}
+              </Button>
+            )}
+            {loginUser?.permission == UserPermission.Administrator && (
+              <Button
+                onClick={() => handleDeleteWordOrder()}
+                type="delete"
+                customStyles="flex"
+              >
+                {isLoading["DELETE"] ? (
+                  <SvgSpinner className="text-white" />
+                ) : (
+                  "Eliminar"
                 )}
               </Button>
             )}
@@ -590,7 +627,12 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             workOrderOperatortimes={workOrderOperatorTimes}
             setWorkOrderOperatortimes={setworkOrderOperatorTimes}
             workOrderId={currentWorkOrder.id}
-            isFinished={isFinished}
+            isFinished={
+              currentWorkOrder.stateWorkOrder == StateWorkOrder.Finished ||
+              currentWorkOrder.stateWorkOrder ==
+                StateWorkOrder.PendingToValidate ||
+              currentWorkOrder.stateWorkOrder == StateWorkOrder.Waiting
+            }
           />
         </div>
         <div className="flex flex-grow w-full">
@@ -599,7 +641,12 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               workOrderInspectionPoints={passedInspectionPoints!}
               setCompletedWorkOrderInspectionPoints={setPassedInspectionPoints}
               workOrderId={currentWorkOrder.id}
-              isFinished={isFinished}
+              isFinished={
+                currentWorkOrder.stateWorkOrder == StateWorkOrder.Finished ||
+                currentWorkOrder.stateWorkOrder ==
+                  StateWorkOrder.PendingToValidate ||
+                currentWorkOrder.stateWorkOrder == StateWorkOrder.Waiting
+              }
             />
           )}
           {currentWorkOrder.workOrderType === WorkOrderType.Corrective && (

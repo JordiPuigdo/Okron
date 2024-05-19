@@ -53,7 +53,7 @@ export const Button = ({
       <Link
         href={href}
         className={twMerge(
-          `relative overflow-visible inline-block ${className}`
+          `relative overflow-visible inline-block ${disabled ? "" : className}`
         )}
         onClick={handleClick}
       >
@@ -108,7 +108,7 @@ const ButtonBody = ({
   id?: string;
 }) => {
   const DISABLED_STYLES =
-    "bg-gray-200 text-gray-500 hover:bg-gray-200 hover:text-gray-500 cursor:default w-full";
+    "bg-gray-200 text-gray-500 hover:bg-gray-200 hover:text-gray-500 cursor:default w-full text-center justify-center rounded-none";
 
   const STYLES: any = {
     common: "transition-all relative text-center rounded-full",
