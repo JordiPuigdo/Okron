@@ -27,7 +27,6 @@ import { Asset } from "app/interfaces/Asset";
 import AssetService from "app/services/assetService";
 import { ElementList } from "components/selector/ElementList";
 import ChooseElement from "components/ChooseElement";
-import { log } from "console";
 import { useSessionStore } from "app/stores/globalStore";
 
 function CorrectivePage() {
@@ -60,6 +59,7 @@ function CorrectivePage() {
 
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const { loginUser } = useSessionStore((state) => state);
 
   async function fetchFormData() {
     await fetchOperators();

@@ -302,7 +302,6 @@ class WorkOrderService {
       throw error;
     }
   }
-
   async addCommentToWorkOrder(addCommentToWorkOrder: AddCommentToWorkOrderRequest): Promise<WorkOrderComment> {
     try {
       const url = `${this.baseUrl}AddCommentToWorkOrder`

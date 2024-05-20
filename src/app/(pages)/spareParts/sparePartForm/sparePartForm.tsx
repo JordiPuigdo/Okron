@@ -211,7 +211,6 @@ const SparePartForm: React.FC<SparePartForm> = ({ sparePartLoaded }) => {
           >
             Guardar
           </button>
-
           <button
             type="button"
             onClick={handleBack}
