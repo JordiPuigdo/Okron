@@ -180,6 +180,7 @@ const SparePartForm: React.FC<SparePartForm> = ({ sparePartLoaded }) => {
             </label>
             <input
               {...register("price")}
+              defaultValue={0}
               className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
             />
           </div>
@@ -200,6 +201,7 @@ const SparePartForm: React.FC<SparePartForm> = ({ sparePartLoaded }) => {
             <input
               type="checkbox"
               {...register("active")}
+              checked={true}
               className="mt-1 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
             />
           </div>
