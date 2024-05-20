@@ -170,6 +170,7 @@ const DataTable: React.FC<DataTableProps> = ({
         }).length
       );
     } else {
+      setTotalRecords(data.length);
       setFilteredData(data.slice(indexOfFirstRecord, indexOfLastRecord));
     }
 
