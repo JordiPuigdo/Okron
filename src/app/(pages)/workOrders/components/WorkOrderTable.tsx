@@ -354,7 +354,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   const handleSearch = async () => {
     setIsLoading(true);
 
-    //await searchWorkOrders();
+    await searchWorkOrders();
     setIsLoading(false);
   };
 
