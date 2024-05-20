@@ -280,7 +280,7 @@ class WorkOrderService {
   }
 
   
-  async updateStateWorkOrder(updateStateWorkOrder: UpdateStateWorkOrder): Promise<boolean> {
+  async updateStateWorkOrder(updateStateWorkOrder: UpdateStateWorkOrder[]): Promise<boolean> {
     try {
       const url = `${this.baseUrl}workorder/state`;
 

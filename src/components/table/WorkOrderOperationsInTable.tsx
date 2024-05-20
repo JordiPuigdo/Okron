@@ -13,6 +13,7 @@ import SparePart from "app/interfaces/SparePart";
 import WorkOrder, {
   StateWorkOrder,
   UpdateStateWorkOrder,
+  WorkOrderSparePart,
   WorkOrderType,
 } from "app/interfaces/workOrder";
 import SparePartService from "app/services/sparePartService";
@@ -29,12 +30,14 @@ interface WorkOrderOperationsInTableProps {
   workOrderId: string;
   workOrder: WorkOrder;
   onChangeStateWorkOrder?: () => void;
+  enableActions?: boolean;
 }
 
 export default function WorkOrderOperationsInTable({
   workOrderId,
   workOrder,
   onChangeStateWorkOrder,
+  enableActions = true,
 }: WorkOrderOperationsInTableProps) {
   const [isPassInspectionPoints, setIsPassInspectionPoints] =
     React.useState(false);
@@ -92,12 +95,14 @@ export default function WorkOrderOperationsInTable({
       return;
     }
 
-    const update: UpdateStateWorkOrder = {
-      workOrderId: workOrder.id,
-      state: state,
-      operatorId: operatorLogged?.idOperatorLogged,
-      userId: loginUser?.agentId,
-    };
+    const update: UpdateStateWorkOrder[] = [
+      {
+        workOrderId: workOrder.id,
+        state: state,
+        operatorId: operatorLogged?.idOperatorLogged,
+        userId: loginUser?.agentId,
+      },
+    ];
     await workOrderService.updateStateWorkOrder(update).then((response) => {
       if (response) {
         workOrder.stateWorkOrder = state;
@@ -179,75 +184,93 @@ export default function WorkOrderOperationsInTable({
         : "bg-gray-200 pointer-events-none"
     } text-white rounded p-2 flex gap-2 justify-center align-middle w-full`;
 
-  return (
-    <div className="flex w-full gap-2">
-      {showModal && (
-        <SparePartsModal workOrder={workOrder} isFinished={false} />
-      )}
-      <Button
-        type="none"
-        size="md"
-        onClick={() => {
-          workOrder.stateWorkOrder == StateWorkOrder.OnGoing
-            ? handleChangeStateWorkOrder(StateWorkOrder.Paused)
-            : handleChangeStateWorkOrder(StateWorkOrder.OnGoing);
-        }}
-        className={classNameOnGoing}
-      >
-        {isLoading[workOrderId + "_Sign"] ? (
-          <SvgSpinner className="text-white" />
-        ) : workOrder.stateWorkOrder == StateWorkOrder.OnGoing ? (
-          <SvgPause className="text-white" />
-        ) : (
-          <SvgStart />
+  if (enableActions)
+    return (
+      <div className="flex w-full gap-2">
+        {showModal && (
+          <SparePartsModal workOrder={workOrder} isFinished={false} />
         )}
-      </Button>
-
-      <Button
-        type="none"
-        className={`${classNameValidate}`}
-        onClick={() => {
-          if (!validStates.includes(workOrder.stateWorkOrder)) return;
-          if (workOrder.stateWorkOrder != StateWorkOrder.PendingToValidate) {
-            handleChangeStateWorkOrder(StateWorkOrder.PendingToValidate);
-          }
-        }}
-      >
-        {isLoading[workOrderId + "_Validate"] ? <SvgSpinner /> : <SvgCheck />}
-      </Button>
-
-      {workOrder.workOrderType == WorkOrderType.Corrective && (
         <Button
-          onClick={() => {
-            handleSparePartsModal();
-          }}
           type="none"
-          className={`${classNameSpareParts}`}
+          size="md"
+          onClick={() => {
+            workOrder.stateWorkOrder == StateWorkOrder.OnGoing
+              ? handleChangeStateWorkOrder(StateWorkOrder.Paused)
+              : handleChangeStateWorkOrder(StateWorkOrder.OnGoing);
+          }}
+          className={classNameOnGoing}
         >
-          {isLoading[workOrderId + "_SpareParts"] ? (
-            <SvgSpinner />
+          {isLoading[workOrderId + "_Sign"] ? (
+            <SvgSpinner className="text-white" />
+          ) : workOrder.stateWorkOrder == StateWorkOrder.OnGoing ? (
+            <SvgPause className="text-white" />
           ) : (
-            <SvgSparePart />
+            <SvgStart />
           )}
         </Button>
-      )}
-      {workOrder.workOrderType == WorkOrderType.Preventive && (
-        <Button
-          onClick={() => {
-            !isPassInspectionPoints && handleInspectionPoints(workOrderId);
-          }}
-          type="none"
-          customStyles={`${isPassInspectionPoints ? "cursor-not-allowed" : ""}`}
-          className={`${classNamePreventive} text-white rounded p-2 flex gap-2 justify-center align-middle w-full`}
-        >
-          {isLoading[workOrderId + "_InspectionPoints"] ? (
-            <SvgSpinner />
-          ) : (
-            <SvgInspectionPoints />
-          )}
-        </Button>
-      )}
 
+        <Button
+          type="none"
+          className={`${classNameValidate}`}
+          onClick={() => {
+            if (!validStates.includes(workOrder.stateWorkOrder)) return;
+            if (workOrder.stateWorkOrder != StateWorkOrder.PendingToValidate) {
+              handleChangeStateWorkOrder(StateWorkOrder.PendingToValidate);
+            }
+          }}
+        >
+          {isLoading[workOrderId + "_Validate"] ? <SvgSpinner /> : <SvgCheck />}
+        </Button>
+
+        {workOrder.workOrderType == WorkOrderType.Corrective && (
+          <Button
+            onClick={() => {
+              handleSparePartsModal();
+            }}
+            type="none"
+            className={`${classNameSpareParts}`}
+          >
+            {isLoading[workOrderId + "_SpareParts"] ? (
+              <SvgSpinner />
+            ) : (
+              <SvgSparePart />
+            )}
+          </Button>
+        )}
+        {workOrder.workOrderType == WorkOrderType.Preventive && (
+          <Button
+            onClick={() => {
+              !isPassInspectionPoints && handleInspectionPoints(workOrderId);
+            }}
+            type="none"
+            customStyles={`${
+              isPassInspectionPoints ? "cursor-not-allowed" : ""
+            }`}
+            className={`${classNamePreventive} text-white rounded p-2 flex gap-2 justify-center align-middle w-full`}
+          >
+            {isLoading[workOrderId + "_InspectionPoints"] ? (
+              <SvgSpinner />
+            ) : (
+              <SvgInspectionPoints />
+            )}
+          </Button>
+        )}
+
+        <Button
+          type="none"
+          onClick={() => {
+            toggleLoading(workOrderId + "_Detail");
+          }}
+          href={`${Routes.workOrders + "/" + workOrder.id}`}
+          className={`bg-okron-btDetail hover:bg-okron-btnDetailHover rounded flex text-center p-2 w-full justify-center align-middle text-white`}
+          customStyles="justify-center align-middle"
+        >
+          {isLoading[workOrderId + "_Detail"] ? <SvgSpinner /> : <SvgDetail />}
+        </Button>
+      </div>
+    );
+  else
+    return (
       <Button
         type="none"
         onClick={() => {
@@ -259,8 +282,7 @@ export default function WorkOrderOperationsInTable({
       >
         {isLoading[workOrderId + "_Detail"] ? <SvgSpinner /> : <SvgDetail />}
       </Button>
-    </div>
-  );
+    );
 }
 
 interface SparePartsModalProps {
@@ -273,7 +295,11 @@ export const SparePartsModal = ({
   isFinished,
 }: SparePartsModalProps) => {
   const { setIsModalOpen } = useGlobalStore((state) => state);
-  function setSelectedSpareParts(x: any) {}
+
+  const [selectedSpareParts, setSelectedSpareParts] = useState<
+    WorkOrderSparePart[]
+  >([]);
+
   const sparePartService = new SparePartService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
@@ -288,7 +314,17 @@ export const SparePartsModal = ({
       });
     }
     fetchSpareParts();
+
+    if (workOrder.workOrderSpareParts) {
+      setSelectedSpareParts(workOrder.workOrderSpareParts);
+    }
   }, []);
+
+  useEffect(() => {
+    workOrder.workOrderSpareParts?.forEach((x) => {
+      setSelectedSpareParts((prevSelected) => [...prevSelected, x]);
+    });
+  }, [selectedSpareParts]);
 
   return (
     <>
@@ -311,7 +347,7 @@ export const SparePartsModal = ({
             {availableSpareParts.length > 0 ? (
               <ChooseSpareParts
                 availableSpareParts={availableSpareParts}
-                selectedSpareParts={workOrder.workOrderSpareParts!}
+                selectedSpareParts={selectedSpareParts!}
                 setSelectedSpareParts={setSelectedSpareParts}
                 WordOrderId={workOrder.id}
                 isFinished={isFinished}

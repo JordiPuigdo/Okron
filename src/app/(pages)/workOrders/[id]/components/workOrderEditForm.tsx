@@ -39,6 +39,7 @@ import { CostsObject } from "components/Costs/CostsObject";
 import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspectionPoint";
 import WorkOrderButtons from "./WorkOrderButtons";
 import { Button } from "designSystem/Button/Buttons";
+import useRoutes from "app/utils/useRoutes";
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -108,7 +109,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [totalCosts, setTotalCosts] = useState<number>(0);
   const [sparePartCosts, setSparePartCosts] = useState<number>(0);
   const [operatorCosts, setOperatorCosts] = useState<number>(0);
-
+  const Routes = useRoutes();
   const [activeTab, setActiveTab] = useState<Tab>(Tab.OPERATORTIMES);
 
   async function fetchWorkOrder() {
@@ -512,30 +513,58 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           </div>
           <div className="py-4 flex gap-2">
             {loginUser?.permission == UserPermission.Administrator && (
-              <Button
-                onClick={() => handleSubmit}
-                type="create"
-                customStyles="flex"
-              >
-                {isLoading["SAVE"] ? (
-                  <SvgSpinner className="text-white" />
-                ) : (
-                  "Actualitzar"
+              <>
+                {" "}
+                <Button
+                  onClick={() => handleSubmit}
+                  type="create"
+                  customStyles="flex"
+                >
+                  {isLoading["SAVE"] ? (
+                    <SvgSpinner className="text-white" />
+                  ) : (
+                    "Actualitzar"
+                  )}
+                </Button>
+                <Button
+                  onClick={() => handleDeleteWordOrder()}
+                  type="delete"
+                  customStyles="flex"
+                >
+                  {isLoading["DELETE"] ? (
+                    <SvgSpinner className="text-white" />
+                  ) : (
+                    "Eliminar"
+                  )}
+                </Button>
+                <Button
+                  href={`${Routes.configuration.assets}/${currentWorkOrder?.asset?.id}`}
+                  type="none"
+                  className="bg-blue-700 hover:bg-blue-900 text-white font-semibold p2- rounded-l"
+                  customStyles="flex"
+                >
+                  {isLoading["DELETE"] ? (
+                    <SvgSpinner className="text-white" />
+                  ) : (
+                    "Veure Actiu"
+                  )}
+                </Button>
+                {currentWorkOrder?.workOrderType ==
+                  WorkOrderType.Preventive && (
+                  <Button
+                    href={`${Routes.preventive.configuration}/${currentWorkOrder?.preventive?.id}`}
+                    type="none"
+                    className="bg-blue-700 hover:bg-blue-900 text-white font-semibold p2- rounded-l"
+                    customStyles="flex"
+                  >
+                    {isLoading["DELETE"] ? (
+                      <SvgSpinner className="text-white" />
+                    ) : (
+                      "Veure Revisió"
+                    )}
+                  </Button>
                 )}
-              </Button>
-            )}
-            {loginUser?.permission == UserPermission.Administrator && (
-              <Button
-                onClick={() => handleDeleteWordOrder()}
-                type="delete"
-                customStyles="flex"
-              >
-                {isLoading["DELETE"] ? (
-                  <SvgSpinner className="text-white" />
-                ) : (
-                  "Eliminar"
-                )}
-              </Button>
+              </>
             )}
           </div>
         </form>
@@ -659,6 +688,45 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             />
           )}
         </div>
+      </div>
+      <div className="py-2 p-2 bg-blue-900 rounded-lg shadow-md  w-full  flex flex-col">
+        {currentWorkOrder &&
+          loginUser?.permission == UserPermission.Administrator && (
+            <div className="flex flex-col  bg-gray-100 rounded-lg shadow-md justify-start">
+              <div className="flex flex-row gap-4 p-4">
+                <div
+                  className="text-gray-600 font-semibold text-lg w-[20%]"
+                  onClick={toggleSortOrder}
+                >
+                  Data Acció {sortOrder === "asc" ? "▲" : "▼"}
+                </div>
+                <div className="text-gray-600 font-semibold w-[20%] text-lg">
+                  Acció
+                </div>
+                <div className="text-gray-600 font-semibold w-[20%] text-lg">
+                  Operari
+                </div>
+              </div>
+              {sortedEvents.map((x, index) => {
+                return (
+                  <div
+                    key={index}
+                    className={`flex flex-row gap-4 p-4 rounded-lg items-center ${
+                      index % 2 == 0 ? "bg-gray-200" : ""
+                    }`}
+                  >
+                    <div className="text-gray-600 w-[20%]">
+                      {formatDate(x.date)}
+                    </div>
+                    <div className=" w-[20%]">
+                      {translateWorkOrderEventType(x.workOrderEventType)}
+                    </div>
+                    <div className="w-[20%]">{x.operator.name}</div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
       </div>
 
       {/*  <div className="bg-white rounded-xl">

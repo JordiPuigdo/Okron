@@ -17,7 +17,6 @@ import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
 import useRoutes from "app/utils/useRoutes";
 import WorkOrderOperationsInTable from "./WorkOrderOperationsInTable";
-import { Button } from "designSystem/Button/Buttons";
 import { PreventiveButtons } from "./components/PreventiveButtons";
 
 interface DataTableProps {
@@ -29,6 +28,8 @@ interface DataTableProps {
   onDelete?: (id: string) => void;
   totalCounts?: boolean;
   enableFilterActive?: boolean;
+  enableCheckbox?: boolean;
+  onChecked?: (id?: string) => void;
 }
 
 export interface LoadingState {
@@ -52,6 +53,8 @@ const DataTable: React.FC<DataTableProps> = ({
   onDelete,
   totalCounts = false,
   enableFilterActive = true,
+  enableCheckbox = true,
+  onChecked,
 }: DataTableProps) => {
   const itemsPerPageOptions = [5, 10, 15, 20, 25, 50];
   const pathName = usePathname();
@@ -279,6 +282,30 @@ const DataTable: React.FC<DataTableProps> = ({
     );
   };
 
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+
+  const handleSelectedRow = (id: string) => {
+    setSelectedRows((prevSelectedRows) => {
+      const newSelectedRows = new Set(prevSelectedRows);
+      if (newSelectedRows.has(id)) {
+        newSelectedRows.delete(id);
+      } else {
+        newSelectedRows.add(id);
+      }
+      return newSelectedRows;
+    });
+    onChecked && onChecked(id);
+  };
+
+  const handleSelectedAllRows = () => {
+    if (selectedRows.size === data.length) {
+      setSelectedRows(new Set()); // Deselect all if all are selected
+    } else {
+      setSelectedRows(new Set(data.map((row) => row.id))); // Select all rows
+    }
+    onChecked && onChecked();
+  };
+
   const renderHeadTableActions = () => {
     return tableButtons.delete ||
       tableButtons.detail ||
@@ -359,12 +386,16 @@ const DataTable: React.FC<DataTableProps> = ({
               workOrderId={item[columns[0].key]}
               workOrder={item}
               onChangeStateWorkOrder={() => setFilterActive(!filterActive)}
+              enableActions={tableButtons.edit || tableButtons.delete}
             />
           </>
         )}
       </td>
     );
   };
+
+  const isAllSelected =
+    data.length > 0 && selectedRows.size === data.length ? true : false;
 
   if (filteredData)
     return (
@@ -379,6 +410,23 @@ const DataTable: React.FC<DataTableProps> = ({
                 <table className="w-full text-left text-sm">
                   <thead>
                     <tr className="border-t border-gray-200 flex-grow">
+                      {enableCheckbox && (
+                        <th
+                          className="border-b border-blue-gray-100 bg-blue-gray-50 p-4 cursor-pointer"
+                          onClick={handleSelectedAllRows}
+                        >
+                          <div className="flex items-center justify-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={
+                                isAllSelected == undefined
+                                  ? false
+                                  : isAllSelected
+                              }
+                            />
+                          </div>
+                        </th>
+                      )}
                       {columns.map((column) => {
                         if (column.key.toLocaleUpperCase() !== "ID") {
                           let classname = "flex";
@@ -421,6 +469,20 @@ const DataTable: React.FC<DataTableProps> = ({
                             rowIndex % 2 === 0 ? "" : "bg-gray-100"
                           } `}
                         >
+                          {enableCheckbox && (
+                            <td
+                              className="p-2 hover:cursor-pointer"
+                              onClick={() => handleSelectedRow(rowData.id)}
+                            >
+                              <div className="flex items-center justify-center">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedRows.has(rowData.id)}
+                                  onChange={() => handleSelectedRow(rowData.id)}
+                                />
+                              </div>
+                            </td>
+                          )}
                           {columns
                             .filter(
                               (column) =>

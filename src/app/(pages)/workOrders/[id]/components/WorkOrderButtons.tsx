@@ -52,12 +52,14 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
       return;
     }
     toggleLoading(state);
-    const update: UpdateStateWorkOrder = {
-      workOrderId: workOrder.id,
-      state: state,
-      operatorId: operatorLogged?.idOperatorLogged,
-      userId: loginUser?.agentId,
-    };
+    const update: UpdateStateWorkOrder[] = [
+      {
+        workOrderId: workOrder.id,
+        state: state,
+        operatorId: operatorLogged?.idOperatorLogged,
+        userId: loginUser?.agentId,
+      },
+    ];
     workOrderService.updateStateWorkOrder(update).then((response) => {
       if (response) {
         handleReload();

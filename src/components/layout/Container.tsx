@@ -8,7 +8,7 @@ export default function Container({
   className?: string;
 }) {
   return (
-    <div className={`bg-gray-100 h-screen overflow-y-auto p-8 py-20`}>
+    <div className={`bg-gray-100 h-screen overflow-y-auto p-8 py-24`}>
       {children}
     </div>
   );

@@ -92,7 +92,7 @@ class SparePartService {
 
   async consumeSparePart(consumeSparePartRequest : ConsumeSparePart ): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}sparePart/consume`;
+      const url = `${this.baseUrl}sparePart/Consume`;
       const response = await fetch(url, {
         method: 'PUT',
         headers: {

@@ -1,3 +1,5 @@
+import { OperatorType } from "./Operator";
+
 export interface User {
     username : string;
     password : string;
@@ -24,4 +26,5 @@ export interface OperatorLogged {
     idOperatorLogged : string;
     codeOperatorLogged : string;
     nameOperatorLogged: string;
+    operatorLoggedType : OperatorType;
 }

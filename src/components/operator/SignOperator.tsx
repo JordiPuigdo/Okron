@@ -35,6 +35,7 @@ export default function SignOperator() {
             codeOperatorLogged: x.code,
             idOperatorLogged: x.id,
             nameOperatorLogged: x.name,
+            operatorLoggedType: x.operatorType,
           };
           setOperatorLogged(op);
           setCodeOperator("");

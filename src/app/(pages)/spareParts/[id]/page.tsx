@@ -359,6 +359,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                   sparePartId={params.id}
                   enableFilters={false}
                   enableDetail={true}
+                  enableDelete={false}
                   enableCreate={false}
                 />
               </div>

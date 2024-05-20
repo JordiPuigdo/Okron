@@ -3,6 +3,7 @@
 import WorkOrder, {
   SearchWorkOrderFilters,
   StateWorkOrder,
+  UpdateStateWorkOrder,
   WorkOrderType,
 } from "app/interfaces/workOrder";
 import WorkOrderService from "app/services/workOrderService";
@@ -30,6 +31,8 @@ import { ElementList } from "components/selector/ElementList";
 import FinalizeWorkOrdersDaysBefore from "./FinalizeWorkOrdersDaysBefore";
 import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
+import { OperatorType } from "app/interfaces/Operator";
+import { Button } from "designSystem/Button/Buttons";
 
 interface WorkOrderTableProps {
   enableFilterAssets?: boolean;
@@ -82,6 +85,11 @@ const columns: Column[] = [
   },
 ];
 
+interface ResponseMessage {
+  message: string;
+  isSuccess: boolean;
+}
+
 const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   enableFilterAssets = false,
   enableFilters = false,
@@ -108,10 +116,12 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   >(undefined);
   const [searchTerm, setSearchTerm] = useState("");
   const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
-
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
+
+  const { operatorLogged, loginUser } = useSessionStore((state) => state);
 
   const tableButtons: TableButtons = {
     edit: enableEdit,
@@ -119,7 +129,12 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     detail: enableDetail,
   };
 
+  const [responseMessage, setResponseMessage] =
+    useState<ResponseMessage | null>(null);
+
   const [selectedAssetId, setSelectedAssetId] = useState<string>(assetId!);
+
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -185,6 +200,12 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
           ).toISOString()
         : "",
     };
+
+    if (operatorLogged?.operatorLoggedType == OperatorType.Quality) {
+      search.stateWorkOrder = StateWorkOrder.PendingToValidate;
+      search.startDateTime = undefined;
+      search.endDateTime = undefined;
+    }
 
     const workOrders = await workOrderService.getWorkOrdersWithFilters(search);
     if (workOrders.length == 0) {
@@ -333,7 +354,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   const handleSearch = async () => {
     setIsLoading(true);
 
-    await searchWorkOrders();
+    //await searchWorkOrders();
     setIsLoading(false);
   };
 
@@ -409,6 +430,68 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     return true;
   });
 
+  const handleOnChecked = (id?: string) => {
+    if (id != undefined) {
+      setSelectedRows((prevSelectedRows) => {
+        const newSelectedRows = new Set(prevSelectedRows);
+        if (newSelectedRows.has(id)) {
+          newSelectedRows.delete(id);
+        } else {
+          newSelectedRows.add(id);
+        }
+        return newSelectedRows;
+      });
+    } else {
+      if (selectedRows.size === filteredWorkOrders.length) {
+        setSelectedRows(new Set());
+      } else {
+        setSelectedRows(new Set(filteredWorkOrders.map((row) => row.id)));
+      }
+    }
+  };
+
+  const handleFinalizeWorkOrders = async () => {
+    setIsUpdating(true);
+
+    const workOrders = Array.from(selectedRows).map((workOrderId) => ({
+      workOrderId,
+      state: StateWorkOrder.Finished,
+      operatorId: operatorLogged?.idOperatorLogged,
+      userId: loginUser?.agentId,
+    }));
+
+    await workOrderService
+      .updateStateWorkOrder(workOrders)
+      .then((response) => {
+        if (response) {
+          setTimeout(() => {
+            setResponseMessage({
+              message: "Ordres actualitzades correctament",
+              isSuccess: true,
+            });
+          }, 2000);
+
+          searchWorkOrders();
+        } else {
+          setTimeout(() => {
+            setResponseMessage({
+              message: "Error actualitzant ordres",
+              isSuccess: false,
+            });
+          }, 3000);
+        }
+      })
+      .catch((error) => {
+        setTimeout(() => {
+          setResponseMessage({
+            message: error,
+            isSuccess: false,
+          });
+        }, 3000);
+      });
+    setIsUpdating(false);
+  };
+
   return (
     <>
       {enableFilters && renderFilterWorkOrders()}
@@ -419,7 +502,41 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
         entity={EntityTable.WORKORDER}
         onDelete={handleDeleteOrder}
         enableFilterActive={false}
+        enableCheckbox={
+          operatorLogged?.operatorLoggedType == OperatorType.Quality
+        }
+        onChecked={handleOnChecked}
       />
+      {filteredWorkOrders.length > 0 && (
+        <div className="py-4 flex flex-row gap-2">
+          <Button
+            type="none"
+            className={`text-white ${
+              selectedRows.size > 0
+                ? " bg-blue-900 hover:bg-blue-950 "
+                : " bg-gray-200 hover:cursor-not-allowed"
+            }  rounded-lg text-sm `}
+            size="lg"
+            customStyles="align-middle flex"
+            onClick={handleFinalizeWorkOrders}
+          >
+            {isUpdating ? (
+              <SvgSpinner className="text-white" />
+            ) : (
+              <>Finalitzar</>
+            )}
+          </Button>
+          {responseMessage && (
+            <div
+              className={` ${
+                responseMessage ? "text-green-500" : "text-red-500"
+              } text-center font-semibold p-2 items-center flex justify-center`}
+            >
+              {responseMessage.message}
+            </div>
+          )}
+        </div>
+      )}
     </>
   );
 };

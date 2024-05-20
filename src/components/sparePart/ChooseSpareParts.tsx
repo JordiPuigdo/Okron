@@ -38,6 +38,7 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
   const [filteredSpareParts, setFilteredSpareParts] = useState<SparePart[]>(
     availableSpareParts.filter((x) => x.active)
   );
+
   const sparePartsLimit = 5;
   const [unitsPerSparePart, setUnitsPerSparePart] = useState<{
     [key: string]: number;

@@ -5,6 +5,7 @@ import SparePart from "./SparePart";
 import InspectionPoint from "./inspectionPoint";
 import Machine from "./machine";
 import { BaseModel } from "./BaseModel";
+import { Preventive } from "./Preventive";
 
 export interface WorkOrder extends BaseModel {
   id: string;
@@ -24,6 +25,7 @@ export interface WorkOrder extends BaseModel {
   workOrderComments? : WorkOrderComment[]
   asset? : Asset;
   workOrderEvents? : WorkOrderEvents[];
+  preventive? : Preventive;
 }
 
 export default WorkOrder;
@@ -110,6 +112,7 @@ export interface SearchWorkOrderFilters {
   endDateTime? : string;
   operatorId? : string;
   assetId? : string;
+  stateWorkOrder? : StateWorkOrder; 
 }
 
 export enum WorkOrderType {
