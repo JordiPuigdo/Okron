@@ -568,7 +568,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               <>
                 {" "}
                 <Button
-                  onClick={() => handleSubmit}
+                  onClick={() => handleSubmitForm()}
                   type="create"
                   customStyles="flex"
                 >
