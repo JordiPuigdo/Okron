@@ -343,8 +343,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     }, 2000);
   };
 
-
-  async function finalizeWorkOrder() {
+  /*async function finalizeWorkOrder() {
     setIsLoading(true);
     const update: UpdateStateWorkOrder = {
       workOrderId: currentWorkOrder!.id,
@@ -367,9 +366,9 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         setErrorMessage(error);
         setShowErrorMessage(true);
       });
-  }
+  }*/
 
-  async function handleReopenWorkOrder() {
+  /*async function handleReopenWorkOrder() {
     setIsLoading(true);
     const update: UpdateStateWorkOrder = {
       workOrderId: currentWorkOrder!.id,
@@ -392,7 +391,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         setErrorMessage(error);
         setShowErrorMessage(true);
       });
-  }
+  }*/
 
   function handleSelectOperator(operatorId: string) {
     const operator = aviableOperators?.find((x) => x.id === operatorId);

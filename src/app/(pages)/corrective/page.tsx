@@ -54,9 +54,6 @@ function CorrectivePage() {
   const router = useRouter();
 
   const [startDate, setStartDate] = useState<Date | null>(new Date());
-
-  const { loginUser } = useSessionStore((state) => state);
-
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const { loginUser } = useSessionStore((state) => state);
