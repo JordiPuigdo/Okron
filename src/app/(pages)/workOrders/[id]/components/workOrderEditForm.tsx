@@ -594,28 +594,30 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                   type="none"
                   className="bg-blue-700 hover:bg-blue-900 text-white font-semibold p2- rounded-l"
                   customStyles="flex"
+                  onClick={() => toggleLoading("SEEACTIVE")}
                 >
-                  {isLoading["DELETE"] ? (
+                  {isLoading["SEEACTIVE"] ? (
                     <SvgSpinner className="text-white" />
                   ) : (
                     "Veure Actiu"
                   )}
                 </Button>
-                {currentWorkOrder?.workOrderType ==
-                  WorkOrderType.Preventive && (
-                  <Button
-                    href={`${Routes.preventive.configuration}/${currentWorkOrder?.preventive?.id}`}
-                    type="none"
-                    className="bg-blue-700 hover:bg-blue-900 text-white font-semibold p2- rounded-l"
-                    customStyles="flex"
-                  >
-                    {isLoading["DELETE"] ? (
-                      <SvgSpinner className="text-white" />
-                    ) : (
-                      "Veure Revisió"
-                    )}
-                  </Button>
-                )}
+                {currentWorkOrder?.workOrderType == WorkOrderType.Preventive &&
+                  currentWorkOrder?.preventive?.id != undefined && (
+                    <Button
+                      href={`${Routes.preventive.configuration}/${currentWorkOrder?.preventive?.id}`}
+                      type="none"
+                      className="bg-blue-700 hover:bg-blue-900 text-white font-semibold p2- rounded-l"
+                      customStyles="flex"
+                      onClick={() => toggleLoading("SEEPREVENTIVE")}
+                    >
+                      {isLoading["SEEPREVENTIVE"] ? (
+                        <SvgSpinner className="text-white" />
+                      ) : (
+                        "Veure Revisió"
+                      )}
+                    </Button>
+                  )}
               </>
             )}
           </div>

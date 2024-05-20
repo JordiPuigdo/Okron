@@ -45,6 +45,11 @@ const columns: Column[] = [
     format: ColumnFormat.DATE,
   },
   {
+    label: "Pròxima execució",
+    key: "nextExecution",
+    format: ColumnFormat.DATE,
+  },
+  {
     label: "Actiu",
     key: "active",
     format: ColumnFormat.BOOLEAN,
@@ -89,9 +94,28 @@ const PreventiveTable: React.FC<PreventiveTableProps> = ({
             await preventiveService.getPreventiveByAssetId(assetId!);
           setPreventives(fetchedPreventives);
         } else {
-          const fetchedPreventives = await preventiveService.getPreventives();
+          await preventiveService
+            .getPreventives()
+            .then((fetchedPreventives) => {
+              setPreventives(
+                fetchedPreventives.map((x) => {
+                  const days = x.days === 0 ? x.hours! / 24 : x.days;
+                  const nextExecutionDate = x.lastExecution
+                    ? new Date(x.lastExecution)
+                    : undefined;
+                  nextExecutionDate?.setDate(
+                    nextExecutionDate.getDate() + days
+                  );
 
-          setPreventives(fetchedPreventives);
+                  return {
+                    ...x,
+                    nextExecution:
+                      nextExecutionDate != undefined ? nextExecutionDate : null,
+                  };
+                })
+              );
+            });
+
           if (filters.filter((x) => x.key === "asset.description").length == 0)
             filters.push({
               key: "asset.description",
