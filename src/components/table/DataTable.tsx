@@ -53,7 +53,7 @@ const DataTable: React.FC<DataTableProps> = ({
   onDelete,
   totalCounts = false,
   enableFilterActive = true,
-  enableCheckbox = true,
+  enableCheckbox = false,
   onChecked,
 }: DataTableProps) => {
   const itemsPerPageOptions = [5, 10, 15, 20, 25, 50];
@@ -117,9 +117,9 @@ const DataTable: React.FC<DataTableProps> = ({
     setCurrentPage(1);
   };*/
 
-  /*const handleSortChange = async (sortedBy: string) => {
+  const handleSortChange = async (sortedBy: string) => {
     if (sortedBy == "") return;
-    setIsLoading(true);
+    // setIsLoading(true);
   };
 
   const handleSort = (columnKey: string) => {
@@ -130,7 +130,7 @@ const DataTable: React.FC<DataTableProps> = ({
 
     const sortText = columnKey + " : " + order;
     handleSortChange(sortText);
-  };*/
+  };
 
   let totalQuantity = 0;
 
@@ -141,9 +141,32 @@ const DataTable: React.FC<DataTableProps> = ({
     setCurrentPage(1);
   };
 
+  const sortData = (
+    data: any[],
+    sortColumn: string,
+    sortOrder: "ASC" | "DESC"
+  ): any[] => {
+    return data.sort((a: any, b: any) => {
+      if (!a.hasOwnProperty(sortColumn) || !b.hasOwnProperty(sortColumn)) {
+        return 0;
+      }
+
+      const aValue = a[sortColumn];
+      const bValue = b[sortColumn];
+
+      if (sortOrder === "ASC") {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+  };
+
   useEffect(() => {
     const indexOfLastRecord = currentPage * itemsPerPage;
     const indexOfFirstRecord = indexOfLastRecord - itemsPerPage;
+
+    data = sortData(data, sortColumn, sortOrder);
     if (enableFilterActive) {
       setFilteredData(
         data
@@ -176,7 +199,7 @@ const DataTable: React.FC<DataTableProps> = ({
 
     setTotalCount(Math.ceil(data.length / itemsPerPage));
     setIsLoading(false);
-  }, [data, currentPage, itemsPerPage, filterActive]);
+  }, [data, currentPage, itemsPerPage, filterActive, sortOrder, sortColumn]);
 
   const getNestedFieldValue = (rowData: any, key: string) => {
     const keys = key.split(".");
@@ -438,6 +461,7 @@ const DataTable: React.FC<DataTableProps> = ({
                             <th
                               key={column.key}
                               className="border-b border-blue-gray-100 bg-blue-gray-50 p-4 cursor-pointer "
+                              onClick={() => handleSort(column.key)}
                             >
                               <div className={classname}>
                                 <label
