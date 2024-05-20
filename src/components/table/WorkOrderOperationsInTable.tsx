@@ -54,6 +54,10 @@ export default function WorkOrderOperationsInTable({
   const [showModal, setShowModal] = useState(false);
 
   function handleInspectionPoints(workOrderId: string) {
+    if (!operatorLogged) {
+      alert("Has de tenir un operari fitxat per fer aquesta acció");
+      return;
+    }
     toggleLoading(workOrderId + "_InspectionPoints");
     checkAllInspectionPoints(workOrder.workOrderInspectionPoint!, workOrderId);
     setIsPassInspectionPoints(!isPassInspectionPoints);
@@ -89,9 +93,17 @@ export default function WorkOrderOperationsInTable({
 
     if (!operatorLogged) {
       alert("Has de tenir un operari fitxat per fer aquesta acció");
+      toggleLoading(
+        workOrderId +
+          (state === StateWorkOrder.PendingToValidate ? "_Validate" : "_Sign")
+      );
       return;
     }
     if (workOrder.stateWorkOrder == state) {
+      toggleLoading(
+        workOrderId +
+          (state === StateWorkOrder.PendingToValidate ? "_Validate" : "_Sign")
+      );
       return;
     }
 
@@ -118,6 +130,10 @@ export default function WorkOrderOperationsInTable({
   }
 
   function handleSparePartsModal() {
+    if (!operatorLogged) {
+      alert("Has de tenir un operari fitxat per fer aquesta acció");
+      return;
+    }
     setShowModal(true);
   }
 
@@ -166,11 +182,11 @@ export default function WorkOrderOperationsInTable({
       ? `${
           workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
             ? "bg-emerald-700"
-            : "bg-okron-finished "
+            : "bg-gray-500 "
         } hover:${
           workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
             ? "bg-emerald-900 pointer-events-none"
-            : "bg-okron-hoverPendingToValidate"
+            : "bg-gray-700"
         }`
       : "bg-gray-200 pointer-events-none"
   } text-white  rounded flex gap-1 w-full justify-center items-center `;
