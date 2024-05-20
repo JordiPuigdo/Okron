@@ -3,6 +3,7 @@
 import Operator, { OperatorType } from "app/interfaces/Operator";
 import WorkOrder, {
   StateWorkOrder,
+  UpdateStateWorkOrder,
   UpdateWorkOrderRequest,
   WorkOrderComment,
   WorkOrderEvents,
@@ -111,6 +112,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [operatorCosts, setOperatorCosts] = useState<number>(0);
   const Routes = useRoutes();
   const [activeTab, setActiveTab] = useState<Tab>(Tab.OPERATORTIMES);
+  const { operatorLogged } = useSessionStore((state) => state);
 
   async function fetchWorkOrder() {
     await workOrderService
@@ -340,6 +342,57 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       window.location.reload();
     }, 2000);
   };
+
+
+  async function finalizeWorkOrder() {
+    setIsLoading(true);
+    const update: UpdateStateWorkOrder = {
+      workOrderId: currentWorkOrder!.id,
+      state: StateWorkOrder.Finished,
+      operatorId: operatorLogged?.idOperatorLogged,
+      userId: loginUser?.agentId,
+    };
+    await workOrderService
+      .updateStateWorkOrder(update)
+      .then((response) => {
+        if (response) {
+          setTimeout(() => {
+            setIsLoading(false);
+            window.location.reload();
+          }, 1000);
+        }
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        setErrorMessage(error);
+        setShowErrorMessage(true);
+      });
+  }
+
+  async function handleReopenWorkOrder() {
+    setIsLoading(true);
+    const update: UpdateStateWorkOrder = {
+      workOrderId: currentWorkOrder!.id,
+      state: StateWorkOrder.Waiting,
+      operatorId: operatorLogged?.idOperatorLogged,
+      userId: loginUser?.agentId,
+    };
+    await workOrderService
+      .updateStateWorkOrder(update)
+      .then((response) => {
+        if (response) {
+          setTimeout(() => {
+            setIsLoading(false);
+            window.location.reload();
+          }, 1000);
+        }
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        setErrorMessage(error);
+        setShowErrorMessage(true);
+      });
+  }
 
   function handleSelectOperator(operatorId: string) {
     const operator = aviableOperators?.find((x) => x.id === operatorId);
