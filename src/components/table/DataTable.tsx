@@ -504,6 +504,7 @@ const DataTable: React.FC<DataTableProps> = ({
                                   type="checkbox"
                                   checked={selectedRows.has(rowData.id)}
                                   onChange={() => handleSelectedRow(rowData.id)}
+                                  onClick={() => handleSelectedRow(rowData.id)}
                                 />
                               </div>
                             </td>
