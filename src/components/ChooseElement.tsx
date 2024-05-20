@@ -10,6 +10,7 @@ interface ChooseElementProps<T> {
   placeholder: string;
   mapElement: (element: T) => { id: string; description: string };
   labelText?: string;
+  disabled?: boolean;
 }
 
 const ChooseElement = <T,>({
@@ -20,6 +21,7 @@ const ChooseElement = <T,>({
   placeholder,
   mapElement,
   labelText = "",
+  disabled = false,
 }: ChooseElementProps<T>) => {
   const [selectedItems, setSelectedItems] = useState<ElementList[]>([]);
   const [filteredElements, setFilteredElements] = useState<ElementList[]>([]);
@@ -72,8 +74,9 @@ const ChooseElement = <T,>({
           elements={filteredElements}
           setCurrentId={handleElementSelected}
           placeholder={placeholder}
+          disabled={disabled}
         />
-        <div className="mt-4 p-2">
+        <div className="p-2">
           {selectedItems.map((item) => (
             <div
               key={item.id}
@@ -82,13 +85,15 @@ const ChooseElement = <T,>({
               <span className="text-gray-600 font-medium">
                 {item.description}
               </span>
-              <button
-                type="button"
-                onClick={() => handleDeleteElementSelected(item.id)}
-                className="bg-okron-btDelete hover:bg-okron-btDeleteHover text-white rounded-xl py-2 px-4 text-sm"
-              >
-                Eliminar
-              </button>
+              {!disabled && (
+                <button
+                  type="button"
+                  onClick={() => handleDeleteElementSelected(item.id)}
+                  className="bg-okron-btDelete hover:bg-okron-btDeleteHover text-white rounded-xl py-2 px-4 text-sm"
+                >
+                  Eliminar
+                </button>
+              )}
             </div>
           ))}
         </div>

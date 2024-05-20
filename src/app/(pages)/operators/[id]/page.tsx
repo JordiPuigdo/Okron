@@ -2,7 +2,7 @@
 
 import OperatorForm from "components/OperatorForm";
 import MainLayout from "components/layout/MainLayout";
-import Operator from "app/interfaces/Operator";
+import Operator, { OperatorType } from "app/interfaces/Operator";
 import { BaseSyntheticEvent, useEffect, useState } from "react";
 import OperatorService from "app/services/operatorService";
 import Container from "components/layout/Container";
@@ -33,6 +33,8 @@ export default function EditOperatorPage({
   };
 
   const updateOperator = async (operator: Operator) => {
+    if (operator.operatorType == null)
+      operator.operatorType = OperatorType.Maintenance;
     await operatorService.updateOperator(operator).then((data) => {
       if (data) {
         setIsUpdateSuccessful(true);

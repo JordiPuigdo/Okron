@@ -1,23 +1,27 @@
 "use client";
 
-import Operator from "app/interfaces/Operator";
+import Operator, { OperatorType } from "app/interfaces/Operator";
 import WorkOrder, {
   StateWorkOrder,
   UpdateStateWorkOrder,
   UpdateWorkOrderRequest,
   WorkOrderComment,
+  WorkOrderEvents,
   WorkOrderInspectionPoint,
   WorkOrderOperatorTimes,
   WorkOrderSparePart,
   WorkOrderType,
 } from "app/interfaces/workOrder";
-import { Averia_Sans_Libre } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, set, useForm } from "react-hook-form";
 import OperatorService from "app/services/operatorService";
 import WorkOrderService from "app/services/workOrderService";
-import { translateStateWorkOrder } from "app/utils/utils";
+import {
+  formatDate,
+  translateStateWorkOrder,
+  translateWorkOrderEventType,
+} from "app/utils/utils";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -25,18 +29,33 @@ import ca from "date-fns/locale/ca";
 import ChooseSpareParts from "components/sparePart/ChooseSpareParts";
 import SparePartService from "app/services/sparePartService";
 import SparePart from "app/interfaces/SparePart";
-import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspectionPoint";
+
 import { SvgSpinner } from "app/icons/icons";
 import WorkOrderOperatorComments from "components/operator/WorkOrderCommentOperator";
 import WorkOrderOperatorTimesComponent from "components/operator/WorkOrderOperatorTimes";
 import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
 import ChooseElement from "components/ChooseElement";
-import { CostsWorkOrder } from "components/Costs/Costs";
+import { CostsObject } from "components/Costs/CostsObject";
+import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspectionPoint";
+import WorkOrderButtons from "./WorkOrderButtons";
+import { Button } from "designSystem/Button/Buttons";
+import useRoutes from "app/utils/useRoutes";
 
 type WorkOrdeEditFormProps = {
   id: string;
 };
+interface TabWO {
+  key: string;
+  permission: UserPermission;
+}
+enum Tab {
+  OPERATORTIMES = "Temps Operaris",
+  COMMENTS = "Comentaris",
+  SPAREPARTS = "Recanvis",
+  INSPECTIONPOINTS = "Punts d'Inspecció",
+  EVENTSWORKORDER = "Events",
+}
 
 const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const { register, handleSubmit, setValue } = useForm<WorkOrder>({});
@@ -47,7 +66,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
+
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
@@ -81,6 +101,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [workOrderComments, setWorkOrderComments] = useState<
     WorkOrderComment[]
   >([]);
+  const [workOrderEvents, setWorkOrderEvents] = useState<WorkOrderEvents[]>([]);
 
   const [selectedOperators, setSelectedOperators] = useState<Operator[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
@@ -89,6 +110,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [totalCosts, setTotalCosts] = useState<number>(0);
   const [sparePartCosts, setSparePartCosts] = useState<number>(0);
   const [operatorCosts, setOperatorCosts] = useState<number>(0);
+  const Routes = useRoutes();
+  const [activeTab, setActiveTab] = useState<Tab>(Tab.OPERATORTIMES);
   const { operatorLogged } = useSessionStore((state) => state);
 
   async function fetchWorkOrder() {
@@ -97,7 +120,9 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       .then((responseWorkOrder) => {
         if (responseWorkOrder) {
           setIsFinished(
-            responseWorkOrder.stateWorkOrder == StateWorkOrder.Finished
+            responseWorkOrder.stateWorkOrder == StateWorkOrder.Finished ||
+              responseWorkOrder.stateWorkOrder ==
+                StateWorkOrder.PendingToValidate
               ? true
               : false
           );
@@ -134,7 +159,27 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       });
   }
 
+  async function handleDeleteWordOrder() {
+    toggleLoading("DELETE");
+    const isConfirmed = window.confirm(
+      "Segur que voleu eliminar aquest ordre de treball?"
+    );
+    if (isConfirmed) {
+      await workOrderService.deleteWorkOrder(id);
+      setShowSuccessMessage(true);
+      setTimeout(() => {
+        history.back();
+      }, 2000);
+    }
+    toggleLoading("DELETE");
+  }
+
   async function loadForm(responseWorkOrder: WorkOrder | null) {
+    setSelectedSpareParts([]);
+    setworkOrderOperatorTimes([]);
+    setWorkOrderComments([]);
+    setWorkOrderEvents([]);
+
     if (responseWorkOrder) {
       setValue("code", responseWorkOrder.code);
       setValue("description", responseWorkOrder.description);
@@ -146,10 +191,18 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       const operatorsToAdd = aviableOperators?.filter((operator: any) =>
         responseWorkOrder.operatorId!.includes(operator.id)
       );
-
       setSelectedOperators((prevSelected) => [
         ...prevSelected,
         ...operatorsToAdd!,
+      ]);
+
+      setWorkOrderEvents((prevSelected) => [
+        ...prevSelected,
+        ...(responseWorkOrder.workOrderEvents || []).sort((a, b) => {
+          const dateA = new Date(a.date) as Date;
+          const dateB = new Date(b.date) as Date;
+          return dateB.getTime() - dateA.getTime();
+        }),
       ]);
 
       if (
@@ -253,8 +306,16 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     if (aviableOperators && availableSpareParts.length > 0) fetchWorkOrder();
   }, [aviableOperators, availableSpareParts]);
 
+  const handleSubmitForm = async () => {
+    handleSubmit(onSubmit)();
+  };
+
+  function toggleLoading(id: string) {
+    setIsLoading((prevLoading) => ({ ...prevLoading, [id]: !prevLoading[id] }));
+  }
+
   const onSubmit: SubmitHandler<WorkOrder> = async (data) => {
-    setIsLoading(true);
+    toggleLoading("SAVE");
     try {
       const updatedWorkOrderData: UpdateWorkOrderRequest = {
         id: id,
@@ -270,17 +331,18 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       setShowErrorMessage(false);
     } catch (error) {
       setTimeout(() => {
-        setIsLoading(false);
+        toggleLoading("SAVE");
         setShowErrorMessage(false);
       }, 3000);
       setShowSuccessMessage(false);
       setShowErrorMessage(true);
     }
     setTimeout(() => {
-      setIsLoading(false);
+      toggleLoading("SAVE");
       window.location.reload();
     }, 2000);
   };
+
 
   async function finalizeWorkOrder() {
     setIsLoading(true);
@@ -344,7 +406,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   }
   const renderHeader = () => {
     return (
-      <div className="flex px-4 sm:px-12 pt-12 items-center flex-col sm:flex-row">
+      <div className="flex p-4 items-center flex-col sm:flex-row bg-white rounded shadow-md border-2 border-blue-900">
         <div
           className="cursor-pointer mb-4 sm:mb-0"
           onClick={() => router.back()}
@@ -386,16 +448,15 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const renderForm = () => {
     return (
       <>
-        {" "}
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="mt-12 bg-white rounded-lg p-8 shadow-md"
+          className="bg-white flex-grow rounded-lg p-4 shadow-md"
         >
-          <div className="flex flex-row gap-8 w-full">
+          <div className="flex flex-col w-full">
             <div className="w-full">
               <label
                 htmlFor="description"
-                className="block text-xl font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 py-2"
               >
                 Descripció
               </label>
@@ -404,8 +465,11 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 type="text"
                 id="description"
                 name="description"
-                className="p-3 border border-gray-300 rounded-md w-full"
-                disabled={isFinished}
+                className="p-3 border text-sm border-gray-300 rounded-md w-full"
+                disabled={
+                  isFinished ||
+                  loginUser?.permission != UserPermission.Administrator
+                }
                 onKeyPress={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
@@ -413,10 +477,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 }}
               />
             </div>
-            <div className="w-full">
+            <div>
               <label
                 htmlFor="stateWorkOrder"
-                className="block text-xl font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 py-2"
               >
                 Estat
               </label>
@@ -424,8 +488,11 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 {...register("stateWorkOrder", { valueAsNumber: true })}
                 id="stateWorkOrder"
                 name="stateWorkOrder"
-                className="p-3 border border-gray-300 rounded-md w-full"
-                disabled={isFinished}
+                className="p-3 text-sm border border-gray-300 rounded-md w-full"
+                disabled={
+                  isFinished ||
+                  loginUser?.permission != UserPermission.Administrator
+                }
               >
                 {Object.values(StateWorkOrder)
                   .filter(
@@ -445,128 +512,293 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                   ))}
               </select>
             </div>
-            <div className="w-full">
+            <div className="">
               <label
                 htmlFor="stateWorkOrder"
-                className="block text-xl font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 py-2"
               >
                 Data Inici
               </label>
               <DatePicker
-                disabled={isFinished}
+                disabled={
+                  isFinished ||
+                  loginUser?.permission != UserPermission.Administrator
+                }
                 id="startDate"
                 selected={startDate}
                 onChange={(date: Date) => setStartDate(date)}
                 dateFormat="dd/MM/yyyy"
                 locale={ca}
-                className="p-3 border border-gray-300 rounded-md text-lg"
+                className="p-3 border border-gray-300 rounded-md text-sm"
               />
             </div>
-          </div>
-          <div className="py-4 px-12 w-full">
-            <ChooseElement
-              elements={aviableOperators!.map((x) => ({
-                id: x.id,
-                description: x.name,
-              }))}
-              onDeleteElementSelected={handleDeleteSelectedOperator}
-              onElementSelected={handleSelectOperator}
-              placeholder={"Selecciona un Operari"}
-              selectedElements={selectedOperators.map((x) => x.id)}
-              mapElement={(aviableOperators) => ({
-                id: aviableOperators.id,
-                description: aviableOperators.description,
-              })}
-            />
-            {totalCosts > 0 &&
-              loginUser!.permission == UserPermission.Administrator && (
-                <CostsWorkOrder
-                  operatorCosts={operatorCosts}
-                  sparePartCosts={sparePartCosts}
-                  totalCosts={totalCosts}
-                />
-              )}
-          </div>
-          {!isFinished && (
-            <div className="flex">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`${
-                  showSuccessMessage
-                    ? "bg-green-500"
-                    : showErrorMessage
-                    ? "bg-red-500"
-                    : "bg-blue-500"
-                } hover:${
-                  showSuccessMessage
-                    ? "bg-green-700"
-                    : showErrorMessage
-                    ? "bg-red-700"
-                    : "bg-blue-700"
-                } text-white font-bold py-2 px-4 rounded mt-6 mb-4 sm:mb-0 sm:mr-2 flex items-center`}
+            <div className="w-full">
+              <label
+                htmlFor="operators"
+                className="block text-sm font-medium text-gray-700 py-2"
               >
-                Actualitzar Ordre
-                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-              </button>
-              <button
-                type="button"
-                onClick={(e) => router.back()}
-                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
-                disabled={isLoading}
-              >
-                Cancelar
-                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-              </button>
-              <button
-                type="button"
-                onClick={(e) => finalizeWorkOrder()}
-                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
-              >
-                Finalitzar Ordre
-                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-              </button>
-              <div>
-                {showSuccessMessage && (
-                  <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
-                    Ordre actualizada correctament
-                  </div>
+                Operaris
+              </label>
+              {aviableOperators !== undefined &&
+                aviableOperators?.length > 0 && (
+                  <ChooseElement
+                    elements={aviableOperators!
+                      .filter((x) => x.operatorType == OperatorType.Maintenance)
+                      .map((x) => ({
+                        id: x.id,
+                        description: x.name,
+                      }))}
+                    onDeleteElementSelected={handleDeleteSelectedOperator}
+                    onElementSelected={handleSelectOperator}
+                    placeholder={"Selecciona un Operari"}
+                    selectedElements={selectedOperators.map((x) => x.id)}
+                    mapElement={(aviableOperators) => ({
+                      id: aviableOperators.id,
+                      description: aviableOperators.description,
+                    })}
+                    disabled={
+                      isFinished ||
+                      loginUser?.permission != UserPermission.Administrator
+                    }
+                  />
                 )}
-
-                {showErrorMessage && (
-                  <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
-                    Error actualitzant ordre de treball
-                  </div>
-                )}
-              </div>
             </div>
-          )}
-        </form>
-        <div className="flex sm:flex-row mb-8 pt-12">
-          {isFinished &&
-            loginUser?.permission == UserPermission.Administrator && (
-              <button
-                type="button"
-                onClick={(e) => handleReopenWorkOrder()}
-                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-6 sm:ml-2 flex items-center"
-              >
-                Reobrir Ordre
-                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-              </button>
+          </div>
+          <div className="py-4 flex gap-2">
+            {loginUser?.permission == UserPermission.Administrator && (
+              <>
+                {" "}
+                <Button
+                  onClick={() => handleSubmit}
+                  type="create"
+                  customStyles="flex"
+                >
+                  {isLoading["SAVE"] ? (
+                    <SvgSpinner className="text-white" />
+                  ) : (
+                    "Actualitzar"
+                  )}
+                </Button>
+                <Button
+                  onClick={() => handleDeleteWordOrder()}
+                  type="delete"
+                  customStyles="flex"
+                >
+                  {isLoading["DELETE"] ? (
+                    <SvgSpinner className="text-white" />
+                  ) : (
+                    "Eliminar"
+                  )}
+                </Button>
+                <Button
+                  href={`${Routes.configuration.assets}/${currentWorkOrder?.asset?.id}`}
+                  type="none"
+                  className="bg-blue-700 hover:bg-blue-900 text-white font-semibold p2- rounded-l"
+                  customStyles="flex"
+                >
+                  {isLoading["DELETE"] ? (
+                    <SvgSpinner className="text-white" />
+                  ) : (
+                    "Veure Actiu"
+                  )}
+                </Button>
+                {currentWorkOrder?.workOrderType ==
+                  WorkOrderType.Preventive && (
+                  <Button
+                    href={`${Routes.preventive.configuration}/${currentWorkOrder?.preventive?.id}`}
+                    type="none"
+                    className="bg-blue-700 hover:bg-blue-900 text-white font-semibold p2- rounded-l"
+                    customStyles="flex"
+                  >
+                    {isLoading["DELETE"] ? (
+                      <SvgSpinner className="text-white" />
+                    ) : (
+                      "Veure Revisió"
+                    )}
+                  </Button>
+                )}
+              </>
             )}
-        </div>
+          </div>
+        </form>
       </>
     );
   };
+
+  const handleTabClick = (tab: Tab) => {
+    setActiveTab(tab);
+  };
+
+  const availableTabs = Object.values(Tab).filter((tab) => {
+    if (currentWorkOrder?.workOrderType === WorkOrderType.Corrective) {
+      return tab !== Tab.INSPECTIONPOINTS;
+    } else if (currentWorkOrder?.workOrderType === WorkOrderType.Preventive) {
+      return tab !== Tab.SPAREPARTS;
+    }
+  });
+
+  const [sortOrder, setSortOrder] = useState("asc");
+  const toggleSortOrder = () => {
+    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
+    setSortOrder(newSortOrder);
+  };
+
+  const sortedEvents = [...workOrderEvents].sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+
+    if (sortOrder === "asc") {
+      return dateA - dateB;
+    } else {
+      return dateB - dateA;
+    }
+  });
 
   if (!currentWorkOrder) return <>Carregant Dades</>;
   return (
     <>
       {renderHeader()}
-      {renderForm()}
+      <div className="flex gap-2 rounded bg-blue-900 my-2 p-2">
+        <div className=" w-full">
+          {renderForm()}
+          {totalCosts > 0 &&
+            loginUser?.permission == UserPermission.Administrator && (
+              <div className="flex flex-grow pt-2">
+                <CostsObject
+                  operatorCosts={operatorCosts}
+                  sparePartCosts={sparePartCosts}
+                  totalCosts={totalCosts}
+                />
+              </div>
+            )}
+        </div>
 
-      <div className="p-4 sm:p-12">
+        <div className="p-2 bg-white rounded-lg shadow-md  w-full  flex flex-col">
+          {currentWorkOrder && (
+            <>
+              <div>
+                <WorkOrderButtons
+                  workOrder={currentWorkOrder}
+                  handleReload={fetchWorkOrder}
+                  handleSubmit={() => handleSubmitForm()}
+                />
+              </div>
+              <div className="py-2">
+                <WorkOrderOperatorComments
+                  workOrderComments={workOrderComments}
+                  workOrderId={currentWorkOrder.id}
+                  isFinished={isFinished}
+                  setWorkOrderComments={setWorkOrderComments}
+                />
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div
+        className={`bg-blue-900 p-2 rounded-lg shadow-md flex gap-2 my-2 ${
+          currentWorkOrder.workOrderType === WorkOrderType.Preventive
+            ? "flex-col md:flex-row "
+            : "flex-col "
+        }`}
+      >
+        <div className="flex w-full">
+          <WorkOrderOperatorTimesComponent
+            operators={aviableOperators!}
+            workOrderOperatortimes={workOrderOperatorTimes}
+            setWorkOrderOperatortimes={setworkOrderOperatorTimes}
+            workOrderId={currentWorkOrder.id}
+            isFinished={
+              currentWorkOrder.stateWorkOrder == StateWorkOrder.Finished ||
+              currentWorkOrder.stateWorkOrder ==
+                StateWorkOrder.PendingToValidate ||
+              currentWorkOrder.stateWorkOrder == StateWorkOrder.Waiting
+            }
+          />
+        </div>
+        <div className="flex flex-grow w-full">
+          {currentWorkOrder.workOrderType === WorkOrderType.Preventive && (
+            <CompleteInspectionPoints
+              workOrderInspectionPoints={passedInspectionPoints!}
+              setCompletedWorkOrderInspectionPoints={setPassedInspectionPoints}
+              workOrderId={currentWorkOrder.id}
+              isFinished={
+                currentWorkOrder.stateWorkOrder == StateWorkOrder.Finished ||
+                currentWorkOrder.stateWorkOrder ==
+                  StateWorkOrder.PendingToValidate ||
+                currentWorkOrder.stateWorkOrder == StateWorkOrder.Waiting
+              }
+            />
+          )}
+          {currentWorkOrder.workOrderType === WorkOrderType.Corrective && (
+            <ChooseSpareParts
+              availableSpareParts={availableSpareParts}
+              selectedSpareParts={selectedSpareParts}
+              setSelectedSpareParts={setSelectedSpareParts}
+              WordOrderId={currentWorkOrder.id}
+              isFinished={isFinished}
+            />
+          )}
+        </div>
+      </div>
+      <div className="py-2 p-2 bg-blue-900 rounded-lg shadow-md  w-full  flex flex-col">
+        {currentWorkOrder &&
+          loginUser?.permission == UserPermission.Administrator && (
+            <div className="flex flex-col  bg-gray-100 rounded-lg shadow-md justify-start">
+              <div className="flex flex-row gap-4 p-4">
+                <div
+                  className="text-gray-600 font-semibold text-lg w-[20%]"
+                  onClick={toggleSortOrder}
+                >
+                  Data Acció {sortOrder === "asc" ? "▲" : "▼"}
+                </div>
+                <div className="text-gray-600 font-semibold w-[20%] text-lg">
+                  Acció
+                </div>
+                <div className="text-gray-600 font-semibold w-[20%] text-lg">
+                  Operari
+                </div>
+              </div>
+              {sortedEvents.map((x, index) => {
+                return (
+                  <div
+                    key={index}
+                    className={`flex flex-row gap-4 p-4 rounded-lg items-center ${
+                      index % 2 == 0 ? "bg-gray-200" : ""
+                    }`}
+                  >
+                    <div className="text-gray-600 w-[20%]">
+                      {formatDate(x.date)}
+                    </div>
+                    <div className=" w-[20%]">
+                      {translateWorkOrderEventType(x.workOrderEventType)}
+                    </div>
+                    <div className="w-[20%]">{x.operator.name}</div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+      </div>
+
+      {/*  <div className="bg-white rounded-xl">
+        <div className="p-4 flex gap-1 border-black border-b-2">
+          {availableTabs.map((tab) => (
+            <p
+              key={tab}
+              className={`p-2 border-blue-500  border-2 rounded-xl hover:cursor-pointer ${
+                activeTab === tab ? "border-t-4 " : ""
+              }`}
+              onClick={() => handleTabClick(tab)}
+            >
+              {tab}
+            </p>
+          ))}
+        </div>
+
         {availableSpareParts !== undefined &&
+          activeTab === Tab.SPAREPARTS &&
           currentWorkOrder &&
           currentWorkOrder.workOrderType === WorkOrderType.Corrective && (
             <ChooseSpareParts
@@ -578,6 +810,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             />
           )}
         {currentWorkOrder &&
+          activeTab === Tab.INSPECTIONPOINTS &&
           currentWorkOrder.workOrderType === WorkOrderType.Preventive && (
             <CompleteInspectionPoints
               workOrderInspectionPoints={passedInspectionPoints!}
@@ -587,16 +820,18 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             />
           )}
 
-        {currentWorkOrder && aviableOperators !== undefined && (
-          <WorkOrderOperatorTimesComponent
-            operators={aviableOperators!}
-            workOrderOperatortimes={workOrderOperatorTimes}
-            setWorkOrderOperatortimes={setworkOrderOperatorTimes}
-            workOrderId={currentWorkOrder.id}
-            isFinished={isFinished}
-          />
-        )}
-        {currentWorkOrder && (
+        {currentWorkOrder &&
+          activeTab === Tab.OPERATORTIMES &&
+          aviableOperators !== undefined && (
+            <WorkOrderOperatorTimesComponent
+              operators={aviableOperators!}
+              workOrderOperatortimes={workOrderOperatorTimes}
+              setWorkOrderOperatortimes={setworkOrderOperatorTimes}
+              workOrderId={currentWorkOrder.id}
+              isFinished={isFinished}
+            />
+          )}
+        {currentWorkOrder && activeTab === Tab.COMMENTS && (
           <WorkOrderOperatorComments
             workOrderComments={workOrderComments}
             workOrderId={currentWorkOrder.id}
@@ -604,7 +839,45 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             setWorkOrderComments={setWorkOrderComments}
           />
         )}
-      </div>
+        {currentWorkOrder &&
+          activeTab === Tab.EVENTSWORKORDER &&
+          loginUser?.permission == UserPermission.Administrator && (
+            <div
+              className="flex flex-col  bg-gray-100 rounded-lg shadow-md justify-start"
+              onClick={toggleSortOrder}
+            >
+              <div className="flex flex-row gap-4 p-4">
+                <div className="text-gray-600 font-semibold text-lg w-[20%]">
+                  Data Acció {sortOrder === "asc" ? "▲" : "▼"}
+                </div>
+                <div className="text-gray-600 font-semibold w-[20%] text-lg">
+                  Acció
+                </div>
+                <div className="text-gray-600 font-semibold w-[20%] text-lg">
+                  Operari
+                </div>
+              </div>
+              {sortedEvents.map((x, index) => {
+                return (
+                  <div
+                    key={index}
+                    className={`flex flex-row gap-4 p-4 rounded-lg items-center ${
+                      index % 2 == 0 ? "bg-gray-200" : ""
+                    }`}
+                  >
+                    <div className="text-gray-600 w-[20%]">
+                      {formatDate(x.date)}
+                    </div>
+                    <div className=" w-[20%]">
+                      {translateWorkOrderEventType(x.workOrderEventType)}
+                    </div>
+                    <div className="w-[20%]">{x.operator.name}</div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+      </div>*/}
     </>
   );
 };

@@ -78,6 +78,8 @@ const config: Config = {
           btCreateHover: "#0056b3",
           btEdit: "#28a745",
           btEditHover: "#1a8031",
+          btnCancel: "#697384",
+          btnCancelHover: "#4b5664",
           btDelete: "#dc3545",
           btDeleteHover: "#9b212d",
           btDetail: "#58a971",
@@ -91,7 +93,15 @@ const config: Config = {
           waiting: "#cc0014",
           onGoing : "#ffad00",
           createold: "#38a0ad",
-          editOld : "ffb72c"
+          editOld : "ffb72c",
+          hoverPending: "#b40516",
+          hoverOnGoing: "#e29900",
+          hoverWaiting: "#3f4858",
+          hoverPendingToValidate: "#105a27",
+          paused : "#4b5664",
+          pendingValidate : "#8d000e",
+          requested: "#ff5c6b",
+
         }
       },
       boxShadow: {

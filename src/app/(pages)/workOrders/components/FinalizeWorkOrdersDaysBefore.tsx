@@ -32,12 +32,10 @@ const FinalizeWorkOrdersDaysBefore: React.FC<
   return (
     <button
       type="button"
-      className="bg-orange-500 text-white p-2 rounded-md hover:bg-orange-600 flex items-center"
+      className="bg-orange-500 text-sm text-white p-2 rounded-md font-semibold hover:bg-orange-600 justifty-center flex items-center justify-center"
       onClick={(e) => handleFinalizeWorkOrdersDayBefore()}
     >
-      Finalitzar Ordres del{" "}
-      {formatDate(new Date(Date.now() - 86400000), false, false)}
-      {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+      Finalitzar Ordres{isLoading && <SvgSpinner />}
     </button>
   );
 };

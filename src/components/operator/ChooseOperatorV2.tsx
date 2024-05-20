@@ -1,5 +1,5 @@
 "use client";
-import Operator from "app/interfaces/Operator";
+import Operator, { OperatorType } from "app/interfaces/Operator";
 import AutocompleteSearchBar from "components/selector/AutocompleteSearchBar";
 import { ElementList } from "components/selector/ElementList";
 import { useEffect, useState } from "react";
@@ -28,7 +28,9 @@ const ChooseOperatorV2: React.FC<ChooseOperatorV2Props> = ({
     );
     setSelectedOperator(selectedOps);
     setElementListOperator(
-      availableOperators.map((x) => ({ id: x.id, description: x.name }))
+      availableOperators
+        .filter((x) => x.operatorType == OperatorType.Maintenance)
+        .map((x) => ({ id: x.id, description: x.name }))
     );
   }, [availableOperators, preventiveSelectedOperators]);
 
@@ -48,7 +50,7 @@ const ChooseOperatorV2: React.FC<ChooseOperatorV2Props> = ({
   return (
     <div className="flex flex-row gap-8 w-full ">
       <div className="w-full">
-        <label className="block text-gray-700 font-bold mb-2 text-lg">
+        <label className="block text-gray-700 font-bold mb-2 text-sm">
           Operaris
         </label>
         <AutocompleteSearchBar

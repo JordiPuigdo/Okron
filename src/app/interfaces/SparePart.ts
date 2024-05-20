@@ -54,6 +54,7 @@ export interface SparePartPerAssetResponse {
     sparePartDescription : string;
     workOrderCode : string;
     workOrderDescription : string
+    dateConsume : Date;
 }
 
 interface SparePartsConsumeds {

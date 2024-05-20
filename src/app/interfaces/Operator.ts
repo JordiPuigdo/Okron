@@ -4,6 +4,14 @@ interface Operator {
   code: string;
   name: string;
   priceHour: number;
+  operatorType: OperatorType; 
 }
+
+export enum OperatorType {
+  Maintenance,
+  Production,
+  Quality,
+}
+
 
 export default Operator;

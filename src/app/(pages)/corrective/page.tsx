@@ -1,7 +1,7 @@
 "use client";
 
 import { Corrective } from "app/interfaces/Corrective";
-import Operator from "app/interfaces/Operator";
+import Operator, { OperatorType } from "app/interfaces/Operator";
 import Machine from "app/interfaces/machine";
 import {
   CreateWorkOrderRequest,
@@ -55,6 +55,8 @@ function CorrectivePage() {
 
   const [startDate, setStartDate] = useState<Date | null>(new Date());
 
+  const { loginUser } = useSessionStore((state) => state);
+
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const { loginUser } = useSessionStore((state) => state);
@@ -87,7 +89,11 @@ function CorrectivePage() {
     await operatorService
       .getOperators()
       .then((aviableOperators) => {
-        setOperators(aviableOperators);
+        setOperators(
+          aviableOperators.filter(
+            (x) => x.operatorType == OperatorType.Maintenance
+          )
+        );
       })
       .catch((error) => {
         setErrorMessage("Error Operaris: " + error);
@@ -230,8 +236,8 @@ function CorrectivePage() {
     return (
       <MainLayout>
         <Container>
-          {renderHeader()}
-          <div className=" bg-white rounded-xl p-4 mt-12">
+          <div className=" bg-white rounded-xl p-4 mt-6">
+            <p className="text-2xl font-bold text-black">Nova Avaria</p>
             <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
               <div className="flex flex-col sm:flex-row">
                 <div className="mb-6 sm:w-1/2">
@@ -315,22 +321,13 @@ function CorrectivePage() {
                     id="stateWorkOrder"
                     name="stateWorkOrder"
                     className="p-3 border border-gray-300 rounded-md w-full"
-                    value={StateWorkOrder.OnGoing}
                   >
-                    {Object.values(StateWorkOrder)
-                      .filter((value) => typeof value === "number")
-                      .map((state) => (
-                        <option
-                          key={state}
-                          value={
-                            typeof state === "string"
-                              ? parseInt(state, 10)
-                              : state
-                          }
-                        >
-                          {translateStateWorkOrder(state)}
-                        </option>
-                      ))}
+                    <option value={StateWorkOrder.OnGoing}>
+                      {translateStateWorkOrder(StateWorkOrder.OnGoing)}
+                    </option>
+                    <option value={StateWorkOrder.Waiting}>
+                      {translateStateWorkOrder(StateWorkOrder.Waiting)}
+                    </option>
                   </select>
                 </div>
               </div>

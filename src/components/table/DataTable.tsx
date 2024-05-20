@@ -2,11 +2,12 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Pagination from "./Pagination";
 import Link from "next/link";
-import { SvgSpinner } from "app/icons/icons";
+import { SvgDelete, SvgDetail, SvgRepeat, SvgSpinner } from "app/icons/icons";
 import { Column, ColumnFormat, Filters, TableButtons } from "./interfaceTable";
 import FiltersComponent from "./FiltersComponent";
 import {
   formatDate,
+  translateOperatorType,
   translateStateWorkOrder,
   translateWorkOrderType,
 } from "app/utils/utils";
@@ -15,6 +16,8 @@ import { EntityTable } from "./tableEntitys";
 import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
 import useRoutes from "app/utils/useRoutes";
+import WorkOrderOperationsInTable from "./WorkOrderOperationsInTable";
+import { PreventiveButtons } from "./components/PreventiveButtons";
 
 interface DataTableProps {
   data: any[];
@@ -25,8 +28,22 @@ interface DataTableProps {
   onDelete?: (id: string) => void;
   totalCounts?: boolean;
   enableFilterActive?: boolean;
+  enableCheckbox?: boolean;
+  onChecked?: (id?: string) => void;
 }
 
+export interface LoadingState {
+  [key: string]: boolean;
+}
+
+export enum ButtonTypesTable {
+  Create,
+  Edit,
+  Delete,
+  Detail,
+  Sign,
+  PassInspectionPoints,
+}
 const DataTable: React.FC<DataTableProps> = ({
   data,
   columns,
@@ -36,6 +53,8 @@ const DataTable: React.FC<DataTableProps> = ({
   onDelete,
   totalCounts = false,
   enableFilterActive = true,
+  enableCheckbox = true,
+  onChecked,
 }: DataTableProps) => {
   const itemsPerPageOptions = [5, 10, 15, 20, 25, 50];
   const pathName = usePathname();
@@ -50,16 +69,11 @@ const DataTable: React.FC<DataTableProps> = ({
   const [totalCount, setTotalCount] = useState(
     Math.ceil(data.length / itemsPerPage)
   );
+  const [totalRecords, setTotalRecords] = useState(data.length);
   const ROUTES = useRoutes();
   const [pathDetail, setPathDetail] = useState<string>("");
 
-  const [isLoadingButton, setIsLoadingButton] = useState<{
-    [key: string]: boolean;
-  }>({
-    ["Edit"]: false,
-    ["Delete"]: false,
-    ["Detail"]: false,
-  });
+  const [loadingState, setLoadingState] = useState<LoadingState>({});
   const { loginUser } = useSessionStore((state) => state);
 
   const handlePageChange = (page: number) => {
@@ -144,9 +158,22 @@ const DataTable: React.FC<DataTableProps> = ({
           })
           .slice(indexOfFirstRecord, indexOfLastRecord)
       );
+      setTotalRecords(
+        data.filter((record) => {
+          if (typeof record === "object" && record.hasOwnProperty("active")) {
+            if (filterActive) {
+              return record.active === true;
+            } else {
+              return true;
+            }
+          }
+        }).length
+      );
     } else {
+      setTotalRecords(data.length);
       setFilteredData(data.slice(indexOfFirstRecord, indexOfLastRecord));
     }
+
     setTotalCount(Math.ceil(data.length / itemsPerPage));
     setIsLoading(false);
   }, [data, currentPage, itemsPerPage, filterActive]);
@@ -196,52 +223,32 @@ const DataTable: React.FC<DataTableProps> = ({
         filteredData.slice(indexOfFirstRecord, indexOfLastRecord)
       );
     }
-
+    //setTotalRecords(filteredData.length);
     setTotalCount(Math.ceil(filteredData.length / itemsPerPage));
   };
 
+  const toggleLoading = (
+    id: string,
+    buttonType: ButtonTypesTable,
+    isLoading: boolean
+  ) => {
+    const loadingKey = `${id}_${buttonType}`;
+    setLoadingState((prevLoadingState) => ({
+      ...prevLoadingState,
+      [loadingKey]: isLoading,
+    }));
+  };
+
   const handleDelete = async (id: string) => {
-    setIsLoadingButton((prevState) => ({
-      ...prevState,
-      ["Delete"]: true,
-    }));
+    toggleLoading(id, ButtonTypesTable.Delete, true);
     onDelete && onDelete(id);
-    setIsLoadingButton((prevState) => ({
-      ...prevState,
-      ["Delete"]: false,
-    }));
+    toggleLoading(id, ButtonTypesTable.Delete, false);
   };
 
   const renderFilters = () => {
     return (
       <>
         <div className="flex gap-4 p-1 justify-between">
-          <div className="flex items-center">
-            <select
-              value={itemsPerPage}
-              onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-              className="text-sm bg-blue-gray-100 rounded-lg border border-gray-500"
-            >
-              {itemsPerPageOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-            <p className="ml-2">registres per pàgina</p>
-          </div>
-          {enableFilterActive && (
-            <div className="flex items-center">
-              <span className="mr-2">Veure registres actius</span>
-              <input
-                type="checkbox"
-                checked={filterActive}
-                onChange={() => setFilterActive(!filterActive)}
-                className="ml-2"
-              />
-            </div>
-          )}
-
           <div className="">
             {filters?.length == 0 && (
               <input
@@ -252,17 +259,60 @@ const DataTable: React.FC<DataTableProps> = ({
             )}
           </div>
         </div>
-        <FiltersComponent
-          filters={filters}
-          onFilterChange={handleFilterChange}
-        />
+        <div className="flex justify-between items-center">
+          <FiltersComponent
+            filters={filters}
+            onFilterChange={handleFilterChange}
+          />
+          {enableFilterActive && (
+            <div
+              className="flex items-center hover:cursor-pointer"
+              onClick={() => setFilterActive(!filterActive)}
+            >
+              <span className="mr-2 text-sm">Actius</span>
+              <input
+                type="checkbox"
+                checked={filterActive}
+                onChange={() => setFilterActive(!filterActive)}
+                className="ml-2"
+              />
+            </div>
+          )}
+        </div>
       </>
     );
   };
 
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+
+  const handleSelectedRow = (id: string) => {
+    setSelectedRows((prevSelectedRows) => {
+      const newSelectedRows = new Set(prevSelectedRows);
+      if (newSelectedRows.has(id)) {
+        newSelectedRows.delete(id);
+      } else {
+        newSelectedRows.add(id);
+      }
+      return newSelectedRows;
+    });
+    onChecked && onChecked(id);
+  };
+
+  const handleSelectedAllRows = () => {
+    if (selectedRows.size === data.length) {
+      setSelectedRows(new Set()); // Deselect all if all are selected
+    } else {
+      setSelectedRows(new Set(data.map((row) => row.id))); // Select all rows
+    }
+    onChecked && onChecked();
+  };
+
   const renderHeadTableActions = () => {
-    return tableButtons.delete || tableButtons.detail || tableButtons.edit ? (
-      <th className="text-center border-b border-blue-gray-100 bg-blue-gray-50 p-4 cursor-pointer">
+    return tableButtons.delete ||
+      tableButtons.detail ||
+      tableButtons.edit ||
+      entity === EntityTable.WORKORDER ? (
+      <th className="text-center border-b border-blue-gray-100 bg-blue-gray-50 ">
         Accions
       </th>
     ) : (
@@ -272,70 +322,53 @@ const DataTable: React.FC<DataTableProps> = ({
 
   const renderTableButtons = (item: any) => {
     return (
-      <div className="justify-center flex flex-col sm:flex-row items-center">
-        {loginUser?.permission !== UserPermission.Administrator ? (
-          <td className="p-4 flex flex-col sm:flex-row justify-center items-center text-center gap-4">
-            <Link href={`${pathDetail}/${item[columns[0].key]}`}>
-              <p
-                className="flex items-center font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover"
-                onClick={() => {
-                  setIsLoadingButton((prevState) => ({
-                    ...prevState,
-                    ["Detail"]: true,
-                  }));
-                }}
-              >
-                Detall
-                {isLoadingButton["Detail"] && (
-                  <span className="ml-2 text-xs">
-                    <SvgSpinner className="w-6 h-6" />
-                  </span>
-                )}
-              </p>
-            </Link>
-          </td>
-        ) : (
-          <>
-            <td className="p-4 flex flex-col sm:flex-row justify-center items-center text-center gap-4">
+      <td className="p-2">
+        {loginUser?.permission == UserPermission.Administrator &&
+          entity !== EntityTable.WORKORDER && (
+            <div className="flex flex-row gap-2 justify-center">
               {tableButtons.edit && (
                 <Link href={`${pathName}/${item[columns[0].key]}`}>
                   <p
-                    className="flex items-center font-medium text-white p-2 rounded-xl bg-okron-btEdit hover:bg-okron-btEditHover"
+                    className="flex items-center font-medium text-white rounded-xl bg-okron-btEdit hover:bg-okron-btEditHover"
                     onClick={() => {
-                      setIsLoadingButton((prevState) => ({
-                        ...prevState,
-                        ["Edit"]: true,
-                      }));
+                      toggleLoading(
+                        item[columns[0].key],
+                        ButtonTypesTable.Edit,
+                        true
+                      );
                     }}
                   >
-                    Editar
-                    {isLoadingButton["Edit"] && (
-                      <span className="ml-2 text-white">
-                        <SvgSpinner className="w-6 h-6" />
-                      </span>
+                    {loadingState[
+                      item[columns[0].key] + "_" + ButtonTypesTable.Edit
+                    ] ? (
+                      <SvgSpinner className="p-2" />
+                    ) : (
+                      <SvgDetail className="p-2" />
                     )}
                   </p>
                 </Link>
               )}
               {tableButtons.delete && (
-                <button
-                  type="button"
-                  className="flex items-center font-medium text-white p-2 rounded-xl bg-okron-btDelete hover:bg-okron-btDeleteHover"
+                <div
+                  className="flex items-center text-white rounded-xl bg-okron-btDelete hover:bg-okron-btDeleteHover hover:cursor-pointer"
                   onClick={() => handleDelete(item[columns[0].key])}
                 >
-                  Eliminar
-                  {isLoadingButton["Delete"] && (
-                    <span className="ml-2 text-white">
-                      <SvgSpinner className="w-6 h-6" />
-                    </span>
+                  {loadingState[
+                    item[columns[0].key] + "_" + ButtonTypesTable.Delete
+                  ] ? (
+                    <SvgSpinner className="p-2" />
+                  ) : (
+                    <SvgDelete className="p-2" />
                   )}
-                </button>
+                </div>
               )}
               {tableButtons.detail && (
                 <Link href={`${pathDetail}/${item[columns[0].key]}`}>
                   <p className="font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover">
                     Detall
-                    {isLoadingButton["Detail"] && (
+                    {loadingState[
+                      item[columns[0].key] + "_" + ButtonTypesTable.Detail
+                    ] && (
                       <span className="ml-2 text-white">
                         <SvgSpinner className="w-6 h-6" />
                       </span>
@@ -343,12 +376,27 @@ const DataTable: React.FC<DataTableProps> = ({
                   </p>
                 </Link>
               )}
-            </td>
+              {entity == EntityTable.PREVENTIVE && (
+                <PreventiveButtons preventive={item} />
+              )}
+            </div>
+          )}
+        {EntityTable.WORKORDER == entity && (
+          <>
+            <WorkOrderOperationsInTable
+              workOrderId={item[columns[0].key]}
+              workOrder={item}
+              onChangeStateWorkOrder={() => setFilterActive(!filterActive)}
+              enableActions={tableButtons.edit || tableButtons.delete}
+            />
           </>
         )}
-      </div>
+      </td>
     );
   };
+
+  const isAllSelected =
+    data.length > 0 && selectedRows.size === data.length ? true : false;
 
   if (filteredData)
     return (
@@ -359,10 +407,27 @@ const DataTable: React.FC<DataTableProps> = ({
             {isLoading ? (
               <SvgSpinner className="w-full justify-center" />
             ) : (
-              <div className="relative overflow-x-auto ">
-                <table className="w-full text-left text-lg">
+              <div className="flex-grow overflow-auto">
+                <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="border-t border-gray-200 pt-2">
+                    <tr className="border-t border-gray-200 flex-grow">
+                      {enableCheckbox && (
+                        <th
+                          className="border-b border-blue-gray-100 bg-blue-gray-50 p-4 cursor-pointer"
+                          onClick={handleSelectedAllRows}
+                        >
+                          <div className="flex items-center justify-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={
+                                isAllSelected == undefined
+                                  ? false
+                                  : isAllSelected
+                              }
+                            />
+                          </div>
+                        </th>
+                      )}
                       {columns.map((column) => {
                         if (column.key.toLocaleUpperCase() !== "ID") {
                           let classname = "flex";
@@ -391,7 +456,8 @@ const DataTable: React.FC<DataTableProps> = ({
                           );
                         }
                       })}
-                      {renderHeadTableActions()}
+                      {(tableButtons.detail || tableButtons.edit) &&
+                        renderHeadTableActions()}
                     </tr>
                   </thead>
                   <tbody className="border-b">
@@ -404,6 +470,20 @@ const DataTable: React.FC<DataTableProps> = ({
                             rowIndex % 2 === 0 ? "" : "bg-gray-100"
                           } `}
                         >
+                          {enableCheckbox && (
+                            <td
+                              className="p-2 hover:cursor-pointer"
+                              onClick={() => handleSelectedRow(rowData.id)}
+                            >
+                              <div className="flex items-center justify-center">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedRows.has(rowData.id)}
+                                  onChange={() => handleSelectedRow(rowData.id)}
+                                />
+                              </div>
+                            </td>
+                          )}
                           {columns
                             .filter(
                               (column) =>
@@ -415,7 +495,7 @@ const DataTable: React.FC<DataTableProps> = ({
                                 column.key
                               );
                               let className = "font-normal ";
-                              let classNametd = " p-4 relative ";
+                              let classNametd = "p-2";
 
                               const formatColumn =
                                 column.format.toLocaleUpperCase();
@@ -441,6 +521,14 @@ const DataTable: React.FC<DataTableProps> = ({
 
                               if (
                                 formatColumn.toLocaleUpperCase() ==
+                                ColumnFormat.OPERATORTYPE
+                              ) {
+                                className = getStatusClassName(value, entity);
+                                value = translateOperatorType(value);
+                              }
+
+                              if (
+                                formatColumn.toLocaleUpperCase() ==
                                 ColumnFormat.NUMBER
                               ) {
                                 totalQuantity += parseInt(value);
@@ -457,7 +545,13 @@ const DataTable: React.FC<DataTableProps> = ({
                                 );
                                 value = translateStateWorkOrder(value);
                               }
-
+                              if (
+                                formatColumn.toLocaleUpperCase() ==
+                                ColumnFormat.BOOLEAN
+                              ) {
+                                className +=
+                                  " text-white rounded-full py-1 px-2 text-sm text-center ";
+                              }
                               /* if (column.key === "status") {
                             className = getStatusClassName(value, entity);
                           } else if (formatColumn === "DATE") {
@@ -508,10 +602,28 @@ const DataTable: React.FC<DataTableProps> = ({
               </div>
             )}
           </div>
-          <div className="flex flex-row ">
+          <div className="flex flex-row">
             {data.length > 0 && (
-              <p className="mt-auto w-full">Total: {data.length} registres</p>
+              <p className="mt-auto text-sm w-full">
+                Total: {totalRecords} registres
+              </p>
             )}
+            <div className="flex align-bottom items-center mt-auto w-full">
+              <select
+                value={itemsPerPage}
+                onChange={(e) =>
+                  handleItemsPerPageChange(Number(e.target.value))
+                }
+                className="text-sm bg-blue-gray-100 rounded-lg border border-gray-500"
+              >
+                {itemsPerPageOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              <p className="ml-2 text-sm">registres per pàgina</p>
+            </div>
 
             <div className="justify-end w-full">
               <Pagination

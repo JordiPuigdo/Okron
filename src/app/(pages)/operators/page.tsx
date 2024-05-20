@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import OperatorForm from "../../../components/OperatorForm";
 import OperatorService from "app/services/operatorService";
-import Operator from "app/interfaces/Operator";
+import Operator, { OperatorType } from "app/interfaces/Operator";
 import Link from "next/link";
 import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
@@ -16,6 +16,7 @@ import {
   TableButtons,
 } from "components/table/interfaceTable";
 import { EntityTable } from "components/table/tableEntitys";
+import { Button } from "designSystem/Button/Buttons";
 
 function OperatorsPage() {
   const [operators, setOperators] = useState<Operator[]>([]);
@@ -35,6 +36,11 @@ function OperatorsPage() {
       label: "Nom",
       key: "name",
       format: ColumnFormat.TEXT,
+    },
+    {
+      label: "Tipus",
+      key: "operatorType",
+      format: ColumnFormat.OPERATORTYPE,
     },
     {
       label: "Actiu",
@@ -91,6 +97,8 @@ function OperatorsPage() {
     if (existingOperator) {
       alert(`Operari amb codi ${operator.code} ja existeix.`);
     } else {
+      if (operator.operatorType == null)
+        operator.operatorType = OperatorType.Maintenance;
       const data = await operatorService.createOperator(operator);
       setIsOperatorCreated(true);
       setIsFormVisible(false);
@@ -112,13 +120,10 @@ function OperatorsPage() {
   return (
     <MainLayout>
       <Container>
-        <h1 className="text-2xl font-semibold mb-4">Operaris</h1>
-        <button
-          onClick={toggleFormVisibility}
-          className="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100"
-        >
+        <Button onClick={toggleFormVisibility} className="py-4">
           {isFormVisible ? "Tancar" : "Crear Operari"}
-        </button>
+        </Button>
+
         {isFormVisible && (
           <OperatorForm
             onSubmit={createOperator}

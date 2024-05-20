@@ -21,6 +21,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
 import { formatDateQuery } from "app/utils/utils";
+import { Button } from "designSystem/Button/Buttons";
 
 interface SparePartTableProps {
   enableFilterAssets?: boolean;
@@ -86,6 +87,11 @@ const columnsPerAsset: Column[] = [
     label: "Codi OT",
     key: "workOrderCode",
     format: ColumnFormat.TEXT,
+  },
+  {
+    label: "Data Consum",
+    key: "dateConsume",
+    format: ColumnFormat.DATE,
   },
   {
     label: "Descripció OT",
@@ -296,21 +302,21 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
     <>
       {enableCreate && (
         <>
-          <h1 className="text-2xl font-bold mb-4">Recanvis</h1>
-
           {loading ? (
             <p>Carregant dades...</p>
           ) : (
             <>
               {loginUser != undefined && loginUser?.permission > 0 && (
                 <div className="mb-4">
-                  <Link
+                  <Button
+                    type="create"
+                    onClick={() => setIsLoading(true)}
+                    customStyles="gap-2 flex"
                     href="/spareParts/sparePartForm"
-                    as={`/spareParts/sparePartForm`}
-                    className="text-white mb-2 rounded-md bg-okron-btCreate hover:bg-okron-btCreateHover px-4 py-2 flex gap-2 w-1/6"
                   >
-                    Crear
-                  </Link>
+                    Crear Recanvi
+                    {isLoading && <SvgSpinner className="w-6 h-6" />}
+                  </Button>
                 </div>
               )}
             </>

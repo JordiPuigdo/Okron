@@ -19,10 +19,10 @@ export default function OTsXAsset({
             <div>
               <span className="text-lg font-semibold">{asset.asset}</span>
               <span className="block text-sm text-gray-500">
-                Total Correctius: {asset.numberCorrective}
+                Total Correctius: {asset.Correctius}
               </span>
               <span className="block text-sm text-gray-500">
-                Total Preventius: {asset.numberPreventive}
+                Total Preventius: {asset.Preventius}
               </span>
               <span className="block text-sm text-gray-500">
                 Total ordres de treball: {asset.number}

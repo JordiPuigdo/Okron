@@ -38,9 +38,9 @@ const FiltersComponent: React.FC<FiltersComponentProps> = ({
   return (
     <>
       {filters && filters.length > 0 && (
-        <div className="flex flex-row gap-4 p-1 justify-between">
-          <div className="flex flex-row sm:flex-row md:flex-row  items-center gap-4">
-            {filters.map((filter) => (
+        <div className="flex flex-row gap-2 p-1 justify-between">
+          <div className="flex flex-row sm:flex-col md:flex-row items-center gap-2">
+            {filters.map((filter, index) => (
               <div key={filter.key} className="flex items-center">
                 {filter.format === FiltersFormat.TEXT && (
                   <input

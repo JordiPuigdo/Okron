@@ -44,6 +44,11 @@ const columns: Column[] = [
     key: "lastExecution",
     format: ColumnFormat.DATE,
   },
+  {
+    label: "Actiu",
+    key: "active",
+    format: ColumnFormat.BOOLEAN,
+  },
 ];
 
 const filters: Filters[] = [
@@ -85,6 +90,7 @@ const PreventiveTable: React.FC<PreventiveTableProps> = ({
           setPreventives(fetchedPreventives);
         } else {
           const fetchedPreventives = await preventiveService.getPreventives();
+
           setPreventives(fetchedPreventives);
           if (filters.filter((x) => x.key === "asset.description").length == 0)
             filters.push({

@@ -7,12 +7,14 @@ type AutocompleteSearchBarProps = {
   elements: ElementList[];
   setCurrentId: (id: string) => void;
   placeholder: string;
+  disabled?: boolean;
 };
 
 const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
   elements,
   setCurrentId,
   placeholder,
+  disabled = false,
 }) => {
   const [query, setQuery] = useState("");
   const [selectedElementIndex, setSelectedElementIndex] = useState<number>(-1);
@@ -99,6 +101,7 @@ const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
         onKeyDown={handleKeyDown}
         inputRef={inputRef}
         placeholder={placeholder}
+        disabled={disabled}
       />
 
       {query !== "" && searchResults.length > 0 && (

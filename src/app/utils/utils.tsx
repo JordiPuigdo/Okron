@@ -1,4 +1,9 @@
-import { StateWorkOrder, WorkOrderType } from "app/interfaces/workOrder";
+import { OperatorType } from "app/interfaces/Operator";
+import {
+  StateWorkOrder,
+  WorkOrderEventType,
+  WorkOrderType,
+} from "app/interfaces/workOrder";
 import { useSessionStore } from "app/stores/globalStore";
 
 export const translateStateWorkOrder = (state: any): string => {
@@ -8,8 +13,33 @@ export const translateStateWorkOrder = (state: any): string => {
     case StateWorkOrder.OnGoing:
       return "En curs";
     case StateWorkOrder.Paused:
-      return "En pausa";
+      return "Pausada";
     case StateWorkOrder.Finished:
+      return "Finalitzada";
+    case StateWorkOrder.PendingToValidate:
+      return "Pendent Validar";
+    case StateWorkOrder.Requested:
+      return "Sol·licitat";
+    default:
+      return "";
+  }
+};
+
+export const translateWorkOrderEventType = (
+  eventType: WorkOrderEventType
+): string => {
+  switch (eventType) {
+    /*case WorkOrderEventType.Requested:
+      return "Sol·licitud";*/
+    case WorkOrderEventType.Waiting:
+      return "Pendent";
+    case WorkOrderEventType.Started:
+      return "En curs";
+    case WorkOrderEventType.Paused:
+      return "Pausada";
+    case WorkOrderEventType.PendingToValidate:
+      return "Validació Pendent";
+    case WorkOrderEventType.Finished:
       return "Finalitzada";
     default:
       return "";
@@ -127,4 +157,30 @@ export function formatDateQuery(date: Date, startDate: boolean) {
   return new Date(
     formated.getTime() - formated.getTimezoneOffset() * 60000
   ).toISOString();
+}
+
+export const translateOperatorType = (operatorType: any): string => {
+  switch (operatorType) {
+    case OperatorType.Maintenance:
+      return "Manteniment";
+    case OperatorType.Production:
+      return "Producció";
+    case OperatorType.Quality:
+      return "Qualitat";
+    default:
+      return "";
+  }
+};
+
+export function convertUTCDateToLocalDate(date: Date) {
+  const newDate = new Date(
+    date.getTime() + date.getTimezoneOffset() * 60 * 1000
+  );
+
+  const offset = date.getTimezoneOffset() / 60;
+  const hours = date.getHours();
+
+  newDate.setHours(hours - offset);
+
+  return newDate;
 }

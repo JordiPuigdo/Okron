@@ -1,3 +1,5 @@
+import { OperatorType } from "./Operator";
+
 export interface User {
     username : string;
     password : string;
@@ -16,11 +18,13 @@ export enum UserPermission
 {
    Worker,
    OfficeUser,
-   Administrator
+   Administrator,
+   SuperAdministrator
 }
 
 export interface OperatorLogged {
     idOperatorLogged : string;
     codeOperatorLogged : string;
     nameOperatorLogged: string;
+    operatorLoggedType : OperatorType;
 }

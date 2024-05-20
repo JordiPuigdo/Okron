@@ -92,7 +92,7 @@ class SparePartService {
 
   async consumeSparePart(consumeSparePartRequest : ConsumeSparePart ): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}sparePart/consume`;
+      const url = `${this.baseUrl}sparePart/Consume`;
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -151,6 +151,20 @@ class SparePartService {
       throw error;
     }
     
+  }
+
+  async cleanCache(): Promise<boolean> {
+    try {
+      const url = `${this.baseUrl}sparepart/CleanCache`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      throw error;
+    }
   }
 
 }

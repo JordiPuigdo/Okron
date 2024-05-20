@@ -33,7 +33,6 @@ export default function WorkOrdersPage() {
   return (
     <MainLayout>
       <Container>
-        {renderHeader()}
         <WorkOrderTable
           enableFilterAssets={true}
           enableFilters={true}

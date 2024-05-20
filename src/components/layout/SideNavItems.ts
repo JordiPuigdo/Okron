@@ -76,6 +76,12 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         path: '/operators',
         permission: UserPermission.Administrator
       },
+      {
+        key: generateKey(),
+        title: 'Usuaris',
+        path: '/users',
+        permission: UserPermission.Administrator
+      },
     ]
   },
 ];

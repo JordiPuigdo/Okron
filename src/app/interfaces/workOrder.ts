@@ -5,6 +5,7 @@ import SparePart from "./SparePart";
 import InspectionPoint from "./inspectionPoint";
 import Machine from "./machine";
 import { BaseModel } from "./BaseModel";
+import { Preventive } from "./Preventive";
 
 export interface WorkOrder extends BaseModel {
   id: string;
@@ -23,6 +24,8 @@ export interface WorkOrder extends BaseModel {
   workOrderSpareParts?: WorkOrderSparePart[]
   workOrderComments? : WorkOrderComment[]
   asset? : Asset;
+  workOrderEvents? : WorkOrderEvents[];
+  preventive? : Preventive;
 }
 
 export default WorkOrder;
@@ -35,10 +38,13 @@ export interface WorkOrderSparePart
 }
 
 export enum StateWorkOrder {
-  Waiting = 0,
-  OnGoing = 1,
-  Paused = 2,
-  Finished = 3,
+  Waiting,
+  OnGoing,
+  Paused,
+  Finished,
+  Requested,
+  PendingToValidate
+
 }
 
 
@@ -107,6 +113,7 @@ export interface SearchWorkOrderFilters {
   endDateTime? : string;
   operatorId? : string;
   assetId? : string;
+  stateWorkOrder? : StateWorkOrder; 
 }
 
 export enum WorkOrderType {
@@ -146,4 +153,20 @@ export interface UpdateStateWorkOrder{
   state : StateWorkOrder;
   operatorId? : string;
   userId? : string; 
+}
+
+export interface WorkOrderEvents{
+  id : string;
+  date : string;
+  workOrderEventType : WorkOrderEventType;
+  operator : Operator;
+}
+
+export enum WorkOrderEventType {
+  Requested,
+  Waiting,
+  Started,
+  Paused,
+  PendingToValidate,
+  Finished,
 }

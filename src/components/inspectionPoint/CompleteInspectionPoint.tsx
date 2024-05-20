@@ -7,8 +7,9 @@ import {
 import WorkOrderService from "app/services/workOrderService";
 import { SvgSpinner } from "app/icons/icons";
 import { useSessionStore } from "app/stores/globalStore";
+import { checkAllInspectionPoints } from "app/utils/utilsInspectionPoints";
 
-interface CompleteInspectionPoints {
+interface CompleteInspectionPointsProps {
   workOrderInspectionPoints: WorkOrderInspectionPoint[];
   setCompletedWorkOrderInspectionPoints: React.Dispatch<
     React.SetStateAction<WorkOrderInspectionPoint[]>
@@ -17,7 +18,7 @@ interface CompleteInspectionPoints {
   isFinished: boolean;
 }
 
-const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
+const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
   workOrderInspectionPoints,
   setCompletedWorkOrderInspectionPoints,
   workOrderId,
@@ -27,6 +28,7 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
+
   const { operatorLogged } = useSessionStore((state) => state);
 
   const handleSelectInspectionPoint = async (
@@ -109,19 +111,50 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
     }));
   };
 
+  async function handleAllChecksOk() {
+    setIsLoading((prevLoadingMap) => ({
+      ...prevLoadingMap,
+      ["OK"]: true,
+    }));
+    const result = await checkAllInspectionPoints(
+      workOrderInspectionPoints,
+      workOrderId
+    );
+    setCompletedWorkOrderInspectionPoints(result);
+    setIsLoading((prevLoadingMap) => ({
+      ...prevLoadingMap,
+      ["OK"]: false,
+    }));
+  }
+
   return (
-    <div className="mx-auto px-4 py-8 mt-12 bg-white rounded-lg">
-      <div className="bg-white w-full text-center p-4 rounded-md border-2 border-gray-400">
-        <span className="text-xl font-bold">Passar Punts d'Inspecció</span>
+    <div className="p-2 bg-white rounded-lg shadow-md w-full">
+      <div
+        className={`flex gap-2 p-2  rounded-xl justify-center font-semibold text-white   ${
+          isFinished
+            ? "bg-gray-500 cursor-default"
+            : "bg-green-500 hover:bg-green-700 cursor-pointer "
+        }`}
+        onClick={(e) => {
+          !isFinished && handleAllChecksOk();
+        }}
+      >
+        Marcar tots OK
+        {isLoading["OK"] && <SvgSpinner className="w-6 h-6" />}
       </div>
-      <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
-      <div className="mt-6 overflow-x-auto">
+      <div className="py-4 overflow-x-auto rounded-sm">
         <table className="w-full table-auto">
           <thead className="bg-gray-50">
             <tr>
-              <th className="py-2 px-4 font-bold text-lg">Check</th>
-              <th className="py-2 px-4 font-bold text-lg">Punt de inspecció</th>
-              <th className="py-2 px-4 font-bold text-lg">Reset</th>
+              <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                Check
+              </th>
+              <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                Punt de inspecció
+              </th>
+              <th className="p-2 text-center text-sm font-medium text-gray-500 uppercase tracking-wider">
+                Reset
+              </th>
             </tr>
           </thead>
 
@@ -137,7 +170,7 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
                     : "bg-orange-100"
                 }
               >
-                <td className="py-2 px-4 text-center align-middle">
+                <td className="p-2 text-left align-middle">
                   <input
                     disabled={isFinished}
                     type="checkbox"
@@ -151,11 +184,11 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
                     className="w-6 h-6 cursor-pointer"
                   />
                 </td>
-                <td className="py-2 px-4 text-center align-middle text-lg">
+                <td className="p-2 text-left align-middle text-lg">
                   {inspectionPoint.inspectionPoint.description}
                 </td>
                 <td
-                  className="py-2 px-4 text-center align-middle"
+                  className="p-2 text-left align-middle"
                   onClick={() => {
                     handleResetInspectionPoint(inspectionPoint);
                   }}
@@ -174,7 +207,6 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPoints> = ({
           </tbody>
         </table>
       </div>
-      <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
     </div>
   );
 };

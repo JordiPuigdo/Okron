@@ -3,6 +3,7 @@
 import WorkOrder, {
   SearchWorkOrderFilters,
   StateWorkOrder,
+  UpdateStateWorkOrder,
   WorkOrderType,
 } from "app/interfaces/workOrder";
 import WorkOrderService from "app/services/workOrderService";
@@ -30,6 +31,8 @@ import { ElementList } from "components/selector/ElementList";
 import FinalizeWorkOrdersDaysBefore from "./FinalizeWorkOrdersDaysBefore";
 import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
+import { OperatorType } from "app/interfaces/Operator";
+import { Button } from "designSystem/Button/Buttons";
 
 interface WorkOrderTableProps {
   enableFilterAssets?: boolean;
@@ -40,6 +43,8 @@ interface WorkOrderTableProps {
   assetId?: string | "";
   enableFinalizeWorkOrdersDayBefore?: boolean;
   operatorId?: string | "";
+  workOrderType?: WorkOrderType;
+  refresh?: boolean;
 }
 
 const columns: Column[] = [
@@ -80,6 +85,11 @@ const columns: Column[] = [
   },
 ];
 
+interface ResponseMessage {
+  message: string;
+  isSuccess: boolean;
+}
+
 const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   enableFilterAssets = false,
   enableFilters = false,
@@ -89,6 +99,8 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   assetId,
   enableFinalizeWorkOrdersDayBefore = false,
   operatorId,
+  workOrderType,
+  refresh,
 }) => {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
@@ -104,10 +116,12 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   >(undefined);
   const [searchTerm, setSearchTerm] = useState("");
   const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
-
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
+
+  const { operatorLogged, loginUser } = useSessionStore((state) => state);
 
   const tableButtons: TableButtons = {
     edit: enableEdit,
@@ -115,7 +129,12 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     detail: enableDetail,
   };
 
+  const [responseMessage, setResponseMessage] =
+    useState<ResponseMessage | null>(null);
+
   const [selectedAssetId, setSelectedAssetId] = useState<string>(assetId!);
+
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -147,7 +166,14 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 
     if (assetId == undefined) fetchAssets();
     if (operatorId !== undefined) handleSearch();
+    searchWorkOrders();
   }, []);
+
+  useEffect(() => {
+    if (refresh) {
+      setSelectedTypeFilter(workOrderType);
+    }
+  }, [refresh, workOrderType]);
 
   const searchWorkOrders = async () => {
     const startDateTime = startDate ? new Date(startDate) : null;
@@ -175,6 +201,12 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
         : "",
     };
 
+    if (operatorLogged?.operatorLoggedType == OperatorType.Quality) {
+      search.stateWorkOrder = StateWorkOrder.PendingToValidate;
+      search.startDateTime = undefined;
+      search.endDateTime = undefined;
+    }
+
     const workOrders = await workOrderService.getWorkOrdersWithFilters(search);
     if (workOrders.length == 0) {
       setMessage("No hi ha ordres disponibles amb aquests filtres");
@@ -194,7 +226,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 
   const renderFilterWorkOrders = () => {
     return (
-      <div className="bg-white p-2 my-4 rounded-xl gap-4 shadow-md">
+      <div className="bg-white my-4 rounded-xl gap-4 p-2 shadow-md">
         <div className="flex gap-4 my-4 items-center">
           <div className="flex items-center">
             <label htmlFor="startDate" className="mr-2">
@@ -267,7 +299,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
             >
               <option value="">-</option>
               {Object.values(StateWorkOrder)
-                .filter((value) => typeof value === "number")
+                .filter((value) => typeof value === "number" && value !== 4)
                 .map((state) => (
                   <option
                     key={state}
@@ -279,30 +311,16 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
                   </option>
                 ))}
             </select>
-            <span>Tipus: </span>
-            <select
-              id="workOrderType"
-              name="workOrderType"
-              className="p-3 border border-gray-300 rounded-md w-full"
-              value={selectedTypeFilter !== undefined ? selectedTypeFilter : ""}
-              onChange={handleTypeFilterChange}
+            <span
+              className="text-white rounded-full p-3 w-full text-center bg-okron-corrective font-semibold hover:cursor-pointer"
+              onClick={() => {
+                if (selectedTypeFilter == WorkOrderType.Corrective) {
+                  setSelectedTypeFilter(undefined);
+                  return;
+                }
+                setSelectedTypeFilter(WorkOrderType.Corrective);
+              }}
             >
-              <option value="">-</option>
-              {Object.values(WorkOrderType)
-                .filter((value) => typeof value === "number")
-                .map((state) => (
-                  <option
-                    key={state}
-                    value={
-                      typeof state === "string" ? parseInt(state, 10) : state
-                    }
-                  >
-                    {translateWorkOrderType(state)}
-                  </option>
-                ))}
-            </select>
-
-            <span className="text-white rounded-full p-3 w-full text-center bg-okron-corrective font-semibold">
               Correctius:{" "}
               {
                 filteredWorkOrders.filter(
@@ -310,7 +328,16 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
                 ).length
               }
             </span>
-            <span className="text-white rounded-full p-3 w-full text-center bg-okron-preventive font-semibold">
+            <span
+              className="text-white rounded-full p-3 w-full text-center bg-okron-preventive font-semibold hover:cursor-pointer"
+              onClick={() => {
+                if (selectedTypeFilter == WorkOrderType.Preventive) {
+                  setSelectedTypeFilter(undefined);
+                  return;
+                }
+                setSelectedTypeFilter(WorkOrderType.Preventive);
+              }}
+            >
               Preventius:{" "}
               {
                 filteredWorkOrders.filter(
@@ -403,6 +430,68 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     return true;
   });
 
+  const handleOnChecked = (id?: string) => {
+    if (id != undefined) {
+      setSelectedRows((prevSelectedRows) => {
+        const newSelectedRows = new Set(prevSelectedRows);
+        if (newSelectedRows.has(id)) {
+          newSelectedRows.delete(id);
+        } else {
+          newSelectedRows.add(id);
+        }
+        return newSelectedRows;
+      });
+    } else {
+      if (selectedRows.size === filteredWorkOrders.length) {
+        setSelectedRows(new Set());
+      } else {
+        setSelectedRows(new Set(filteredWorkOrders.map((row) => row.id)));
+      }
+    }
+  };
+
+  const handleFinalizeWorkOrders = async () => {
+    setIsUpdating(true);
+
+    const workOrders = Array.from(selectedRows).map((workOrderId) => ({
+      workOrderId,
+      state: StateWorkOrder.Finished,
+      operatorId: operatorLogged?.idOperatorLogged,
+      userId: loginUser?.agentId,
+    }));
+
+    await workOrderService
+      .updateStateWorkOrder(workOrders)
+      .then((response) => {
+        if (response) {
+          setTimeout(() => {
+            setResponseMessage({
+              message: "Ordres actualitzades correctament",
+              isSuccess: true,
+            });
+          }, 2000);
+
+          searchWorkOrders();
+        } else {
+          setTimeout(() => {
+            setResponseMessage({
+              message: "Error actualitzant ordres",
+              isSuccess: false,
+            });
+          }, 3000);
+        }
+      })
+      .catch((error) => {
+        setTimeout(() => {
+          setResponseMessage({
+            message: error,
+            isSuccess: false,
+          });
+        }, 3000);
+      });
+    setIsUpdating(false);
+  };
+
   return (
     <>
       {enableFilters && renderFilterWorkOrders()}
@@ -413,7 +502,41 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
         entity={EntityTable.WORKORDER}
         onDelete={handleDeleteOrder}
         enableFilterActive={false}
+        enableCheckbox={
+          operatorLogged?.operatorLoggedType == OperatorType.Quality
+        }
+        onChecked={handleOnChecked}
       />
+      {filteredWorkOrders.length > 0 && (
+        <div className="py-4 flex flex-row gap-2">
+          <Button
+            type="none"
+            className={`text-white ${
+              selectedRows.size > 0
+                ? " bg-blue-900 hover:bg-blue-950 "
+                : " bg-gray-200 hover:cursor-not-allowed"
+            }  rounded-lg text-sm `}
+            size="lg"
+            customStyles="align-middle flex"
+            onClick={handleFinalizeWorkOrders}
+          >
+            {isUpdating ? (
+              <SvgSpinner className="text-white" />
+            ) : (
+              <>Finalitzar</>
+            )}
+          </Button>
+          {responseMessage && (
+            <div
+              className={` ${
+                responseMessage ? "text-green-500" : "text-red-500"
+              } text-center font-semibold p-2 items-center flex justify-center`}
+            >
+              {responseMessage.message}
+            </div>
+          )}
+        </div>
+      )}
     </>
   );
 };

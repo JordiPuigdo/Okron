@@ -9,6 +9,7 @@ import Container from "components/layout/Container";
 import { useRouter } from "next/navigation";
 import PreventiveTable from "./preventiveTable/preventiveTable";
 import GeneratePreventive from "./components/GeneratePreventive";
+import { Button } from "designSystem/Button/Buttons";
 
 function PreventivePage() {
   const preventiveService = new PreventiveService(
@@ -68,20 +69,16 @@ function PreventivePage() {
   return (
     <MainLayout>
       <Container>
-        {renderHeader()}
-
         <div className="flex flex-row gap-3 items-start">
-          <Link
-            href={{
-              pathname: "/preventive/preventiveForm",
-              query: { counter: preventives.length },
-            }}
-            className="text-white mb-2 rounded-md bg-okron-btCreate hover:bg-okron-btCreateHover px-4 py-2 flex gap-2"
-            onClick={(e) => setIsLoading(true)}
+          <Button
+            type="create"
+            href={`/preventive/preventiveForm`}
+            onClick={() => setIsLoading(true)}
+            customStyles="flex gap-2"
           >
             Crear Revisió
             {isLoading && <SvgSpinner className="w-6 h-6" />}
-          </Link>
+          </Button>
           <GeneratePreventive />
         </div>
 

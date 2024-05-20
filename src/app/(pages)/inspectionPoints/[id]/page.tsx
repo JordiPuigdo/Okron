@@ -78,7 +78,10 @@ export default function EditInspectionPoint({
   return (
     <MainLayout>
       <Container>
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="mt-8 bg-white rounded-xl p-4"
+        >
           {isLoading ? (
             <div>Loading...</div>
           ) : inspectionPoint ? (

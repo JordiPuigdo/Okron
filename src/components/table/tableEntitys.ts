@@ -7,4 +7,5 @@ export enum EntityTable {
     INSPECTIONPOINTS = "INSPECTIONPOINTS",
     MACHINE = "MACHINE",
     ASSET = "ASSET",
+    USERS = "USERS"
 }

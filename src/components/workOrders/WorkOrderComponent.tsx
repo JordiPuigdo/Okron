@@ -2,10 +2,17 @@
 import { useSessionStore } from "app/stores/globalStore";
 import { useEffect, useState } from "react";
 import WorkOrderTable from "app/(pages)/workOrders/components/WorkOrderTable";
+import { WorkOrderType } from "app/interfaces/workOrder";
 
-export default function WorkOrderComponent() {
+interface WorkOrderComponentProps {
+  workOrderType?: WorkOrderType;
+}
+export default function WorkOrderComponent({
+  workOrderType,
+}: WorkOrderComponentProps) {
   const { operatorLogged } = useSessionStore((state) => state);
   const [operatorId, setOperatorId] = useState<string | "">("");
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     operatorLogged !== undefined
@@ -13,15 +20,21 @@ export default function WorkOrderComponent() {
       : setOperatorId("");
   }, [operatorLogged]);
 
+  useEffect(() => {
+    setRefresh(true);
+  }, [workOrderType]);
+
   return (
     <>
       {operatorId !== "" ? (
         <WorkOrderTable
           enableDelete={false}
-          enableEdit={false}
+          enableEdit={true}
           enableFilters={false}
           operatorId={operatorId}
-          enableDetail={true}
+          enableDetail={false}
+          workOrderType={workOrderType}
+          refresh={refresh}
         />
       ) : (
         <></>

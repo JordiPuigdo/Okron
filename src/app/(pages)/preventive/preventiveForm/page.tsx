@@ -5,14 +5,11 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { CreatePreventiveRequest, Preventive } from "app/interfaces/Preventive";
 import { useRouter } from "next/navigation";
 import PreventiveService from "app/services/preventiveService";
-import SparePartService from "app/services/sparePartService";
 import InspectionPointService from "app/services/inspectionPointService";
-import SparePart from "app/interfaces/SparePart";
 import InspectionPoint from "app/interfaces/inspectionPoint";
 import OperatorService from "app/services/operatorService";
 import Operator from "app/interfaces/Operator";
 import MachineService from "app/services/machineService";
-import Machine from "app/interfaces/machine";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -23,30 +20,23 @@ import Container from "components/layout/Container";
 import ChooseInspectionPoint from "components/inspectionPoint/ChooseInspectionPoint";
 import ChooseOperatorV2 from "components/operator/ChooseOperatorV2";
 import ChooseElement from "components/ChooseElement";
-import machine from "app/interfaces/machine";
 import AssetService from "app/services/assetService";
 import { ElementList } from "components/selector/ElementList";
 import { Asset } from "app/interfaces/Asset";
+import { Button } from "designSystem/Button/Buttons";
 
 const PreventiveForm = () => {
   const router = useRouter();
-  const apiURL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-  const [selectedSpareParts, setSelectedSpareParts] = useState<string[]>([]);
-  const [selectedMachines, setSelectedMachines] = useState<string[]>([]);
+  const apiURL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
-  const [availableSpareParts, setAvailableSpareParts] = useState<SparePart[]>(
-    []
-  );
   const [availableInspectionPoints, setAvailableInspectionPoints] = useState<
     InspectionPoint[]
   >([]);
-  const [aviableMachines, setAviableMachines] = useState<Machine[]>([]);
   const [selectedInspectionPoints, setSelectedInspectionPoints] = useState<
     string[]
   >([]);
-  const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
+  const assetService = new AssetService(apiURL);
   const preventiveService = new PreventiveService(apiURL);
-  const sparePartService = new SparePartService(apiURL);
   const inspectionPointService = new InspectionPointService(apiURL);
   const operatorService = new OperatorService(apiURL);
   const machineService = new MachineService(apiURL);
@@ -59,7 +49,6 @@ const PreventiveForm = () => {
   const [selectedOperator, setSelectedOperator] = useState<string[]>([]);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
-  const [date, setDate] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [isLoading, setIsLoading] = useState(false);
@@ -150,6 +139,10 @@ const PreventiveForm = () => {
     };
     return createPreventiveRequest;
   }
+
+  const handleSubmitForm = async () => {
+    handleSubmit(onSubmit)();
+  };
 
   const onSubmit: SubmitHandler<Preventive> = async (data) => {
     setIsLoading(true);
@@ -354,35 +347,25 @@ const PreventiveForm = () => {
               />
             </div>
 
-            <div className="flex flex-row gap-4">
-              <button
-                type="submit"
+            <div className="flex gap-4">
+              <Button
+                type="create"
+                onClick={handleSubmitForm}
                 disabled={isLoading}
-                className={`${
-                  showSuccessMessage
-                    ? "bg-green-500"
-                    : showErrorMessage
-                    ? "bg-red-500"
-                    : "bg-blue-500"
-                } hover:${
-                  showSuccessMessage
-                    ? "bg-green-700"
-                    : showErrorMessage
-                    ? "bg-red-700"
-                    : "bg-blue-700"
-                } text-white font-bold py-2 px-4 rounded mt-6 flex items-center justify-center`}
+                customStyles="flex gap-2"
               >
                 Crear Revisió
-                {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
-              </button>
-
-              <button
-                type="button"
+                {isLoading && <SvgSpinner className="w-6 h-6" />}
+              </Button>
+              <Button
+                type="cancel"
                 onClick={handleCancel}
-                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-6"
+                disabled={isLoading}
+                customStyles="flex gap-2"
               >
                 Cancelar
-              </button>
+                {isLoading && <SvgSpinner className="w-6 h-6" />}
+              </Button>
             </div>
             <div className="flex flex-row py-4 w-full">
               {showSuccessMessage && (

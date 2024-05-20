@@ -14,14 +14,14 @@ import OTsXAsset from "./components/OTsXAsset";
 
 interface WorkOrdersChartProps {
   operator: string;
-  numberPreventive: number;
-  numberCorrective: number;
+  Correctius: number;
+  Preventius: number;
 }
 
 export interface AssetChartProps {
   asset: string;
-  numberPreventive: number;
-  numberCorrective: number;
+  Correctius: number;
+  Preventius: number;
   number: number;
 }
 
@@ -38,9 +38,10 @@ export default function DashboardPage() {
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
   const currentDate = new Date();
+  const lastMonth = currentDate.getMonth() - 1;
   const firstDayOfMonth = new Date(
     currentDate.getFullYear(),
-    currentDate.getMonth(),
+    currentDate.getMonth() - 1,
     1
   );
 
@@ -80,22 +81,22 @@ export default function DashboardPage() {
 
               if (existingOperator) {
                 if (workOrder.workOrderType === WorkOrderType.Preventive) {
-                  existingOperator.numberPreventive++;
+                  existingOperator.Preventius++;
                 } else if (
                   workOrder.workOrderType === WorkOrderType.Corrective
                 ) {
-                  existingOperator.numberCorrective++;
+                  existingOperator.Correctius++;
                 }
               } else {
                 const newOperatorEntry: WorkOrdersChartProps = {
                   operator:
                     operators.find((x) => x.id === operatorName)?.name ||
                     "Proves",
-                  numberPreventive:
+                  Preventius:
                     workOrder.workOrderType === WorkOrderType.Preventive
                       ? 1
                       : 0,
-                  numberCorrective:
+                  Correctius:
                     workOrder.workOrderType === WorkOrderType.Corrective
                       ? 1
                       : 0,
@@ -121,19 +122,19 @@ export default function DashboardPage() {
         const existingAsset = assetMap.get(asset);
         if (existingAsset) {
           if (workOrder.workOrderType === WorkOrderType.Preventive) {
-            existingAsset.numberPreventive++;
+            existingAsset.Preventius++;
           }
           if (workOrder.workOrderType === WorkOrderType.Corrective) {
-            existingAsset.numberCorrective++;
+            existingAsset.Correctius++;
           }
           existingAsset.number++;
         } else {
           const newAssetEntry: AssetChartProps = {
             asset: asset,
             number: 1,
-            numberPreventive:
+            Preventius:
               workOrder.workOrderType === WorkOrderType.Preventive ? 1 : 0,
-            numberCorrective:
+            Correctius:
               workOrder.workOrderType === WorkOrderType.Corrective ? 1 : 0,
           };
           assetMap.set(asset, newAssetEntry);
@@ -191,7 +192,7 @@ export default function DashboardPage() {
       <div className="flex flex-col gap-12 w-full items-center bg-white p-4 rounded-xl">
         {chartData.length > 0 && (
           <BarChartComponent
-            category={["numberPreventive", "numberCorrective"]}
+            category={["Preventius", "Correctius"]}
             chartData={chartData}
             index="operator"
           />

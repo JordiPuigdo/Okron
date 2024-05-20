@@ -4,7 +4,7 @@ import {
   WorkOrderComment,
 } from "app/interfaces/workOrder";
 import WorkOrderService from "app/services/workOrderService";
-import { SvgSpinner } from "app/icons/icons";
+import { SvgDelete, SvgSpinner } from "app/icons/icons";
 import { useSessionStore } from "app/stores/globalStore";
 import { formatDate } from "app/utils/utils";
 
@@ -43,12 +43,15 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
 
   const handleAddComment = async () => {
     try {
-      setIsLoading(true);
       if (operatorLogged?.idOperatorLogged == undefined) {
         alert("Has de fitxar un operari per fer aquesta acció");
         return;
       }
-
+      if (newComment.trim().length === 0) {
+        alert("No hi ha cap comentari per afegir");
+        return;
+      }
+      setIsLoading(true);
       const commentToAdd: AddCommentToWorkOrderRequest = {
         comment: newComment,
         operatorId: operatorLogged.idOperatorLogged,
@@ -84,93 +87,82 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
   };
 
   return (
-    <div className="mx-auto px-4 py-8 mt-12 bg-white rounded-lg">
-      <div className="bg-white w-full text-center p-4 rounded-md border-2 border-gray-400">
-        <span className="text-xl font-bold">Observacions</span>
-      </div>
-
-      <div className="w-full bg-black border-2 border-black rounded-xl mt-6"></div>
-
-      <div className="bg-white shadow-md rounded my-6">
-        <div className="p-6">
-          <div className="mb-6 flex items-center justify-between">
-            <input
-              disabled={isFinished}
-              type="text"
-              placeholder="Afegir comentari aquí..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              className="w-full border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:border-indigo-500"
-            />
-            <button
-              type="button"
-              onClick={handleAddComment}
-              className={`ml-2 px-4 py-2  text-white rounded-md ${
-                isFinished
-                  ? "bg-gray-500"
-                  : "bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:bg-indigo-600"
-              }`}
-              disabled={isFinished}
-            >
-              Afegir Comentari
-              {isLoading && <SvgSpinner />}
-            </button>
-          </div>
-          <h2 className="text-xl font-semibold mb-4">
-            Comentaris de la ordre de treball
-          </h2>
-          <div className="overflow-x-auto">
-            <table className="table-auto w-full">
-              <thead>
-                <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                  <th className="py-3 px-6 text-left">Operari</th>
-                  <th className="py-3 px-6 text-left">Comentari</th>
-                  <th className="py-3 px-6 text-left">Data</th>
-                  <th className="py-3 px-6 text-left">Accions</th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-600 text-sm font-light">
-                {currentComments
-                  .slice(0)
-                  .reverse()
-                  .map((comment, index) => (
-                    <tr key={index} className="border-b border-gray-200">
-                      <td className="py-3 px-6 text-left whitespace-nowrap">
-                        {comment.operator.name}
-                      </td>
-                      <td className="py-3 px-6 text-left">{comment.comment}</td>
-                      <td className="py-3 px-6 text-left">
-                        {formatDate(comment.creationDate)}
-                      </td>
-                      <td className="py-3 px-6 text-left">
-                        <button
-                          onClick={() =>
-                            !isFinished && handleDeleteComment(comment.id!)
-                          }
-                          type="button"
-                          className={`${
-                            isFinished
-                              ? "bg-gray-500"
-                              : "bg-red-500 hover:bg-red-600 focus:bg-red-600"
-                          } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
-                          disabled={isLoading || isFinished}
-                        >
-                          Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <Pagination
-          itemsPerPage={commentsPerPage}
-          totalItems={workOrderComments.length}
-          paginate={paginate}
-          currentPage={currentPage}
+    <div>
+      <div className="py-2 flex flex-row gap-2">
+        <textarea
+          disabled={isFinished}
+          placeholder="Afegir comentari aquí..."
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          className="w-full border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:border-indigo-500"
         />
+        <button
+          type="button"
+          onClick={handleAddComment}
+          className={`p-2 flex text-white text-sm rounded-md items-center ${
+            isFinished
+              ? "bg-gray-500"
+              : "bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:bg-indigo-600"
+          }`}
+          disabled={isFinished}
+        >
+          Afegir Comentari
+          {isLoading && <SvgSpinner />}
+        </button>
       </div>
+      <div className="overflow-x-auto">
+        <table className="table-auto w-full">
+          <thead>
+            <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+              <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                Operari
+              </th>
+              <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase w-full tracking-wider">
+                Comentari
+              </th>
+              <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase w-full tracking-wider">
+                Data
+              </th>
+              <th className="p-2 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"></th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-600 text-sm font-light">
+            {currentComments.slice(0).map((comment, index) => (
+              <tr key={index} className="border-b border-gray-200">
+                <td className="p-2 text-left whitespace-nowrap">
+                  {comment.operator.name}
+                </td>
+                <td className="p-2  text-left">{comment.comment}</td>
+                <td className="p-2  text-left">
+                  {formatDate(comment.creationDate)}
+                </td>
+                <td className="p-2 text-left">
+                  <button
+                    onClick={() =>
+                      !isFinished && handleDeleteComment(comment.id!)
+                    }
+                    type="button"
+                    className={`${
+                      isFinished
+                        ? "bg-gray-500"
+                        : "bg-red-500 hover:bg-red-600 focus:bg-red-600"
+                    } p-2 text-white rounded-md focus:outline-none  flex items-center`}
+                    disabled={isLoading || isFinished}
+                  >
+                    <SvgDelete className="w-6 h-6" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <Pagination
+        itemsPerPage={commentsPerPage}
+        totalItems={workOrderComments.length}
+        paginate={paginate}
+        currentPage={currentPage}
+      />
     </div>
   );
 };
