@@ -2,6 +2,7 @@
 import { UserPermission } from "app/interfaces/User";
 import WorkOrder, {
   SearchWorkOrderFilters,
+  StateWorkOrder,
   WorkOrderType,
 } from "app/interfaces/workOrder";
 import OperatorService from "app/services/operatorService";
@@ -11,6 +12,12 @@ import { BarChartComponent } from "designSystem/BarChart/BarChartComponent";
 import { DonutChartComponent } from "designSystem/DonutChart/DonutChartComponent";
 import { useEffect, useState } from "react";
 import OTsXAsset from "./components/OTsXAsset";
+import {
+  translateStateWorkOrder,
+  translateWorkOrderType,
+} from "app/utils/utils";
+import { Button } from "designSystem/Button/Buttons";
+import { SvgSpinner } from "app/icons/icons";
 
 interface WorkOrdersChartProps {
   operator: string;
@@ -30,6 +37,24 @@ export interface ConsumedSparePartsChartProps {
   number: number;
 }
 
+interface WorkOrderTypeChartProps {
+  workOrderType: WorkOrderType;
+  value: number;
+  index: string;
+}
+
+interface WorkOrderStateChartProps {
+  statWorkOrder: StateWorkOrder;
+  value: number;
+  color: string;
+}
+
+const Filter = [
+  { key: 0, label: "Mensual" },
+  { key: 1, label: "Setmanal" },
+  { key: 2, label: "Dia" },
+];
+
 export default function DashboardPage() {
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
@@ -38,12 +63,22 @@ export default function DashboardPage() {
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
   const currentDate = new Date();
-  const lastMonth = currentDate.getMonth() - 1;
   const firstDayOfMonth = new Date(
     currentDate.getFullYear(),
     currentDate.getMonth() - 1,
     1
   );
+
+  const validStates = [
+    StateWorkOrder.Waiting,
+    StateWorkOrder.OnGoing,
+    StateWorkOrder.Paused,
+    StateWorkOrder.PendingToValidate,
+    StateWorkOrder.Finished,
+  ];
+  const [workOrderState, setWorkOrderState] = useState<
+    WorkOrderStateChartProps[]
+  >([]);
 
   const { loginUser } = useSessionStore((state) => state);
 
@@ -53,67 +88,154 @@ export default function DashboardPage() {
     []
   );
 
-  useEffect(() => {
-    async function fetchData() {
-      const operators = await operatorService.getOperators();
+  const [isLoading, setIsLoading] = useState(false);
 
-      const filters: SearchWorkOrderFilters = {
-        assetId: "",
-        operatorId: "",
-        startDateTime: firstDayOfMonth.toISOString(),
-        endDateTime: currentDate.toISOString(),
-      };
-      await workOrderService
-        .getWorkOrdersWithFilters(filters)
-        .then((response) => {
-          getTopAssets(response);
+  const [workOrderTypeChartData, setWorkOrderTypeChartData] = useState<
+    WorkOrderTypeChartProps[]
+  >([]);
+  const [selectedFilter, setSelectedFilter] = useState<number | null>(0);
 
-          getTopConsumedSpareParts(response);
+  const getFirstDayOfWeek = (currentDate: Date): Date => {
+    const currentDayOfWeek = currentDate.getDay();
+    const daysToMonday = (currentDayOfWeek === 0 ? -6 : 1) - currentDayOfWeek;
+    const firstDayOfWeek = new Date(currentDate);
+    firstDayOfWeek.setDate(currentDate.getDate() + daysToMonday);
 
-          if (!operators) return;
-          const operatorMap = new Map<string, WorkOrdersChartProps>();
+    return firstDayOfWeek;
+  };
 
-          response.forEach((workOrder) => {
-            const operatorId = workOrder.operatorId?.map((op) => op) || [];
+  const firstDayOfWeek = getFirstDayOfWeek(currentDate);
 
-            operatorId.forEach((operatorName) => {
-              const existingOperator = operatorMap.get(operatorName);
+  const stateColors: { [key in StateWorkOrder]: string } = {
+    [StateWorkOrder.Waiting]: "border-red-500",
+    [StateWorkOrder.OnGoing]: "border-yellow-500",
+    [StateWorkOrder.Paused]: "border-gray-300",
+    [StateWorkOrder.PendingToValidate]: "border-red-200",
+    [StateWorkOrder.Requested]: "border-red-500",
+    [StateWorkOrder.Finished]: "border-green-500",
+  };
 
-              if (existingOperator) {
-                if (workOrder.workOrderType === WorkOrderType.Preventive) {
-                  existingOperator.Preventius++;
-                } else if (
-                  workOrder.workOrderType === WorkOrderType.Corrective
-                ) {
-                  existingOperator.Correctius++;
-                }
-              } else {
-                const newOperatorEntry: WorkOrdersChartProps = {
-                  operator:
-                    operators.find((x) => x.id === operatorName)?.name ||
-                    "Proves",
-                  Preventius:
-                    workOrder.workOrderType === WorkOrderType.Preventive
-                      ? 1
-                      : 0,
-                  Correctius:
-                    workOrder.workOrderType === WorkOrderType.Corrective
-                      ? 1
-                      : 0,
-                };
-                operatorMap.set(operatorName, newOperatorEntry);
-              }
-            });
-          });
-
-          const data = Array.from(operatorMap.values());
-          setChartData(data);
-        });
+  const handleFilterClick = (filter: number) => {
+    if (filter === selectedFilter) return;
+    setSelectedFilter(filter);
+    switch (filter) {
+      case 0:
+        fetchData(firstDayOfMonth);
+        break;
+      case 1:
+        fetchData(firstDayOfWeek);
+        break;
+      case 2:
+        fetchData(currentDate);
+        break;
     }
-    if (loginUser?.permission == UserPermission.Administrator) fetchData();
+  };
+
+  async function fetchData(date: Date) {
+    setIsLoading(true);
+
+    const operators = await operatorService.getOperators();
+
+    setChartAssets([]);
+    setChartConsumedSpareParts([]);
+    setWorkOrderState([]);
+    const endDate = new Date(currentDate);
+
+    const filters: SearchWorkOrderFilters = {
+      assetId: "",
+      operatorId: "",
+      startDateTime: date,
+      endDateTime: currentDate,
+    };
+    await workOrderService
+      .getWorkOrdersWithFilters(filters)
+      .then((response) => {
+        getTopAssets(response);
+
+        getTopConsumedSpareParts(response);
+
+        if (!operators) return;
+
+        const updatedWorkOrderTypes = validStates.map((state) => ({
+          statWorkOrder: state,
+          value: 0,
+          color: stateColors[state],
+        }));
+
+        const operatorMap = new Map<string, WorkOrdersChartProps>();
+        const workOrderTypeMap = new Map<
+          WorkOrderType,
+          WorkOrderTypeChartProps
+        >();
+
+        response.forEach((workOrder) => {
+          const index = validStates.findIndex(
+            (state) => state === workOrder.stateWorkOrder
+          );
+          if (index !== -1) {
+            updatedWorkOrderTypes[index].value++;
+          }
+
+          const workOrderType = workOrder.workOrderType;
+          if (workOrderTypeMap.has(workOrderType)) {
+            workOrderTypeMap.get(workOrderType)!.value++;
+          } else {
+            const workOrderTypeChartProps: WorkOrderTypeChartProps = {
+              workOrderType: workOrderType,
+              value: 0,
+              index: translateWorkOrderType(workOrderType),
+            };
+            workOrderTypeMap.set(workOrderType, workOrderTypeChartProps);
+          }
+
+          const operatorId = workOrder.operatorId?.map((op) => op) || [];
+
+          operatorId.forEach((operatorName) => {
+            const existingOperator = operatorMap.get(operatorName);
+
+            if (existingOperator) {
+              if (workOrder.workOrderType === WorkOrderType.Preventive) {
+                existingOperator.Preventius++;
+              } else if (workOrder.workOrderType === WorkOrderType.Corrective) {
+                existingOperator.Correctius++;
+              }
+            } else {
+              const newOperatorEntry: WorkOrdersChartProps = {
+                operator:
+                  operators.find((x) => x.id === operatorName)?.name ||
+                  "Proves",
+                Preventius:
+                  workOrder.workOrderType === WorkOrderType.Preventive ? 1 : 0,
+                Correctius:
+                  workOrder.workOrderType === WorkOrderType.Corrective ? 1 : 0,
+              };
+              operatorMap.set(operatorName, newOperatorEntry);
+            }
+          });
+        });
+        setWorkOrderState(updatedWorkOrderTypes);
+        const workOrderTypeChartData = Array.from(workOrderTypeMap.values());
+        setWorkOrderTypeChartData(workOrderTypeChartData);
+        debugger;
+        const data = Array.from(operatorMap.values());
+        setChartData(data);
+      });
+    setIsLoading(false);
+  }
+
+  useEffect(() => {
+    if (loginUser?.permission == UserPermission.Administrator) {
+      fetchData(firstDayOfMonth);
+      const initialWorkOrderTypes = validStates.map((state) => ({
+        statWorkOrder: state,
+        value: 0,
+        color: stateColors[state],
+      }));
+      setWorkOrderState(initialWorkOrderTypes);
+    }
   }, []);
 
-  function getTopAssets(workOrders: WorkOrder[], top: number = 5) {
+  function getTopAssets(workOrders: WorkOrder[], top: number = 3) {
     const assetMap = new Map<string, AssetChartProps>();
 
     workOrders.forEach((workOrder) => {
@@ -186,10 +308,56 @@ export default function DashboardPage() {
     });
   }
 
+  if (isLoading) return <SvgSpinner className="w-full text-white" />;
+
   if (loginUser?.permission !== UserPermission.Administrator) return <></>;
   return (
-    <>
-      <div className="flex flex-col gap-12 w-full items-center bg-white p-4 rounded-xl">
+    <div className="flex flex-col w-full gap-4">
+      <div className="flex flex-col gap-4 w-full items-center p-2 rounded-xl">
+        <div className="flex justify-start w-full gap-2 py-4">
+          {Filter.map((filter) => (
+            <Button
+              key={filter.key}
+              type="none"
+              className={`rounded-md text-white ${
+                filter.key === selectedFilter
+                  ? "bg-gray-200 hover:cursor-default"
+                  : "bg-gray-500 hover:bg-gray-600 "
+              }`}
+              customStyles="flex text-center"
+              onClick={() => handleFilterClick(filter.key)}
+            >
+              {filter.label}
+            </Button>
+          ))}
+        </div>
+        <div className="flex gap-4 text-white w-full ">
+          {workOrderState.map((workOrderType) => (
+            <div
+              key={workOrderType.statWorkOrder}
+              className={`flex flex-col justify-center gap-4 p-4 bg-gray-900 w-full border-t-4 ${workOrderType.color}`}
+            >
+              <div className="flex w-full items-center justify-center">
+                <p className="text-lg font-semibold text-white">
+                  {translateStateWorkOrder(workOrderType.statWorkOrder)}
+                </p>
+              </div>
+              <div className="flex w-full items-center justify-around">
+                <p className="text-lg font-semibold text-white">
+                  {workOrderType.value}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex flex-row gap-4 rounded-xl p-2 bg-white border-2 border-blue-950">
+        <DonutChartComponent
+          chartData={workOrderTypeChartData}
+          category={["Preventius", "Correctius"]}
+          index="index"
+          title="Correctius vs Preventius"
+        />
         {chartData.length > 0 && (
           <BarChartComponent
             category={["Preventius", "Correctius"]}
@@ -197,51 +365,51 @@ export default function DashboardPage() {
             index="operator"
           />
         )}
-        {chartAssets.length > 0 && (
-          <div className="flex flex-row gap-11">
-            <div>
-              <OTsXAsset chartAssets={chartAssets} />
-            </div>
-            <div>
-              <p className="text-lg font-semibold mb-4 items-center w-full">
-                Top Recanvis mes consumits
-              </p>
-              <ul className="grid grid-rows-3 gap-4 w-full">
-                {chartConsumedSpareParts.map((consumedSparePart, index) => (
-                  <li
-                    key={index}
-                    className="bg-gray-100 p-4 rounded-md shadow-md flex justify-between items-center gap-4"
-                  >
-                    <div>
-                      <span className="text-lg font-semibold">
-                        {consumedSparePart.sparePart}
-                      </span>
-                      <span className="block text-sm text-gray-500">
-                        Total consums: {consumedSparePart.number}
-                      </span>
-                    </div>
-                    {index === 0 && (
-                      <span className="bg-red-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-                        1r
-                      </span>
-                    )}
-                    {index === 1 && (
-                      <span className="bg-yellow-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-                        2n
-                      </span>
-                    )}
-                    {index === 2 && (
-                      <span className="bg-green-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-                        3r
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
       </div>
-    </>
+      {chartAssets.length > 0 && (
+        <div className="flex flex-row w-full  justify-center gap-4">
+          <div className=" border-2 border-blue-950 bg-white p-4 rounded-xl w-full">
+            <OTsXAsset chartAssets={chartAssets} />
+          </div>
+          <div className=" border-2 border-blue-950 bg-white p-4 rounded-xl w-full">
+            <p className="text-lg font-semibold mb-4 items-center w-full">
+              Top Recanvis mes consumits
+            </p>
+            <ul className="grid grid-rows-3 gap-4 w-full">
+              {chartConsumedSpareParts.map((consumedSparePart, index) => (
+                <li
+                  key={index}
+                  className="bg-gray-100 p-4 rounded-md shadow-md flex justify-between items-center gap-4"
+                >
+                  <div>
+                    <span className="text-lg font-semibold">
+                      {consumedSparePart.sparePart}
+                    </span>
+                    <span className="block text-sm text-gray-500">
+                      Total consums: {consumedSparePart.number}
+                    </span>
+                  </div>
+                  {index === 0 && (
+                    <span className="bg-red-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
+                      1r
+                    </span>
+                  )}
+                  {index === 1 && (
+                    <span className="bg-yellow-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
+                      2n
+                    </span>
+                  )}
+                  {index === 2 && (
+                    <span className="bg-green-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
+                      3r
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

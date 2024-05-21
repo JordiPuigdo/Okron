@@ -12,24 +12,31 @@ const datahero = [
 ];
 
 const dataFormatter = (number: number) => number.toLocaleString("es-ES");
+export interface DonutChartComponentProps {
+  chartData: any[];
+  index: string;
+  category: string[];
+  title: string;
+}
 
-export const DonutChartComponent = () => (
+export const DonutChartComponent = ({
+  chartData,
+  index,
+  category,
+  title,
+}: DonutChartComponentProps) => (
   <>
-    <div className="mx-auto space-y-12">
-      <div className="space-y-3">
-        <span className="text-center block font-semibold ">
-          Correctius vs Preventius mensual
-        </span>
-        <div className="flex justify-center">
-          <DonutChart
-            data={datahero}
-            variant="donut"
-            valueFormatter={dataFormatter}
-            onValueChange={(v) => console.log(v)}
-            className="text-black"
-          />
-        </div>
-      </div>
+    <div className="flex flex-col w-full justify-center items-center gap-4">
+      <p className="text-lg font-semibold">{title}</p>
+      <DonutChart
+        data={chartData}
+        index={index}
+        variant="pie"
+        colors={["blue", "rose"]}
+        valueFormatter={dataFormatter}
+        onValueChange={(v) => console.log(v)}
+        className="text-black"
+      />
     </div>
   </>
 );

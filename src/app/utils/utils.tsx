@@ -73,19 +73,17 @@ export const formatDate = (
   return `${formattedDate.replace(",", "")}`;
 };
 
-export const translateWorkOrderType = (type: any): string => {
-  switch (type) {
-    case WorkOrderType.Corrective:
-      return "Correctiu";
-    case WorkOrderType.Preventive:
-      return "Preventiu";
-    case WorkOrderType.Predicitve:
-      return "Predictiu";
-    default:
-      return "Error";
-  }
-};
+export const translateWorkOrderType = (
+  workOrderType: WorkOrderType
+): string => {
+  const translations: { [key in WorkOrderType]: string } = {
+    [WorkOrderType.Preventive]: "Preventiu",
+    [WorkOrderType.Corrective]: "Correctiu",
+    [WorkOrderType.Predicitve]: "",
+  };
 
+  return translations[workOrderType];
+};
 export const validateEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const validDomains = [
