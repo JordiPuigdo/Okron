@@ -71,7 +71,7 @@ const columns: Column[] = [
   {
     label: "Data Inici",
     key: "startTime",
-    format: ColumnFormat.DATE,
+    format: ColumnFormat.DATETIME,
   },
   {
     label: "Estat",
@@ -507,36 +507,37 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
         }
         onChecked={handleOnChecked}
       />
-      {filteredWorkOrders.length > 0 && (
-        <div className="py-4 flex flex-row gap-2">
-          <Button
-            type="none"
-            className={`text-white ${
-              selectedRows.size > 0
-                ? " bg-blue-900 hover:bg-blue-950 "
-                : " bg-gray-200 hover:cursor-not-allowed"
-            }  rounded-lg text-sm `}
-            size="lg"
-            customStyles="align-middle flex"
-            onClick={handleFinalizeWorkOrders}
-          >
-            {isUpdating ? (
-              <SvgSpinner className="text-white" />
-            ) : (
-              <>Finalitzar</>
-            )}
-          </Button>
-          {responseMessage && (
-            <div
-              className={` ${
-                responseMessage ? "text-green-500" : "text-red-500"
-              } text-center font-semibold p-2 items-center flex justify-center`}
+      {filteredWorkOrders.length > 0 &&
+        operatorLogged?.operatorLoggedType == OperatorType.Quality && (
+          <div className="py-4 flex flex-row gap-2">
+            <Button
+              type="none"
+              className={`text-white ${
+                selectedRows.size > 0
+                  ? " bg-blue-900 hover:bg-blue-950 "
+                  : " bg-gray-200 hover:cursor-not-allowed"
+              }  rounded-lg text-sm `}
+              size="lg"
+              customStyles="align-middle flex"
+              onClick={handleFinalizeWorkOrders}
             >
-              {responseMessage.message}
-            </div>
-          )}
-        </div>
-      )}
+              {isUpdating ? (
+                <SvgSpinner className="text-white" />
+              ) : (
+                <>Finalitzar</>
+              )}
+            </Button>
+            {responseMessage && (
+              <div
+                className={` ${
+                  responseMessage ? "text-green-500" : "text-red-500"
+                } text-center font-semibold p-2 items-center flex justify-center`}
+              >
+                {responseMessage.message}
+              </div>
+            )}
+          </div>
+        )}
     </>
   );
 };

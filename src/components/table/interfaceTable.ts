@@ -30,6 +30,7 @@ export interface  TableButtons {
 export enum ColumnFormat {
     ANY = "ANY",
     DATE = "DATE",
+    DATETIME = "DATETIME",
     BOOLEAN = "BOOLEAN",    
     TEXT = "TEXT",
     NUMBER = "NUMBER",

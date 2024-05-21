@@ -100,12 +100,16 @@ const PreventiveTable: React.FC<PreventiveTableProps> = ({
               setPreventives(
                 fetchedPreventives.map((x) => {
                   const days = x.days === 0 ? x.hours! / 24 : x.days;
-                  const nextExecutionDate = x.lastExecution
+                  let nextExecutionDate = x.lastExecution
                     ? new Date(x.lastExecution)
                     : undefined;
                   nextExecutionDate?.setDate(
                     nextExecutionDate.getDate() + days
                   );
+
+                  if (!nextExecutionDate) {
+                    nextExecutionDate = new Date(x.startExecution);
+                  }
 
                   return {
                     ...x,

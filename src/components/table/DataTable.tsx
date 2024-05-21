@@ -534,8 +534,13 @@ const DataTable: React.FC<DataTableProps> = ({
                               }
 
                               if (formatColumn == ColumnFormat.DATE) {
+                                value = formatDate(value, false, false);
+                              }
+
+                              if (formatColumn == ColumnFormat.DATETIME) {
                                 value = formatDate(value);
                               }
+
                               if (
                                 formatColumn.toLocaleUpperCase() ==
                                 ColumnFormat.WORKORDERTYPE
