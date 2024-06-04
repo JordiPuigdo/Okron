@@ -169,4 +169,5 @@ export enum WorkOrderEventType {
   Paused,
   PendingToValidate,
   Finished,
+  Created
 }

@@ -775,7 +775,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                     <div className=" w-[20%]">
                       {translateWorkOrderEventType(x.workOrderEventType)}
                     </div>
-                    <div className="w-[20%]">{x.operator.name}</div>
+                    <div className="w-[20%]">{x.operator?.name}</div>
                   </div>
                 );
               })}

@@ -41,6 +41,8 @@ export const translateWorkOrderEventType = (
       return "Validació Pendent";
     case WorkOrderEventType.Finished:
       return "Finalitzada";
+    case WorkOrderEventType.Created:
+      return "Creada";
     default:
       return "";
   }
