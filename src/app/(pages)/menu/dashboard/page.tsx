@@ -216,7 +216,6 @@ export default function DashboardPage() {
         setWorkOrderState(updatedWorkOrderTypes);
         const workOrderTypeChartData = Array.from(workOrderTypeMap.values());
         setWorkOrderTypeChartData(workOrderTypeChartData);
-        debugger;
         const data = Array.from(operatorMap.values());
         setChartData(data);
       });

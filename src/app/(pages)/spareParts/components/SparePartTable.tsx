@@ -22,6 +22,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
 import { formatDateQuery } from "app/utils/utils";
 import { Button } from "designSystem/Button/Buttons";
+import { useSparePartsHook } from "app/hooks/useSparePartsHook";
 
 interface SparePartTableProps {
   enableFilterAssets?: boolean;
@@ -171,7 +172,8 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
   enableCreate = true,
   sparePartId,
 }) => {
-  const [spareParts, setSpareParts] = useState<SparePart[]>([]);
+  //const [spareParts, setSpareParts] = useState<SparePart[]>([]);
+  const { spareParts } = useSparePartsHook();
   const [sparePartsPerAsset, setSparePartsPerAsset] = useState<
     SparePartPerAssetResponse[]
   >([]);
@@ -191,7 +193,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
     detail: enableDetail,
   };
 
-  useEffect(() => {
+  /*  useEffect(() => {
     async function fetchSpareParts() {
       try {
         const data = await sparePartService.getSpareParts();
@@ -205,7 +207,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
     }
 
     if (assetId == undefined && sparePartId == undefined) fetchSpareParts();
-  }, []);
+  }, []);*/
 
   const handleSparePartActiveChange = async (id: string) => {
     const isConfirmed = window.confirm(
@@ -302,7 +304,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
     <>
       {enableCreate && (
         <>
-          {loading ? (
+          {!spareParts ? (
             <p>Carregant dades...</p>
           ) : (
             <>
@@ -338,15 +340,19 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
           />
         </>
       ) : (
-        <DataTable
-          columns={columns}
-          data={spareParts}
-          tableButtons={tableButtons}
-          entity={EntityTable.SPAREPART}
-          filters={enableFilters ? filters : undefined}
-          onDelete={handleSparePartActiveChange}
-          enableFilterActive={true}
-        />
+        <>
+          {spareParts && (
+            <DataTable
+              columns={columns}
+              data={spareParts}
+              tableButtons={tableButtons}
+              entity={EntityTable.SPAREPART}
+              filters={enableFilters ? filters : undefined}
+              onDelete={handleSparePartActiveChange}
+              enableFilterActive={true}
+            />
+          )}
+        </>
       )}
     </>
   );

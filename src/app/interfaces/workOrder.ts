@@ -26,6 +26,7 @@ export interface WorkOrder extends BaseModel {
   asset? : Asset;
   workOrderEvents? : WorkOrderEvents[];
   preventive? : Preventive;
+  plannedDuration: string;
 }
 
 export default WorkOrder;
@@ -158,6 +159,7 @@ export interface UpdateStateWorkOrder{
 export interface WorkOrderEvents{
   id : string;
   date : string;
+  endDate? : string;
   workOrderEventType : WorkOrderEventType;
   operator : Operator;
 }
@@ -169,4 +171,5 @@ export enum WorkOrderEventType {
   Paused,
   PendingToValidate,
   Finished,
+  Created
 }

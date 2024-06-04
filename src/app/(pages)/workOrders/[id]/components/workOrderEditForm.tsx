@@ -3,9 +3,9 @@
 import Operator, { OperatorType } from "app/interfaces/Operator";
 import WorkOrder, {
   StateWorkOrder,
-  UpdateStateWorkOrder,
   UpdateWorkOrderRequest,
   WorkOrderComment,
+  WorkOrderEventType,
   WorkOrderEvents,
   WorkOrderInspectionPoint,
   WorkOrderOperatorTimes,
@@ -18,6 +18,7 @@ import { SubmitHandler, set, useForm } from "react-hook-form";
 import OperatorService from "app/services/operatorService";
 import WorkOrderService from "app/services/workOrderService";
 import {
+  differenceBetweenDates,
   formatDate,
   translateStateWorkOrder,
   translateWorkOrderEventType,
@@ -113,6 +114,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const Routes = useRoutes();
   const [activeTab, setActiveTab] = useState<Tab>(Tab.OPERATORTIMES);
   const { operatorLogged } = useSessionStore((state) => state);
+  const [workOrderTimeExceeded, setWorkOrderTimeExceeded] =
+    useState<boolean>(false);
 
   async function fetchWorkOrder() {
     await workOrderService
@@ -127,6 +130,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               : false
           );
           setCurrentWorkOrder(responseWorkOrder);
+          setWorkOrderTimeExceeded(isWorkOrderTimeExceeded(responseWorkOrder));
           loadForm(responseWorkOrder);
         }
       })
@@ -306,6 +310,29 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     if (aviableOperators && availableSpareParts.length > 0) fetchWorkOrder();
   }, [aviableOperators, availableSpareParts]);
 
+  function isWorkOrderTimeExceeded(workOrder: WorkOrder): boolean {
+    const currentDate = new Date();
+    let totalMilliseconds = 0;
+    workOrder.workOrderEvents?.forEach((event) => {
+      if (event.workOrderEventType === WorkOrderEventType.Started) {
+        const startDate = new Date(event.date);
+        const endDate = event.endDate ? new Date(event.endDate) : currentDate;
+        totalMilliseconds += endDate.getTime() - startDate.getTime();
+      }
+    });
+
+    const plannedDurationMilliseconds = parseDuration(
+      workOrder.plannedDuration
+    );
+
+    return totalMilliseconds > plannedDurationMilliseconds;
+  }
+
+  function parseDuration(duration: string): number {
+    const [hours, minutes] = duration.split(":").map(Number);
+    return (hours * 3600 + minutes * 60) * 1000; // convert to milliseconds
+  }
+
   const handleSubmitForm = async () => {
     handleSubmit(onSubmit)();
   };
@@ -343,55 +370,22 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     }, 2000);
   };
 
-  /*async function finalizeWorkOrder() {
-    setIsLoading(true);
-    const update: UpdateStateWorkOrder = {
-      workOrderId: currentWorkOrder!.id,
-      state: StateWorkOrder.Finished,
-      operatorId: operatorLogged?.idOperatorLogged,
-      userId: loginUser?.agentId,
-    };
-    await workOrderService
-      .updateStateWorkOrder(update)
-      .then((response) => {
-        if (response) {
-          setTimeout(() => {
-            setIsLoading(false);
-            window.location.reload();
-          }, 1000);
-        }
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        setErrorMessage(error);
-        setShowErrorMessage(true);
-      });
-  }*/
+  function isWorkOrderInProgress(workOrder: WorkOrder): boolean {
+    const { startTime, plannedDuration } = workOrder;
+    const duration = parseTimeDuration(plannedDuration);
+    const endDate = new Date(startTime);
+    endDate.setHours(endDate.getHours() + duration.hours);
+    endDate.setMinutes(endDate.getMinutes() + duration.minutes);
+    return endDate > new Date(); // Compare with current date
+  }
 
-  /*async function handleReopenWorkOrder() {
-    setIsLoading(true);
-    const update: UpdateStateWorkOrder = {
-      workOrderId: currentWorkOrder!.id,
-      state: StateWorkOrder.Waiting,
-      operatorId: operatorLogged?.idOperatorLogged,
-      userId: loginUser?.agentId,
-    };
-    await workOrderService
-      .updateStateWorkOrder(update)
-      .then((response) => {
-        if (response) {
-          setTimeout(() => {
-            setIsLoading(false);
-            window.location.reload();
-          }, 1000);
-        }
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        setErrorMessage(error);
-        setShowErrorMessage(true);
-      });
-  }*/
+  function parseTimeDuration(timeDuration: string): {
+    hours: number;
+    minutes: number;
+  } {
+    const [hours, minutes] = timeDuration.split(":").map(Number);
+    return { hours, minutes };
+  }
 
   function handleSelectOperator(operatorId: string) {
     const operator = aviableOperators?.find((x) => x.id === operatorId);
@@ -452,6 +446,13 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           className="bg-white flex-grow rounded-lg p-4 shadow-md"
         >
           <div className="flex flex-col w-full">
+            <div>
+              {workOrderTimeExceeded && (
+                <div className="text-red-500 text-center">
+                  Temps d'execució excedit
+                </div>
+              )}
+            </div>
             <div className="w-full">
               <label
                 htmlFor="description"
@@ -760,6 +761,15 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 <div className="text-gray-600 font-semibold w-[20%] text-lg">
                   Operari
                 </div>
+                <div
+                  className="text-gray-600 font-semibold text-lg w-[20%]"
+                  onClick={toggleSortOrder}
+                >
+                  Final
+                </div>
+                <div className="text-gray-600 font-semibold w-[20%] text-lg">
+                  Total
+                </div>
               </div>
               {sortedEvents.map((x, index) => {
                 return (
@@ -775,110 +785,28 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                     <div className=" w-[20%]">
                       {translateWorkOrderEventType(x.workOrderEventType)}
                     </div>
-                    <div className="w-[20%]">{x.operator.name}</div>
+                    <div className="w-[20%]">{x.operator?.name || ""}</div>
+                    <div className="text-gray-600 w-[20%]">
+                      {formatDate(x.endDate)}
+                    </div>
+                    <div className="text-gray-600 w-[20%]">
+                      {x.endDate != undefined && (
+                        <span>
+                          {
+                            differenceBetweenDates(
+                              new Date(x.date),
+                              new Date(x.endDate)
+                            ).fullTime
+                          }
+                        </span>
+                      )}
+                    </div>
                   </div>
                 );
               })}
             </div>
           )}
       </div>
-
-      {/*  <div className="bg-white rounded-xl">
-        <div className="p-4 flex gap-1 border-black border-b-2">
-          {availableTabs.map((tab) => (
-            <p
-              key={tab}
-              className={`p-2 border-blue-500  border-2 rounded-xl hover:cursor-pointer ${
-                activeTab === tab ? "border-t-4 " : ""
-              }`}
-              onClick={() => handleTabClick(tab)}
-            >
-              {tab}
-            </p>
-          ))}
-        </div>
-
-        {availableSpareParts !== undefined &&
-          activeTab === Tab.SPAREPARTS &&
-          currentWorkOrder &&
-          currentWorkOrder.workOrderType === WorkOrderType.Corrective && (
-            <ChooseSpareParts
-              availableSpareParts={availableSpareParts}
-              selectedSpareParts={selectedSpareParts}
-              setSelectedSpareParts={setSelectedSpareParts}
-              WordOrderId={currentWorkOrder.id}
-              isFinished={isFinished}
-            />
-          )}
-        {currentWorkOrder &&
-          activeTab === Tab.INSPECTIONPOINTS &&
-          currentWorkOrder.workOrderType === WorkOrderType.Preventive && (
-            <CompleteInspectionPoints
-              workOrderInspectionPoints={passedInspectionPoints!}
-              setCompletedWorkOrderInspectionPoints={setPassedInspectionPoints}
-              workOrderId={currentWorkOrder.id}
-              isFinished={isFinished}
-            />
-          )}
-
-        {currentWorkOrder &&
-          activeTab === Tab.OPERATORTIMES &&
-          aviableOperators !== undefined && (
-            <WorkOrderOperatorTimesComponent
-              operators={aviableOperators!}
-              workOrderOperatortimes={workOrderOperatorTimes}
-              setWorkOrderOperatortimes={setworkOrderOperatorTimes}
-              workOrderId={currentWorkOrder.id}
-              isFinished={isFinished}
-            />
-          )}
-        {currentWorkOrder && activeTab === Tab.COMMENTS && (
-          <WorkOrderOperatorComments
-            workOrderComments={workOrderComments}
-            workOrderId={currentWorkOrder.id}
-            isFinished={isFinished}
-            setWorkOrderComments={setWorkOrderComments}
-          />
-        )}
-        {currentWorkOrder &&
-          activeTab === Tab.EVENTSWORKORDER &&
-          loginUser?.permission == UserPermission.Administrator && (
-            <div
-              className="flex flex-col  bg-gray-100 rounded-lg shadow-md justify-start"
-              onClick={toggleSortOrder}
-            >
-              <div className="flex flex-row gap-4 p-4">
-                <div className="text-gray-600 font-semibold text-lg w-[20%]">
-                  Data Acció {sortOrder === "asc" ? "▲" : "▼"}
-                </div>
-                <div className="text-gray-600 font-semibold w-[20%] text-lg">
-                  Acció
-                </div>
-                <div className="text-gray-600 font-semibold w-[20%] text-lg">
-                  Operari
-                </div>
-              </div>
-              {sortedEvents.map((x, index) => {
-                return (
-                  <div
-                    key={index}
-                    className={`flex flex-row gap-4 p-4 rounded-lg items-center ${
-                      index % 2 == 0 ? "bg-gray-200" : ""
-                    }`}
-                  >
-                    <div className="text-gray-600 w-[20%]">
-                      {formatDate(x.date)}
-                    </div>
-                    <div className=" w-[20%]">
-                      {translateWorkOrderEventType(x.workOrderEventType)}
-                    </div>
-                    <div className="w-[20%]">{x.operator.name}</div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-      </div>*/}
     </>
   );
 };

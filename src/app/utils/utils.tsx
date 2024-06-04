@@ -41,6 +41,8 @@ export const translateWorkOrderEventType = (
       return "Validació Pendent";
     case WorkOrderEventType.Finished:
       return "Finalitzada";
+    case WorkOrderEventType.Created:
+      return "Creada";
     default:
       return "";
   }
@@ -181,4 +183,22 @@ export function convertUTCDateToLocalDate(date: Date) {
   newDate.setHours(hours - offset);
 
   return newDate;
+}
+
+export function differenceBetweenDates(date1: Date, date2: Date) {
+  const diff = Math.abs(date1.getTime() - date2.getTime());
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  const pad = (num: number) => num.toString().padStart(2, "0");
+  const fullTime = `${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
+  return {
+    days,
+    hours,
+    minutes,
+    seconds,
+    fullTime,
+  };
 }

@@ -24,6 +24,7 @@ import AssetService from "app/services/assetService";
 import { ElementList } from "components/selector/ElementList";
 import { Asset } from "app/interfaces/Asset";
 import { Button } from "designSystem/Button/Buttons";
+import OkronTimePicker from "designSystem/TimePicker/OkronTimePicker";
 
 const PreventiveForm = () => {
   const router = useRouter();
@@ -55,6 +56,7 @@ const PreventiveForm = () => {
   const [preventiveDays, setPreventiveDays] = useState(0);
   const [assets, setAssets] = useState<ElementList[]>([]);
   const [selectedAssets, setSelectedAsset] = useState<string[]>([]);
+  const [timeExecution, setTimeExecution] = useState<Date | null>(null);
 
   useEffect(() => {
     const fetchInspectionPoints = async () => {
@@ -136,8 +138,14 @@ const PreventiveForm = () => {
       assetId: selectedAssets.map((asset) => asset),
       inspectionPointId: selectedInspectionPoints.map((point) => point),
       operatorId: selectedOperator.map((operator) => operator),
+      plannedDuration: "00:00",
     };
     return createPreventiveRequest;
+  }
+
+  function getTimeDuration(timeStr: string): Duration {
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    return { hours, minutes };
   }
 
   const handleSubmitForm = async () => {
@@ -241,6 +249,13 @@ const PreventiveForm = () => {
     );
   };
 
+  const handleTimePickerChange = (time: string) => {
+    const [hours, minutes] = time.split(":").map(Number);
+    const currentTimeExecution = new Date();
+    currentTimeExecution.setHours(hours, minutes, 0, 0);
+    setTimeExecution(currentTimeExecution);
+  };
+
   return (
     <MainLayout>
       <Container>
@@ -282,8 +297,8 @@ const PreventiveForm = () => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-4 w-full gap-4 py-4">
-              <div className="col-span-2">
+            <div className="flex w-full gap-4 py-4">
+              <div className="col-span-2 w-full">
                 <label
                   className="block text-gray-700 font-bold mb-2 text-lg"
                   htmlFor="days"
@@ -298,21 +313,45 @@ const PreventiveForm = () => {
                   className="form-input border border-gray-300 rounded-md w-full"
                 />
               </div>
-              <div className="col-span-2">
-                <label
-                  className="block text-gray-700 font-bold mb-2 text-lg"
-                  htmlFor="startExecution"
-                >
-                  Primera Execució
-                </label>
-                <DatePicker
-                  id="startDate"
-                  selected={startDate}
-                  onChange={(date: Date) => setStartDate(date)}
-                  dateFormat="dd/MM/yyyy"
-                  locale={ca}
-                  className="border border-gray-300 p-2 rounded-md mr-4 w-full"
-                />
+              <div className="flex flex-row  col-span-2 w-full">
+                <div className="flex flex-row gap-4 items-center">
+                  <div>
+                    <label
+                      className="block text-gray-700 font-bold mb-2 text-lg"
+                      htmlFor="startExecution"
+                    >
+                      Primera Execució
+                    </label>
+                    <DatePicker
+                      id="startDate"
+                      selected={startDate}
+                      onChange={(date: Date) => setStartDate(date)}
+                      dateFormat="dd/MM/yyyy"
+                      locale={ca}
+                      className="border border-gray-300 p-2 rounded-md mr-4 w-full"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      className="block text-gray-700 font-bold mb-2 text-lg"
+                      htmlFor="timeExecution"
+                    >
+                      Temps d'execució
+                    </label>
+                    <OkronTimePicker
+                      selectedTime={
+                        timeExecution?.toLocaleTimeString("ca-ES", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }) || "00:00"
+                      }
+                      onTimeChange={handleTimePickerChange}
+                      startTme={0}
+                      endTime={9}
+                      interval={30}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
