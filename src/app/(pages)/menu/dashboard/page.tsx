@@ -11,6 +11,7 @@ import { BarChartComponent } from "designSystem/BarChart/BarChartComponent";
 import { DonutChartComponent } from "designSystem/DonutChart/DonutChartComponent";
 import { useEffect, useState } from "react";
 import OTsXAsset from "./components/OTsXAsset";
+import SparePartTable from "app/(pages)/spareParts/components/SparePartTable";
 
 interface WorkOrdersChartProps {
   operator: string;
@@ -199,10 +200,10 @@ export default function DashboardPage() {
         )}
         {chartAssets.length > 0 && (
           <div className="flex flex-row gap-11">
-            <div>
+            <div className="flex flex-row w-full">
               <OTsXAsset chartAssets={chartAssets} />
             </div>
-            <div>
+            <div className="flex flex-col w-full">
               <p className="text-lg font-semibold mb-4 items-center w-full">
                 Top Recanvis mes consumits
               </p>
@@ -238,6 +239,19 @@ export default function DashboardPage() {
                   </li>
                 ))}
               </ul>
+            </div>
+            <div className="flex flex-col w-full">
+              <p className="text-lg font-semibold mb-4 items-center w-full">
+                Recanvis sense stock
+              </p>
+              <SparePartTable
+                enableFilters={true}
+                enableDetail={false}
+                enableCreate={false}
+                withoutStock={true}
+                enableFilterActive={false}
+                timer={5000}
+              />
             </div>
           </div>
         )}
