@@ -32,6 +32,9 @@ interface SparePartTableProps {
   assetId?: string | "";
   enableCreate?: boolean;
   sparePartId?: string;
+  withoutStock?: boolean;
+  enableFilterActive?: boolean;
+  timer?: number;
 }
 
 const columns: Column[] = [
@@ -170,6 +173,9 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
   assetId,
   enableCreate = true,
   sparePartId,
+  withoutStock = false,
+  enableFilterActive = true,
+  timer = 0,
 }) => {
   const [spareParts, setSpareParts] = useState<SparePart[]>([]);
   const [sparePartsPerAsset, setSparePartsPerAsset] = useState<
@@ -194,7 +200,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
   useEffect(() => {
     async function fetchSpareParts() {
       try {
-        const data = await sparePartService.getSpareParts();
+        const data = await sparePartService.getSpareParts(withoutStock);
 
         setSpareParts(data);
       } catch (error) {
@@ -204,7 +210,14 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
       }
     }
 
-    if (assetId == undefined && sparePartId == undefined) fetchSpareParts();
+    if (assetId == undefined && sparePartId == undefined) {
+      fetchSpareParts();
+      if (timer > 0) {
+        const interval = setInterval(fetchSpareParts, timer);
+
+        return () => clearInterval(interval);
+      }
+    }
   }, []);
 
   const handleSparePartActiveChange = async (id: string) => {
@@ -333,7 +346,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
             entity={EntityTable.WORKORDER}
             filters={enableFilters ? filtersPerAsset : undefined}
             onDelete={handleSparePartActiveChange}
-            enableFilterActive={false}
+            enableFilterActive={enableFilterActive}
             totalCounts={true}
           />
         </>
@@ -345,7 +358,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
           entity={EntityTable.SPAREPART}
           filters={enableFilters ? filters : undefined}
           onDelete={handleSparePartActiveChange}
-          enableFilterActive={true}
+          enableFilterActive={enableFilterActive}
         />
       )}
     </>
