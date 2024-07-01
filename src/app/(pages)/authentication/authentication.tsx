@@ -22,7 +22,7 @@ const AuthenticationComponent: React.FC<AuthenticationProps> = ({
   errorEmail,
 }) => {
   return (
-    <div className="flex items-center justify-center p-4 h-screen bg-gradient-to-br from-purple-900 to-indigo-800">
+    <div className="flex items-center justify-center p-4 h-screen">
       <div className="flex flex-col bg-white rounded-xl p-8 text-center shadow-xl overflow-hidden">
         <div className="mb-8">
           <h1 className="text-5xl font-bold text-gray-800">Okron</h1>
@@ -49,7 +49,7 @@ const AuthenticationComponent: React.FC<AuthenticationProps> = ({
           />
         </div>
         <button
-          className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold py-3 rounded-md shadow-md transition duration-300"
+          className="w-full bg-gradient-to-r from-blue-900 to-blue-700 hover:from-blue-600 hover:to-blue-400 text-white font-bold py-3 rounded-md shadow-md transition duration-300"
           onClick={handleLogin}
         >
           {isLoading ? (
