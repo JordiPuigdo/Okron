@@ -68,8 +68,8 @@ export default function DashboardPage() {
       const filters: SearchWorkOrderFilters = {
         assetId: "",
         operatorId: "",
-        startDateTime: firstDayOfMonth.toISOString(),
-        endDateTime: currentDate.toISOString(),
+        startDateTime: firstDayOfMonth,
+        endDateTime: currentDate,
       };
       await workOrderService
         .getWorkOrdersWithFilters(filters)
