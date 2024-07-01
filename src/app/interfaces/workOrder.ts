@@ -26,6 +26,7 @@ export interface WorkOrder extends BaseModel {
   asset? : Asset;
   workOrderEvents? : WorkOrderEvents[];
   preventive? : Preventive;
+  plannedDuration: string;
 }
 
 export default WorkOrder;
@@ -109,8 +110,8 @@ export interface DeleteWorkOrderOperatorTimes {
 
 export interface SearchWorkOrderFilters {
   machineId? : string;
-  startDateTime? : string;
-  endDateTime? : string;
+  startDateTime? : Date;
+  endDateTime? : Date;
   operatorId? : string;
   assetId? : string;
   stateWorkOrder? : StateWorkOrder; 
@@ -158,6 +159,7 @@ export interface UpdateStateWorkOrder{
 export interface WorkOrderEvents{
   id : string;
   date : string;
+  endDate? : string;
   workOrderEventType : WorkOrderEventType;
   operator : Operator;
 }

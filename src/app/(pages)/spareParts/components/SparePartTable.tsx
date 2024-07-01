@@ -22,6 +22,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
 import { formatDateQuery } from "app/utils/utils";
 import { Button } from "designSystem/Button/Buttons";
+import { useSparePartsHook } from "app/hooks/useSparePartsHook";
 
 interface SparePartTableProps {
   enableFilterAssets?: boolean;
@@ -32,9 +33,6 @@ interface SparePartTableProps {
   assetId?: string | "";
   enableCreate?: boolean;
   sparePartId?: string;
-  withoutStock?: boolean;
-  enableFilterActive?: boolean;
-  timer?: number;
 }
 
 const columns: Column[] = [
@@ -173,11 +171,9 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
   assetId,
   enableCreate = true,
   sparePartId,
-  withoutStock = false,
-  enableFilterActive = true,
-  timer = 0,
 }) => {
-  const [spareParts, setSpareParts] = useState<SparePart[]>([]);
+  //const [spareParts, setSpareParts] = useState<SparePart[]>([]);
+  const { spareParts } = useSparePartsHook();
   const [sparePartsPerAsset, setSparePartsPerAsset] = useState<
     SparePartPerAssetResponse[]
   >([]);
@@ -197,10 +193,10 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
     detail: enableDetail,
   };
 
-  useEffect(() => {
+  /*  useEffect(() => {
     async function fetchSpareParts() {
       try {
-        const data = await sparePartService.getSpareParts(withoutStock);
+        const data = await sparePartService.getSpareParts();
 
         setSpareParts(data);
       } catch (error) {
@@ -210,15 +206,8 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
       }
     }
 
-    if (assetId == undefined && sparePartId == undefined) {
-      fetchSpareParts();
-      if (timer > 0) {
-        const interval = setInterval(fetchSpareParts, timer);
-
-        return () => clearInterval(interval);
-      }
-    }
-  }, []);
+    if (assetId == undefined && sparePartId == undefined) fetchSpareParts();
+  }, []);*/
 
   const handleSparePartActiveChange = async (id: string) => {
     const isConfirmed = window.confirm(
@@ -315,7 +304,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
     <>
       {enableCreate && (
         <>
-          {loading ? (
+          {!spareParts ? (
             <p>Carregant dades...</p>
           ) : (
             <>
@@ -346,20 +335,24 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
             entity={EntityTable.WORKORDER}
             filters={enableFilters ? filtersPerAsset : undefined}
             onDelete={handleSparePartActiveChange}
-            enableFilterActive={enableFilterActive}
+            enableFilterActive={false}
             totalCounts={true}
           />
         </>
       ) : (
-        <DataTable
-          columns={columns}
-          data={spareParts}
-          tableButtons={tableButtons}
-          entity={EntityTable.SPAREPART}
-          filters={enableFilters ? filters : undefined}
-          onDelete={handleSparePartActiveChange}
-          enableFilterActive={enableFilterActive}
-        />
+        <>
+          {spareParts && (
+            <DataTable
+              columns={columns}
+              data={spareParts}
+              tableButtons={tableButtons}
+              entity={EntityTable.SPAREPART}
+              filters={enableFilters ? filters : undefined}
+              onDelete={handleSparePartActiveChange}
+              enableFilterActive={true}
+            />
+          )}
+        </>
       )}
     </>
   );

@@ -8,7 +8,7 @@ export default function OTsXAsset({
   return (
     <div>
       <p className="text-lg font-semibold mb-4 items-center w-full">
-        Top Equips amb més OTs del mes
+        Top Equips amb més OTs
       </p>
       <ul className="grid grid-rows-3 gap-4 w-full">
         {chartAssets.map((asset, index) => (

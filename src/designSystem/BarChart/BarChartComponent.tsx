@@ -15,17 +15,17 @@ export function BarChartComponent({
   category,
 }: BarChartComponentProps) {
   return (
-    <>
-      <h3 className="text-lg font-medium">Ordres de treball del mes</h3>
+    <div className="w-full flex flex-col justify-center items-center ">
+      <p className="text-lg font-medium">Ordres de treball per operari</p>
       <BarChart
         className="mt-6"
         data={chartData}
         index={index}
         categories={category}
-        colors={["blue", "teal", "amber", "rose", "indigo", "emerald"]}
+        colors={["blue", "rose"]}
         valueFormatter={dataFormatter}
         yAxisWidth={48}
       />
-    </>
+    </div>
   );
 }

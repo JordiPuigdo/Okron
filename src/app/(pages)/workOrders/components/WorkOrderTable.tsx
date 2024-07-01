@@ -176,29 +176,11 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   }, [refresh, workOrderType]);
 
   const searchWorkOrders = async () => {
-    const startDateTime = startDate ? new Date(startDate) : null;
-    const endDateTime = endDate ? new Date(endDate) : null;
-    const machineId = 0;
-
-    if (startDateTime) {
-      startDateTime.setHours(0, 0, 0, 0);
-    }
-    if (endDateTime) {
-      endDateTime.setHours(23, 59, 59, 999);
-    }
     const search: SearchWorkOrderFilters = {
       assetId: "",
       operatorId: operatorId || "",
-      startDateTime: startDateTime
-        ? new Date(
-            startDateTime.getTime() - startDateTime.getTimezoneOffset() * 60000
-          ).toISOString()
-        : "",
-      endDateTime: endDateTime
-        ? new Date(
-            endDateTime.getTime() - endDateTime.getTimezoneOffset() * 60000
-          ).toISOString()
-        : "",
+      startDateTime: startDate!,
+      endDateTime: endDate!,
     };
 
     if (operatorLogged?.operatorLoggedType == OperatorType.Quality) {

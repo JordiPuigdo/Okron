@@ -2,6 +2,7 @@
 import { UserPermission } from "app/interfaces/User";
 import WorkOrder, {
   SearchWorkOrderFilters,
+  StateWorkOrder,
   WorkOrderType,
 } from "app/interfaces/workOrder";
 import OperatorService from "app/services/operatorService";
@@ -11,7 +12,12 @@ import { BarChartComponent } from "designSystem/BarChart/BarChartComponent";
 import { DonutChartComponent } from "designSystem/DonutChart/DonutChartComponent";
 import { useEffect, useState } from "react";
 import OTsXAsset from "./components/OTsXAsset";
-import SparePartTable from "app/(pages)/spareParts/components/SparePartTable";
+import {
+  translateStateWorkOrder,
+  translateWorkOrderType,
+} from "app/utils/utils";
+import { Button } from "designSystem/Button/Buttons";
+import { SvgSpinner } from "app/icons/icons";
 
 interface WorkOrdersChartProps {
   operator: string;

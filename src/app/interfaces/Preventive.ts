@@ -20,6 +20,7 @@ export interface Preventive {
     assetId? : string[],
     asset : Asset
     active : boolean
+    plannedDuration: string;
 }
 
 
@@ -34,6 +35,7 @@ export interface CreatePreventiveRequest {
     inspectionPointId : string[],
     operatorId : string[]
     assetId : string[]  
+    plannedDuration: string;
 }
 
 export interface UpdatePreventiveRequest extends CreatePreventiveRequest {
