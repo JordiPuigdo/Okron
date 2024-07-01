@@ -110,8 +110,8 @@ export interface DeleteWorkOrderOperatorTimes {
 
 export interface SearchWorkOrderFilters {
   machineId? : string;
-  startDateTime? : Date;
-  endDateTime? : Date;
+  startDateTime? : string;
+  endDateTime? : string;
   operatorId? : string;
   assetId? : string;
   stateWorkOrder? : StateWorkOrder; 

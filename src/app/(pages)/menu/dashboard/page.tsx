@@ -18,6 +18,7 @@ import {
 } from "app/utils/utils";
 import { Button } from "designSystem/Button/Buttons";
 import { SvgSpinner } from "app/icons/icons";
+import SparePartTable from "app/(pages)/spareParts/components/SparePartTable";
 
 interface WorkOrdersChartProps {
   operator: string;
@@ -250,14 +251,6 @@ export default function DashboardPage() {
               <p className="text-lg font-semibold mb-4 items-center w-full">
                 Recanvis sense stock
               </p>
-              <SparePartTable
-                enableFilters={true}
-                enableDetail={false}
-                enableCreate={false}
-                withoutStock={true}
-                enableFilterActive={false}
-                timer={5000}
-              />
             </div>
           </div>
         )}
