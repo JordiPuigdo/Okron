@@ -8,8 +8,13 @@ export default function Container({
   className?: string;
 }) {
   return (
-    <div className={`bg-gray-100 h-screen overflow-y-auto p-8 py-24`}>
-      {children}
+    <div className="pt-16">
+      <div className="p-6 gap-2">
+        <div className="p-2">
+          <p>Menu - WorkOrders</p>
+        </div>
+        <div>{children}</div>
+      </div>
     </div>
   );
 }

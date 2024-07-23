@@ -19,9 +19,6 @@
   }
 }
 
-main {
-  background-color: whitesmoke;
-}
 
 h1, td, label, span, input, textarea {
   color: black; /* Set text color to black for h1 and td */

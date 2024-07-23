@@ -1,0 +1,64 @@
+import WorkOrder, { SearchWorkOrderFilters } from "app/interfaces/workOrder";
+import WorkOrderService from "app/services/workOrderService";
+import useSWR from "swr";
+
+const workOrderService = new WorkOrderService(
+  process.env.NEXT_PUBLIC_API_BASE_URL!
+);
+
+const fetchWorkOrdersWithFilters = async (
+  filters?: SearchWorkOrderFilters
+): Promise<WorkOrder[]> => {
+  try {
+    if (filters) {
+      const response = await workOrderService.getWorkOrdersWithFilters(filters);
+      return response;
+    }
+    return [];
+  } catch (error) {
+    console.error("Error fetching work orders with filters:", error);
+    throw error;
+  }
+};
+
+const fetchWorkOrderById = async (id: string): Promise<WorkOrder> => {
+  try {
+    const response = await workOrderService.getWorkOrderById(id);
+    return response!;
+  } catch (error) {
+    console.error("Error fetching work order by ID:", error);
+    throw error;
+  }
+};
+
+export const useWorkOrders = () => {
+  const fetchById = async (id: string) => {
+    const { data, error, mutate } = useSWR<WorkOrder>(["workOrder", id], () =>
+      fetchWorkOrderById(id)
+    );
+    return {
+      workOrder: data,
+      isLoading: !error && !data,
+      isError: error,
+      reloadWorkOrder: mutate,
+    };
+  };
+
+  const fetchWithFilters = async (filters?: SearchWorkOrderFilters) => {
+    const { data, error, mutate } = useSWR<WorkOrder[]>(
+      ["workOrdersWithFilters", filters],
+      () => fetchWorkOrdersWithFilters(filters)
+    );
+    return {
+      data: data,
+      isLoading: !error && !data,
+      isError: error,
+      reloadWorkOrders: mutate,
+    };
+  };
+
+  return {
+    fetchById,
+    fetchWithFilters,
+  };
+};

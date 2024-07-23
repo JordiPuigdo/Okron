@@ -18,6 +18,7 @@ import {
 } from "app/utils/utils";
 import { Button } from "designSystem/Button/Buttons";
 import { SvgSpinner } from "app/icons/icons";
+import { useWorkOrders } from "app/hooks/useWorkOrders";
 
 interface WorkOrdersChartProps {
   operator: string;
@@ -56,9 +57,6 @@ const Filter = [
 ];
 
 export default function DashboardPage() {
-  const workOrderService = new WorkOrderService(
-    process.env.NEXT_PUBLIC_API_BASE_URL!
-  );
   const operatorService = new OperatorService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
@@ -69,6 +67,7 @@ export default function DashboardPage() {
     1
   );
 
+  const [isLoading, setIsLoading] = useState(false);
   const validStates = [
     StateWorkOrder.Waiting,
     StateWorkOrder.OnGoing,
@@ -87,8 +86,6 @@ export default function DashboardPage() {
   const [chartConsumedSpareParts, setChartConsumedSpareParts] = useState<any[]>(
     []
   );
-
-  const [isLoading, setIsLoading] = useState(false);
 
   const [workOrderTypeChartData, setWorkOrderTypeChartData] = useState<
     WorkOrderTypeChartProps[]
@@ -114,6 +111,8 @@ export default function DashboardPage() {
     [StateWorkOrder.Requested]: "border-red-500",
     [StateWorkOrder.Finished]: "border-green-500",
   };
+
+  const { fetchWithFilters } = useWorkOrders();
 
   const handleFilterClick = (filter: number) => {
     if (filter === selectedFilter) return;
@@ -147,83 +146,81 @@ export default function DashboardPage() {
       startDateTime: date,
       endDateTime: currentDate,
     };
-    await workOrderService
-      .getWorkOrdersWithFilters(filters)
-      .then((response) => {
-        getTopAssets(response);
+    await fetchWithFilters(filters).then((response) => {
+      const workOrders = response.data as WorkOrder[];
+      getTopAssets(workOrders);
 
-        getTopConsumedSpareParts(response);
+      getTopConsumedSpareParts(workOrders);
 
-        if (!operators) return;
+      if (!operators) return;
 
-        const updatedWorkOrderTypes = validStates.map((state) => ({
-          statWorkOrder: state,
-          value: 0,
-          color: stateColors[state],
-        }));
+      const updatedWorkOrderTypes = validStates.map((state) => ({
+        statWorkOrder: state,
+        value: 0,
+        color: stateColors[state],
+      }));
 
-        const operatorMap = new Map<string, WorkOrdersChartProps>();
-        const workOrderTypeMap = new Map<
-          WorkOrderType,
-          WorkOrderTypeChartProps
-        >();
+      const operatorMap = new Map<string, WorkOrdersChartProps>();
+      const workOrderTypeMap = new Map<
+        WorkOrderType,
+        WorkOrderTypeChartProps
+      >();
 
-        response.forEach((workOrder) => {
-          const index = validStates.findIndex(
-            (state) => state === workOrder.stateWorkOrder
-          );
-          if (index !== -1) {
-            updatedWorkOrderTypes[index].value++;
-          }
+      workOrders.forEach((workOrder) => {
+        const index = validStates.findIndex(
+          (state) => state === workOrder.stateWorkOrder
+        );
+        if (index !== -1) {
+          updatedWorkOrderTypes[index].value++;
+        }
 
-          const workOrderType = workOrder.workOrderType;
-          if (workOrderTypeMap.has(workOrderType)) {
-            workOrderTypeMap.get(workOrderType)!.value++;
-          } else {
-            const workOrderTypeChartProps: WorkOrderTypeChartProps = {
-              workOrderType: workOrderType,
-              value: 0,
-              index: translateWorkOrderType(workOrderType),
-            };
-            workOrderTypeMap.set(workOrderType, workOrderTypeChartProps);
-          }
+        const workOrderType = workOrder.workOrderType;
+        if (workOrderTypeMap.has(workOrderType)) {
+          workOrderTypeMap.get(workOrderType)!.value++;
+        } else {
+          const workOrderTypeChartProps: WorkOrderTypeChartProps = {
+            workOrderType: workOrderType,
+            value: 0,
+            index: translateWorkOrderType(workOrderType),
+          };
+          workOrderTypeMap.set(workOrderType, workOrderTypeChartProps);
+        }
 
-          const operatorId = workOrder.operatorId?.map((op) => op) || [];
+        const operatorId = workOrder.operatorId?.map((op) => op) || [];
 
-          operatorId.forEach((operatorName) => {
-            const existingOperator = operatorMap.get(operatorName);
+        operatorId.forEach((operatorName) => {
+          const existingOperator = operatorMap.get(operatorName);
 
-            if (existingOperator) {
-              if (workOrder.workOrderType === WorkOrderType.Preventive) {
-                existingOperator.Preventius++;
-              } else if (workOrder.workOrderType === WorkOrderType.Corrective) {
-                existingOperator.Correctius++;
-              }
-            } else {
-              const newOperatorEntry: WorkOrdersChartProps = {
-                operator:
-                  operators.find((x) => x.id === operatorName)?.name ||
-                  "Proves",
-                Preventius:
-                  workOrder.workOrderType === WorkOrderType.Preventive ? 1 : 0,
-                Correctius:
-                  workOrder.workOrderType === WorkOrderType.Corrective ? 1 : 0,
-              };
-              operatorMap.set(operatorName, newOperatorEntry);
+          if (existingOperator) {
+            if (workOrder.workOrderType === WorkOrderType.Preventive) {
+              existingOperator.Preventius++;
+            } else if (workOrder.workOrderType === WorkOrderType.Corrective) {
+              existingOperator.Correctius++;
             }
-          });
+          } else {
+            const newOperatorEntry: WorkOrdersChartProps = {
+              operator:
+                operators.find((x) => x.id === operatorName)?.name || "Proves",
+              Preventius:
+                workOrder.workOrderType === WorkOrderType.Preventive ? 1 : 0,
+              Correctius:
+                workOrder.workOrderType === WorkOrderType.Corrective ? 1 : 0,
+            };
+            operatorMap.set(operatorName, newOperatorEntry);
+          }
         });
-        setWorkOrderState(updatedWorkOrderTypes);
-        const workOrderTypeChartData = Array.from(workOrderTypeMap.values());
-        setWorkOrderTypeChartData(workOrderTypeChartData);
-        const data = Array.from(operatorMap.values());
-        setChartData(data);
       });
+      setWorkOrderState(updatedWorkOrderTypes);
+      const workOrderTypeChartData = Array.from(workOrderTypeMap.values());
+      setWorkOrderTypeChartData(workOrderTypeChartData);
+      const data = Array.from(operatorMap.values());
+      setChartData(data);
+    });
     setIsLoading(false);
   }
 
   useEffect(() => {
-    if (loginUser?.permission == UserPermission.Administrator) {
+    if (loginUser?.permission == UserPermission.Administrator && !isLoading) {
       fetchData(firstDayOfMonth);
       const initialWorkOrderTypes = validStates.map((state) => ({
         statWorkOrder: state,
@@ -312,7 +309,7 @@ export default function DashboardPage() {
   if (loginUser?.permission !== UserPermission.Administrator) return <></>;
   return (
     <div className="flex flex-col w-full gap-4">
-      <div className="flex flex-col gap-4 w-full items-center p-2 rounded-xl">
+      <div className="flex flex-col bg-white gap-4 w-full items-center p-4 rounded-xl">
         <div className="flex justify-start w-full gap-2 py-4">
           {Filter.map((filter) => (
             <Button
@@ -320,8 +317,8 @@ export default function DashboardPage() {
               type="none"
               className={`rounded-md text-white ${
                 filter.key === selectedFilter
-                  ? "bg-gray-200 hover:cursor-default"
-                  : "bg-gray-500 hover:bg-gray-600 "
+                  ? "bg-blue-950 hover:cursor-default"
+                  : "bg-blue-500 hover:bg-blue-600 "
               }`}
               customStyles="flex text-center"
               onClick={() => handleFilterClick(filter.key)}
@@ -330,11 +327,11 @@ export default function DashboardPage() {
             </Button>
           ))}
         </div>
-        <div className="flex gap-4 text-white w-full ">
+        <div className="flex gap-4 text-white w-full  ">
           {workOrderState.map((workOrderType) => (
             <div
               key={workOrderType.statWorkOrder}
-              className={`flex flex-col justify-center gap-4 p-4 bg-gray-900 w-full border-t-4 ${workOrderType.color}`}
+              className={`flex flex-col justify-center gap-4 p-4 bg-gray-900 w-full border-t-4 ${workOrderType.color} rounded`}
             >
               <div className="flex w-full items-center justify-center">
                 <p className="text-lg font-semibold text-white">
@@ -350,20 +347,24 @@ export default function DashboardPage() {
           ))}
         </div>
       </div>
-      <div className="flex flex-row gap-4 rounded-xl p-2 bg-white border-2 border-blue-950">
-        <DonutChartComponent
-          chartData={workOrderTypeChartData}
-          category={["Preventius", "Correctius"]}
-          index="index"
-          title="Correctius vs Preventius"
-        />
-        {chartData.length > 0 && (
-          <BarChartComponent
+      <div className="flex flex-row gap-4">
+        <div className="border-2  border-blue-950 w-full rounded-xl bg-white justify-center">
+          <DonutChartComponent
+            chartData={workOrderTypeChartData}
             category={["Preventius", "Correctius"]}
-            chartData={chartData}
-            index="operator"
+            index="index"
+            title="Correctius vs Preventius"
           />
-        )}
+        </div>
+        <div className="border-2  border-blue-950 w-full rounded-xl bg-white">
+          {chartData.length > 0 && (
+            <BarChartComponent
+              category={["Preventius", "Correctius"]}
+              chartData={chartData}
+              index="operator"
+            />
+          )}
+        </div>
       </div>
       {chartAssets.length > 0 && (
         <div className="flex flex-row w-full  justify-center gap-4">

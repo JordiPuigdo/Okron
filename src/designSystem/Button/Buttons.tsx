@@ -68,13 +68,31 @@ export const Button = ({
       </Link>
     );
   }
-
-  return (
+  if (onClick) {
     <button
       className={twMerge(
         `transition-all relative group overflow-visible ${className}`
       )}
       onClick={handleClick}
+      type={rest?.isSubmit ? "submit" : "button"}
+    >
+      <ButtonBody
+        id={id}
+        type={type}
+        size={size}
+        customStyles={customStyles}
+        disabled={disabled}
+        {...rest}
+      >
+        {children}
+      </ButtonBody>
+    </button>;
+  }
+  return (
+    <button
+      className={twMerge(
+        `transition-all relative group overflow-visible ${className}`
+      )}
       type={rest?.isSubmit ? "submit" : "button"}
     >
       <ButtonBody

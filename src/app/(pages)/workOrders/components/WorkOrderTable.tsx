@@ -208,7 +208,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 
   const renderFilterWorkOrders = () => {
     return (
-      <div className="bg-white my-4 rounded-xl gap-4 p-2 shadow-md">
+      <div className="bg-white  rounded-xl gap-4 p-2 shadow-md">
         <div className="flex gap-4 my-4 items-center">
           <div className="flex items-center">
             <label htmlFor="startDate" className="mr-2">
@@ -476,19 +476,21 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 
   return (
     <>
-      {enableFilters && renderFilterWorkOrders()}
-      <DataTable
-        columns={columns}
-        data={filteredWorkOrders}
-        tableButtons={tableButtons}
-        entity={EntityTable.WORKORDER}
-        onDelete={handleDeleteOrder}
-        enableFilterActive={false}
-        enableCheckbox={
-          operatorLogged?.operatorLoggedType == OperatorType.Quality
-        }
-        onChecked={handleOnChecked}
-      />
+      <div className="flex flex-col gap-4">
+        {enableFilters && renderFilterWorkOrders()}
+        <DataTable
+          columns={columns}
+          data={filteredWorkOrders}
+          tableButtons={tableButtons}
+          entity={EntityTable.WORKORDER}
+          onDelete={handleDeleteOrder}
+          enableFilterActive={false}
+          enableCheckbox={
+            operatorLogged?.operatorLoggedType == OperatorType.Quality
+          }
+          onChecked={handleOnChecked}
+        />
+      </div>
       {filteredWorkOrders.length > 0 &&
         operatorLogged?.operatorLoggedType == OperatorType.Quality && (
           <div className="py-4 flex flex-row gap-2">
