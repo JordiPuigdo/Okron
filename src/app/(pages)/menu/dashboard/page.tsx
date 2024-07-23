@@ -18,7 +18,6 @@ import {
 } from "app/utils/utils";
 import { Button } from "designSystem/Button/Buttons";
 import { SvgSpinner } from "app/icons/icons";
-import { useWorkOrders } from "app/hooks/useWorkOrders";
 
 interface WorkOrdersChartProps {
   operator: string;
@@ -57,6 +56,9 @@ const Filter = [
 ];
 
 export default function DashboardPage() {
+  const workOrderService = new WorkOrderService(
+    process.env.NEXT_PUBLIC_API_BASE_URL!
+  );
   const operatorService = new OperatorService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
@@ -67,7 +69,6 @@ export default function DashboardPage() {
     1
   );
 
-  const [isLoading, setIsLoading] = useState(false);
   const validStates = [
     StateWorkOrder.Waiting,
     StateWorkOrder.OnGoing,
@@ -86,6 +87,8 @@ export default function DashboardPage() {
   const [chartConsumedSpareParts, setChartConsumedSpareParts] = useState<any[]>(
     []
   );
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const [workOrderTypeChartData, setWorkOrderTypeChartData] = useState<
     WorkOrderTypeChartProps[]
@@ -111,8 +114,6 @@ export default function DashboardPage() {
     [StateWorkOrder.Requested]: "border-red-500",
     [StateWorkOrder.Finished]: "border-green-500",
   };
-
-  const { fetchWithFilters } = useWorkOrders();
 
   const handleFilterClick = (filter: number) => {
     if (filter === selectedFilter) return;
@@ -146,81 +147,83 @@ export default function DashboardPage() {
       startDateTime: date,
       endDateTime: currentDate,
     };
-    await fetchWithFilters(filters).then((response) => {
-      const workOrders = response.data as WorkOrder[];
-      getTopAssets(workOrders);
+    await workOrderService
+      .getWorkOrdersWithFilters(filters)
+      .then((response) => {
+        getTopAssets(response);
 
-      getTopConsumedSpareParts(workOrders);
+        getTopConsumedSpareParts(response);
 
-      if (!operators) return;
+        if (!operators) return;
 
-      const updatedWorkOrderTypes = validStates.map((state) => ({
-        statWorkOrder: state,
-        value: 0,
-        color: stateColors[state],
-      }));
+        const updatedWorkOrderTypes = validStates.map((state) => ({
+          statWorkOrder: state,
+          value: 0,
+          color: stateColors[state],
+        }));
 
-      const operatorMap = new Map<string, WorkOrdersChartProps>();
-      const workOrderTypeMap = new Map<
-        WorkOrderType,
-        WorkOrderTypeChartProps
-      >();
+        const operatorMap = new Map<string, WorkOrdersChartProps>();
+        const workOrderTypeMap = new Map<
+          WorkOrderType,
+          WorkOrderTypeChartProps
+        >();
 
-      workOrders.forEach((workOrder) => {
-        const index = validStates.findIndex(
-          (state) => state === workOrder.stateWorkOrder
-        );
-        if (index !== -1) {
-          updatedWorkOrderTypes[index].value++;
-        }
-
-        const workOrderType = workOrder.workOrderType;
-        if (workOrderTypeMap.has(workOrderType)) {
-          workOrderTypeMap.get(workOrderType)!.value++;
-        } else {
-          const workOrderTypeChartProps: WorkOrderTypeChartProps = {
-            workOrderType: workOrderType,
-            value: 0,
-            index: translateWorkOrderType(workOrderType),
-          };
-          workOrderTypeMap.set(workOrderType, workOrderTypeChartProps);
-        }
-
-        const operatorId = workOrder.operatorId?.map((op) => op) || [];
-
-        operatorId.forEach((operatorName) => {
-          const existingOperator = operatorMap.get(operatorName);
-
-          if (existingOperator) {
-            if (workOrder.workOrderType === WorkOrderType.Preventive) {
-              existingOperator.Preventius++;
-            } else if (workOrder.workOrderType === WorkOrderType.Corrective) {
-              existingOperator.Correctius++;
-            }
-          } else {
-            const newOperatorEntry: WorkOrdersChartProps = {
-              operator:
-                operators.find((x) => x.id === operatorName)?.name || "Proves",
-              Preventius:
-                workOrder.workOrderType === WorkOrderType.Preventive ? 1 : 0,
-              Correctius:
-                workOrder.workOrderType === WorkOrderType.Corrective ? 1 : 0,
-            };
-            operatorMap.set(operatorName, newOperatorEntry);
+        response.forEach((workOrder) => {
+          const index = validStates.findIndex(
+            (state) => state === workOrder.stateWorkOrder
+          );
+          if (index !== -1) {
+            updatedWorkOrderTypes[index].value++;
           }
+
+          const workOrderType = workOrder.workOrderType;
+          if (workOrderTypeMap.has(workOrderType)) {
+            workOrderTypeMap.get(workOrderType)!.value++;
+          } else {
+            const workOrderTypeChartProps: WorkOrderTypeChartProps = {
+              workOrderType: workOrderType,
+              value: 0,
+              index: translateWorkOrderType(workOrderType),
+            };
+            workOrderTypeMap.set(workOrderType, workOrderTypeChartProps);
+          }
+
+          const operatorId = workOrder.operatorId?.map((op) => op) || [];
+
+          operatorId.forEach((operatorName) => {
+            const existingOperator = operatorMap.get(operatorName);
+
+            if (existingOperator) {
+              if (workOrder.workOrderType === WorkOrderType.Preventive) {
+                existingOperator.Preventius++;
+              } else if (workOrder.workOrderType === WorkOrderType.Corrective) {
+                existingOperator.Correctius++;
+              }
+            } else {
+              const newOperatorEntry: WorkOrdersChartProps = {
+                operator:
+                  operators.find((x) => x.id === operatorName)?.name ||
+                  "Proves",
+                Preventius:
+                  workOrder.workOrderType === WorkOrderType.Preventive ? 1 : 0,
+                Correctius:
+                  workOrder.workOrderType === WorkOrderType.Corrective ? 1 : 0,
+              };
+              operatorMap.set(operatorName, newOperatorEntry);
+            }
+          });
         });
+        setWorkOrderState(updatedWorkOrderTypes);
+        const workOrderTypeChartData = Array.from(workOrderTypeMap.values());
+        setWorkOrderTypeChartData(workOrderTypeChartData);
+        const data = Array.from(operatorMap.values());
+        setChartData(data);
       });
-      setWorkOrderState(updatedWorkOrderTypes);
-      const workOrderTypeChartData = Array.from(workOrderTypeMap.values());
-      setWorkOrderTypeChartData(workOrderTypeChartData);
-      const data = Array.from(operatorMap.values());
-      setChartData(data);
-    });
     setIsLoading(false);
   }
 
   useEffect(() => {
-    if (loginUser?.permission == UserPermission.Administrator && !isLoading) {
+    if (loginUser?.permission == UserPermission.Administrator) {
       fetchData(firstDayOfMonth);
       const initialWorkOrderTypes = validStates.map((state) => ({
         statWorkOrder: state,

@@ -1,6 +1,6 @@
 import WorkOrder, { SearchWorkOrderFilters } from "app/interfaces/workOrder";
 import WorkOrderService from "app/services/workOrderService";
-import useSWR from "swr";
+import useSWR, { Fetcher } from "swr";
 
 const workOrderService = new WorkOrderService(
   process.env.NEXT_PUBLIC_API_BASE_URL!
@@ -32,22 +32,11 @@ const fetchWorkOrderById = async (id: string): Promise<WorkOrder> => {
 };
 
 export const useWorkOrders = () => {
-  const fetchById = async (id: string) => {
-    const { data, error, mutate } = useSWR<WorkOrder>(["workOrder", id], () =>
-      fetchWorkOrderById(id)
-    );
-    return {
-      workOrder: data,
-      isLoading: !error && !data,
-      isError: error,
-      reloadWorkOrder: mutate,
-    };
-  };
+  const fetchById: Fetcher<WorkOrder, string> = (id) => fetchWorkOrderById(id);
 
   const fetchWithFilters = async (filters?: SearchWorkOrderFilters) => {
-    const { data, error, mutate } = useSWR<WorkOrder[]>(
-      ["workOrdersWithFilters", filters],
-      () => fetchWorkOrdersWithFilters(filters)
+    const { data, error, mutate } = useSWR<WorkOrder[]>(filters, () =>
+      fetchWorkOrdersWithFilters(filters)
     );
     return {
       data: data,
