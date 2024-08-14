@@ -28,19 +28,19 @@ import AssetService from "app/services/assetService";
 import { ElementList } from "components/selector/ElementList";
 import ChooseElement from "components/ChooseElement";
 import { useSessionStore } from "app/stores/globalStore";
+import { useOperatorHook } from "app/hooks/useOperatorsHook";
+import { set } from "date-fns";
 
 function CorrectivePage() {
   const operatorService = new OperatorService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
-  const machinService = new MachineService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
-  );
+
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
   const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
-  const [operators, setOperators] = useState<Operator[]>([]);
+  const [operatorsAvailable, setOperatorsAvailable] = useState<Operator[]>([]);
   const [selectedOperator, setSelectedOperator] = useState<string[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
 
@@ -58,11 +58,12 @@ function CorrectivePage() {
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const { loginUser } = useSessionStore((state) => state);
 
+  const { operators, fetchAllOperators } = useOperatorHook();
+
   async function fetchFormData() {
-    await fetchOperators();
+    //  await fetchOperators();
     await createCode();
     await fetchAssets();
-
     setIsLoadingPage(false);
   }
 
@@ -76,21 +77,6 @@ function CorrectivePage() {
           : "0000";
         const code = "COR" + paddedCounter;
         setValue("code", code);
-      })
-      .catch((error) => {
-        setErrorMessage("Error Operaris: " + error);
-      });
-  }
-
-  async function fetchOperators() {
-    await operatorService
-      .getOperators()
-      .then((aviableOperators) => {
-        setOperators(
-          aviableOperators.filter(
-            (x) => x.operatorType == OperatorType.Maintenance
-          )
-        );
       })
       .catch((error) => {
         setErrorMessage("Error Operaris: " + error);
@@ -350,17 +336,19 @@ function CorrectivePage() {
                   <label className="block text-xl font-medium text-gray-700 mb-2">
                     Operaris
                   </label>
-                  <ChooseElement
-                    elements={operators}
-                    selectedElements={selectedOperator}
-                    onElementSelected={handleSelectedOperator}
-                    onDeleteElementSelected={handleDeleteSelectedOperator}
-                    placeholder="Buscar Operaris"
-                    mapElement={(operator) => ({
-                      id: operator.id,
-                      description: operator.name,
-                    })}
-                  />
+                  {operators !== undefined && operators.length > 0 && (
+                    <ChooseElement
+                      elements={operators}
+                      selectedElements={selectedOperator}
+                      onElementSelected={handleSelectedOperator}
+                      onDeleteElementSelected={handleDeleteSelectedOperator}
+                      placeholder="Buscar Operaris"
+                      mapElement={(operator) => ({
+                        id: operator.id,
+                        description: operator.name,
+                      })}
+                    />
+                  )}
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row mb-8">

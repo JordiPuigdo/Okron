@@ -18,6 +18,7 @@ import {
 } from "app/utils/utils";
 import { Button } from "designSystem/Button/Buttons";
 import { SvgSpinner } from "app/icons/icons";
+import { useWorkOrders } from "app/hooks/useWorkOrders";
 
 interface WorkOrdersChartProps {
   operator: string;
@@ -56,9 +57,6 @@ const Filter = [
 ];
 
 export default function DashboardPage() {
-  const workOrderService = new WorkOrderService(
-    process.env.NEXT_PUBLIC_API_BASE_URL!
-  );
   const operatorService = new OperatorService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
@@ -106,6 +104,8 @@ export default function DashboardPage() {
 
   const firstDayOfWeek = getFirstDayOfWeek(currentDate);
 
+  const { fetchWithFilters } = useWorkOrders();
+
   const stateColors: { [key in StateWorkOrder]: string } = {
     [StateWorkOrder.Waiting]: "border-red-500",
     [StateWorkOrder.OnGoing]: "border-yellow-500",
@@ -147,78 +147,75 @@ export default function DashboardPage() {
       startDateTime: date,
       endDateTime: currentDate,
     };
-    await workOrderService
-      .getWorkOrdersWithFilters(filters)
-      .then((response) => {
-        getTopAssets(response);
+    await fetchWithFilters(filters).then((response) => {
+      getTopAssets(response);
 
-        getTopConsumedSpareParts(response);
+      getTopConsumedSpareParts(response);
 
-        if (!operators) return;
+      if (!operators) return;
 
-        const updatedWorkOrderTypes = validStates.map((state) => ({
-          statWorkOrder: state,
-          value: 0,
-          color: stateColors[state],
-        }));
+      const updatedWorkOrderTypes = validStates.map((state) => ({
+        statWorkOrder: state,
+        value: 0,
+        color: stateColors[state],
+      }));
 
-        const operatorMap = new Map<string, WorkOrdersChartProps>();
-        const workOrderTypeMap = new Map<
-          WorkOrderType,
-          WorkOrderTypeChartProps
-        >();
+      const operatorMap = new Map<string, WorkOrdersChartProps>();
+      const workOrderTypeMap = new Map<
+        WorkOrderType,
+        WorkOrderTypeChartProps
+      >();
 
-        response.forEach((workOrder) => {
-          const index = validStates.findIndex(
-            (state) => state === workOrder.stateWorkOrder
-          );
-          if (index !== -1) {
-            updatedWorkOrderTypes[index].value++;
-          }
+      response.forEach((workOrder) => {
+        const index = validStates.findIndex(
+          (state) => state === workOrder.stateWorkOrder
+        );
+        if (index !== -1) {
+          updatedWorkOrderTypes[index].value++;
+        }
 
-          const workOrderType = workOrder.workOrderType;
-          if (workOrderTypeMap.has(workOrderType)) {
-            workOrderTypeMap.get(workOrderType)!.value++;
-          } else {
-            const workOrderTypeChartProps: WorkOrderTypeChartProps = {
-              workOrderType: workOrderType,
-              value: 0,
-              index: translateWorkOrderType(workOrderType),
-            };
-            workOrderTypeMap.set(workOrderType, workOrderTypeChartProps);
-          }
+        const workOrderType = workOrder.workOrderType;
+        if (workOrderTypeMap.has(workOrderType)) {
+          workOrderTypeMap.get(workOrderType)!.value++;
+        } else {
+          const workOrderTypeChartProps: WorkOrderTypeChartProps = {
+            workOrderType: workOrderType,
+            value: 0,
+            index: translateWorkOrderType(workOrderType),
+          };
+          workOrderTypeMap.set(workOrderType, workOrderTypeChartProps);
+        }
 
-          const operatorId = workOrder.operatorId?.map((op) => op) || [];
+        const operatorId = workOrder.operatorId?.map((op) => op) || [];
 
-          operatorId.forEach((operatorName) => {
-            const existingOperator = operatorMap.get(operatorName);
+        operatorId.forEach((operatorName) => {
+          const existingOperator = operatorMap.get(operatorName);
 
-            if (existingOperator) {
-              if (workOrder.workOrderType === WorkOrderType.Preventive) {
-                existingOperator.Preventius++;
-              } else if (workOrder.workOrderType === WorkOrderType.Corrective) {
-                existingOperator.Correctius++;
-              }
-            } else {
-              const newOperatorEntry: WorkOrdersChartProps = {
-                operator:
-                  operators.find((x) => x.id === operatorName)?.name ||
-                  "Proves",
-                Preventius:
-                  workOrder.workOrderType === WorkOrderType.Preventive ? 1 : 0,
-                Correctius:
-                  workOrder.workOrderType === WorkOrderType.Corrective ? 1 : 0,
-              };
-              operatorMap.set(operatorName, newOperatorEntry);
+          if (existingOperator) {
+            if (workOrder.workOrderType === WorkOrderType.Preventive) {
+              existingOperator.Preventius++;
+            } else if (workOrder.workOrderType === WorkOrderType.Corrective) {
+              existingOperator.Correctius++;
             }
-          });
+          } else {
+            const newOperatorEntry: WorkOrdersChartProps = {
+              operator:
+                operators.find((x) => x.id === operatorName)?.name || "Proves",
+              Preventius:
+                workOrder.workOrderType === WorkOrderType.Preventive ? 1 : 0,
+              Correctius:
+                workOrder.workOrderType === WorkOrderType.Corrective ? 1 : 0,
+            };
+            operatorMap.set(operatorName, newOperatorEntry);
+          }
         });
-        setWorkOrderState(updatedWorkOrderTypes);
-        const workOrderTypeChartData = Array.from(workOrderTypeMap.values());
-        setWorkOrderTypeChartData(workOrderTypeChartData);
-        const data = Array.from(operatorMap.values());
-        setChartData(data);
       });
+      setWorkOrderState(updatedWorkOrderTypes);
+      const workOrderTypeChartData = Array.from(workOrderTypeMap.values());
+      setWorkOrderTypeChartData(workOrderTypeChartData);
+      const data = Array.from(operatorMap.values());
+      setChartData(data);
+    });
     setIsLoading(false);
   }
 

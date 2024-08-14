@@ -35,15 +35,7 @@ export const useWorkOrders = () => {
   const fetchById: Fetcher<WorkOrder, string> = (id) => fetchWorkOrderById(id);
 
   const fetchWithFilters = async (filters?: SearchWorkOrderFilters) => {
-    const { data, error, mutate } = useSWR<WorkOrder[]>(filters, () =>
-      fetchWorkOrdersWithFilters(filters)
-    );
-    return {
-      data: data,
-      isLoading: !error && !data,
-      isError: error,
-      reloadWorkOrders: mutate,
-    };
+    return fetchWorkOrdersWithFilters(filters);
   };
 
   return {
