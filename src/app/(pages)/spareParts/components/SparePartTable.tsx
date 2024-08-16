@@ -201,7 +201,10 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
     async function fetchSpareParts() {
       try {
         const data = await sparePartService.getSpareParts(withoutStock);
-
+        if (timer > 0) {
+          setSpareParts(data.filter((sparePart) => sparePart.active == true));
+          return;
+        }
         setSpareParts(data);
       } catch (error) {
         console.error("Error fetching operators:", error);
