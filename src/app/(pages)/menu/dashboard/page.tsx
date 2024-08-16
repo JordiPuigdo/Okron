@@ -12,6 +12,12 @@ import { DonutChartComponent } from "designSystem/DonutChart/DonutChartComponent
 import { useEffect, useState } from "react";
 import OTsXAsset from "./components/OTsXAsset";
 import SparePartTable from "app/(pages)/spareParts/components/SparePartTable";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface WorkOrdersChartProps {
   operator: string;
@@ -46,6 +52,8 @@ export default function DashboardPage() {
     1
   );
 
+  const startOfMonth = dayjs.tz(dayjs(), "Europe/Madrid").startOf("month");
+
   const { loginUser } = useSessionStore((state) => state);
 
   const [chartData, setChartData] = useState<any[]>([]);
@@ -60,9 +68,10 @@ export default function DashboardPage() {
       const filters: SearchWorkOrderFilters = {
         assetId: "",
         operatorId: "",
-        startDateTime: firstDayOfMonth.toISOString(),
+        startDateTime: startOfMonth.format(),
         endDateTime: currentDate.toISOString(),
       };
+
       await workOrderService
         .getWorkOrdersWithFilters(filters)
         .then((response) => {
@@ -116,31 +125,33 @@ export default function DashboardPage() {
   function getTopAssets(workOrders: WorkOrder[], top: number = 5) {
     const assetMap = new Map<string, AssetChartProps>();
 
-    workOrders.forEach((workOrder) => {
-      const asset = workOrder.asset?.description;
-      if (asset) {
-        const existingAsset = assetMap.get(asset);
-        if (existingAsset) {
-          if (workOrder.workOrderType === WorkOrderType.Preventive) {
-            existingAsset.Preventius++;
+    workOrders
+      .filter((x) => x.active == true)
+      .forEach((workOrder) => {
+        const asset = workOrder.asset?.description;
+        if (asset) {
+          const existingAsset = assetMap.get(asset);
+          if (existingAsset) {
+            if (workOrder.workOrderType === WorkOrderType.Preventive) {
+              existingAsset.Preventius++;
+            }
+            if (workOrder.workOrderType === WorkOrderType.Corrective) {
+              existingAsset.Correctius++;
+            }
+            existingAsset.number++;
+          } else {
+            const newAssetEntry: AssetChartProps = {
+              asset: asset,
+              number: 1,
+              Preventius:
+                workOrder.workOrderType === WorkOrderType.Preventive ? 1 : 0,
+              Correctius:
+                workOrder.workOrderType === WorkOrderType.Corrective ? 1 : 0,
+            };
+            assetMap.set(asset, newAssetEntry);
           }
-          if (workOrder.workOrderType === WorkOrderType.Corrective) {
-            existingAsset.Correctius++;
-          }
-          existingAsset.number++;
-        } else {
-          const newAssetEntry: AssetChartProps = {
-            asset: asset,
-            number: 1,
-            Preventius:
-              workOrder.workOrderType === WorkOrderType.Preventive ? 1 : 0,
-            Correctius:
-              workOrder.workOrderType === WorkOrderType.Corrective ? 1 : 0,
-          };
-          assetMap.set(asset, newAssetEntry);
         }
-      }
-    });
+      });
     const sortedAssets = Array.from(assetMap.values()).sort(
       (a, b) => b.number - a.number
     );
