@@ -42,7 +42,7 @@ export default function DashboardPage() {
   const lastMonth = currentDate.getMonth() - 1;
   const firstDayOfMonth = new Date(
     currentDate.getFullYear(),
-    currentDate.getMonth() - 1,
+    currentDate.getMonth(),
     1
   );
 
@@ -57,7 +57,6 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchData() {
       const operators = await operatorService.getOperators();
-
       const filters: SearchWorkOrderFilters = {
         assetId: "",
         operatorId: "",
