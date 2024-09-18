@@ -1,4 +1,6 @@
-import { DonutChart } from "@tremor/react";
+import { DonutChart, List, ListItem } from "@tremor/react";
+import { WorkOrderType } from "app/interfaces/workOrder";
+import { translateWorkOrderType } from "app/utils/utils";
 
 const datahero = [
   {
@@ -25,18 +27,42 @@ export const DonutChartComponent = ({
   category,
   title,
 }: DonutChartComponentProps) => (
-  <>
-    <div className="flex flex-col w-full justify-center items-center gap-4">
-      <p className="text-lg font-semibold">{title}</p>
-      <DonutChart
-        data={chartData}
-        index={index}
-        variant="pie"
-        colors={["blue", "rose"]}
-        valueFormatter={dataFormatter}
-        onValueChange={(v) => console.log(v)}
-        className="text-black"
-      />
+  <div className="w-full flex flex-col items-center p-4 space-y-4">
+    <p className="text-lg font-semibold text-center">{title}</p>
+
+    <div className="flex w-full space-x-4 p-2 items-center">
+      <div className="flex-1 flex flex-col space-y-3 p-4">
+        {chartData.map((item) => (
+          <div key={item.name} className="flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <span
+                className={`inline-block w-5 h-5 rounded-full ${
+                  item.workOrderType === WorkOrderType.Preventive
+                    ? "bg-blue-500"
+                    : "bg-red-500"
+                }`}
+              ></span>
+              <span className="font-medium text-gray-700">
+                {translateWorkOrderType(item.workOrderType as WorkOrderType)}
+              </span>
+            </div>
+            <div className="text-lg font-semibold text-gray-900">
+              {item.value}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="flex-1 bg-white p-4 ">
+        <DonutChart
+          data={chartData}
+          index={index}
+          variant="pie"
+          colors={["blue", "rose"]}
+          valueFormatter={dataFormatter}
+          onValueChange={(v) => console.log(v)}
+          className="text-black"
+        />
+      </div>
     </div>
-  </>
+  </div>
 );

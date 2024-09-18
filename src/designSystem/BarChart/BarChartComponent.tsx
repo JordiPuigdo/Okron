@@ -15,16 +15,19 @@ export function BarChartComponent({
   category,
 }: BarChartComponentProps) {
   return (
-    <div className="w-full flex flex-col justify-center items-center ">
+    <div className="w-full flex flex-col justify-center items-center p-2">
       <p className="text-lg font-medium">Ordres de treball per operari</p>
       <BarChart
-        className="mt-6"
+        className=""
         data={chartData}
         index={index}
         categories={category}
         colors={["blue", "rose"]}
         valueFormatter={dataFormatter}
-        yAxisWidth={48}
+        yAxisWidth={200} // Slightly wider Y-axis for better readability
+        showAnimation={true} // Adding smooth animation for better UX
+        showTooltip={true} // Display tooltips on hover for better interactivity
+        layout="vertical" // Optional: Use horizontal bars if preferred
       />
     </div>
   );

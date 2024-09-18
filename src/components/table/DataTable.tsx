@@ -106,6 +106,9 @@ const DataTable: React.FC<DataTableProps> = ({
       case EntityTable.SPAREPART:
         setPathDetail(ROUTES.spareParts);
         break;
+      case EntityTable.OPERATOR:
+        setPathDetail(ROUTES.configuration.operators);
+        break;
       default:
         setPathDetail(pathName);
     }
