@@ -27,6 +27,7 @@ import WorkOrdersDashboard from "./components/WorkOrdersDashboard";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+dayjs.extend(isoWeek);
 
 interface WorkOrdersChartProps {
   operator: string;
@@ -69,12 +70,6 @@ export default function DashboardPage() {
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
   const currentDate = new Date();
-  /*const firstDayOfMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    1
-  );*/
-
   const validStates = [
     StateWorkOrder.Waiting,
     StateWorkOrder.OnGoing,
@@ -101,28 +96,16 @@ export default function DashboardPage() {
   >([]);
   const [selectedFilter, setSelectedFilter] = useState<number | null>(0);
 
-  const getFirstDayOfWeek = (
-    currentDate: Date,
-    timeZone: string = "local"
-  ): Date => {
-    // Convert the input date to a dayjs object in UTC
-    const utcDate = dayjs(currentDate).utc();
-
-    // Get the first day of the week in UTC
-    const startOfWeekUtc = utcDate.isoWeekday(1).startOf("day");
-
-    // Convert to local time zone if specified
-    const localStartOfWeek =
-      timeZone === "local"
-        ? startOfWeekUtc.local()
-        : startOfWeekUtc.tz(timeZone); // Use the provided time zone
-
-    return localStartOfWeek.toDate();
-  };
-
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
 
-  const firstDayOfWeek = getFirstDayOfWeek(currentDate);
+  const firstDayOfMonth = dayjs
+    .utc(dayjs(), "Europe/Madrid")
+    .startOf("month")
+    .toDate();
+  const firstDayOfWeek = dayjs
+    .utc(dayjs(), "Europe/Madrid")
+    .startOf("isoWeek")
+    .toDate();
 
   const { fetchWithFilters } = useWorkOrders();
 
@@ -140,7 +123,7 @@ export default function DashboardPage() {
     setSelectedFilter(filter);
     switch (filter) {
       case 0:
-        // fetchData(startOfMonth);
+        fetchData(firstDayOfMonth);
         break;
       case 1:
         fetchData(firstDayOfWeek);
@@ -159,7 +142,7 @@ export default function DashboardPage() {
     setChartAssets([]);
     setChartConsumedSpareParts([]);
     setWorkOrderState([]);
-    debugger;
+
     const filters: SearchWorkOrderFilters = {
       assetId: "",
       operatorId: "",
@@ -242,7 +225,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (loginUser?.permission == UserPermission.Administrator) {
-      //fetchData(startOfMonth);
+      fetchData(firstDayOfMonth);
       const initialWorkOrderTypes = validStates.map((state) => ({
         statWorkOrder: state,
         value: 0,
@@ -359,11 +342,11 @@ export default function DashboardPage() {
           ))}
           <div className="flex justify-start w-full items-center">
             Data:{" "}
-            {/*selectedFilter == 0
-              ? startOfMonth.toLocaleDateString("en-GB")
+            {selectedFilter == 0
+              ? firstDayOfMonth.toLocaleDateString("en-GB")
               : selectedFilter === 1
               ? firstDayOfWeek.toLocaleDateString("en-GB")
-              : currentDate.toLocaleDateString("en-GB")*/}{" "}
+              : currentDate.toLocaleDateString("en-GB")}{" "}
             {" - "} {currentDate.toLocaleDateString("en-GB")}
           </div>
           <div className="flex justify-start w-full items-center">
