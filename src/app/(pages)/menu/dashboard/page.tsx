@@ -24,6 +24,8 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import isoWeek from "dayjs/plugin/isoWeek";
 import WorkOrdersDashboard from "./components/WorkOrdersDashboard";
+import SparePartTable from "app/(pages)/spareParts/components/SparePartTable";
+import CostXAsset from "./components/CostXAsset";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -45,6 +47,7 @@ export interface AssetChartProps {
 export interface ConsumedSparePartsChartProps {
   sparePart: string;
   number: number;
+  totalStock: number;
 }
 
 interface WorkOrderTypeChartProps {
@@ -97,6 +100,8 @@ export default function DashboardPage() {
   const [selectedFilter, setSelectedFilter] = useState<number | null>(0);
 
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
+  const [totalMinutes, setTotalMinutes] = useState<number>(0);
+  const [totalCosts, setTotalCosts] = useState<number>(0);
 
   const firstDayOfMonth = dayjs
     .utc(dayjs(), "Europe/Madrid")
@@ -170,6 +175,8 @@ export default function DashboardPage() {
         WorkOrderTypeChartProps
       >();
 
+      getTotalMinutes(response);
+      getTotalCosts(response);
       response.forEach((workOrder) => {
         const index = validStates.findIndex(
           (state) => state === workOrder.stateWorkOrder
@@ -223,6 +230,49 @@ export default function DashboardPage() {
     setIsLoading(false);
   }
 
+  const getTotalMinutes = (workOrders: WorkOrder[]) => {
+    let totalMinutes = 0;
+    workOrders.forEach((workOrder) => {
+      totalMinutes += calculateTotalTime(workOrder);
+    });
+    setTotalMinutes(totalMinutes);
+  };
+
+  const calculateTotalTime = (workOrder: WorkOrder) => {
+    let totalTime = 0;
+
+    workOrder.workOrderOperatorTimes?.forEach((time) => {
+      const startTime = new Date(time.startTime).getTime();
+      const endTime = time.endTime ? new Date(time.endTime).getTime() : null;
+
+      if (endTime && startTime < endTime) {
+        const timeDifference = endTime - startTime;
+        totalTime += timeDifference;
+      }
+    });
+
+    return totalTime / (1000 * 60);
+  };
+
+  const getTotalCosts = (workOrders: WorkOrder[]) => {
+    let totalCosts = 0;
+    workOrders.forEach((workOrder) => {
+      totalCosts += calculateTotalCosts(workOrder);
+    });
+    setTotalCosts(totalCosts);
+  };
+
+  const calculateTotalCosts = (workOrder: WorkOrder) => {
+    let totalCosts = 0;
+
+    workOrder.workOrderSpareParts?.forEach((sparePart) => {
+      totalCosts += sparePart.quantity * 94.32;
+      //sparePart.sparePart.price;
+    });
+
+    return totalCosts;
+  };
+
   useEffect(() => {
     if (loginUser?.permission == UserPermission.Administrator) {
       fetchData(firstDayOfMonth);
@@ -267,7 +317,7 @@ export default function DashboardPage() {
       });
 
     const sortedAssets = Array.from(assetMap.values()).sort(
-      (a, b) => b.number - a.number
+      (a, b) => b.Correctius - a.Correctius
     );
 
     setChartAssets(sortedAssets.slice(0, top));
@@ -300,6 +350,7 @@ export default function DashboardPage() {
                 " - " +
                 consumedSparePart.sparePart.description,
               number: consumedSparePart.quantity,
+              totalStock: consumedSparePart.sparePart.stock,
             };
             consumedSparePartsMap.set(
               consumedSparePart.sparePart.code +
@@ -323,7 +374,7 @@ export default function DashboardPage() {
   if (loginUser?.permission !== UserPermission.Administrator) return <></>;
   return (
     <div className="flex flex-col w-full gap-4">
-      <div className="flex flex-col bg-white gap-4 w-full items-center p-4 rounded-xl">
+      <div className="flex flex-col bg-white gap-4 w-full items-center p-4 rounded-xl border-2 border-blue-950">
         <div className="flex justify-start w-full gap-2 py-4">
           {Filter.map((filter) => (
             <Button
@@ -340,17 +391,28 @@ export default function DashboardPage() {
               {filter.label}
             </Button>
           ))}
-          <div className="flex justify-start w-full items-center">
-            Data:{" "}
-            {selectedFilter == 0
-              ? firstDayOfMonth.toLocaleDateString("en-GB")
-              : selectedFilter === 1
-              ? firstDayOfWeek.toLocaleDateString("en-GB")
-              : currentDate.toLocaleDateString("en-GB")}{" "}
-            {" - "} {currentDate.toLocaleDateString("en-GB")}
+          <div className="flex flex-col w-full border-l-2 pl-2 p-1 border-blue-950 bg-gray-200 rounded-sm">
+            <span>Data:</span>
+            <span>
+              {selectedFilter == 0
+                ? firstDayOfMonth.toLocaleDateString("en-GB")
+                : selectedFilter === 1
+                ? firstDayOfWeek.toLocaleDateString("en-GB")
+                : currentDate.toLocaleDateString("en-GB")}{" "}
+              {" - "} {currentDate.toLocaleDateString("en-GB")}
+            </span>
           </div>
-          <div className="flex justify-start w-full items-center">
-            Minuts: 254
+          <div className="flex flex-col justify-start w-full border-l-2 pl-2 p-1 border-blue-950 bg-gray-200 rounded-sm">
+            <span>Minuts: </span>
+            <span>
+              {Math.round(totalMinutes).toLocaleString().replace(",", ".")}
+            </span>
+          </div>
+          <div className="flex flex-col justify-start w-full border-l-2 pl-2 p-1 border-blue-950 bg-gray-200 rounded-sm">
+            <span>Cost Material: </span>
+            <span>
+              {Math.round(totalCosts).toLocaleString().replace(",", ".")} €
+            </span>
           </div>
         </div>
         <div className="flex gap-4 text-white w-full  ">
@@ -374,7 +436,7 @@ export default function DashboardPage() {
         </div>
       </div>
       <div className="flex flex-row gap-4">
-        <div className="border-2  border-blue-950 w-full rounded-xl bg-white justify-center">
+        <div className="border-2 p-2 border-blue-950 w-full rounded-xl bg-white justify-center">
           <DonutChartComponent
             chartData={workOrderTypeChartData}
             category={["Preventius", "Correctius"]}
@@ -382,25 +444,31 @@ export default function DashboardPage() {
             title="Correctius vs Preventius"
           />
         </div>
-        <div className="border-2  border-blue-950 w-full rounded-xl bg-white">
+        <div className="flex w-full bg-white rounded-xl p-2 border-2 border-blue-950">
+          <WorkOrdersDashboard
+            workOrders={workOrders.sort((a, b) => {
+              const dateA = new Date(a.startTime).getTime();
+              const dateB = new Date(b.startTime).getTime();
+              return dateB - dateA;
+            })}
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-grow w-full gap-4 items-center">
+        <div className="flex flex-grow border-2  border-blue-950 w-full rounded-xl bg-white p-2">
           {chartData.length > 0 && (
             <BarChartComponent
               category={["Preventius", "Correctius"]}
               chartData={chartData}
               index="operator"
+              title="Ordres de treball per operari"
             />
           )}
         </div>
-      </div>
-
-      <div className="flex flex-col bg-white gap-4 w-full items-center p-4 rounded-xl ">
-        <WorkOrdersDashboard
-          workOrders={workOrders.sort((a, b) => {
-            const dateA = new Date(a.startTime).getTime();
-            const dateB = new Date(b.startTime).getTime();
-            return dateB - dateA;
-          })}
-        />
+        <div className="flex flex-grow border-2  border-blue-950 w-full rounded-xl bg-white p-2">
+          <CostXAsset workOrders={workOrders} />
+        </div>
       </div>
       {chartAssets.length > 0 && (
         <div className="flex flex-row w-full  justify-center gap-4">
@@ -424,6 +492,9 @@ export default function DashboardPage() {
                     <span className="block text-sm text-gray-500">
                       Total consums: {consumedSparePart.number}
                     </span>
+                    <span className="block text-sm text-gray-500">
+                      Stock: {consumedSparePart.totalStock}
+                    </span>
                   </div>
                   {index === 0 && (
                     <span className="bg-red-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
@@ -446,6 +517,19 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+      <div className="flex flex-col w-full bg-white rounded-xl border-2 border-blue-950">
+        <p className="text-lg font-semibold mb-4 p-2 items-center w-full">
+          Recanvis sense stock
+        </p>
+        <SparePartTable
+          enableFilters={true}
+          enableDetail={false}
+          enableCreate={false}
+          withoutStock={true}
+          enableFilterActive={false}
+          timer={60000}
+        />
+      </div>
     </div>
   );
 }

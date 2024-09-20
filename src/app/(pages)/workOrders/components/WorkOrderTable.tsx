@@ -33,6 +33,7 @@ import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
 import { OperatorType } from "app/interfaces/Operator";
 import { Button } from "designSystem/Button/Buttons";
+import { FilterWorkOrders } from "app/types/filterWorkOrders";
 
 interface WorkOrderTableProps {
   enableFilterAssets?: boolean;
@@ -102,8 +103,15 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   workOrderType,
   refresh,
 }) => {
-  const [startDate, setStartDate] = useState<Date | null>(new Date());
-  const [endDate, setEndDate] = useState<Date | null>(new Date());
+  const { operatorLogged, loginUser, setFilterWorkOrders, filterWorkOrders } =
+    useSessionStore((state) => state);
+
+  const [startDate, setStartDate] = useState<Date | null>(
+    filterWorkOrders?.startDateTime || new Date()
+  );
+  const [endDate, setEndDate] = useState<Date | null>(
+    filterWorkOrders?.endDateTime || new Date()
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string>("");
   const [workOrders, setWorkOrders] = useState<WorkOrder[] | []>([]);
@@ -120,8 +128,6 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
-
-  const { operatorLogged, loginUser } = useSessionStore((state) => state);
 
   const tableButtons: TableButtons = {
     edit: enableEdit,
@@ -179,8 +185,12 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     const search: SearchWorkOrderFilters = {
       assetId: "",
       operatorId: operatorId || "",
-      startDateTime: startDate!,
-      endDateTime: endDate!,
+      startDateTime: filterWorkOrders?.startDateTime
+        ? filterWorkOrders.startDateTime
+        : startDate!,
+      endDateTime: filterWorkOrders?.endDateTime
+        ? filterWorkOrders.endDateTime
+        : endDate!,
     };
 
     if (operatorLogged?.operatorLoggedType == OperatorType.Quality) {
@@ -188,7 +198,11 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
       search.startDateTime = undefined;
       search.endDateTime = undefined;
     }
-
+    const filters: FilterWorkOrders = {
+      startDateTime: startDate!,
+      endDateTime: endDate!,
+    };
+    setFilterWorkOrders(filters);
     const workOrders = await workOrderService.getWorkOrdersWithFilters(search);
     if (workOrders.length == 0) {
       setMessage("No hi ha ordres disponibles amb aquests filtres");

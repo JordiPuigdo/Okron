@@ -60,7 +60,7 @@ const Header: React.FC<Header> = ({ setOpenMenu }) => {
           </div>
         </div>
       </div>
-      <div>
+      <div className="text-black">
         {operatorLogged &&
           operatorLogged?.codeOperatorLogged +
             " - " +
