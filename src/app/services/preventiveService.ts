@@ -233,6 +233,30 @@ class PreventiveService {
       throw error;
     }
   }
+
+  async UnAssignOperatorFromPreventives(
+    request: AssignOperatorToPreventivesRequest
+  ): Promise<boolean> {
+    try {
+      const url = `${this.baseUrl}preventive/UnAssignOperatorFromPreventives`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to assign operator to preventives`);
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error assigning operator to preventives:", error);
+      throw error;
+    }
+  }
 }
 
 export default PreventiveService;

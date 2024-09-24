@@ -238,7 +238,8 @@ const DataTable: React.FC<DataTableProps> = ({
 
     const indexOfLastRecord = currentPage * itemsPerPage;
     const indexOfFirstRecord = indexOfLastRecord - itemsPerPage;
-    if (enableFilterActive) {
+
+    if (enableFilterActive && filterActive) {
       setFilteredData(
         filteredData
           .filter((x) => x["active"] == filterActive)
@@ -249,7 +250,7 @@ const DataTable: React.FC<DataTableProps> = ({
         filteredData.slice(indexOfFirstRecord, indexOfLastRecord)
       );
     }
-    //setTotalRecords(filteredData.length);
+    setTotalRecords(filteredData.length);
     setTotalCount(Math.ceil(filteredData.length / itemsPerPage));
   };
 

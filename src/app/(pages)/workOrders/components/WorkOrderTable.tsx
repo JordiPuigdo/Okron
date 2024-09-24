@@ -185,12 +185,15 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     const search: SearchWorkOrderFilters = {
       assetId: "",
       operatorId: operatorId || "",
-      startDateTime: filterWorkOrders?.startDateTime
-        ? filterWorkOrders.startDateTime
-        : startDate!,
-      endDateTime: filterWorkOrders?.endDateTime
-        ? filterWorkOrders.endDateTime
-        : endDate!,
+      startDateTime:
+        filterWorkOrders?.startDateTime &&
+        filterWorkOrders.startDateTime == startDate
+          ? filterWorkOrders.startDateTime
+          : startDate!,
+      endDateTime:
+        filterWorkOrders?.endDateTime && filterWorkOrders.endDateTime == endDate
+          ? filterWorkOrders.endDateTime
+          : endDate!,
     };
 
     if (operatorLogged?.operatorLoggedType == OperatorType.Quality) {

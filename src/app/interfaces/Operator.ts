@@ -1,10 +1,10 @@
-
 interface Operator {
   id: string;
   code: string;
   name: string;
   priceHour: number;
-  operatorType: OperatorType; 
+  operatorType: OperatorType;
+  active: boolean;
 }
 
 export enum OperatorType {
@@ -12,6 +12,5 @@ export enum OperatorType {
   Production,
   Quality,
 }
-
 
 export default Operator;

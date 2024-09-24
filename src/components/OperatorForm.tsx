@@ -93,6 +93,12 @@ const OperatorForm: React.FC<OperatorFormProps> = ({
         />
       </div>
       <div className="mb-4">
+        <label
+          htmlFor="name"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Tipus
+        </label>
         <Controller
           name="operatorType"
           control={control}
@@ -113,6 +119,27 @@ const OperatorForm: React.FC<OperatorFormProps> = ({
                   </option>
                 ))}
             </select>
+          )}
+        />
+      </div>
+      <div className="mb-4">
+        <label
+          htmlFor="name"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Actiu
+        </label>
+        <Controller
+          name="active"
+          control={control}
+          defaultValue={operator ? operator.active : true}
+          render={({ field }) => (
+            <input
+              type="checkbox"
+              className="text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+              checked={field.value as boolean}
+              onChange={(e) => field.onChange(e.target.checked)}
+            />
           )}
         />
       </div>
