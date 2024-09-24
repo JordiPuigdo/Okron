@@ -361,6 +361,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                   enableDetail={true}
                   enableDelete={false}
                   enableCreate={false}
+                  enableFilterActive={false}
                 />
               </div>
             )}

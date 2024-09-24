@@ -57,7 +57,6 @@ const DataTable: React.FC<DataTableProps> = ({
   onChecked,
 }: DataTableProps) => {
   const itemsPerPageOptions = [5, 10, 15, 20, 25, 50];
-  const pathName = usePathname();
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState("");
   const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("ASC");
@@ -103,6 +102,7 @@ const DataTable: React.FC<DataTableProps> = ({
         break;
       case EntityTable.PREVENTIVE:
         setPathDetail(ROUTES.preventive.configuration);
+        break;
       case EntityTable.SPAREPART:
         setPathDetail(ROUTES.spareParts);
         break;
@@ -110,7 +110,7 @@ const DataTable: React.FC<DataTableProps> = ({
         setPathDetail(ROUTES.configuration.operators);
         break;
       default:
-        setPathDetail(pathName);
+        setPathDetail("");
     }
   }, []);
 
@@ -354,7 +354,12 @@ const DataTable: React.FC<DataTableProps> = ({
           entity !== EntityTable.WORKORDER && (
             <div className="flex flex-row gap-2 justify-center">
               {tableButtons.edit && (
-                <Link href={`${pathName}/${item[columns[0].key]}`}>
+                <Link
+                  href={`${pathDetail}/${item[columns[0].key]}`}
+                  onClick={(e) => {
+                    console.log(`${pathDetail}/${item[columns[0].key]}`);
+                  }}
+                >
                   <p
                     className="flex items-center font-medium text-white rounded-xl bg-okron-btEdit hover:bg-okron-btEditHover"
                     onClick={() => {
