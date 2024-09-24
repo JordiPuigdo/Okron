@@ -61,6 +61,7 @@ export const DonutChartComponent = ({
           valueFormatter={dataFormatter}
           onValueChange={(v) => console.log(v)}
           className="text-black"
+          noDataText="No hi ha resultats amb aquests filtres"
         />
       </div>
     </div>

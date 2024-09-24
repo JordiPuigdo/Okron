@@ -435,6 +435,7 @@ export default function DashboardPage() {
           ))}
         </div>
       </div>
+
       <div className="flex flex-row gap-4">
         <div className="border-2 p-2 border-blue-950 w-full rounded-xl bg-white justify-center">
           <DonutChartComponent
@@ -457,14 +458,12 @@ export default function DashboardPage() {
 
       <div className="flex flex-grow w-full gap-4 items-center">
         <div className="flex flex-grow border-2  border-blue-950 w-full rounded-xl bg-white p-2">
-          {chartData.length > 0 && (
-            <BarChartComponent
-              category={["Preventius", "Correctius"]}
-              chartData={chartData}
-              index="operator"
-              title="Ordres de treball per operari"
-            />
-          )}
+          <BarChartComponent
+            category={["Preventius", "Correctius"]}
+            chartData={chartData}
+            index="operator"
+            title="Ordres de treball per operari"
+          />
         </div>
         <div className="flex flex-grow border-2  border-blue-950 w-full rounded-xl bg-white p-2">
           <CostXAsset workOrders={workOrders} />
@@ -517,6 +516,7 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
       <div className="flex flex-col w-full bg-white rounded-xl border-2 border-blue-950">
         <p className="text-lg font-semibold mb-4 p-2 items-center w-full">
           Recanvis sense stock
