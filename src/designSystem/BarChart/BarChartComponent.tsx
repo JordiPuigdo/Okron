@@ -33,6 +33,7 @@ export function BarChartComponent({
         showTooltip={true} // Show tooltips on hover
         layout="vertical" // Optional: Vertical layout for bars
         showLegend={showLegend} // Show or hide legend
+        noDataText="No hi ha resultats amb aquests filtres"
       />
     </div>
   );
