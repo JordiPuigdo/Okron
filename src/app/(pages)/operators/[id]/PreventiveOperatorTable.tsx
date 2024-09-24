@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Preventive } from "app/interfaces/Preventive";
-import { time } from "console";
 
 interface PreventiveOperatorTableProps {
   title: string;

@@ -34,7 +34,7 @@ import SparePart from "app/interfaces/SparePart";
 import { SvgSpinner } from "app/icons/icons";
 import WorkOrderOperatorComments from "components/operator/WorkOrderCommentOperator";
 import WorkOrderOperatorTimesComponent from "components/operator/WorkOrderOperatorTimes";
-import { useSessionStore } from "app/stores/globalStore";
+import { useGlobalStore, useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
 import ChooseElement from "components/ChooseElement";
 import { CostsObject } from "components/Costs/CostsObject";
@@ -42,6 +42,7 @@ import CompleteInspectionPoints from "components/inspectionPoint/CompleteInspect
 import WorkOrderButtons from "./WorkOrderButtons";
 import { Button } from "designSystem/Button/Buttons";
 import useRoutes from "app/utils/useRoutes";
+import ModalGenerateCorrective from "app/(pages)/corrective/components/ModalGenerateCorrective";
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -68,7 +69,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
-
+  const { isModalOpen, setIsModalOpen } = useGlobalStore((state) => state);
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
@@ -103,7 +104,6 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     WorkOrderComment[]
   >([]);
   const [workOrderEvents, setWorkOrderEvents] = useState<WorkOrderEvents[]>([]);
-
   const [selectedOperators, setSelectedOperators] = useState<Operator[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [isFinished, setIsFinished] = useState(false);
@@ -116,6 +116,14 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const { operatorLogged } = useSessionStore((state) => state);
   const [workOrderTimeExceeded, setWorkOrderTimeExceeded] =
     useState<boolean>(false);
+
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    if (!isModalOpen) {
+      setShowModal(false);
+    }
+  }, [isModalOpen]);
 
   async function fetchWorkOrder() {
     await workOrderService
@@ -567,7 +575,6 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           <div className="py-4 flex gap-2">
             {loginUser?.permission == UserPermission.Administrator && (
               <>
-                {" "}
                 <Button
                   onClick={() => handleSubmitForm()}
                   type="create"
@@ -619,16 +626,25 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                       )}
                     </Button>
                   )}
+                {currentWorkOrder?.workOrderType == WorkOrderType.Preventive &&
+                  currentWorkOrder?.preventive?.id != undefined && (
+                    <Button
+                      type="none"
+                      className="bg-red-700 hover:bg-red-900 text-white font-semibold p2- rounded-l"
+                      customStyles="flex"
+                      onClick={() => {
+                        setShowModal(true);
+                      }}
+                    >
+                      Crear Avaria
+                    </Button>
+                  )}
               </>
             )}
           </div>
         </form>
       </>
     );
-  };
-
-  const handleTabClick = (tab: Tab) => {
-    setActiveTab(tab);
   };
 
   const availableTabs = Object.values(Tab).filter((tab) => {
@@ -731,6 +747,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                   StateWorkOrder.PendingToValidate ||
                 currentWorkOrder.stateWorkOrder == StateWorkOrder.Waiting
               }
+              workOrder={currentWorkOrder}
             />
           )}
           {currentWorkOrder.workOrderType === WorkOrderType.Corrective && (
@@ -807,6 +824,14 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             </div>
           )}
       </div>
+      {showModal && (
+        <ModalGenerateCorrective
+          assetId={currentWorkOrder?.asset?.id!}
+          description={currentWorkOrder.description}
+          stateWorkOrder={StateWorkOrder.OnGoing}
+          operatorIds={currentWorkOrder?.operatorId}
+        />
+      )}
     </>
   );
 };
