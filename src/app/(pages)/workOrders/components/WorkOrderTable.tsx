@@ -139,7 +139,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     useState<ResponseMessage | null>(null);
 
   const [selectedAssetId, setSelectedAssetId] = useState<string>(assetId!);
-
+  const [firstLoad, setFirstLoad] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
@@ -170,9 +170,14 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
       }
     };
 
+    const fetchWorkOrders = async () => {
+      await searchWorkOrders();
+    };
+
     if (assetId == undefined) fetchAssets();
     if (operatorId !== undefined) handleSearch();
-    searchWorkOrders();
+    fetchWorkOrders();
+    setFirstLoad(false);
   }, []);
 
   useEffect(() => {
@@ -207,7 +212,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     };
     setFilterWorkOrders(filters);
     const workOrders = await workOrderService.getWorkOrdersWithFilters(search);
-    if (workOrders.length == 0) {
+    if (workOrders.length == 0 && !firstLoad) {
       setMessage("No hi ha ordres disponibles amb aquests filtres");
 
       setTimeout(() => {

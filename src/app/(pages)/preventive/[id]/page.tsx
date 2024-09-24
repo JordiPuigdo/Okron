@@ -289,7 +289,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
                 preventiveSelectedInspectionPoints={selectedInspectionPoints}
               />
               <ChooseOperatorV2
-                availableOperators={operators}
+                availableOperators={operators.filter((x) => x.active == true)}
                 preventiveSelectedOperators={selectedOperator}
                 onDeleteSelectedOperator={handleDeleteSelectedOperator}
                 onSelectedOperator={handleSelectedOperator}

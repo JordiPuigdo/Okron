@@ -315,7 +315,7 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
             </label>
             {operators !== undefined && operators.length > 0 && (
               <ChooseElement
-                elements={operators}
+                elements={operators.filter((x) => x.active == true)}
                 selectedElements={selectedOperator}
                 onElementSelected={handleSelectedOperator}
                 onDeleteElementSelected={handleDeleteSelectedOperator}
