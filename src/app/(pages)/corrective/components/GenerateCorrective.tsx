@@ -61,6 +61,8 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const { loginUser } = useSessionStore((state) => state);
+  const [descriptionCorrective, setDescriptionCorrective] =
+    useState(description);
 
   const { operators, fetchAllOperators } = useOperatorHook();
 
@@ -227,7 +229,8 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
               name="description"
               className="p-3 border border-gray-300 rounded-md w-full"
               placeholder="Descripció del correctiu"
-              value={description != undefined ? description : ""}
+              onChange={(e) => setDescriptionCorrective(e.target.value)}
+              value={descriptionCorrective!}
             />
           </div>
         </div>
