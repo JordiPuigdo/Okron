@@ -1,13 +1,15 @@
-import React, { useState } from "react";
-import {
+import React, { useEffect, useState } from "react";
+import WorkOrder, {
   ResultInspectionPoint,
   SaveInspectionResultPointRequest,
+  StateWorkOrder,
   WorkOrderInspectionPoint,
 } from "app/interfaces/workOrder";
 import WorkOrderService from "app/services/workOrderService";
 import { SvgSpinner } from "app/icons/icons";
-import { useSessionStore } from "app/stores/globalStore";
+import { useGlobalStore, useSessionStore } from "app/stores/globalStore";
 import { checkAllInspectionPoints } from "app/utils/utilsInspectionPoints";
+import ModalGenerateCorrective from "app/(pages)/corrective/components/ModalGenerateCorrective";
 
 interface CompleteInspectionPointsProps {
   workOrderInspectionPoints: WorkOrderInspectionPoint[];
@@ -16,6 +18,7 @@ interface CompleteInspectionPointsProps {
   >;
   workOrderId: string;
   isFinished: boolean;
+  workOrder?: WorkOrder;
 }
 
 const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
@@ -23,13 +26,22 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
   setCompletedWorkOrderInspectionPoints,
   workOrderId,
   isFinished,
+  workOrder,
 }) => {
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
-
+  const [description, setDescription] = useState<string | null>(null);
   const { operatorLogged } = useSessionStore((state) => state);
+  const { isModalOpen, setIsModalOpen } = useGlobalStore((state) => state);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    if (!isModalOpen) {
+      setShowModal(false);
+    }
+  }, [isModalOpen]);
 
   const handleSelectInspectionPoint = async (
     inspectionPoint: WorkOrderInspectionPoint,
@@ -70,6 +82,13 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
       [inspectionPoint.id]: false,
     }));
   };
+
+  /*useEffect(() => {
+    debugger;
+    if (isModalOpen && description != null) {
+      setDescription(null);
+    }
+  }, [isModalOpen]);*/
 
   const handleResetInspectionPoint = async (
     inspectionPoint: WorkOrderInspectionPoint
@@ -155,6 +174,9 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
               <th className="p-2 text-center text-sm font-medium text-gray-500 uppercase tracking-wider">
                 Reset
               </th>
+              <th className="p-2 text-center text-sm font-medium text-gray-500 uppercase tracking-wider">
+                Avaria
+              </th>
             </tr>
           </thead>
 
@@ -202,11 +224,33 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
                     {isLoading[inspectionPoint.id] && <SvgSpinner />}
                   </button>
                 </td>
+                <td>
+                  <button
+                    type="button"
+                    className="border border-gray-700 rounded-xl p-2 gap-2 bg-red-700 text-white w-full text-lg flex items-center justify-center"
+                    onClick={() => {
+                      setDescription(
+                        inspectionPoint.inspectionPoint.description
+                      );
+                      setShowModal(true);
+                    }}
+                  >
+                    Crear
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {showModal && (
+        <ModalGenerateCorrective
+          assetId={workOrder?.asset?.id!}
+          description={description != null ? description : ""}
+          stateWorkOrder={StateWorkOrder.OnGoing}
+          operatorIds={workOrder?.operatorId}
+        />
+      )}
     </div>
   );
 };

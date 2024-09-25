@@ -3,27 +3,25 @@ import { useState } from "react";
 import { SIDENAV_ITEMS } from "./SideNavItems";
 import Link from "next/link";
 import { useSessionStore } from "app/stores/globalStore";
-import { SvgSpinner } from "app/icons/icons";
+import { SvgArrowDown, SvgArrowRight, SvgSpinner } from "app/icons/icons";
 
-const SideNav = () => {
+type SideNavProps = {
+  setOpenMenu: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const SideNav: React.FC<SideNavProps> = ({ setOpenMenu }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { loginUser } = useSessionStore((state) => state);
 
+  const handleMenuClick = () => {
+    setOpenMenu(!menuOpen);
+    setMenuOpen(!menuOpen);
+  };
+
   return (
     <div className="flex flex-col md:px-4">
-      <Link
-        className="flex items-center font-semibold text-lg text-white p-1 hover:bg-purple-900 rounded-md"
-        href={"/menu"}
-        onClick={() => setIsLoading(true)}
-      >
-        Okron
-        {isLoading && (
-          <span className="ml-2 text-xs text-white">
-            <SvgSpinner className="w-6 h-6" />
-          </span>
-        )}
-      </Link>
-      <div className="pt-4 ">
+      <div className="pt-14 ">
         {SIDENAV_ITEMS.map((item, idx) => {
           return (
             <>
@@ -61,10 +59,11 @@ const MenuItem = ({
           <>
             <button onClick={toggleSubMenu} className="w-full">
               <div className="flex flex-row items-center">
-                <span className="font-semibold text-l flex text-white p-1 w-full hover:bg-purple-900 rounded-md items-center">
+                <span className="font-semibold text-l flex text-gray-700 p-1 w-full hover:text-purple-900 rounded-md items-center">
                   {item.icon && <item.icon className="mr-2 " />}
                   {item.title}
                 </span>
+                {subMenuOpen ? <SvgArrowDown /> : <SvgArrowRight />}
               </div>
             </button>
 
@@ -76,7 +75,7 @@ const MenuItem = ({
                       <span
                         className={`${
                           isLoading[subItem.key] ? "text-sm" : "text-sm"
-                        } font-semibold text-white flex p-1 hover:bg-purple-900 rounded-md items-center`}
+                        } font-semibold text-gray-700 flex p-1 hover:text-purple-900 rounded-md items-center`}
                         onClick={() => {
                           onClick && onClick();
                           setIsLoading((prevLoading) => ({
@@ -100,7 +99,7 @@ const MenuItem = ({
         ) : (
           <Link href={item.path}>
             <span
-              className="font-semibold text-l flex text-white p-1 hover:bg-purple-900 rounded-md items-center"
+              className="font-semibold text-l flex text-gray-700 p-1 w-full hover:text-purple-900 rounded-md items-center"
               onClick={() => {
                 onClick && onClick();
                 setIsLoading((prevLoading) => ({

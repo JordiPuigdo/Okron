@@ -1,14 +1,15 @@
 "use client";
 
-import { SvgSpinner } from "app/icons/icons";
+import { SvgClose, SvgSpinner } from "app/icons/icons";
 import { Preventive } from "app/interfaces/Preventive";
 import { UserPermission } from "app/interfaces/User";
 import PreventiveService from "app/services/preventiveService";
 import WorkOrderService from "app/services/workOrderService";
-import { useSessionStore } from "app/stores/globalStore";
+import { useGlobalStore, useSessionStore } from "app/stores/globalStore";
 import { formatDate } from "app/utils/utils";
 import { Button } from "designSystem/Button/Buttons";
-import { useState } from "react";
+import { Modal } from "designSystem/Modals/Modal";
+import { useEffect, useState } from "react";
 
 interface PreventiveCreateds {
   key: Preventive;
@@ -20,7 +21,7 @@ const GeneratePreventive = () => {
   const [preventivesCreated, setPreventivesCreated] = useState<
     Preventive[] | null
   >([]);
-
+  const [showModal, setShowModal] = useState<boolean>(false);
   const preventiveService = new PreventiveService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
@@ -29,8 +30,15 @@ const GeneratePreventive = () => {
   );
 
   const { loginUser } = useSessionStore((state) => state);
+  const { setIsModalOpen } = useGlobalStore((state) => state);
 
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    if (preventivesCreated != null && preventivesCreated?.length > 0) {
+      setShowModal(true);
+    }
+  }, [preventivesCreated]);
 
   const generateWorkOrders = async () => {
     setIsLoading(true);
@@ -47,9 +55,9 @@ const GeneratePreventive = () => {
       });
       setPreventivesCreated(prevCreat.map((x) => x.key));
       workOrderService.cleanCache();
-      setTimeout(() => {
+      /*  setTimeout(() => {
         setPreventivesCreated([]);
-      }, 10000);
+      }, 10000);*/
     } else {
       setMessage("Avui no hi ha revisions per crear");
       setTimeout(() => {
@@ -62,33 +70,55 @@ const GeneratePreventive = () => {
   if (loginUser?.permission == UserPermission.Administrator)
     return (
       <>
-        <div className="flex flex-col gap-1 ">
+        <Modal
+          type="center"
+          height="h-auto"
+          width="w-full"
+          className="max-w-sm mx-auto"
+          isVisible={showModal}
+          avoidClosing={true}
+        >
+          <>
+            <div className="bg-blue-950 p-4 rounded-lg shadow-md w-full">
+              <div className="relative bg-white">
+                <div className="absolute p-2 top-0 right-0 justify-end hover:cursor-pointer">
+                  <SvgClose
+                    onClick={() => {
+                      setIsModalOpen(false);
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+            {preventivesCreated != undefined &&
+              preventivesCreated?.length > 0 && (
+                <>
+                  <p className="text-white font-semibold">
+                    {(preventivesCreated?.length || 0 > 0) &&
+                      "Revisions creades per avui:"}
+                  </p>
+                  {preventivesCreated?.map((preventive, index) => (
+                    <div key={index}>
+                      {preventive.code} - {preventive.description}
+                    </div>
+                  ))}
+                  {message != "" && (
+                    <span className="text-red-500">{message}</span>
+                  )}
+                </>
+              )}
+          </>
+        </Modal>
+        <div className="flex items-center">
           <Button
             type="others"
             onClick={generateWorkOrders}
-            className="bg-orange-500 text-sm text-white p-2 rounded-md font-semibold hover:bg-orange-600 "
+            className="bg-orange-500 text-sm text-white rounded-md font-semibold hover:bg-orange-600 "
             customStyles="flex"
           >
             Generar Revisions {formatDate(new Date(), false, false)}
             {isLoading && <SvgSpinner className="w-6 h-6" />}
           </Button>
-          {preventivesCreated != undefined &&
-            preventivesCreated?.length > 0 && (
-              <>
-                <p className="text-black font-semibold">
-                  {(preventivesCreated?.length || 0 > 0) &&
-                    "Revisions creades per avui:"}
-                </p>
-                {preventivesCreated?.map((preventive, index) => (
-                  <div key={index}>
-                    {preventive.code} - {preventive.description}
-                  </div>
-                ))}
-                {message != "" && (
-                  <span className="text-red-500">{message}</span>
-                )}
-              </>
-            )}
         </div>
       </>
     );

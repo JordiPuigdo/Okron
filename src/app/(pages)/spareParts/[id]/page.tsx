@@ -304,6 +304,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                       className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     />
                   </div>
+
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-600">
                       Actiu

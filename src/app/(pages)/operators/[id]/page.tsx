@@ -6,6 +6,12 @@ import Operator, { OperatorType } from "app/interfaces/Operator";
 import { BaseSyntheticEvent, useEffect, useState } from "react";
 import OperatorService from "app/services/operatorService";
 import Container from "components/layout/Container";
+import {
+  AssignOperatorToPreventivesRequest,
+  Preventive,
+} from "app/interfaces/Preventive";
+import PreventiveService from "app/services/preventiveService";
+import PreventiveAssignment from "./PreventiveAssignament";
 
 export default function EditOperatorPage({
   params,
@@ -15,9 +21,19 @@ export default function EditOperatorPage({
   const operatorService = new OperatorService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
+  const preventiveService = new PreventiveService(
+    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  );
   const [isUpdateSuccessful, setIsUpdateSuccessful] = useState<boolean | null>(
     null
   );
+
+  const [operatorPreventives, setOperatorPreventives] = useState<
+    Preventive[] | null
+  >(null);
+
+  const [preventives, setPreventives] = useState<Preventive[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchOperatorData = async () => {
     try {
@@ -28,6 +44,27 @@ export default function EditOperatorPage({
       return operatorData;
     } catch (error) {
       console.error("Error fetching operator data:", error);
+      return null;
+    }
+  };
+
+  const fetchOperatorPreventives = async () => {
+    try {
+      const operatorPreventives =
+        await preventiveService.getPreventiveByOperatorId(params.id as string);
+      return operatorPreventives;
+    } catch (error) {
+      console.error("Error fetching operator preventives:", error);
+      return null;
+    }
+  };
+
+  const fetchPreventives = async () => {
+    try {
+      const preventives = await preventiveService.getPreventives();
+      return preventives;
+    } catch (error) {
+      console.error("Error fetching preventives:", error);
       return null;
     }
   };
@@ -60,6 +97,17 @@ export default function EditOperatorPage({
           setOperatorData(data);
         }
       });
+      fetchOperatorPreventives().then((data) => {
+        if (data) {
+          setOperatorPreventives(data);
+        }
+      });
+      fetchPreventives().then((data) => {
+        if (data) {
+          setPreventives(data);
+        }
+      });
+      setIsLoading(false);
     }
   }, [params.id]);
 
@@ -79,6 +127,13 @@ export default function EditOperatorPage({
               history.back();
             }}
             onUpdatedSuccesfully={isUpdateSuccessful}
+          />
+        )}
+        {!isLoading && (
+          <PreventiveAssignment
+            operatorId={params.id}
+            preventives={preventives}
+            operatorPreventives={operatorPreventives}
           />
         )}
       </Container>

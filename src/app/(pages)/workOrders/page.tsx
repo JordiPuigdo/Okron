@@ -33,13 +33,18 @@ export default function WorkOrdersPage() {
   return (
     <MainLayout>
       <Container>
-        <WorkOrderTable
-          enableFilterAssets={true}
-          enableFilters={true}
-          enableEdit={true}
-          enableDelete={true}
-          enableFinalizeWorkOrdersDayBefore={true}
-        />
+        <div className="p-2">
+          <p>Menu {">"} Ordres de treball</p>
+        </div>
+        <div className="mt-2">
+          <WorkOrderTable
+            enableFilterAssets={true}
+            enableFilters={true}
+            enableEdit={true}
+            enableDelete={true}
+            enableFinalizeWorkOrdersDayBefore={true}
+          />
+        </div>
       </Container>
     </MainLayout>
   );

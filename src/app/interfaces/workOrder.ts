@@ -9,32 +9,32 @@ import { Preventive } from "./Preventive";
 
 export interface WorkOrder extends BaseModel {
   id: string;
-  code : string;
+  code: string;
   description: string;
   startTime: Date;
   endTime: Date;
   stateWorkOrder: StateWorkOrder;
-  workOrderType : WorkOrderType;
-  machineId?: string
-  machine? : Machine;
+  workOrderType: WorkOrderType;
+  machineId?: string;
+  machine?: Machine;
   workOrderInspectionPoint?: WorkOrderInspectionPoint[];
-  workOrderOperatorTimes?: WorkOrderOperatorTimes[]
+  workOrderOperatorTimes?: WorkOrderOperatorTimes[];
   operator?: Operator[];
   operatorId?: string[];
-  workOrderSpareParts?: WorkOrderSparePart[]
-  workOrderComments? : WorkOrderComment[]
-  asset? : Asset;
-  workOrderEvents? : WorkOrderEvents[];
-  preventive? : Preventive;
+  workOrderSpareParts?: WorkOrderSparePart[];
+  workOrderComments?: WorkOrderComment[];
+  asset?: Asset;
+  workOrderEvents?: WorkOrderEvents[];
+  preventive?: Preventive;
+  plannedDuration: string;
 }
 
 export default WorkOrder;
 
-export interface WorkOrderSparePart
-{
-  id : string;
-  quantity : number;
-  sparePart : SparePart;
+export interface WorkOrderSparePart {
+  id: string;
+  quantity: number;
+  sparePart: SparePart;
 }
 
 export enum StateWorkOrder {
@@ -43,15 +43,13 @@ export enum StateWorkOrder {
   Paused,
   Finished,
   Requested,
-  PendingToValidate
-
+  PendingToValidate,
 }
 
-
 export interface WorkOrderInspectionPoint {
-  id : string;
+  id: string;
   check?: boolean;
-  inspectionPoint : InspectionPoint;
+  inspectionPoint: InspectionPoint;
 }
 
 export interface WorkOrderOperatorTimes {
@@ -73,26 +71,25 @@ export interface CreateWorkOrderRequest {
   initialDateTime?: Date;
   stateWorkOrder: StateWorkOrder;
   workOrderType?: WorkOrderType;
-  machineId?: string
-  assetId?: string
+  machineId?: string;
+  assetId?: string;
   operatorId?: string[];
   inspectionPointId?: string[];
-  sparePartId?: string[]
+  sparePartId?: string[];
   userId?: string;
 }
-
 
 export interface AddWorkOrderOperatorTimes {
   WorkOrderId: string;
   startTime: Date;
-  operatorId: string
-  workOrderOperatorTimesId? : string;
+  operatorId: string;
+  workOrderOperatorTimesId?: string;
 }
 
 export interface FinishWorkOrderOperatorTimes {
   WorkOrderId: string;
   finishTime: Date;
-  operatorId: string
+  operatorId: string;
 }
 
 export interface UpdateWorkOrderOperatorTimes {
@@ -108,12 +105,12 @@ export interface DeleteWorkOrderOperatorTimes {
 }
 
 export interface SearchWorkOrderFilters {
-  machineId? : string;
-  startDateTime? : string;
-  endDateTime? : string;
-  operatorId? : string;
-  assetId? : string;
-  stateWorkOrder? : StateWorkOrder; 
+  machineId?: string;
+  startDateTime?: Date;
+  endDateTime?: Date;
+  operatorId?: string;
+  assetId?: string;
+  stateWorkOrder?: StateWorkOrder;
 }
 
 export enum WorkOrderType {
@@ -123,43 +120,43 @@ export enum WorkOrderType {
 }
 
 export interface SaveInspectionResultPointRequest {
-  WorkOrderId : string;
-  WorkOrderInspectionPointId : string
-  resultInspectionPoint : ResultInspectionPoint
-
+  WorkOrderId: string;
+  WorkOrderInspectionPointId: string;
+  resultInspectionPoint: ResultInspectionPoint;
 }
 
 export enum ResultInspectionPoint {
   Pending,
   Ok,
-  NOk
+  NOk,
 }
 
 export interface WorkOrderComment {
   id?: string;
-  creationDate : string;
-  comment : string;
-  operator : Operator;
+  creationDate: string;
+  comment: string;
+  operator: Operator;
 }
 
 export interface AddCommentToWorkOrderRequest {
-  comment : string;
-  operatorId : string;
-  workOrderId : string;
+  comment: string;
+  operatorId: string;
+  workOrderId: string;
 }
 
-export interface UpdateStateWorkOrder{
-  workOrderId : string;
-  state : StateWorkOrder;
-  operatorId? : string;
-  userId? : string; 
+export interface UpdateStateWorkOrder {
+  workOrderId: string;
+  state: StateWorkOrder;
+  operatorId?: string;
+  userId?: string;
 }
 
-export interface WorkOrderEvents{
-  id : string;
-  date : string;
-  workOrderEventType : WorkOrderEventType;
-  operator : Operator;
+export interface WorkOrderEvents {
+  id: string;
+  date: string;
+  endDate?: string;
+  workOrderEventType: WorkOrderEventType;
+  operator: Operator;
 }
 
 export enum WorkOrderEventType {
@@ -169,5 +166,5 @@ export enum WorkOrderEventType {
   Paused,
   PendingToValidate,
   Finished,
-  Created
+  Created,
 }

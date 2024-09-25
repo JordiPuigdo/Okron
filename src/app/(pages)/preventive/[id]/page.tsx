@@ -184,6 +184,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
       inspectionPointId: selectedInspectionPoints.map((point) => point),
       operatorId: selectedOperator.map((sparePart) => sparePart),
       active: preventive.active,
+      plannedDuration: "",
     };
     return updatePreventiveRequest;
   }
@@ -288,7 +289,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
                 preventiveSelectedInspectionPoints={selectedInspectionPoints}
               />
               <ChooseOperatorV2
-                availableOperators={operators}
+                availableOperators={operators.filter((x) => x.active == true)}
                 preventiveSelectedOperators={selectedOperator}
                 onDeleteSelectedOperator={handleDeleteSelectedOperator}
                 onSelectedOperator={handleSelectedOperator}

@@ -75,19 +75,17 @@ export const formatDate = (
   return `${formattedDate.replace(",", "")}`;
 };
 
-export const translateWorkOrderType = (type: any): string => {
-  switch (type) {
-    case WorkOrderType.Corrective:
-      return "Correctiu";
-    case WorkOrderType.Preventive:
-      return "Preventiu";
-    case WorkOrderType.Predicitve:
-      return "Predictiu";
-    default:
-      return "Error";
-  }
-};
+export const translateWorkOrderType = (
+  workOrderType: WorkOrderType
+): string => {
+  const translations: { [key in WorkOrderType]: string } = {
+    [WorkOrderType.Preventive]: "Preventiu",
+    [WorkOrderType.Corrective]: "Correctiu",
+    [WorkOrderType.Predicitve]: "",
+  };
 
+  return translations[workOrderType];
+};
 export const validateEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const validDomains = [
@@ -185,4 +183,22 @@ export function convertUTCDateToLocalDate(date: Date) {
   newDate.setHours(hours - offset);
 
   return newDate;
+}
+
+export function differenceBetweenDates(date1: Date, date2: Date) {
+  const diff = Math.abs(date1.getTime() - date2.getTime());
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  const pad = (num: number) => num.toString().padStart(2, "0");
+  const fullTime = `${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
+  return {
+    days,
+    hours,
+    minutes,
+    seconds,
+    fullTime,
+  };
 }

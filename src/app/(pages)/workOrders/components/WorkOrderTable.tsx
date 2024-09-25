@@ -33,6 +33,7 @@ import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
 import { OperatorType } from "app/interfaces/Operator";
 import { Button } from "designSystem/Button/Buttons";
+import { FilterWorkOrders } from "app/types/filterWorkOrders";
 
 interface WorkOrderTableProps {
   enableFilterAssets?: boolean;
@@ -102,8 +103,15 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   workOrderType,
   refresh,
 }) => {
-  const [startDate, setStartDate] = useState<Date | null>(new Date());
-  const [endDate, setEndDate] = useState<Date | null>(new Date());
+  const { operatorLogged, loginUser, setFilterWorkOrders, filterWorkOrders } =
+    useSessionStore((state) => state);
+
+  const [startDate, setStartDate] = useState<Date | null>(
+    filterWorkOrders?.startDateTime || new Date()
+  );
+  const [endDate, setEndDate] = useState<Date | null>(
+    filterWorkOrders?.endDateTime || new Date()
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string>("");
   const [workOrders, setWorkOrders] = useState<WorkOrder[] | []>([]);
@@ -121,8 +129,6 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
 
-  const { operatorLogged, loginUser } = useSessionStore((state) => state);
-
   const tableButtons: TableButtons = {
     edit: enableEdit,
     delete: enableDelete,
@@ -133,7 +139,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     useState<ResponseMessage | null>(null);
 
   const [selectedAssetId, setSelectedAssetId] = useState<string>(assetId!);
-
+  const [firstLoad, setFirstLoad] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
@@ -164,9 +170,14 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
       }
     };
 
+    const fetchWorkOrders = async () => {
+      await searchWorkOrders();
+    };
+
     if (assetId == undefined) fetchAssets();
     if (operatorId !== undefined) handleSearch();
-    searchWorkOrders();
+    fetchWorkOrders();
+    setFirstLoad(false);
   }, []);
 
   useEffect(() => {
@@ -176,29 +187,18 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   }, [refresh, workOrderType]);
 
   const searchWorkOrders = async () => {
-    const startDateTime = startDate ? new Date(startDate) : null;
-    const endDateTime = endDate ? new Date(endDate) : null;
-    const machineId = 0;
-
-    if (startDateTime) {
-      startDateTime.setHours(0, 0, 0, 0);
-    }
-    if (endDateTime) {
-      endDateTime.setHours(23, 59, 59, 999);
-    }
     const search: SearchWorkOrderFilters = {
       assetId: "",
       operatorId: operatorId || "",
-      startDateTime: startDateTime
-        ? new Date(
-            startDateTime.getTime() - startDateTime.getTimezoneOffset() * 60000
-          ).toISOString()
-        : "",
-      endDateTime: endDateTime
-        ? new Date(
-            endDateTime.getTime() - endDateTime.getTimezoneOffset() * 60000
-          ).toISOString()
-        : "",
+      startDateTime:
+        filterWorkOrders?.startDateTime &&
+        filterWorkOrders.startDateTime == startDate
+          ? filterWorkOrders.startDateTime
+          : startDate!,
+      endDateTime:
+        filterWorkOrders?.endDateTime && filterWorkOrders.endDateTime == endDate
+          ? filterWorkOrders.endDateTime
+          : endDate!,
     };
 
     if (operatorLogged?.operatorLoggedType == OperatorType.Quality) {
@@ -206,9 +206,13 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
       search.startDateTime = undefined;
       search.endDateTime = undefined;
     }
-
+    const filters: FilterWorkOrders = {
+      startDateTime: startDate!,
+      endDateTime: endDate!,
+    };
+    setFilterWorkOrders(filters);
     const workOrders = await workOrderService.getWorkOrdersWithFilters(search);
-    if (workOrders.length == 0) {
+    if (workOrders.length == 0 && !firstLoad) {
       setMessage("No hi ha ordres disponibles amb aquests filtres");
 
       setTimeout(() => {
@@ -226,7 +230,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 
   const renderFilterWorkOrders = () => {
     return (
-      <div className="bg-white my-4 rounded-xl gap-4 p-2 shadow-md">
+      <div className="bg-white  rounded-xl gap-4 p-2 shadow-md">
         <div className="flex gap-4 my-4 items-center">
           <div className="flex items-center">
             <label htmlFor="startDate" className="mr-2">
@@ -494,19 +498,21 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 
   return (
     <>
-      {enableFilters && renderFilterWorkOrders()}
-      <DataTable
-        columns={columns}
-        data={filteredWorkOrders}
-        tableButtons={tableButtons}
-        entity={EntityTable.WORKORDER}
-        onDelete={handleDeleteOrder}
-        enableFilterActive={false}
-        enableCheckbox={
-          operatorLogged?.operatorLoggedType == OperatorType.Quality
-        }
-        onChecked={handleOnChecked}
-      />
+      <div className="flex flex-col gap-4">
+        {enableFilters && renderFilterWorkOrders()}
+        <DataTable
+          columns={columns}
+          data={filteredWorkOrders}
+          tableButtons={tableButtons}
+          entity={EntityTable.WORKORDER}
+          onDelete={handleDeleteOrder}
+          enableFilterActive={false}
+          enableCheckbox={
+            operatorLogged?.operatorLoggedType == OperatorType.Quality
+          }
+          onChecked={handleOnChecked}
+        />
+      </div>
       {filteredWorkOrders.length > 0 &&
         operatorLogged?.operatorLoggedType == OperatorType.Quality && (
           <div className="py-4 flex flex-row gap-2">

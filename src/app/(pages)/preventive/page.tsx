@@ -69,7 +69,12 @@ function PreventivePage() {
   return (
     <MainLayout>
       <Container>
-        <div className="flex flex-row gap-3 items-start">
+        <div className="p-2">
+          <p>
+            Menu {">"} Revisions {">"} Configuració
+          </p>
+        </div>
+        <div className="flex flex-row gap-3 items-start mt-2">
           <Button
             type="create"
             href={`/preventive/preventiveForm`}

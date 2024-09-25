@@ -5,6 +5,7 @@ import { UserPermission } from "app/interfaces/User";
 import WorkOrderService from "app/services/workOrderService";
 import { useSessionStore } from "app/stores/globalStore";
 import { formatDate } from "app/utils/utils";
+import { Button } from "designSystem/Button/Buttons";
 import { useState } from "react";
 
 interface FinalizeWorkOrdersDaysBeforeProps {
@@ -30,13 +31,14 @@ const FinalizeWorkOrdersDaysBefore: React.FC<
 
   if (loginUser?.permission != UserPermission.Administrator) return <></>;
   return (
-    <button
-      type="button"
-      className="bg-orange-500 text-sm text-white p-2 rounded-md font-semibold hover:bg-orange-600 justifty-center flex items-center justify-center"
-      onClick={(e) => handleFinalizeWorkOrdersDayBefore()}
-    >
-      Finalitzar Ordres{isLoading && <SvgSpinner />}
-    </button>
+    <div className="flex items-center">
+      <Button
+        customStyles="bg-orange-500 text-sm text-white rounded-md font-semibold hover:bg-orange-600 justifty-center flex items-center "
+        onClick={(e) => handleFinalizeWorkOrdersDayBefore()}
+      >
+        Finalitzar Ordres{isLoading && <SvgSpinner />}
+      </Button>
+    </div>
   );
 };
 

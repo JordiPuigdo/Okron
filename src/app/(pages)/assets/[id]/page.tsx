@@ -160,8 +160,8 @@ export default function AssetDetailsPage({
     try {
       const workOrders = await workOrderService.getWorkOrdersWithFilters({
         assetId: id,
-        startDateTime: startDate!.toISOString(),
-        endDateTime: endDate!.toISOString(),
+        startDateTime: startDate!,
+        endDateTime: endDate!,
       });
       return workOrders;
     } catch (error) {

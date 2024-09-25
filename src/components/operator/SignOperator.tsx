@@ -53,30 +53,36 @@ export default function SignOperator() {
   }
 
   return (
-    <div className="flex flex-row gap-4 items-center bg-white rounded-xl p-4 font-semibold">
-      <input
-        type="text"
-        placeholder="Codi Operari"
-        className="rounded-sm text-sm"
-        value={codeOperator}
-        onChange={(e) => setCodeOperator(e.target.value)}
-        onKeyUp={(e) => {
-          if (e.key === "Enter") {
-            signOperator();
-          }
-        }}
-      />
-      <Button
-        customStyles={` ${
-          operatorLogged?.codeOperatorLogged ? "bg-blue-500 " : "bg-red-500 "
-        } rounded-md p-2 text-white text-sm hover:${
-          operatorLogged?.codeOperatorLogged ? "bg-blue-700" : "bg-red-700"
-        }`}
-        onClick={signOperator}
-      >
-        {operatorLogged?.codeOperatorLogged ? "Desfitxar" : "Fitxar"}
-      </Button>
-      <p className="text-red-500">{errorSign && errorSign}</p>
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-4">
+        <input
+          type="text"
+          placeholder="Codi Operari"
+          className="rounded-sm text-sm"
+          value={codeOperator}
+          onChange={(e) => setCodeOperator(e.target.value)}
+          onKeyUp={(e) => {
+            if (e.key === "Enter") {
+              signOperator();
+            }
+          }}
+        />
+        <Button
+          customStyles={` ${
+            operatorLogged?.codeOperatorLogged ? "bg-blue-500 " : "bg-red-500 "
+          } rounded-md text-white text-sm justifty-center flex items-center hover:${
+            operatorLogged?.codeOperatorLogged ? "bg-blue-700" : "bg-red-700"
+          }`}
+          onClick={signOperator}
+        >
+          {operatorLogged?.codeOperatorLogged ? "Desfitxar" : "Fitxar"}
+        </Button>
+      </div>
+      {errorSign && (
+        <div className="flex px-2">
+          <p className="text-red-500">{errorSign}</p>
+        </div>
+      )}
     </div>
   );
 }

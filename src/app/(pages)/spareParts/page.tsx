@@ -10,11 +10,16 @@ function SparePartsPage() {
   return (
     <MainLayout>
       <Container>
-        <SparePartTable
-          enableFilters={true}
-          enableEdit={loginUser?.permission == UserPermission.Administrator}
-          enableDelete={loginUser?.permission == UserPermission.Administrator}
-        />
+        <div className="p-2">
+          <p>Menu {">"} Recanvis</p>
+        </div>
+        <div className="mt-2">
+          <SparePartTable
+            enableFilters={true}
+            enableEdit={loginUser?.permission == UserPermission.Administrator}
+            enableDelete={loginUser?.permission == UserPermission.Administrator}
+          />
+        </div>
       </Container>
     </MainLayout>
   );

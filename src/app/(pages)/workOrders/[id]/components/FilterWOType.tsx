@@ -24,11 +24,11 @@ export default function FilterWOType({ onClick }: FilterWOTypeProps) {
     }
   }
   return (
-    <div className="flex flex-row gap-4 items-center bg-white rounded-xl p-4 font-semibold  hover:cursor-pointer">
+    <div className="flex flex-row gap-4 items-center bg-white rounded-xl font-semibold  hover:cursor-pointer">
       <span
         className={`text-white rounded-full p-3 w-full text-center hover:bg-okron-btDeleteHover font-semibold  ${
           workOrderType == WorkOrderType.Corrective
-            ? "bg-okron-btDeleteHover"
+            ? "bg-okron-correctiveSelected"
             : "bg-okron-corrective"
         }`}
         onClick={() => handleChange(WorkOrderType.Corrective)}
@@ -38,7 +38,7 @@ export default function FilterWOType({ onClick }: FilterWOTypeProps) {
       <span
         className={`text-white rounded-full p-3 w-full text-center hover:bg-okron-btCreateHover font-semibold hover:cursor-pointer ${
           workOrderType == WorkOrderType.Preventive
-            ? "bg-okron-btCreateHover"
+            ? "bg-okron-preventiveSelected"
             : "bg-okron-preventive"
         }`}
         onClick={() => handleChange(WorkOrderType.Preventive)}

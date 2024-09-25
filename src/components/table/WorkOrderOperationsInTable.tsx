@@ -1,3 +1,4 @@
+import { useSparePartsHook } from "app/hooks/useSparePartsHook";
 import {
   SvgCheck,
   SvgClose,
@@ -312,35 +313,35 @@ export const SparePartsModal = ({
 }: SparePartsModalProps) => {
   const { setIsModalOpen } = useGlobalStore((state) => state);
 
+  const { spareParts, sparePartsError, fetchSpareParts } = useSparePartsHook();
+
   const [selectedSpareParts, setSelectedSpareParts] = useState<
     WorkOrderSparePart[]
   >([]);
 
-  const sparePartService = new SparePartService(
-    process.env.NEXT_PUBLIC_API_BASE_URL!
-  );
-  const [availableSpareParts, setAvailableSpareParts] = useState<SparePart[]>(
-    []
-  );
-
-  useEffect(() => {
-    async function fetchSpareParts() {
-      await sparePartService.getSpareParts().then((x) => {
-        setAvailableSpareParts(x);
-      });
-    }
+  /* useEffect(() => {
     fetchSpareParts();
-
     if (workOrder.workOrderSpareParts) {
       setSelectedSpareParts(workOrder.workOrderSpareParts);
     }
-  }, []);
+    console.log(spareParts);
+  }, []);*/
 
   useEffect(() => {
     workOrder.workOrderSpareParts?.forEach((x) => {
       setSelectedSpareParts((prevSelected) => [...prevSelected, x]);
     });
   }, [selectedSpareParts]);
+
+  useEffect(() => {
+    if (spareParts) {
+      console.log(spareParts);
+    }
+  }, [spareParts]);
+
+  if (sparePartsError) {
+    return <div>Error loading spare parts: {sparePartsError.message}</div>;
+  }
 
   return (
     <>
@@ -360,9 +361,9 @@ export const SparePartsModal = ({
                 }}
               />
             </div>
-            {availableSpareParts.length > 0 ? (
+            {spareParts != undefined && spareParts.length > 0 ? (
               <ChooseSpareParts
-                availableSpareParts={availableSpareParts}
+                availableSpareParts={spareParts}
                 selectedSpareParts={selectedSpareParts!}
                 setSelectedSpareParts={setSelectedSpareParts}
                 WordOrderId={workOrder.id}
