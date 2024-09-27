@@ -191,7 +191,7 @@ export default function DashboardPage() {
         } else {
           const workOrderTypeChartProps: WorkOrderTypeChartProps = {
             workOrderType: workOrderType,
-            value: 0,
+            value: 1,
             index: translateWorkOrderType(workOrderType),
           };
           workOrderTypeMap.set(workOrderType, workOrderTypeChartProps);

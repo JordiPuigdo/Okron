@@ -105,13 +105,8 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 }) => {
   const { operatorLogged, loginUser, setFilterWorkOrders, filterWorkOrders } =
     useSessionStore((state) => state);
-
-  const [startDate, setStartDate] = useState<Date | null>(
-    filterWorkOrders?.startDateTime || new Date()
-  );
-  const [endDate, setEndDate] = useState<Date | null>(
-    filterWorkOrders?.endDateTime || new Date()
-  );
+  const [startDate, setStartDate] = useState<Date | null>(new Date());
+  const [endDate, setEndDate] = useState<Date | null>(new Date());
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string>("");
   const [workOrders, setWorkOrders] = useState<WorkOrder[] | []>([]);
@@ -186,20 +181,43 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     }
   }, [refresh, workOrderType]);
 
+  function getStartDateTime() {
+    if (filterWorkOrders?.startDateTime !== undefined) {
+      if (firstLoad) {
+        setStartDate(filterWorkOrders.startDateTime);
+        return filterWorkOrders?.startDateTime;
+      } else {
+        return startDate;
+      }
+    }
+    return startDate;
+  }
+
+  function getEndDateTime() {
+    if (filterWorkOrders?.endDateTime !== undefined) {
+      if (firstLoad) {
+        setEndDate(filterWorkOrders.endDateTime);
+        return filterWorkOrders.endDateTime;
+      } else {
+        return endDate;
+      }
+    }
+    return endDate;
+  }
+
   const searchWorkOrders = async () => {
-    const search: SearchWorkOrderFilters = {
-      assetId: "",
-      operatorId: operatorId || "",
-      startDateTime:
-        filterWorkOrders?.startDateTime &&
-        filterWorkOrders.startDateTime == startDate
-          ? filterWorkOrders.startDateTime
-          : startDate!,
-      endDateTime:
-        filterWorkOrders?.endDateTime && filterWorkOrders.endDateTime == endDate
-          ? filterWorkOrders.endDateTime
-          : endDate!,
-    };
+    let search: SearchWorkOrderFilters;
+    try {
+      search = {
+        assetId: "",
+        operatorId: operatorId || "",
+        startDateTime: getStartDateTime()!,
+        endDateTime: getEndDateTime()!,
+      };
+    } catch (error) {
+      console.error("Error fetching work orders:", error);
+      return;
+    }
 
     if (operatorLogged?.operatorLoggedType == OperatorType.Quality) {
       search.stateWorkOrder = StateWorkOrder.PendingToValidate;

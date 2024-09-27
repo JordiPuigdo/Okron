@@ -63,6 +63,9 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
   const { loginUser } = useSessionStore((state) => state);
   const [descriptionCorrective, setDescriptionCorrective] =
     useState(description);
+  const [stateCorrective, setStateCorrective] = useState<StateWorkOrder>(
+    stateWorkOrder ?? StateWorkOrder.Waiting
+  );
 
   const { operators, fetchAllOperators } = useOperatorHook();
 
@@ -283,7 +286,10 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
               id="stateWorkOrder"
               name="stateWorkOrder"
               className="p-3 border border-gray-300 rounded-md w-full"
-              value={stateWorkOrder != undefined ? stateWorkOrder : 0}
+              onChange={(e) =>
+                setStateCorrective(e.target.value as unknown as StateWorkOrder)
+              }
+              value={stateCorrective}
             >
               <option value={StateWorkOrder.OnGoing}>
                 {translateStateWorkOrder(StateWorkOrder.OnGoing)}

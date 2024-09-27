@@ -83,13 +83,6 @@ const CompleteInspectionPoints: React.FC<CompleteInspectionPointsProps> = ({
     }));
   };
 
-  /*useEffect(() => {
-    debugger;
-    if (isModalOpen && description != null) {
-      setDescription(null);
-    }
-  }, [isModalOpen]);*/
-
   const handleResetInspectionPoint = async (
     inspectionPoint: WorkOrderInspectionPoint
   ) => {
