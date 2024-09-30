@@ -409,7 +409,10 @@ const DataTable: React.FC<DataTableProps> = ({
                 </Link>
               )}
               {entity == EntityTable.PREVENTIVE && (
-                <PreventiveButtons preventive={item} />
+                <PreventiveButtons
+                  preventive={item}
+                  userId={loginUser!.agentId}
+                />
               )}
             </div>
           )}

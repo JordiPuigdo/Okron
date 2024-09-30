@@ -5,9 +5,13 @@ import { useState } from "react";
 
 interface PreventiveButtonsProps {
   preventive: Preventive;
+  userId: string;
 }
 
-export const PreventiveButtons = ({ preventive }: PreventiveButtonsProps) => {
+export const PreventiveButtons = ({
+  preventive,
+  userId,
+}: PreventiveButtonsProps) => {
   const preventiveService = new PreventiveService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
@@ -15,7 +19,7 @@ export const PreventiveButtons = ({ preventive }: PreventiveButtonsProps) => {
   const handleForceExecute = async (id: string) => {
     setIsLoading(true);
     await preventiveService
-      .ForceExecutePreventive(id)
+      .ForceExecutePreventive(id, userId)
       .then((data) => {
         setIsLoading(false);
       })

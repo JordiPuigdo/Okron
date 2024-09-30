@@ -42,8 +42,9 @@ const GeneratePreventive = () => {
 
   const generateWorkOrders = async () => {
     setIsLoading(true);
-    const preventives =
-      await preventiveService.CreateWorkOrderPreventivePerDay();
+    const preventives = await preventiveService.CreateWorkOrderPreventivePerDay(
+      loginUser!.agentId
+    );
     if (preventives?.length! > 0) {
       const prevCreat: PreventiveCreateds[] = [];
       preventives?.forEach((x) => {
@@ -74,14 +75,14 @@ const GeneratePreventive = () => {
           type="center"
           height="h-auto"
           width="w-full"
-          className="max-w-sm mx-auto"
+          className="max-w-lg mx-auto border-4 border-blue-950 p-2"
           isVisible={showModal}
           avoidClosing={true}
         >
           <>
-            <div className="bg-blue-950 p-4 rounded-lg shadow-md w-full">
+            <div className="rounded-lg shadow-md w-full">
               <div className="relative bg-white">
-                <div className="absolute p-2 top-0 right-0 justify-end hover:cursor-pointer">
+                <div className="absolute top-0 right-0 justify-end hover:cursor-pointer">
                   <SvgClose
                     onClick={() => {
                       setIsModalOpen(false);
@@ -93,9 +94,9 @@ const GeneratePreventive = () => {
             {preventivesCreated != undefined &&
               preventivesCreated?.length > 0 && (
                 <>
-                  <p className="text-white font-semibold">
+                  <p className="text-black font-semibold">
                     {(preventivesCreated?.length || 0 > 0) &&
-                      "Revisions creades per avui:"}
+                      "Revisions creades:"}
                   </p>
                   {preventivesCreated?.map((preventive, index) => (
                     <div key={index}>

@@ -181,13 +181,23 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     }
   }, [refresh, workOrderType]);
 
+  function isValidDate(d: any): boolean {
+    return d instanceof Date && !isNaN(d.getTime());
+  }
+
   function getStartDateTime() {
+    debugger;
     if (filterWorkOrders?.startDateTime !== undefined) {
-      if (firstLoad) {
-        setStartDate(filterWorkOrders.startDateTime);
-        return filterWorkOrders?.startDateTime;
+      const startDateTime = new Date(filterWorkOrders.startDateTime);
+      if (isValidDate(startDateTime)) {
+        if (firstLoad) {
+          setStartDate(startDateTime);
+          return startDateTime;
+        } else {
+          return startDate;
+        }
       } else {
-        return startDate;
+        console.log("Invalid date");
       }
     }
     return startDate;
