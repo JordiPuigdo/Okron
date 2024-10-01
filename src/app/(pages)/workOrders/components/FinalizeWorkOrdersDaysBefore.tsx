@@ -22,6 +22,11 @@ const FinalizeWorkOrdersDaysBefore: React.FC<
   const [isLoading, setIsLoading] = useState(false);
 
   const handleFinalizeWorkOrdersDayBefore = async () => {
+    const isConfirmed = window.confirm(
+      "Segur que voleu finalitzar totes les ordres de treball pendents?"
+    );
+    if (!isConfirmed) return;
+
     setIsLoading(true);
     const today = new Date();
     await workOrderService.finishWorkOrdersByDate(today);

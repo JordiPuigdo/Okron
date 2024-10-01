@@ -96,6 +96,10 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
         setValue("stock", sparePartDetailResponse.sparePart.stock);
         setValue("price", sparePartDetailResponse.sparePart.price);
         setValue("active", sparePartDetailResponse.sparePart.active);
+        setValue(
+          "documentation",
+          sparePartDetailResponse.sparePart.documentation
+        );
         setSparePartPerMachine(
           sparePartDetailResponse.sparePartPerMachineResponse
         );
