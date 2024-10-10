@@ -186,7 +186,6 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   }
 
   function getStartDateTime() {
-    debugger;
     if (filterWorkOrders?.startDateTime !== undefined) {
       const startDateTime = new Date(filterWorkOrders.startDateTime);
       if (isValidDate(startDateTime)) {
@@ -260,32 +259,37 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     return (
       <div className="bg-white  rounded-xl gap-4 p-2 shadow-md">
         <div className="flex gap-4 my-4 items-center">
-          <div className="flex items-center">
-            <label htmlFor="startDate" className="mr-2">
-              Inici
-            </label>
-            <DatePicker
-              id="startDate"
-              selected={startDate}
-              onChange={(date: Date) => setStartDate(date)}
-              dateFormat="dd/MM/yyyy"
-              locale={ca}
-              className="border border-gray-300 p-2 rounded-md mr-4"
-            />
-          </div>
-          <div className="flex items-center">
-            <label htmlFor="endDate" className="mr-2">
-              Final
-            </label>
-            <DatePicker
-              id="endDate"
-              selected={endDate}
-              onChange={(date: Date) => setEndDate(date)}
-              dateFormat="dd/MM/yyyy"
-              locale={ca}
-              className="border border-gray-300 p-2 rounded-md mr-4"
-            />
-          </div>
+          {!isLoading && (
+            <>
+              <div className="flex items-center">
+                <label htmlFor="startDate" className="mr-2">
+                  Inici
+                </label>
+                <DatePicker
+                  id="startDate"
+                  selected={startDate}
+                  onChange={(date: Date) => setStartDate(date)}
+                  dateFormat="dd/MM/yyyy"
+                  locale={ca}
+                  className="border border-gray-300 p-2 rounded-md mr-4"
+                />
+              </div>
+              <div className="flex items-center">
+                <label htmlFor="endDate" className="mr-2">
+                  Final
+                </label>
+                <DatePicker
+                  id="endDate"
+                  selected={endDate}
+                  onChange={(date: Date) => setEndDate(date)}
+                  dateFormat="dd/MM/yyyy"
+                  locale={ca}
+                  className="border border-gray-300 p-2 rounded-md mr-4"
+                />
+              </div>
+            </>
+          )}
+
           <button
             type="button"
             className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
