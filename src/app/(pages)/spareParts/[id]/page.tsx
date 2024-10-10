@@ -93,6 +93,8 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
             ? sparePartDetailResponse.sparePart.brand
             : ""
         );
+        setValue("minium", sparePartDetailResponse.sparePart.minium);
+        setValue("maximum", sparePartDetailResponse.sparePart.maximum);
         setValue("stock", sparePartDetailResponse.sparePart.stock);
         setValue("price", sparePartDetailResponse.sparePart.price);
         setValue("active", sparePartDetailResponse.sparePart.active);
@@ -287,7 +289,27 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                     className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                   />
                 </div>
+                <div className="flex flex-row gap-4 items-start w-full">
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-600">
+                      Stock mínim
+                    </label>
+                    <input
+                      {...register("minium")}
+                      className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                    />
+                  </div>
 
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-600">
+                      Stock máxim
+                    </label>
+                    <input
+                      {...register("maximum")}
+                      className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                    />
+                  </div>
+                </div>
                 <div className="flex flex-row gap-4 items-start w-full">
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-600">

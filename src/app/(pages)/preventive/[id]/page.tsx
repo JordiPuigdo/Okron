@@ -26,6 +26,12 @@ import { Asset } from "app/interfaces/Asset";
 import { ElementList } from "components/selector/ElementList";
 import { WorkOrder } from "app/interfaces/workOrder";
 import { WorkOrderPerPreventive } from "./components/WorkOrderPerPreventive";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export default function EditPreventive({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -133,6 +139,7 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
           const finalData = new Date(data.startExecution);
           setValue("asset", data.asset);
           setValue("active", data.active);
+          setValue("lastExecution", data.lastExecution);
           setStartDate(finalData);
           await fetchInspectionPoints(data);
           await fetchOperators(data);
@@ -276,6 +283,21 @@ export default function EditPreventive({ params }: { params: { id: string } }) {
                   className="border border-gray-300 p-2 rounded-md mr-4 w-full"
                 />
               </div>
+              {preventiveData?.lastExecution && (
+                <div className="col-span-2">
+                  <label
+                    className="block text-gray-700 font-bold mb-2 text-sm"
+                    htmlFor="startExecution"
+                  >
+                    Última Execució
+                  </label>
+                  <div>
+                    {dayjs
+                      .utc(preventiveData?.lastExecution, "Europe/Madrid")
+                      .format("DD/MM/YYYY")}
+                  </div>
+                </div>
+              )}
             </div>
 
             {error && <p style={{ color: "red" }}>{error}</p>}

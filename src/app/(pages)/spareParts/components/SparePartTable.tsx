@@ -69,9 +69,19 @@ const columns: Column[] = [
     format: ColumnFormat.TEXT,
   },
   {
+    label: "Mín",
+    key: "minium",
+    format: ColumnFormat.TEXTRIGHT,
+  },
+  {
+    label: "Màx",
+    key: "maximum",
+    format: ColumnFormat.TEXTRIGHT,
+  },
+  {
     label: "Stock",
     key: "stock",
-    format: ColumnFormat.TEXT,
+    format: ColumnFormat.TEXTRIGHT,
   },
   {
     label: "Actiu",

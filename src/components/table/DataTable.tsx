@@ -348,8 +348,12 @@ const DataTable: React.FC<DataTableProps> = ({
   };
 
   const renderTableButtons = (item: any) => {
+    let colorRow = "";
+    if (item.colorRow) {
+      colorRow = item.colorRow;
+    }
     return (
-      <td className="p-2">
+      <td className={`p-2 ${colorRow}`}>
         {loginUser?.permission == UserPermission.Administrator &&
           entity !== EntityTable.WORKORDER && (
             <div className="flex flex-row gap-2 justify-center">
@@ -472,7 +476,9 @@ const DataTable: React.FC<DataTableProps> = ({
                           return (
                             <th
                               key={column.key}
-                              className="border-b border-blue-gray-100 bg-blue-gray-50 p-4 cursor-pointer "
+                              className={`border-b border-blue-gray-100 bg-blue-gray-50 p-4 cursor-pointer ${
+                                column.width && column.width
+                              }`}
                               onClick={() => handleSort(column.key)}
                             >
                               <div className={classname}>
@@ -593,6 +599,16 @@ const DataTable: React.FC<DataTableProps> = ({
                               ) {
                                 className +=
                                   " text-white rounded-full py-1 px-2 text-sm text-center ";
+                              }
+                              if (
+                                formatColumn.toLocaleUpperCase() ==
+                                ColumnFormat.TEXTRIGHT
+                              ) {
+                                className += " flex justify-end pr-8";
+                              }
+                              if (rowData.colorRow) {
+                                classNametd =
+                                  classNametd + ` ${rowData.colorRow}`;
                               }
                               /* if (column.key === "status") {
                             className = getStatusClassName(value, entity);

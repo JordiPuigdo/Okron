@@ -27,6 +27,7 @@ export interface WorkOrder extends BaseModel {
   workOrderEvents?: WorkOrderEvents[];
   preventive?: Preventive;
   plannedDuration: string;
+  operatorsNames?: string;
 }
 
 export default WorkOrder;
