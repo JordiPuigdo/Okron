@@ -31,8 +31,7 @@ const WorkOrdersDashboard: React.FC<WorkOrdersDashboardProps> = ({
     let totalCost = 0;
 
     workOrder.workOrderSpareParts?.forEach((sparePart) => {
-      totalCost += sparePart.quantity * 23.4;
-      //sparePart.sparePart.price;
+      totalCost += sparePart.quantity * sparePart.sparePart.price;
     });
 
     return totalCost;
