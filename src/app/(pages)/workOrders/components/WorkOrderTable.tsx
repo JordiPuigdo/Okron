@@ -487,6 +487,8 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   };
 
   const handleFinalizeWorkOrders = async () => {
+    if (isUpdating || selectedRows.size == 0) return;
+
     setIsUpdating(true);
 
     const workOrders = Array.from(selectedRows).map((workOrderId) => ({
@@ -500,9 +502,13 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
       .updateStateWorkOrder(workOrders)
       .then((response) => {
         if (response) {
+          setResponseMessage({
+            message: "Ordres actualitzades correctament",
+            isSuccess: true,
+          });
           setTimeout(() => {
             setResponseMessage({
-              message: "Ordres actualitzades correctament",
+              message: "",
               isSuccess: true,
             });
           }, 2000);
@@ -525,13 +531,14 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
           });
         }, 3000);
       });
+    setSelectedRows(new Set());
     setIsUpdating(false);
   };
 
   return (
     <>
       <div className="flex flex-col gap-4">
-        {enableFilters && renderFilterWorkOrders()}
+        {enableFilters && !isLoading && renderFilterWorkOrders()}
         <DataTable
           columns={columns}
           data={filteredWorkOrders}
@@ -551,13 +558,15 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
             <Button
               type="none"
               className={`text-white ${
-                selectedRows.size > 0
+                selectedRows.size > 0 || !isUpdating
                   ? " bg-blue-900 hover:bg-blue-950 "
-                  : " bg-gray-200 hover:cursor-not-allowed"
+                  : " bg-gray-200 hover:cursor-not-allowed "
               }  rounded-lg text-sm `}
               size="lg"
               customStyles="align-middle flex"
-              onClick={handleFinalizeWorkOrders}
+              onClick={async () => {
+                await handleFinalizeWorkOrders();
+              }}
             >
               {isUpdating ? (
                 <SvgSpinner className="text-white" />
