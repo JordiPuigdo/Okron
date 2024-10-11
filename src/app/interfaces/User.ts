@@ -1,30 +1,30 @@
 import { OperatorType } from "./Operator";
 
 export interface User {
-    username : string;
-    password : string;
+  username: string;
+  password: string;
 }
 
 export interface LoginUser {
-    token : string;
-    refreshToken : string;
-    refreshTokenExpiryTime : Date;
-    agentId : string;
-    username : string;
-    permission : UserPermission
+  token: string;
+  refreshToken: string;
+  refreshTokenExpiryTime: Date;
+  agentId: string;
+  username: string;
+  permission: UserPermission;
 }
 
-export enum UserPermission
-{
-   Worker,
-   OfficeUser,
-   Administrator,
-   SuperAdministrator
+export enum UserPermission {
+  Worker,
+  OfficeUser,
+  Administrator,
+  SuperAdministrator,
+  SpareParts,
 }
 
 export interface OperatorLogged {
-    idOperatorLogged : string;
-    codeOperatorLogged : string;
-    nameOperatorLogged: string;
-    operatorLoggedType : OperatorType;
+  idOperatorLogged: string;
+  codeOperatorLogged: string;
+  nameOperatorLogged: string;
+  operatorLoggedType: OperatorType;
 }

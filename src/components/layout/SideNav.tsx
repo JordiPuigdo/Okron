@@ -18,14 +18,14 @@ const SideNav: React.FC<SideNavProps> = ({ setOpenMenu }) => {
     setOpenMenu(!menuOpen);
     setMenuOpen(!menuOpen);
   };
-
+  const loginPermission = loginUser?.permission!;
   return (
     <div className="flex flex-col md:px-4">
       <div className="pt-14 ">
         {SIDENAV_ITEMS.map((item, idx) => {
           return (
             <>
-              {item.permission <= loginUser?.permission! && (
+              {item.permission.includes(loginPermission) && (
                 <>
                   <MenuItem key={idx} item={item} />
                 </>

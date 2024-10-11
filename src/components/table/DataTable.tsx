@@ -348,74 +348,80 @@ const DataTable: React.FC<DataTableProps> = ({
   };
 
   const renderTableButtons = (item: any) => {
+    const validPermission = [
+      UserPermission.Administrator,
+      UserPermission.SpareParts,
+    ];
+    const canEdit =
+      validPermission.includes(loginUser?.permission!) &&
+      entity !== EntityTable.WORKORDER;
     return (
       <td className="p-2">
-        {loginUser?.permission == UserPermission.Administrator &&
-          entity !== EntityTable.WORKORDER && (
-            <div className="flex flex-row gap-2 justify-center">
-              {tableButtons.edit && (
-                <Link
-                  href={`${pathDetail}/${item[columns[0].key]}`}
-                  onClick={(e) => {
-                    console.log(`${pathDetail}/${item[columns[0].key]}`);
+        {canEdit && (
+          <div className="flex flex-row gap-2 justify-center">
+            {tableButtons.edit && (
+              <Link
+                href={`${pathDetail}/${item[columns[0].key]}`}
+                onClick={(e) => {
+                  console.log(`${pathDetail}/${item[columns[0].key]}`);
+                }}
+              >
+                <p
+                  className="flex items-center font-medium text-white rounded-xl bg-okron-btEdit hover:bg-okron-btEditHover"
+                  onClick={() => {
+                    toggleLoading(
+                      item[columns[0].key],
+                      ButtonTypesTable.Edit,
+                      true
+                    );
                   }}
                 >
-                  <p
-                    className="flex items-center font-medium text-white rounded-xl bg-okron-btEdit hover:bg-okron-btEditHover"
-                    onClick={() => {
-                      toggleLoading(
-                        item[columns[0].key],
-                        ButtonTypesTable.Edit,
-                        true
-                      );
-                    }}
-                  >
-                    {loadingState[
-                      item[columns[0].key] + "_" + ButtonTypesTable.Edit
-                    ] ? (
-                      <SvgSpinner className="p-2" />
-                    ) : (
-                      <SvgDetail className="p-2" />
-                    )}
-                  </p>
-                </Link>
-              )}
-              {tableButtons.delete && (
-                <div
-                  className="flex items-center text-white rounded-xl bg-okron-btDelete hover:bg-okron-btDeleteHover hover:cursor-pointer"
-                  onClick={() => handleDelete(item[columns[0].key])}
-                >
                   {loadingState[
-                    item[columns[0].key] + "_" + ButtonTypesTable.Delete
+                    item[columns[0].key] + "_" + ButtonTypesTable.Edit
                   ] ? (
                     <SvgSpinner className="p-2" />
                   ) : (
-                    <SvgDelete className="p-2" />
+                    <SvgDetail className="p-2" />
                   )}
-                </div>
-              )}
-              {tableButtons.detail && (
-                <Link href={`${pathDetail}/${item[columns[0].key]}`}>
-                  <p className="font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover">
-                    Detall
-                    {loadingState[
-                      item[columns[0].key] + "_" + ButtonTypesTable.Detail
-                    ] && (
-                      <span className="ml-2 text-white">
-                        <SvgSpinner className="w-6 h-6" />
-                      </span>
-                    )}
-                  </p>
-                </Link>
-              )}
-              {entity == EntityTable.PREVENTIVE && (
-                <PreventiveButtons
-                  preventive={item}
-                  userId={loginUser!.agentId}
-                />
-              )}
-            </div>
-          )}
+                </p>
+              </Link>
+            )}
+            {tableButtons.delete && (
+              <div
+                className="flex items-center text-white rounded-xl bg-okron-btDelete hover:bg-okron-btDeleteHover hover:cursor-pointer"
+                onClick={() => handleDelete(item[columns[0].key])}
+              >
+                {loadingState[
+                  item[columns[0].key] + "_" + ButtonTypesTable.Delete
+                ] ? (
+                  <SvgSpinner className="p-2" />
+                ) : (
+                  <SvgDelete className="p-2" />
+                )}
+              </div>
+            )}
+            {tableButtons.detail && (
+              <Link href={`${pathDetail}/${item[columns[0].key]}`}>
+                <p className="font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover">
+                  Detall
+                  {loadingState[
+                    item[columns[0].key] + "_" + ButtonTypesTable.Detail
+                  ] && (
+                    <span className="ml-2 text-white">
+                      <SvgSpinner className="w-6 h-6" />
+                    </span>
+                  )}
+                </p>
+              </Link>
+            )}
+            {entity == EntityTable.PREVENTIVE && (
+              <PreventiveButtons
+                preventive={item}
+                userId={loginUser!.agentId}
+              />
+            )}
+          </div>
+        )}
         {EntityTable.WORKORDER == entity && (
           <>
             <WorkOrderOperationsInTable

@@ -3,85 +3,89 @@ import { SvgGear, SvgMachine, SvgSparePart } from "app/icons/icons";
 import { UserPermission } from "app/interfaces/User";
 
 export const SIDENAV_ITEMS: SideNavItem[] = [
-
-
   {
     key: generateKey(),
-    title: 'Revisions',
-    path: '',
+    title: "Revisions",
+    path: "",
     submenu: true,
-    permission: UserPermission.Administrator,
+    permission: [UserPermission.Administrator],
     submenuItems: [
       {
         key: generateKey(),
-        title: 'Configuració',
-        path: '/preventive',
-        permission: UserPermission.Administrator
-      },{
+        title: "Configuració",
+        path: "/preventive",
+        permission: [UserPermission.Administrator],
+      },
+      {
         key: generateKey(),
-        title: 'Punts Inspecció',
-        path: '/inspectionPoints',
-        permission: UserPermission.Administrator
-      },]
+        title: "Punts Inspecció",
+        path: "/inspectionPoints",
+        permission: [UserPermission.Administrator],
+      },
+    ],
   },
   {
     key: generateKey(),
-    title: 'Avaries',
-    path: '/corrective',
-    permission: UserPermission.Worker
+    title: "Avaries",
+    path: "/corrective",
+    permission: [UserPermission.Administrator, UserPermission.Worker],
   },
   {
     key: generateKey(),
-    title: 'Ordres de treball',
-    path: '/workOrders',
-    permission: UserPermission.Worker
+    title: "Ordres de treball",
+    path: "/workOrders",
+    permission: [UserPermission.Administrator, UserPermission.Worker],
   },
   {
     key: generateKey(),
-    title: 'Recanvis',
-    path: '/spareParts',
-    permission: UserPermission.Worker,
+    title: "Recanvis",
+    path: "/spareParts",
+    permission: [
+      UserPermission.Administrator,
+      UserPermission.Worker,
+      UserPermission.SpareParts,
+    ],
     //icon : SvgSparePart,
   },
   {
     key: generateKey(),
-    title: 'Configuració',
-    path: '',
-    permission: UserPermission.Administrator,
+    title: "Configuració",
+    path: "",
+    permission: [UserPermission.Administrator],
     submenu: true,
-    icon : SvgGear,
+    icon: SvgGear,
     submenuItems: [
       {
         key: generateKey(),
-        title: 'Actius i Equips',
-        path: '/assets',
-        permission: UserPermission.Administrator
-      },  
-      {
-        key: generateKey(),
-        title: 'Seccions',
-        path: '/section',
-        permission: UserPermission.Administrator
-      },
-      {
-      key: generateKey(),
-      title: 'Màquines',
-      path: '/machines',
-      //icon: SvgMachine,
-      permission: UserPermission.Administrator
+        title: "Actius i Equips",
+        path: "/assets",
+        permission: [UserPermission.Administrator],
       },
       {
         key: generateKey(),
-        title: 'Operaris',
-        path: '/operators',
-        permission: UserPermission.Administrator
+        title: "Seccions",
+        path: "/section",
+        permission: [UserPermission.Administrator],
       },
       {
         key: generateKey(),
-        title: 'Usuaris',
-        path: '/users',
-        permission: UserPermission.Administrator
+        title: "Màquines",
+        path: "/machines",
+        //icon: SvgMachine,
+        permission: [UserPermission.Administrator],
       },
-    ]
+      {
+        key: generateKey(),
+        title: "Operaris",
+        path: "/operators",
+        permission: [UserPermission.Administrator],
+      },
+      {
+        key: generateKey(),
+        title: "Usuaris",
+        path: "/users",
+        permission: [UserPermission.Administrator],
+      },
+    ],
   },
 ];

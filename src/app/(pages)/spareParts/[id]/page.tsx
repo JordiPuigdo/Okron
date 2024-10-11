@@ -62,6 +62,12 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
   const { loginUser } = useSessionStore((state) => state);
   const [loadingMap, setLoadingMap] = useState<{ [key: string]: boolean }>({});
 
+  const validPermission = [
+    UserPermission.Administrator,
+    UserPermission.SpareParts,
+  ];
+  const canEdit = validPermission.includes(loginUser?.permission!);
+
   useEffect(() => {
     const fetchSparePart = async () => {
       try {
@@ -320,7 +326,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                     />
                   </div>
                 </div>
-                {loginUser?.permission == UserPermission.Administrator && (
+                {canEdit && (
                   <div className="flex gap-4">
                     <button
                       type="submit"
@@ -357,7 +363,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                 </div>
               </form>
             </div>
-            {loginUser?.permission == UserPermission.Administrator && (
+            {canEdit && (
               <div className="p-4 flex-grow rounded-md bg-blue-950">
                 <p className="text-white font-semibold">Històric de consums</p>
                 <SparePartTable
@@ -402,7 +408,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                 </div>
               ))}
             </div>
-            {loginUser?.permission == UserPermission.Administrator && (
+            {canEdit && (
               <div className="pt-4">
                 <input
                   type="file"
