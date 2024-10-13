@@ -166,11 +166,14 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     };
 
     const fetchWorkOrders = async () => {
+      setIsLoading(true);
       await searchWorkOrders();
+      setIsLoading(false);
     };
 
     if (assetId == undefined) fetchAssets();
     if (operatorId !== undefined) handleSearch();
+
     fetchWorkOrders();
     setFirstLoad(false);
   }, []);
@@ -187,16 +190,11 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 
   function getStartDateTime() {
     if (filterWorkOrders?.startDateTime !== undefined) {
-      const startDateTime = new Date(filterWorkOrders.startDateTime);
-      if (isValidDate(startDateTime)) {
-        if (firstLoad) {
-          setStartDate(startDateTime);
-          return startDateTime;
-        } else {
-          return startDate;
-        }
+      if (firstLoad) {
+        setStartDate(new Date(filterWorkOrders.startDateTime));
+        return new Date(filterWorkOrders.startDateTime);
       } else {
-        console.log("Invalid date");
+        return startDate;
       }
     }
     return startDate;
@@ -205,8 +203,8 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   function getEndDateTime() {
     if (filterWorkOrders?.endDateTime !== undefined) {
       if (firstLoad) {
-        setEndDate(filterWorkOrders.endDateTime);
-        return filterWorkOrders.endDateTime;
+        setEndDate(new Date(filterWorkOrders.endDateTime));
+        return new Date(filterWorkOrders.endDateTime);
       } else {
         return endDate;
       }
@@ -246,15 +244,30 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
         setMessage("");
       }, 3000);
     }
-    setWorkOrders(
-      workOrders.sort((a, b) => {
-        const startTimeA = new Date(a.startTime).valueOf();
-        const startTimeB = new Date(b.startTime).valueOf();
-        return startTimeA - startTimeB;
-      })
-    );
+    try {
+      setWorkOrders(
+        workOrders.sort((a, b) => {
+          const startTimeA = new Date(a.startTime).valueOf();
+          const startTimeB = new Date(b.startTime).valueOf();
+          return startTimeA - startTimeB;
+        })
+      );
+    } catch (error) {
+      console.error("Error fetching work orders:", error);
+    }
   };
-
+  const handleDateChange = (
+    date: Date | null,
+    setDate: (value: Date | null) => void
+  ) => {
+    debugger;
+    if (date instanceof Date && !isNaN(date.valueOf())) {
+      setDate(date);
+    } else {
+      console.error("Invalid date selected:", date);
+      setDate(null);
+    }
+  };
   const renderFilterWorkOrders = () => {
     return (
       <div className="bg-white  rounded-xl gap-4 p-2 shadow-md">
@@ -267,7 +280,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
                 </label>
                 <DatePicker
                   id="startDate"
-                  selected={startDate}
+                  selected={startDate ?? new Date()}
                   onChange={(date: Date) => setStartDate(date)}
                   dateFormat="dd/MM/yyyy"
                   locale={ca}
@@ -280,7 +293,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
                 </label>
                 <DatePicker
                   id="endDate"
-                  selected={endDate}
+                  selected={endDate ?? new Date()}
                   onChange={(date: Date) => setEndDate(date)}
                   dateFormat="dd/MM/yyyy"
                   locale={ca}
