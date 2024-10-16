@@ -7,6 +7,11 @@ import { UserPermission } from "app/interfaces/User";
 
 function SparePartsPage() {
   const { loginUser } = useSessionStore((state) => state);
+  const validPermission = [
+    UserPermission.Administrator,
+    UserPermission.SpareParts,
+  ];
+  const canEdit = validPermission.includes(loginUser?.permission!);
   return (
     <MainLayout>
       <Container>
@@ -16,8 +21,8 @@ function SparePartsPage() {
         <div className="mt-2">
           <SparePartTable
             enableFilters={true}
-            enableEdit={loginUser?.permission == UserPermission.Administrator}
-            enableDelete={loginUser?.permission == UserPermission.Administrator}
+            enableEdit={canEdit}
+            enableDelete={canEdit}
           />
         </div>
       </Container>
