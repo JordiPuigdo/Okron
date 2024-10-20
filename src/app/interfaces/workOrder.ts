@@ -78,6 +78,7 @@ export interface CreateWorkOrderRequest {
   inspectionPointId?: string[];
   sparePartId?: string[];
   userId?: string;
+  operatorCreatorId: string;
 }
 
 export interface AddWorkOrderOperatorTimes {

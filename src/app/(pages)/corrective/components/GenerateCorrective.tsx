@@ -60,7 +60,7 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
-  const { loginUser } = useSessionStore((state) => state);
+  const { loginUser, operatorLogged } = useSessionStore((state) => state);
   const [descriptionCorrective, setDescriptionCorrective] =
     useState(description);
   const [stateCorrective, setStateCorrective] = useState<StateWorkOrder>(
@@ -144,6 +144,7 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
       stateWorkOrder: corrective.stateWorkOrder,
       workOrderType: 0,
       userId: loginUser?.agentId,
+      operatorCreatorId: operatorLogged!.idOperatorLogged,
     };
     return createWorkOrderRequest;
   }
@@ -157,6 +158,11 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
     if (!validData(data)) {
       setIsLoading(false);
       alert("Falten dades per completar");
+      return;
+    }
+    if (operatorLogged == undefined) {
+      setIsLoading(false);
+      alert("Has de tenir un operari fitxat per fer aquesta acció");
       return;
     }
     data.startTime = startDate || new Date();

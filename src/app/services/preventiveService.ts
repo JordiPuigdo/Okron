@@ -111,10 +111,11 @@ class PreventiveService {
   }
 
   async CreateWorkOrderPreventivePerDay(
-    userId: string
+    userId: string,
+    operatorId: string
   ): Promise<Preventive[] | null> {
     const response = await fetch(
-      `${this.baseUrl}preventive/CreateWorkOrderPreventivePerDay?userId=${userId}`
+      `${this.baseUrl}preventive/CreateWorkOrderPreventivePerDay?userId=${userId}&operatorId=${operatorId}`
     );
     if (!response.ok) {
       throw new Error("Failed to fetch inspection points");
@@ -147,10 +148,11 @@ class PreventiveService {
 
   async ForceExecutePreventive(
     id: string,
-    userId: string
+    userId: string,
+    operatorId: string
   ): Promise<Preventive> {
     try {
-      const url = `${this.baseUrl}preventive/ForceExecutePreventive/${id}?userId=${userId}`;
+      const url = `${this.baseUrl}preventive/ForceExecutePreventive/${id}?userId=${userId}&operatorId=${operatorId}`;
       const response = await fetch(url, {
         method: "POST",
         headers: {

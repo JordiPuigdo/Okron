@@ -3,7 +3,13 @@ import { useEffect, useState } from "react";
 import Pagination from "./Pagination";
 import Link from "next/link";
 import { SvgDelete, SvgDetail, SvgRepeat, SvgSpinner } from "app/icons/icons";
-import { Column, ColumnFormat, Filters, TableButtons } from "./interfaceTable";
+import {
+  Column,
+  ColumnFormat,
+  ColumnnAlign,
+  Filters,
+  TableButtons,
+} from "./interfaceTable";
 import FiltersComponent from "./FiltersComponent";
 import {
   formatDate,
@@ -348,20 +354,20 @@ const DataTable: React.FC<DataTableProps> = ({
   };
 
   const renderTableButtons = (item: any) => {
-   let colorRow = "";
+    let colorRow = "";
     if (item.colorRow) {
       colorRow = item.colorRow;
     }
-  const validPermission = [
+    const validPermission = [
       UserPermission.Administrator,
       UserPermission.SpareParts,
     ];
     const canEdit =
       validPermission.includes(loginUser?.permission!) &&
       entity !== EntityTable.WORKORDER;
-      
+
     return (
-      <td className="p-2">
+      <td className={`p-2 ${colorRow}`}>
         {canEdit && (
           <div className="flex flex-row gap-2 justify-center">
             {tableButtons.edit && (
@@ -459,7 +465,7 @@ const DataTable: React.FC<DataTableProps> = ({
                     <tr className="border-t border-gray-200 flex-grow">
                       {enableCheckbox && (
                         <th
-                          className="border-b border-blue-gray-100 bg-blue-gray-50 p-4 cursor-pointer"
+                          className="border-b border-blue-gray-100 bg-blue-gray-50 p-2 cursor-pointer"
                           onClick={handleSelectedAllRows}
                         >
                           <div className="flex items-center justify-center gap-2">
@@ -521,7 +527,7 @@ const DataTable: React.FC<DataTableProps> = ({
                         >
                           {enableCheckbox && (
                             <td
-                              className="p-2 hover:cursor-pointer"
+                              className="p-4 hover:cursor-pointer"
                               onClick={() => handleSelectedRow(rowData.id)}
                             >
                               <div className="flex items-center justify-center">
@@ -544,17 +550,20 @@ const DataTable: React.FC<DataTableProps> = ({
                                 rowData,
                                 column.key
                               );
-                              let className = "font-normal ";
-                              let classNametd = "p-2";
+                              let className = "font-normlal ";
+                              let classNametd = "p-4";
 
                               const formatColumn =
                                 column.format.toLocaleUpperCase();
 
+                              const alignColumn =
+                                column.align?.toLocaleUpperCase();
+
                               if (column.key === "active") {
                                 className += " w-full";
                                 className += value
-                                  ? " bg-green-500 p-2 rounded-xl text-white"
-                                  : " bg-red-500 p-2 rounded-xl text-white";
+                                  ? " bg-green-500 p-4 rounded-xl text-white"
+                                  : " bg-red-500 p-4 rounded-xl text-white";
                                 //className = getStatusClassName( value, entity);
                               }
 
@@ -608,10 +617,10 @@ const DataTable: React.FC<DataTableProps> = ({
                                   " text-white rounded-full py-1 px-2 text-sm text-center ";
                               }
                               if (
-                                formatColumn.toLocaleUpperCase() ==
-                                ColumnFormat.TEXTRIGHT
+                                alignColumn?.toLocaleUpperCase() ==
+                                ColumnnAlign.RIGHT
                               ) {
-                                className += " flex justify-end pr-8";
+                                className += " flex justify-end ";
                               }
                               if (rowData.colorRow) {
                                 classNametd =

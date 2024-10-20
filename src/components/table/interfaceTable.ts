@@ -3,6 +3,7 @@ export interface Column {
   key: string;
   format: ColumnFormat;
   width?: string;
+  align?: string;
 }
 
 export interface Filters {
@@ -30,10 +31,15 @@ export enum ColumnFormat {
   DATETIME = "DATETIME",
   BOOLEAN = "BOOLEAN",
   TEXT = "TEXT",
-  TEXTRIGHT = "TEXTRIGHT",
   NUMBER = "NUMBER",
   WORKORDERTYPE = "WORKORDERTYPE",
   STATEWORKORDER = "STATEWORKORDER",
   KEY = "KEY",
   OPERATORTYPE = "OPERATORTYPE",
+}
+
+export enum ColumnnAlign {
+  LEFT = "LEFT",
+  CENTER = "CENTER",
+  RIGHT = "RIGHT",
 }

@@ -10,6 +10,7 @@ import DataTable from "components/table/DataTable";
 import {
   Column,
   ColumnFormat,
+  ColumnnAlign,
   Filters,
   FiltersFormat,
   TableButtons,
@@ -71,17 +72,23 @@ const columns: Column[] = [
   {
     label: "Mín",
     key: "minium",
-    format: ColumnFormat.TEXTRIGHT,
+    format: ColumnFormat.NUMBER,
+    align: ColumnnAlign.RIGHT,
   },
   {
     label: "Màx",
     key: "maximum",
-    format: ColumnFormat.TEXTRIGHT,
+    format: ColumnFormat.NUMBER,
   },
   {
     label: "Stock",
     key: "stock",
-    format: ColumnFormat.TEXTRIGHT,
+    format: ColumnFormat.NUMBER,
+  },
+  {
+    key: "lastMovementConsume",
+    label: "Últim Consum",
+    format: ColumnFormat.DATETIME,
   },
   {
     label: "Actiu",

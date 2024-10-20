@@ -17,6 +17,9 @@ interface SparePart {
   minium: number;
   maximum: number;
   colorRow: string;
+  lastMovementConsume: Date;
+  lastMovement: Date;
+  lastRestockDate: Date;
 }
 
 export default SparePart;

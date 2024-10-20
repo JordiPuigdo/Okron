@@ -1,6 +1,7 @@
 import { SvgRepeat, SvgSpinner } from "app/icons/icons";
 import { Preventive } from "app/interfaces/Preventive";
 import PreventiveService from "app/services/preventiveService";
+import { useSessionStore } from "app/stores/globalStore";
 import { useState } from "react";
 
 interface PreventiveButtonsProps {
@@ -15,11 +16,16 @@ export const PreventiveButtons = ({
   const preventiveService = new PreventiveService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
+  const { operatorLogged } = useSessionStore((state) => state);
   const [isLoading, setIsLoading] = useState(false);
   const handleForceExecute = async (id: string) => {
+    if (operatorLogged == undefined) {
+      alert("Has de tenir un operari fitxat per fer aquesta acció");
+      return;
+    }
     setIsLoading(true);
     await preventiveService
-      .ForceExecutePreventive(id, userId)
+      .ForceExecutePreventive(id, userId, operatorLogged!.idOperatorLogged)
       .then((data) => {
         setIsLoading(false);
       })

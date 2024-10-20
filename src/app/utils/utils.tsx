@@ -5,6 +5,10 @@ import {
   WorkOrderType,
 } from "app/interfaces/workOrder";
 import { useSessionStore } from "app/stores/globalStore";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
 
 export const translateStateWorkOrder = (state: any): string => {
   switch (state) {
@@ -53,26 +57,29 @@ export const formatDate = (
   includeHours: boolean = true,
   includeSeconds: boolean = true
 ) => {
-  if (dateString === null) {
+  if (!dateString) {
     return "";
   }
-  const options: any = {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: includeHours ? "2-digit" : undefined,
-    minute: includeHours ? "2-digit" : undefined,
-    second: includeSeconds ? "2-digit" : undefined,
-    hour12: false,
-  };
-  const date = new Date(dateString);
+  if (dateString.length > 0 && dateString.includes("0001")) {
+    return "";
+  }
+  const newDate = new Date(dateString);
+  const date = dayjs(newDate);
 
-  if (isNaN(date.getTime())) {
-    return null;
+  if (!date.isValid()) {
+    return "";
   }
 
-  const formattedDate = new Intl.DateTimeFormat("es-ES", options).format(date);
-  return `${formattedDate.replace(",", "")}`;
+  let formatString = "DD/MM/YYYY";
+
+  if (includeHours) {
+    formatString += " HH:mm";
+    if (includeSeconds) {
+      formatString += ":ss";
+    }
+  }
+
+  return date.utc().format(formatString);
 };
 
 export const translateWorkOrderType = (

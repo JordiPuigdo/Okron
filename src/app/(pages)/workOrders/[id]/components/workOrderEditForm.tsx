@@ -358,6 +358,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         stateWorkOrder: data.stateWorkOrder,
         operatorId: selectedOperators.map((x) => x.id),
         startTime: startDate || new Date(),
+        operatorCreatorId:
+          operatorLogged?.idOperatorLogged || selectedOperators[0].id,
       };
 
       await workOrderService.updateWorkOrder(updatedWorkOrderData);

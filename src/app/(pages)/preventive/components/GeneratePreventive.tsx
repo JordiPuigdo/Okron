@@ -29,7 +29,7 @@ const GeneratePreventive = () => {
     process.env.NEXT_PUBLIC_API_BASE_URL || ""
   );
 
-  const { loginUser } = useSessionStore((state) => state);
+  const { loginUser, operatorLogged } = useSessionStore((state) => state);
   const { setIsModalOpen } = useGlobalStore((state) => state);
 
   const [message, setMessage] = useState("");
@@ -41,9 +41,14 @@ const GeneratePreventive = () => {
   }, [preventivesCreated]);
 
   const generateWorkOrders = async () => {
+    if (operatorLogged == undefined) {
+      alert("Has de tenir un operari fitxat per fer aquesta acció");
+      return;
+    }
     setIsLoading(true);
     const preventives = await preventiveService.CreateWorkOrderPreventivePerDay(
-      loginUser!.agentId
+      loginUser!.agentId,
+      operatorLogged!.idOperatorLogged
     );
     if (preventives?.length! > 0) {
       const prevCreat: PreventiveCreateds[] = [];

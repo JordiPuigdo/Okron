@@ -519,7 +519,7 @@ export default function DashboardPage() {
 
       <div className="flex flex-col w-full bg-white rounded-xl border-2 border-blue-950">
         <p className="text-lg font-semibold mb-4 p-2 items-center w-full">
-          Recanvis sense stock
+          Recanvis sota stock
         </p>
         <SparePartTable
           enableFilters={true}
