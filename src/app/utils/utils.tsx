@@ -7,8 +7,10 @@ import {
 import { useSessionStore } from "app/stores/globalStore";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export const translateStateWorkOrder = (state: any): string => {
   switch (state) {
@@ -79,7 +81,7 @@ export const formatDate = (
     }
   }
 
-  return date.utc().format(formatString);
+  return date.format(formatString);
 };
 
 export const translateWorkOrderType = (
