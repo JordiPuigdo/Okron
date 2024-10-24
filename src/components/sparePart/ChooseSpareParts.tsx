@@ -7,10 +7,15 @@ import SparePart, {
 import { WorkOrderSparePart } from "app/interfaces/workOrder";
 import { useEffect, useState } from "react";
 import SparePartService from "app/services/sparePartService";
-import { checkOperatorCreated, isOperatorLogged } from "app/utils/utils";
+import {
+  checkOperatorCreated,
+  formatDate,
+  isOperatorLogged,
+} from "app/utils/utils";
 import { useSessionStore } from "app/stores/globalStore";
 import WorkOrderService from "app/services/workOrderService";
 import { SvgConsumeSparePart, SvgRestoreSparePart } from "app/icons/icons";
+import Link from "next/link";
 
 interface ChooseSparePartsProps {
   availableSpareParts: SparePart[];
@@ -276,7 +281,13 @@ const ChooseSpareParts: React.FC<ChooseSparePartsProps> = ({
                 key={selectedPart.id}
                 className=" flex flex-row items-center gap-2"
               >
-                <p>{selectedPart.sparePart.code}</p>
+                <p className="text-blue-600 underline">
+                  <Link href={`/spareParts/${selectedPart.sparePart.id}`}>
+                    {selectedPart.sparePart.code}
+                  </Link>
+                </p>
+                <p>{" - "}</p>
+                <p>{formatDate(selectedPart.creationDate ?? new Date())}</p>
                 <p>{" - "}</p>
                 <p>{selectedPart.sparePart.description}</p>
                 <p>{" - "}</p>

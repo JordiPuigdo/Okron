@@ -16,6 +16,12 @@ import {
 } from "app/icons/icons";
 import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface IWorkOrderOperatorTimes {
   operators: Operator[];
@@ -453,7 +459,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
               >
                 <td className="p-2 whitespace-nowrap">
                   <div className="text-sm text-gray-900 flex flex-col">
-                    {formatDate(time.startTime.toLocaleString())}
+                    {formatDate(time.startTime.toString())}
                     {editingIndex === index && (
                       <input
                         type="text"

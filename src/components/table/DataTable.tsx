@@ -36,6 +36,7 @@ interface DataTableProps {
   enableFilterActive?: boolean;
   enableCheckbox?: boolean;
   onChecked?: (id?: string) => void;
+  isReport?: boolean;
 }
 
 export interface LoadingState {
@@ -61,6 +62,7 @@ const DataTable: React.FC<DataTableProps> = ({
   enableFilterActive = true,
   enableCheckbox = false,
   onChecked,
+  isReport = false,
 }: DataTableProps) => {
   const itemsPerPageOptions = [5, 10, 15, 20, 25, 50];
   const [currentPage, setCurrentPage] = useState(1);
@@ -353,7 +355,7 @@ const DataTable: React.FC<DataTableProps> = ({
     );
   };
 
-  const renderTableButtons = (item: any) => {
+  const renderTableButtons = (item: any, isReport: boolean) => {
     let colorRow = "";
     if (item.colorRow) {
       colorRow = item.colorRow;
@@ -365,86 +367,86 @@ const DataTable: React.FC<DataTableProps> = ({
     const canEdit =
       validPermission.includes(loginUser?.permission!) &&
       entity !== EntityTable.WORKORDER;
-
-    return (
-      <td className={`p-2 ${colorRow}`}>
-        {canEdit && (
-          <div className="flex flex-row gap-2 justify-center">
-            {tableButtons.edit && (
-              <Link
-                href={`${pathDetail}/${item[columns[0].key]}`}
-                onClick={(e) => {
-                  console.log(`${pathDetail}/${item[columns[0].key]}`);
-                }}
-              >
-                <p
-                  className="flex items-center font-medium text-white rounded-xl bg-okron-btEdit hover:bg-okron-btEditHover"
-                  onClick={() => {
-                    toggleLoading(
-                      item[columns[0].key],
-                      ButtonTypesTable.Edit,
-                      true
-                    );
+    if (!isReport)
+      return (
+        <td className={`p-2 ${colorRow}`}>
+          {canEdit && (
+            <div className="flex flex-row gap-2 justify-center">
+              {tableButtons.edit && (
+                <Link
+                  href={`${pathDetail}/${item[columns[0].key]}`}
+                  onClick={(e) => {
+                    console.log(`${pathDetail}/${item[columns[0].key]}`);
                   }}
                 >
+                  <p
+                    className="flex items-center font-medium text-white rounded-xl bg-okron-btEdit hover:bg-okron-btEditHover"
+                    onClick={() => {
+                      toggleLoading(
+                        item[columns[0].key],
+                        ButtonTypesTable.Edit,
+                        true
+                      );
+                    }}
+                  >
+                    {loadingState[
+                      item[columns[0].key] + "_" + ButtonTypesTable.Edit
+                    ] ? (
+                      <SvgSpinner className="p-2" />
+                    ) : (
+                      <SvgDetail className="p-2" />
+                    )}
+                  </p>
+                </Link>
+              )}
+              {tableButtons.delete && (
+                <div
+                  className="flex items-center text-white rounded-xl bg-okron-btDelete hover:bg-okron-btDeleteHover hover:cursor-pointer"
+                  onClick={() => handleDelete(item[columns[0].key])}
+                >
                   {loadingState[
-                    item[columns[0].key] + "_" + ButtonTypesTable.Edit
+                    item[columns[0].key] + "_" + ButtonTypesTable.Delete
                   ] ? (
                     <SvgSpinner className="p-2" />
                   ) : (
-                    <SvgDetail className="p-2" />
+                    <SvgDelete className="p-2" />
                   )}
-                </p>
-              </Link>
-            )}
-            {tableButtons.delete && (
-              <div
-                className="flex items-center text-white rounded-xl bg-okron-btDelete hover:bg-okron-btDeleteHover hover:cursor-pointer"
-                onClick={() => handleDelete(item[columns[0].key])}
-              >
-                {loadingState[
-                  item[columns[0].key] + "_" + ButtonTypesTable.Delete
-                ] ? (
-                  <SvgSpinner className="p-2" />
-                ) : (
-                  <SvgDelete className="p-2" />
-                )}
-              </div>
-            )}
-            {tableButtons.detail && (
-              <Link href={`${pathDetail}/${item[columns[0].key]}`}>
-                <p className="font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover">
-                  Detall
-                  {loadingState[
-                    item[columns[0].key] + "_" + ButtonTypesTable.Detail
-                  ] && (
-                    <span className="ml-2 text-white">
-                      <SvgSpinner className="w-6 h-6" />
-                    </span>
-                  )}
-                </p>
-              </Link>
-            )}
-            {entity == EntityTable.PREVENTIVE && (
-              <PreventiveButtons
-                preventive={item}
-                userId={loginUser!.agentId}
+                </div>
+              )}
+              {tableButtons.detail && (
+                <Link href={`${pathDetail}/${item[columns[0].key]}`}>
+                  <p className="font-medium text-center text-white p-2 rounded-xl bg-okron-btDetail hover:bg-okron-btnDetailHover">
+                    Detall
+                    {loadingState[
+                      item[columns[0].key] + "_" + ButtonTypesTable.Detail
+                    ] && (
+                      <span className="ml-2 text-white">
+                        <SvgSpinner className="w-6 h-6" />
+                      </span>
+                    )}
+                  </p>
+                </Link>
+              )}
+              {entity == EntityTable.PREVENTIVE && (
+                <PreventiveButtons
+                  preventive={item}
+                  userId={loginUser!.agentId}
+                />
+              )}
+            </div>
+          )}
+          {EntityTable.WORKORDER == entity && (
+            <>
+              <WorkOrderOperationsInTable
+                workOrderId={item[columns[0].key]}
+                workOrder={item}
+                onChangeStateWorkOrder={() => setFilterActive(!filterActive)}
+                enableActions={tableButtons.edit || tableButtons.delete}
               />
-            )}
-          </div>
-        )}
-        {EntityTable.WORKORDER == entity && (
-          <>
-            <WorkOrderOperationsInTable
-              workOrderId={item[columns[0].key]}
-              workOrder={item}
-              onChangeStateWorkOrder={() => setFilterActive(!filterActive)}
-              enableActions={tableButtons.edit || tableButtons.delete}
-            />
-          </>
-        )}
-      </td>
-    );
+            </>
+          )}
+        </td>
+      );
   };
 
   const isAllSelected =
@@ -654,7 +656,7 @@ const DataTable: React.FC<DataTableProps> = ({
                               );
                             })}
 
-                          {renderTableButtons(rowData)}
+                          {renderTableButtons(rowData, isReport)}
                         </tr>
                       ))}
                     {totalCounts && (

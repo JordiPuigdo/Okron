@@ -49,6 +49,13 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
   },
   {
     key: generateKey(),
+    title: "Reports",
+    path: "/reports/spareParts/consumedSpareParts",
+    permission: [UserPermission.Administrator, UserPermission.SpareParts],
+    //icon : SvgSparePart,
+  },
+  {
+    key: generateKey(),
     title: "Configuració",
     path: "",
     permission: [UserPermission.Administrator],

@@ -33,6 +33,7 @@ export interface WorkOrder extends BaseModel {
 export default WorkOrder;
 
 export interface WorkOrderSparePart {
+  creationDate?: Date;
   id: string;
   quantity: number;
   sparePart: SparePart;

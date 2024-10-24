@@ -6,6 +6,7 @@ interface BarChartComponentProps {
   category: string[];
   title: string;
   showLegend?: boolean;
+  yAxisWidth?: number;
 }
 
 const dataFormatter = (number: number) =>
@@ -17,18 +18,19 @@ export function BarChartComponent({
   category,
   title,
   showLegend = true,
+  yAxisWidth = 200,
 }: BarChartComponentProps) {
   return (
     <div className="w-full flex flex-col justify-center items-center">
       <p className="text-lg font-medium">{title}</p>
       <BarChart
-        className={`${!showLegend && "pt-8"}`} // Moves the chart down if no legend
+        className={`${!showLegend && "pt-8"}`}
         data={chartData}
         index={index}
         categories={category}
         colors={["blue", "rose"]}
         valueFormatter={dataFormatter}
-        yAxisWidth={200} // Wider Y-axis
+        yAxisWidth={yAxisWidth} // Wider Y-axis
         showAnimation={true} // Smooth animation
         showTooltip={true} // Show tooltips on hover
         layout="vertical" // Optional: Vertical layout for bars

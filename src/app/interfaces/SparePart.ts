@@ -73,3 +73,15 @@ export interface SparePartDetailRequest {
   machineId?: string;
   assetId?: string;
 }
+
+export interface SparePartsConsumedsReport {
+  sparePartId: string;
+  sparePartCode: string;
+  sparePartDescription: string;
+  sparePartNumber: number;
+  date: Date;
+  workOrderId: string;
+  workOrderCode: string;
+  workOrderDescription: string;
+  operator: string;
+}
