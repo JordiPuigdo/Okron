@@ -17,14 +17,14 @@ import {
   Column,
   ColumnFormat,
   TableButtons,
-} from "components/table/interfaceTable";
+} from "components/table/interface/interfaceTable";
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
 import { SvgSpinner } from "app/icons/icons";
 import AutocompleteSearchBar from "components/selector/AutocompleteSearchBar";
-import { EntityTable } from "components/table/tableEntitys";
+import { EntityTable } from "components/table/interface/tableEntitys";
 import { Asset } from "app/interfaces/Asset";
 import AssetService from "app/services/assetService";
 import { ElementList } from "components/selector/ElementList";
@@ -33,7 +33,6 @@ import { useSessionStore } from "app/stores/globalStore";
 import { UserPermission } from "app/interfaces/User";
 import { OperatorType } from "app/interfaces/Operator";
 import { Button } from "designSystem/Button/Buttons";
-import { FilterWorkOrders } from "app/types/filterWorkOrders";
 
 interface WorkOrderTableProps {
   enableFilterAssets?: boolean;
@@ -111,8 +110,16 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 }) => {
   const { operatorLogged, loginUser, setFilterWorkOrders, filterWorkOrders } =
     useSessionStore((state) => state);
-  const [startDate, setStartDate] = useState<Date | null>(new Date());
-  const [endDate, setEndDate] = useState<Date | null>(new Date());
+  const [startDate, setStartDate] = useState<Date | null>(
+    filterWorkOrders?.startDateTime
+      ? new Date(filterWorkOrders?.startDateTime)
+      : new Date()
+  );
+  const [endDate, setEndDate] = useState<Date | null>(
+    filterWorkOrders?.endDateTime
+      ? new Date(filterWorkOrders?.endDateTime)
+      : new Date()
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string>("");
   const [workOrders, setWorkOrders] = useState<WorkOrder[] | []>([]);
@@ -189,42 +196,14 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     }
   }, [refresh, workOrderType]);
 
-  function isValidDate(d: any): boolean {
-    return d instanceof Date && !isNaN(d.getTime());
-  }
-
-  function getStartDateTime() {
-    if (filterWorkOrders?.startDateTime !== undefined) {
-      if (firstLoad) {
-        setStartDate(new Date(filterWorkOrders.startDateTime));
-        return new Date(filterWorkOrders.startDateTime);
-      } else {
-        return startDate;
-      }
-    }
-    return startDate;
-  }
-
-  function getEndDateTime() {
-    if (filterWorkOrders?.endDateTime !== undefined) {
-      if (firstLoad) {
-        setEndDate(new Date(filterWorkOrders.endDateTime));
-        return new Date(filterWorkOrders.endDateTime);
-      } else {
-        return endDate;
-      }
-    }
-    return endDate;
-  }
-
   const searchWorkOrders = async () => {
     let search: SearchWorkOrderFilters;
     try {
       search = {
         assetId: "",
         operatorId: operatorId || "",
-        startDateTime: getStartDateTime()!,
-        endDateTime: getEndDateTime()!,
+        startDateTime: startDate!,
+        endDateTime: endDate!,
       };
     } catch (error) {
       console.error("Error fetching work orders:", error);
@@ -236,12 +215,15 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
       search.startDateTime = undefined;
       search.endDateTime = undefined;
     }
-    const filters: FilterWorkOrders = {
-      startDateTime: startDate!,
-      endDateTime: endDate!,
-    };
-    setFilterWorkOrders(filters);
-    const workOrders = await workOrderService.getWorkOrdersWithFilters(search);
+    // const filters: FilterWorkOrders = {
+    //   startDateTime: startDate!,
+    //   endDateTime: endDate!,
+    //   workOrderType: selectedTypeFilter
+    //     ? selectedTypeFilter
+    //     : filterWorkOrders?.workOrderType,
+    // };
+    // setFilterWorkOrders(filters);
+    let workOrders = await workOrderService.getWorkOrdersWithFilters(search);
     if (workOrders.length == 0 && !firstLoad) {
       setMessage("No hi ha ordres disponibles amb aquests filtres");
 
@@ -249,6 +231,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
         setMessage("");
       }, 3000);
     }
+
     setWorkOrders(
       workOrders.sort((a, b) => {
         const startTimeA = new Date(a.startTime).valueOf();
@@ -262,7 +245,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     return (
       <div className="bg-white  rounded-xl gap-4 p-2 shadow-md">
         <div className="flex gap-4 my-4 items-center">
-          {!isLoading && (
+          {
             <>
               <div className="flex items-center">
                 <label htmlFor="startDate" className="mr-2">
@@ -291,7 +274,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
                 />
               </div>
             </>
-          )}
+          }
 
           <button
             type="button"
@@ -351,13 +334,26 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
                 ))}
             </select>
             <span
-              className="text-white rounded-full p-3 w-full text-center bg-okron-corrective font-semibold hover:cursor-pointer"
+              className={`text-white rounded-full p-3 w-full text-center bg-okron-corrective font-semibold hover:cursor-pointer`}
               onClick={() => {
-                if (selectedTypeFilter == WorkOrderType.Corrective) {
+                if (
+                  selectedTypeFilter == WorkOrderType.Corrective ||
+                  filterWorkOrders?.workOrderType == WorkOrderType.Corrective
+                ) {
                   setSelectedTypeFilter(undefined);
+                  setFilterWorkOrders({
+                    startDateTime: startDate!,
+                    endDateTime: endDate!,
+                    workOrderType: undefined,
+                  });
                   return;
                 }
                 setSelectedTypeFilter(WorkOrderType.Corrective);
+                setFilterWorkOrders({
+                  startDateTime: startDate!,
+                  endDateTime: endDate!,
+                  workOrderType: WorkOrderType.Corrective,
+                });
               }}
             >
               Correctius:{" "}
@@ -370,11 +366,24 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
             <span
               className="text-white rounded-full p-3 w-full text-center bg-okron-preventive font-semibold hover:cursor-pointer"
               onClick={() => {
-                if (selectedTypeFilter == WorkOrderType.Preventive) {
+                if (
+                  selectedTypeFilter == WorkOrderType.Preventive ||
+                  filterWorkOrders?.workOrderType == WorkOrderType.Preventive
+                ) {
                   setSelectedTypeFilter(undefined);
+                  setFilterWorkOrders({
+                    startDateTime: startDate!,
+                    endDateTime: endDate!,
+                    workOrderType: undefined,
+                  });
                   return;
                 }
                 setSelectedTypeFilter(WorkOrderType.Preventive);
+                setFilterWorkOrders({
+                  startDateTime: startDate!,
+                  endDateTime: endDate!,
+                  workOrderType: WorkOrderType.Preventive,
+                });
               }}
             >
               Preventius:{" "}
@@ -429,17 +438,6 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     }
   };
 
-  const handleTypeFilterChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    let selectedValue = event.target.value;
-    if (!selectedValue) {
-      setSelectedTypeFilter(undefined);
-    } else {
-      setSelectedTypeFilter(parseInt(event.target.value));
-    }
-  };
-
   const filteredWorkOrders = workOrders.filter((order) => {
     if (
       selectedStateFilter !== undefined &&
@@ -466,6 +464,13 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     ) {
       return false;
     }
+    if (
+      filterWorkOrders?.workOrderType != undefined &&
+      order.workOrderType != filterWorkOrders?.workOrderType
+    ) {
+      return false;
+    }
+
     return true;
   });
 
@@ -541,7 +546,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   return (
     <>
       <div className="flex flex-col gap-4">
-        {enableFilters && !isLoading && renderFilterWorkOrders()}
+        {enableFilters && renderFilterWorkOrders()}
         <DataTable
           columns={columns}
           data={filteredWorkOrders}

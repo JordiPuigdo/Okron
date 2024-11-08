@@ -14,8 +14,8 @@ import {
   Filters,
   FiltersFormat,
   TableButtons,
-} from "components/table/interfaceTable";
-import { EntityTable } from "components/table/tableEntitys";
+} from "components/table/interface/interfaceTable";
+import { EntityTable } from "components/table/interface/tableEntitys";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
@@ -23,6 +23,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
 import { formatDateQuery } from "app/utils/utils";
 import { Button } from "designSystem/Button/Buttons";
+import { document } from "postcss";
 
 interface SparePartTableProps {
   enableFilterAssets?: boolean;
@@ -202,7 +203,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
   const sparePartService = new SparePartService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
-  const { loginUser } = useSessionStore((state) => state);
+  const { loginUser, setFilterSpareParts } = useSessionStore((state) => state);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
   const [isLoading, setIsLoading] = useState(false);
@@ -246,12 +247,23 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
     );
     if (isConfirmed) {
       await sparePartService.deleteSparePart(id).then((data) => {
-        window.location.reload();
+        setSpareParts(spareParts.filter((sparePart) => sparePart.id !== id));
       });
     }
   };
 
   async function filterSpareParts() {
+    /*setFilterSpareParts({
+      startDateTime: startDate!,
+      endDateTime: endDate!,
+      code: code,
+      description: description,
+      family: family,
+      refSupplier: refSupplier,
+      ubication: ubication,
+    });*/
+    const test = window.document.getElementById("filter-code");
+    debugger;
     const x: SparePartDetailRequest = {
       assetId: assetId,
       id: sparePartId,

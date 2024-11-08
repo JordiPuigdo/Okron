@@ -1,4 +1,7 @@
-import { Column, ColumnFormat } from "components/table/interfaceTable";
+import {
+  Column,
+  ColumnFormat,
+} from "components/table/interface/interfaceTable";
 
 export const columnsSparePartConsumedReport: Column[] = [
   {

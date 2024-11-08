@@ -4,7 +4,8 @@ import Link from "next/link";
 import { Asset } from "app/interfaces/Asset";
 import AssetService from "app/services/assetService";
 import { SvgSpinner } from "app/icons/icons";
-import { ButtonTypesTable, LoadingState } from "components/table/DataTable";
+import { ButtonTypesTable } from "components/table/DataTable";
+import { LoadingState } from "app/types/loadingState";
 
 interface Props {
   asset: Asset;

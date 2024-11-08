@@ -7,8 +7,8 @@ import {
   Filters,
   FiltersFormat,
   TableButtons,
-} from "components/table/interfaceTable";
-import { EntityTable } from "components/table/tableEntitys";
+} from "components/table/interface/interfaceTable";
+import { EntityTable } from "components/table/interface/tableEntitys";
 import { useEffect, useState } from "react";
 
 interface PreventiveTableProps {

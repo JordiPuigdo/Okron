@@ -11,9 +11,9 @@ import {
   Filters,
   FiltersFormat,
   TableButtons,
-} from "components/table/interfaceTable";
+} from "components/table/interface/interfaceTable";
 import DataTable from "components/table/DataTable";
-import { EntityTable } from "components/table/tableEntitys";
+import { EntityTable } from "components/table/interface/tableEntitys";
 
 export default function InspectionPointsPage() {
   const [inspectionPoints, setInspectionPoints] = useState<InspectionPoint[]>(

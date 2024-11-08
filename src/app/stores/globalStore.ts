@@ -1,5 +1,5 @@
 import { LoginUser, OperatorLogged } from "app/interfaces/User";
-import { FilterWorkOrders } from "app/types/filterWorkOrders";
+import { FilterSpareParts, FilterWorkOrders } from "app/types/filters";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -7,12 +7,14 @@ interface SessionStore {
   loginUser: LoginUser | undefined;
   operatorLogged: OperatorLogged | undefined;
   filterWorkOrders: FilterWorkOrders | undefined;
+  filterSpareParts: FilterSpareParts | undefined;
 }
 
 interface SessionActions {
   setLoginUser: (loginUser: LoginUser | undefined) => void;
   setOperatorLogged: (operatorLogged: OperatorLogged | undefined) => void;
   setFilterWorkOrders: (filterWorkOrders: FilterWorkOrders | undefined) => void;
+  setFilterSpareParts: (filterSpareParts: FilterSpareParts | undefined) => void;
 }
 
 export const useSessionStore = create(
@@ -21,6 +23,7 @@ export const useSessionStore = create(
       loginUser: undefined,
       operatorLogged: undefined,
       filterWorkOrders: undefined,
+      filterSpareParts: undefined,
       setLoginUser: (value) => {
         set({ loginUser: value });
       },
@@ -29,6 +32,9 @@ export const useSessionStore = create(
       },
       setFilterWorkOrders: (value) => {
         set({ filterWorkOrders: value });
+      },
+      setFilterSpareParts: (value) => {
+        set({ filterSpareParts: value });
       },
     }),
     {

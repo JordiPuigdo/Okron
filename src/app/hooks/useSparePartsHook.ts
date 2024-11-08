@@ -11,7 +11,6 @@ const sparePartService = new SparePartService(
 
 const fetchAllSpareParts = async (): Promise<SparePart[]> => {
   try {
-    debugger;
     const response = await sparePartService.getSpareParts();
     return response;
   } catch (error) {
@@ -23,7 +22,6 @@ const fetchAllSpareParts = async (): Promise<SparePart[]> => {
 const fetchSparePartByRequest = async (
   sparePartDetailRequest: SparePartDetailRequest
 ): Promise<SparePart> => {
-  debugger;
   sparePartService
     .getSparePart(sparePartDetailRequest)
     .then((response) => {

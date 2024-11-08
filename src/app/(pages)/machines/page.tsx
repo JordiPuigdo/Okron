@@ -17,8 +17,8 @@ import {
   Filters,
   FiltersFormat,
   TableButtons,
-} from "components/table/interfaceTable";
-import { EntityTable } from "components/table/tableEntitys";
+} from "components/table/interface/interfaceTable";
+import { EntityTable } from "components/table/interface/tableEntitys";
 
 export default function MachinesPage() {
   const [machines, setMachines] = useState<Machine[]>([]);

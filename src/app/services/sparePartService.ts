@@ -159,11 +159,11 @@ class SparePartService {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to update sparePart`);
+        throw new Error(`Failed to delete sparePart`);
       }
       return true;
     } catch (error) {
-      console.error("Error updating SparePart:", error);
+      console.error("Error delete SparePart:", error);
       throw error;
     }
   }

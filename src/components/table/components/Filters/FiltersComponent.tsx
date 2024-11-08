@@ -1,19 +1,24 @@
 import React, { useState } from "react";
-import { Filters, FiltersFormat } from "./interfaceTable";
+import { Filters, FiltersFormat } from "../../interface/interfaceTable";
 import DatePicker from "react-datepicker";
 import ca from "date-fns/locale/ca";
+import { useSessionStore } from "app/stores/globalStore";
+import { EntityTable } from "components/table/interface/tableEntitys";
 
 interface FiltersComponentProps {
   filters?: Filters[];
   onFilterChange?: (key: string, value: string | boolean | Date) => void;
   onFilterDateChange?: (date: Date) => void;
+  entity: EntityTable;
 }
 
 const FiltersComponent: React.FC<FiltersComponentProps> = ({
   filters,
   onFilterChange,
   onFilterDateChange,
+  entity,
 }) => {
+  const { filterSpareParts, setFilterSpareParts } = useSessionStore();
   const currentDate = new Date();
   const [date, setDate] = useState<Date | null>(currentDate);
 
@@ -26,6 +31,9 @@ const FiltersComponent: React.FC<FiltersComponentProps> = ({
     if (onFilterChange) {
       onFilterChange(key, value);
     }
+    /*   if (entity === EntityTable.SPAREPART && typeof value === "string") {
+      handleFilterSpareParts(key, value as string);
+    }*/
   };
 
   const handleDateChange = (date: Date) => {
@@ -34,6 +42,48 @@ const FiltersComponent: React.FC<FiltersComponentProps> = ({
       onFilterDateChange(date);
     }
   };
+
+  function handleFilterSpareParts(key: string, value: string) {
+    if (key === "code") {
+      setFilterSpareParts({
+        ...filterSpareParts,
+        code: value,
+      });
+    }
+    if (key === "description") {
+      setFilterSpareParts({
+        ...filterSpareParts,
+        description: value,
+      });
+    }
+    if (key === "family") {
+      setFilterSpareParts({
+        ...filterSpareParts,
+        family: value,
+      });
+    }
+
+    if (key === "refProvider") {
+      setFilterSpareParts({
+        ...filterSpareParts,
+        refSupplier: value,
+      });
+    }
+    if (key === "ubication") {
+      setFilterSpareParts({
+        ...filterSpareParts,
+        ubication: value,
+      });
+    }
+  }
+
+  /* if (filterSpareParts !== undefined) {
+    handleInputChange("code", filterSpareParts.code as string);
+    handleInputChange("description", filterSpareParts.description as string);
+    handleInputChange("family", filterSpareParts.family as string);
+    handleInputChange("refProvider", filterSpareParts.refSupplier as string);
+    handleInputChange("ubication", filterSpareParts.ubication as string);
+  }*/
 
   return (
     <>
@@ -44,6 +94,7 @@ const FiltersComponent: React.FC<FiltersComponentProps> = ({
               <div key={filter.key} className="flex items-center">
                 {filter.format === FiltersFormat.TEXT && (
                   <input
+                    id={`filter-${filter.key}`}
                     type="text"
                     placeholder={filter.label}
                     className="text-sm bg-blue-gray-100 rounded-lg border border-gray-500"
