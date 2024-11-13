@@ -1,27 +1,27 @@
-"use client";
-import { useEffect,useState } from "react";
-import SparePartTable from "app/(pages)/spareParts/components/SparePartTable";
-import { useWorkOrders } from "app/hooks/useWorkOrders";
-import { SvgSpinner } from "app/icons/icons";
-import { LoginUser, UserPermission } from "app/interfaces/User";
+'use client';
+import { useEffect, useState } from 'react';
+import SparePartTable from 'app/(pages)/spareParts/components/SparePartTable';
+import { useWorkOrders } from 'app/hooks/useWorkOrders';
+import { SvgSpinner } from 'app/icons/icons';
+import { LoginUser, UserPermission } from 'app/interfaces/User';
 import WorkOrder, {
   SearchWorkOrderFilters,
   StateWorkOrder,
   WorkOrderType,
-} from "app/interfaces/workOrder";
-import OperatorService from "app/services/operatorService";
+} from 'app/interfaces/workOrder';
+import OperatorService from 'app/services/operatorService';
 import {
   translateStateWorkOrder,
   translateWorkOrderType,
-} from "app/utils/utils";
-import dayjs from "dayjs";
-import { BarChartComponent } from "designSystem/BarChart/BarChartComponent";
-import { Button } from "designSystem/Button/Buttons";
-import { DonutChartComponent } from "designSystem/DonutChart/DonutChartComponent";
+} from 'app/utils/utils';
+import dayjs from 'dayjs';
+import { BarChartComponent } from 'designSystem/BarChart/BarChartComponent';
+import { Button } from 'designSystem/Button/Buttons';
+import { DonutChartComponent } from 'designSystem/DonutChart/DonutChartComponent';
 
-import CostXAsset from "../components/CostXAsset";
-import OTsXAsset from "../components/OTsXAsset";
-import WorkOrdersDashboard from "../components/WorkOrdersDashboard";
+import CostXAsset from '../components/CostXAsset';
+import OTsXAsset from '../components/OTsXAsset';
+import WorkOrdersDashboard from '../components/WorkOrdersDashboard';
 
 interface WorkOrdersChartProps {
   operator: string;
@@ -55,9 +55,9 @@ interface WorkOrderStateChartProps {
 }
 
 const Filter = [
-  { key: 0, label: "Mensual" },
-  { key: 1, label: "Setmanal" },
-  { key: 2, label: "Dia" },
+  { key: 0, label: 'Mensual' },
+  { key: 1, label: 'Setmanal' },
+  { key: 2, label: 'Dia' },
 ];
 
 export interface DashboardMM {
@@ -98,23 +98,24 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
   const [totalCosts, setTotalCosts] = useState<number>(0);
 
   const firstDayOfMonth = dayjs
-    .utc(dayjs(), "Europe/Madrid")
-    .startOf("month")
+    .utc(dayjs(), 'Europe/Madrid')
+    .startOf('month')
     .toDate();
   const firstDayOfWeek = dayjs
-    .utc(dayjs(), "Europe/Madrid")
-    .startOf("isoWeek")
+    .utc(dayjs(), 'Europe/Madrid')
+    .startOf('isoWeek')
     .toDate();
 
   const { fetchWithFilters } = useWorkOrders();
 
   const stateColors: { [key in StateWorkOrder]: string } = {
-    [StateWorkOrder.Waiting]: "border-red-500",
-    [StateWorkOrder.OnGoing]: "border-yellow-500",
-    [StateWorkOrder.Paused]: "border-gray-300",
-    [StateWorkOrder.PendingToValidate]: "border-red-200",
-    [StateWorkOrder.Requested]: "border-red-500",
-    [StateWorkOrder.Finished]: "border-green-500",
+    [StateWorkOrder.Waiting]: 'border-red-500',
+    [StateWorkOrder.OnGoing]: 'border-yellow-500',
+    [StateWorkOrder.Paused]: 'border-gray-300',
+    [StateWorkOrder.PendingToValidate]: 'border-red-200',
+    [StateWorkOrder.Requested]: 'border-red-500',
+    [StateWorkOrder.Finished]: 'border-green-500',
+    [StateWorkOrder.Open]: 'border-green-500',
   };
 
   const handleFilterClick = (filter: number) => {
@@ -143,13 +144,13 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
     setWorkOrderState([]);
 
     const filters: SearchWorkOrderFilters = {
-      assetId: "",
-      operatorId: "",
+      assetId: '',
+      operatorId: '',
       startDateTime: date,
       endDateTime: currentDate,
     };
 
-    await fetchWithFilters(filters).then((response) => {
+    await fetchWithFilters(filters).then(response => {
       setWorkOrders(response);
       getTopAssets(response);
 
@@ -157,7 +158,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
 
       if (!operators) return;
 
-      const updatedWorkOrderTypes = validStates.map((state) => ({
+      const updatedWorkOrderTypes = validStates.map(state => ({
         statWorkOrder: state,
         value: 0,
         color: stateColors[state],
@@ -171,9 +172,9 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
 
       getTotalMinutes(response);
       getTotalCosts(response);
-      response.forEach((workOrder) => {
+      response.forEach(workOrder => {
         const index = validStates.findIndex(
-          (state) => state === workOrder.stateWorkOrder
+          state => state === workOrder.stateWorkOrder
         );
         if (index !== -1) {
           updatedWorkOrderTypes[index].value++;
@@ -191,9 +192,9 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
           workOrderTypeMap.set(workOrderType, workOrderTypeChartProps);
         }
 
-        const operatorId = workOrder.operatorId?.map((op) => op) || [];
+        const operatorId = workOrder.operatorId?.map(op => op) || [];
 
-        operatorId.forEach((operatorName) => {
+        operatorId.forEach(operatorName => {
           const existingOperator = operatorMap.get(operatorName);
 
           if (existingOperator) {
@@ -205,7 +206,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
           } else {
             const newOperatorEntry: WorkOrdersChartProps = {
               operator:
-                operators.find((x) => x.id === operatorName)?.name || "Proves",
+                operators.find(x => x.id === operatorName)?.name || 'Proves',
               Preventius:
                 workOrder.workOrderType === WorkOrderType.Preventive ? 1 : 0,
               Correctius:
@@ -226,7 +227,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
 
   const getTotalMinutes = (workOrders: WorkOrder[]) => {
     let totalMinutes = 0;
-    workOrders.forEach((workOrder) => {
+    workOrders.forEach(workOrder => {
       totalMinutes += calculateTotalTime(workOrder);
     });
     setTotalMinutes(totalMinutes);
@@ -235,7 +236,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
   const calculateTotalTime = (workOrder: WorkOrder) => {
     let totalTime = 0;
 
-    workOrder.workOrderOperatorTimes?.forEach((time) => {
+    workOrder.workOrderOperatorTimes?.forEach(time => {
       const startTime = new Date(time.startTime).getTime();
       const endTime = time.endTime ? new Date(time.endTime).getTime() : null;
 
@@ -250,7 +251,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
 
   const getTotalCosts = (workOrders: WorkOrder[]) => {
     let totalCosts = 0;
-    workOrders.forEach((workOrder) => {
+    workOrders.forEach(workOrder => {
       totalCosts += calculateTotalCosts(workOrder);
     });
     setTotalCosts(totalCosts);
@@ -259,7 +260,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
   const calculateTotalCosts = (workOrder: WorkOrder) => {
     let totalCosts = 0;
 
-    workOrder.workOrderSpareParts?.forEach((sparePart) => {
+    workOrder.workOrderSpareParts?.forEach(sparePart => {
       totalCosts += sparePart.quantity * 94.32;
       //sparePart.sparePart.price;
     });
@@ -270,7 +271,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
   useEffect(() => {
     if (loginUser?.permission == UserPermission.Administrator) {
       fetchData(firstDayOfMonth);
-      const initialWorkOrderTypes = validStates.map((state) => ({
+      const initialWorkOrderTypes = validStates.map(state => ({
         statWorkOrder: state,
         value: 0,
         color: stateColors[state],
@@ -283,8 +284,8 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
     const assetMap = new Map<string, AssetChartProps>();
 
     workOrders
-      .filter((x) => x.active == true)
-      .forEach((workOrder) => {
+      .filter(x => x.active == true)
+      .forEach(workOrder => {
         const asset = workOrder.asset?.description;
         if (asset) {
           const existingAsset = assetMap.get(asset);
@@ -323,16 +324,16 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
       ConsumedSparePartsChartProps
     >();
 
-    workOrders.forEach((workOrder) => {
+    workOrders.forEach(workOrder => {
       const consumedSpareParts = workOrder.workOrderSpareParts?.map(
-        (sparePart) => sparePart
+        sparePart => sparePart
       );
 
       if (consumedSpareParts) {
-        consumedSpareParts.forEach((consumedSparePart) => {
+        consumedSpareParts.forEach(consumedSparePart => {
           const existingConsumedSparePart = consumedSparePartsMap.get(
             consumedSparePart.sparePart.code +
-              " - " +
+              ' - ' +
               consumedSparePart.sparePart.description
           );
           if (existingConsumedSparePart) {
@@ -341,14 +342,14 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
             const newConsumedSparePartEntry: ConsumedSparePartsChartProps = {
               sparePart:
                 consumedSparePart.sparePart.code +
-                " - " +
+                ' - ' +
                 consumedSparePart.sparePart.description,
               number: consumedSparePart.quantity,
               totalStock: consumedSparePart.sparePart.stock,
             };
             consumedSparePartsMap.set(
               consumedSparePart.sparePart.code +
-                " - " +
+                ' - ' +
                 consumedSparePart.sparePart.description,
               newConsumedSparePartEntry
             );
@@ -370,14 +371,14 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
     <div className="flex flex-col w-full gap-4">
       <div className="flex flex-col bg-white gap-4 w-full items-center p-4 rounded-xl border-2 border-blue-950">
         <div className="flex justify-start w-full gap-2 py-4">
-          {Filter.map((filter) => (
+          {Filter.map(filter => (
             <Button
               key={filter.key}
               type="none"
               className={`rounded-md text-white ${
                 filter.key === selectedFilter
-                  ? "bg-blue-950 hover:cursor-default"
-                  : "bg-blue-500 hover:bg-blue-600 "
+                  ? 'bg-blue-950 hover:cursor-default'
+                  : 'bg-blue-500 hover:bg-blue-600 '
               }`}
               customStyles="flex text-center"
               onClick={() => handleFilterClick(filter.key)}
@@ -389,28 +390,28 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
             <span>Data:</span>
             <span>
               {selectedFilter == 0
-                ? firstDayOfMonth.toLocaleDateString("en-GB")
+                ? firstDayOfMonth.toLocaleDateString('en-GB')
                 : selectedFilter === 1
-                ? firstDayOfWeek.toLocaleDateString("en-GB")
-                : currentDate.toLocaleDateString("en-GB")}{" "}
-              {" - "} {currentDate.toLocaleDateString("en-GB")}
+                ? firstDayOfWeek.toLocaleDateString('en-GB')
+                : currentDate.toLocaleDateString('en-GB')}{' '}
+              {' - '} {currentDate.toLocaleDateString('en-GB')}
             </span>
           </div>
           <div className="flex flex-col justify-start w-full border-l-2 pl-2 p-1 border-blue-950 bg-gray-200 rounded-sm">
             <span>Minuts: </span>
             <span>
-              {Math.round(totalMinutes).toLocaleString().replace(",", ".")}
+              {Math.round(totalMinutes).toLocaleString().replace(',', '.')}
             </span>
           </div>
           <div className="flex flex-col justify-start w-full border-l-2 pl-2 p-1 border-blue-950 bg-gray-200 rounded-sm">
             <span>Cost Material: </span>
             <span>
-              {Math.round(totalCosts).toLocaleString().replace(",", ".")} €
+              {Math.round(totalCosts).toLocaleString().replace(',', '.')} €
             </span>
           </div>
         </div>
         <div className="flex gap-4 text-white w-full  ">
-          {workOrderState.map((workOrderType) => (
+          {workOrderState.map(workOrderType => (
             <div
               key={workOrderType.statWorkOrder}
               className={`flex flex-col justify-center gap-4 p-4 bg-gray-900 w-full border-t-4 ${workOrderType.color} rounded`}
@@ -434,7 +435,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
         <div className="border-2 p-2 border-blue-950 w-full rounded-xl bg-white justify-center">
           <DonutChartComponent
             chartData={workOrderTypeChartData}
-            category={["Preventius", "Correctius"]}
+            category={['Preventius', 'Correctius']}
             index="index"
             title="Correctius vs Preventius"
           />
@@ -453,7 +454,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
       <div className="flex flex-grow w-full gap-4 items-center">
         <div className="flex flex-grow border-2  border-blue-950 w-full rounded-xl bg-white p-2">
           <BarChartComponent
-            category={["Preventius", "Correctius"]}
+            category={['Preventius', 'Correctius']}
             chartData={chartData}
             index="operator"
             title="Ordres de treball per operari"

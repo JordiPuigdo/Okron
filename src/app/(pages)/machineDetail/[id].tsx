@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
-import Machine from "app/interfaces/machine";
+import { useEffect, useState } from 'react';
+import Machine from 'app/interfaces/machine';
 import WorkOrder, {
   AddWorkOrderOperatorTimes,
   FinishWorkOrderOperatorTimes,
   StateWorkOrder,
-} from "app/interfaces/workOrder";
-import MachineService from "app/services/machineService";
-import WorkOrderService from "app/services/workOrderService";
-import MainLayout from "components/layout/MainLayout";
-import { useRouter } from "next/router";
+} from 'app/interfaces/workOrder';
+import MachineService from 'app/services/machineService';
+import WorkOrderService from 'app/services/workOrderService';
+import MainLayout from 'components/layout/MainLayout';
+import { useRouter } from 'next/router';
 
 const MachineDetailsPage = () => {
   const router = useRouter();
@@ -16,10 +16,10 @@ const MachineDetailsPage = () => {
   const [machine, setMachine] = useState<Machine | null>();
   const [WorkOrder, setWorkOrder] = useState<WorkOrder[] | []>([]);
   const machineService = new MachineService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+    process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
   const workOrderService = new WorkOrderService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+    process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
   const [selectedWorkOrderId, setSelectedWorkOrderId] = useState<
     string | null
@@ -29,21 +29,12 @@ const MachineDetailsPage = () => {
   );
   const [showPreventive, setShowPreventive] = useState(false);
 
-  const stateTranslations: Record<StateWorkOrder, string> = {
-    [StateWorkOrder.Waiting]: "Pendent",
-    [StateWorkOrder.OnGoing]: "En Curs",
-    [StateWorkOrder.Paused]: "Pausada",
-    [StateWorkOrder.Finished]: "Acabada",
-    [StateWorkOrder.Requested]: "",
-    [StateWorkOrder.PendingToValidate]: "Validació Pendent",
-  };
-
   useEffect(() => {
     if (id) {
-      machineService.getMachineById(id as string).then((data) => {
+      machineService.getMachineById(id as string).then(data => {
         setMachine(data);
       });
-      workOrderService.getWorkOrdersByMachine(id as string).then((data) => {
+      workOrderService.getWorkOrdersByMachine(id as string).then(data => {
         setWorkOrder(data);
       });
     }
@@ -51,7 +42,7 @@ const MachineDetailsPage = () => {
 
   const toggleVisibility = (section: string) => {
     switch (section) {
-      case "Preventive":
+      case 'Preventive':
         setShowPreventive(!showPreventive);
         setSelectedWorkOrderId(null);
         break;
@@ -64,7 +55,7 @@ const MachineDetailsPage = () => {
     //TODO Fitxar Operari
     const addWorkOrderOperatorTimes: AddWorkOrderOperatorTimes = {
       WorkOrderId: id,
-      operatorId: "652fdb692614987920656210",
+      operatorId: '652fdb692614987920656210',
       startTime: new Date(),
     };
     await workOrderService.addWorkOrderOperatorTimes(addWorkOrderOperatorTimes);
@@ -74,7 +65,7 @@ const MachineDetailsPage = () => {
     //TODO Fitxar Operari
     const finishWorkOrderOperatorTimes: FinishWorkOrderOperatorTimes = {
       WorkOrderId: id,
-      operatorId: "652fdb692614987920656210",
+      operatorId: '652fdb692614987920656210',
       finishTime: new Date(),
     };
     await workOrderService.finishWorkOrderOperatorTimes(
@@ -108,7 +99,7 @@ const MachineDetailsPage = () => {
         <div className="flex-grow mr-6">
           {showPreventive && WorkOrder && (
             <div className="gap-4">
-              {WorkOrder.map((op) => (
+              {WorkOrder.map(op => (
                 <div
                   key={op.id}
                   className="bg-blue-100 p-4 rounded-lg shadow-md mb-4"
@@ -116,14 +107,12 @@ const MachineDetailsPage = () => {
                     setSelectedWorkOrderId(op.id);
                     setSelectedWorkOrder(op);
                   }}
-                  style={{ cursor: "pointer" }}
+                  style={{ cursor: 'pointer' }}
                 >
                   <h4 className="text-lg font-semibold mb-2">
                     {op.description}
                   </h4>
-                  <p className="text-gray-600 mb-2">
-                    Estat: {stateTranslations[op.stateWorkOrder]}
-                  </p>
+                  <p className="text-gray-600 mb-2">Estat:</p>
                 </div>
               ))}
             </div>
@@ -175,8 +164,8 @@ const MachineDetailsPage = () => {
                 <div>
                   {selectedWorkOrderId !== null &&
                     WorkOrder.find(
-                      (op) => op.id === selectedWorkOrderId
-                    )?.workOrderSpareParts?.map((sparePart) => (
+                      op => op.id === selectedWorkOrderId
+                    )?.workOrderSpareParts?.map(sparePart => (
                       <div
                         key={sparePart.id}
                         className="bg-white rounded-md shadow-md p-4 mb-4"
@@ -220,9 +209,9 @@ const MachineDetailsPage = () => {
           <div className="flex justify-center">
             <button
               className={`bg-blue-500 hover:bg-blue-700 text-white font-bold h-full border-2 border-white px-4 ${
-                showPreventive ? "bg-blue-700" : ""
+                showPreventive ? 'bg-blue-700' : ''
               }`}
-              onClick={() => toggleVisibility("Preventive")}
+              onClick={() => toggleVisibility('Preventive')}
             >
               Predictiu
             </button>
