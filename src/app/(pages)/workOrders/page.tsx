@@ -1,5 +1,6 @@
-import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
+import MainLayout from "components/layout/MainLayout";
+
 import WorkOrderTable from "./components/WorkOrderTable";
 
 export default function WorkOrdersPage() {

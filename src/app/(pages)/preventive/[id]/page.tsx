@@ -1,34 +1,31 @@
 "use client";
 
+import "react-datepicker/dist/react-datepicker.css";
+
+import { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { Asset } from "app/interfaces/Asset";
+import InspectionPoint from "app/interfaces/inspectionPoint";
 import Operator from "app/interfaces/Operator";
 import { Preventive, UpdatePreventiveRequest } from "app/interfaces/Preventive";
 import SparePart from "app/interfaces/SparePart";
-import InspectionPoint from "app/interfaces/inspectionPoint";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import AssetService from "app/services/assetService";
 import InspectionPointService from "app/services/inspectionPointService";
 import OperatorService from "app/services/operatorService";
 import PreventiveService from "app/services/preventiveService";
-import SparePartService from "app/services/sparePartService";
-
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import ca from "date-fns/locale/ca";
-import MainLayout from "components/layout/MainLayout";
-import Container from "components/layout/Container";
 import ChooseInspectionPoint from "components/inspectionPoint/ChooseInspectionPoint";
+import Container from "components/layout/Container";
+import MainLayout from "components/layout/MainLayout";
 import ChooseOperatorV2 from "components/operator/ChooseOperatorV2";
-import ChooseElement from "components/ChooseElement";
-import assetService from "app/services/assetService";
-import AssetService from "app/services/assetService";
-import { Asset } from "app/interfaces/Asset";
 import { ElementList } from "components/selector/ElementList";
-import { WorkOrder } from "app/interfaces/workOrder";
-import { WorkOrderPerPreventive } from "./components/WorkOrderPerPreventive";
+import ca from "date-fns/locale/ca";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+import { useRouter } from "next/navigation";
+
+import { WorkOrderPerPreventive } from "./components/WorkOrderPerPreventive";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);

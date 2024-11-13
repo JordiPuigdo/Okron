@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
-import Pagination from "./Pagination";
 import { SvgExportExcel, SvgSpinner } from "app/icons/icons";
-import { Column, Filters, TableButtons } from "./interface/interfaceTable";
-import { EntityTable } from "./interface/tableEntitys";
 import { useSessionStore } from "app/stores/globalStore";
 import useRoutes from "app/utils/useRoutes";
+
 import { RenderFilters } from "./components/Filters/RenderFilters";
-import { exportTableToExcel, sortData } from "./utils/TableUtils";
-import { TableHeader } from "./components/TableHeader";
 import { TableBodyComponent } from "./components/TableBody";
+import { TableHeader } from "./components/TableHeader";
+import { Column, Filters, TableButtons } from "./interface/interfaceTable";
+import { EntityTable } from "./interface/tableEntitys";
+import Pagination from "./Pagination";
+import { exportTableToExcel, sortData } from "./utils/TableUtils";
 
 interface DataTableProps {
   data: any[];
@@ -101,8 +102,11 @@ const DataTable: React.FC<DataTableProps> = ({
       case EntityTable.OPERATOR:
         setPathDetail(ROUTES.configuration.operators);
         break;
+      case EntityTable.MACHINE:
+        setPathDetail(ROUTES.configuration.machines);
+        break;
       default:
-        setPathDetail("");
+        setPathDetail("error");
     }
   }, []);
 
@@ -120,7 +124,7 @@ const DataTable: React.FC<DataTableProps> = ({
     handleSortChange(sortText);
   };
 
-  let totalQuantity = 0;
+  const totalQuantity = 0;
 
   const handleItemsPerPageChange = (value: number) => {
     setIsLoading(true);

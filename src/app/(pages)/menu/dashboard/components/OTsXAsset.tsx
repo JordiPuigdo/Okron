@@ -1,4 +1,4 @@
-import { AssetChartProps } from "../page";
+import { AssetChartProps } from '../DashboardMM/DashboardMM';
 
 export default function OTsXAsset({
   chartAssets,

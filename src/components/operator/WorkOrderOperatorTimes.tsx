@@ -1,24 +1,24 @@
 import React, { useState } from "react";
 import {
+  SvgLoginOperator,
+  SvgLogoutOperator,
+  SvgSpinner,
+} from "app/icons/icons";
+import Operator from "app/interfaces/Operator";
+import { UserPermission } from "app/interfaces/User";
+import {
   AddWorkOrderOperatorTimes,
   DeleteWorkOrderOperatorTimes,
   FinishWorkOrderOperatorTimes,
   UpdateWorkOrderOperatorTimes,
   WorkOrderOperatorTimes,
 } from "app/interfaces/workOrder";
-import Operator from "app/interfaces/Operator";
-import { formatDate } from "app/utils/utils";
 import WorkOrderService from "app/services/workOrderService";
-import {
-  SvgLoginOperator,
-  SvgLogoutOperator,
-  SvgSpinner,
-} from "app/icons/icons";
 import { useSessionStore } from "app/stores/globalStore";
-import { UserPermission } from "app/interfaces/User";
+import { formatDate } from "app/utils/utils";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -280,11 +280,11 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
         return null;
       }
 
-      let newStartTime = createDate(
+      const newStartTime = createDate(
         editedStartTime.length > 0 ? editedStartTime : starttime
       );
 
-      let updateWorkOrderOperatorTimes: UpdateWorkOrderOperatorTimes = {
+      const updateWorkOrderOperatorTimes: UpdateWorkOrderOperatorTimes = {
         workOrderId: workOrderId,
         startTime: newStartTime!,
         workOrderOperatorTimesId: workOrderOperatorTimesId,
@@ -294,7 +294,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
           alert("Format incorrecte, dia/mes/any hores/minuts");
           return null;
         }
-        let newEndTime = createDate(
+        const newEndTime = createDate(
           editedEndTime.length > 0 ? editedEndTime : endtime
         );
         updateWorkOrderOperatorTimes.endTime = newEndTime!;

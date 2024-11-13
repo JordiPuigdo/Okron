@@ -1,7 +1,7 @@
+import React from "react";
+import { Controller, SubmitHandler,useForm } from "react-hook-form";
 import Operator, { OperatorType } from "app/interfaces/Operator";
 import { translateOperatorType } from "app/utils/utils";
-import React from "react";
-import { useForm, Controller, SubmitHandler } from "react-hook-form";
 
 type OperatorFormProps = {
   operator?: Operator;

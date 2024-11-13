@@ -35,7 +35,7 @@ const PreventiveOperatorTable: React.FC<PreventiveOperatorTableProps> = ({
   );
 
   // Filter for pending preventives
-  let displayedPreventives = showPending
+  const displayedPreventives = showPending
     ? filteredPreventives?.filter(
         (preventive) => !assignedPreventiveIds?.has(preventive.id)
       )

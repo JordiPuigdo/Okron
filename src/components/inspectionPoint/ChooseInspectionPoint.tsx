@@ -1,7 +1,7 @@
 "use client";
+import { useEffect, useState } from "react";
 import InspectionPoint from "app/interfaces/inspectionPoint";
 import AutocompleteSearchBar from "components/selector/AutocompleteSearchBar";
-import { useEffect, useState } from "react";
 
 interface ChooseInspectionPointProps {
   preventiveInspectionPoints: InspectionPoint[];

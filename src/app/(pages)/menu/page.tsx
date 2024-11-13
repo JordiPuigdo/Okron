@@ -1,8 +1,9 @@
 import Container from "components/layout/Container";
 import LoginChecker from "components/layout/LoginChecker";
 import MainLayout from "components/layout/MainLayout";
-import DashboardPage from "./dashboard/page";
+
 import { HeaderMenu } from "./dashboard/components/HeaderMenu";
+import DashboardPage from "./dashboard/page";
 
 export default function MenuPage() {
   return (

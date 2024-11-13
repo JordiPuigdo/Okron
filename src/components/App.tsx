@@ -1,5 +1,7 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
+
+import Loader from "./Loader/loader";
 
 export default function Html({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -22,8 +24,14 @@ export default function Html({ children }: { children: ReactNode }) {
   const togglePreventiusSubMenu = () => {
     setPreventiusSubMenuOpen(!preventiusSubMenuOpen);
   };
+  const [loading, setLoading] = useState<boolean>(true);
+  useEffect(() => {
+    setTimeout(() => setLoading(false), 3000);
+  }, []);
 
-  return (
+  return loading ? (
+    <Loader />
+  ) : (
     <main className="min-h-screen h-100 bg-slate-300 flex">
       <div className="relative w-full max-w-full overflow-hidden">
         <div

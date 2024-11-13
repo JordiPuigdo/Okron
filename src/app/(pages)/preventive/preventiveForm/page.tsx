@@ -1,30 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { CreatePreventiveRequest, Preventive } from "app/interfaces/Preventive";
-import { useRouter } from "next/navigation";
-import PreventiveService from "app/services/preventiveService";
-import InspectionPointService from "app/services/inspectionPointService";
-import InspectionPoint from "app/interfaces/inspectionPoint";
-import OperatorService from "app/services/operatorService";
-import Operator from "app/interfaces/Operator";
-import MachineService from "app/services/machineService";
-
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import ca from "date-fns/locale/ca";
+
+import { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { SvgSpinner } from "app/icons/icons";
-import MainLayout from "components/layout/MainLayout";
-import Container from "components/layout/Container";
-import ChooseInspectionPoint from "components/inspectionPoint/ChooseInspectionPoint";
-import ChooseOperatorV2 from "components/operator/ChooseOperatorV2";
-import ChooseElement from "components/ChooseElement";
-import AssetService from "app/services/assetService";
-import { ElementList } from "components/selector/ElementList";
 import { Asset } from "app/interfaces/Asset";
+import InspectionPoint from "app/interfaces/inspectionPoint";
+import Operator from "app/interfaces/Operator";
+import { CreatePreventiveRequest, Preventive } from "app/interfaces/Preventive";
+import AssetService from "app/services/assetService";
+import InspectionPointService from "app/services/inspectionPointService";
+import MachineService from "app/services/machineService";
+import OperatorService from "app/services/operatorService";
+import PreventiveService from "app/services/preventiveService";
+import ChooseElement from "components/ChooseElement";
+import ChooseInspectionPoint from "components/inspectionPoint/ChooseInspectionPoint";
+import Container from "components/layout/Container";
+import MainLayout from "components/layout/MainLayout";
+import ChooseOperatorV2 from "components/operator/ChooseOperatorV2";
+import { ElementList } from "components/selector/ElementList";
+import ca from "date-fns/locale/ca";
 import { Button } from "designSystem/Button/Buttons";
 import OkronTimePicker from "designSystem/TimePicker/OkronTimePicker";
+import { useRouter } from "next/navigation";
 
 const PreventiveForm = () => {
   const router = useRouter();
@@ -184,7 +184,7 @@ const PreventiveForm = () => {
   };
 
   function notValidForm(preventive: Preventive) {
-    let invalidFields = [];
+    const invalidFields = [];
 
     if (!preventive.code || preventive.code.trim().length === 0) {
       invalidFields.push("Code");

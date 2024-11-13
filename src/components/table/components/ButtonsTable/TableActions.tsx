@@ -1,12 +1,12 @@
+import { useState } from "react";
+import { SvgDelete, SvgDetail, SvgSpinner } from "app/icons/icons";
 import { LoginUser, UserPermission } from "app/interfaces/User";
+import { LoadingState } from "app/types/loadingState";
+import Link from "next/link";
+
+import { ButtonTypesTable } from "../../DataTable";
 import { TableButtons } from "../../interface/interfaceTable";
 import { EntityTable } from "../../interface/tableEntitys";
-import Link from "next/link";
-import { SvgDelete, SvgDetail, SvgSpinner } from "app/icons/icons";
-
-import { useState } from "react";
-import { ButtonTypesTable } from "../../DataTable";
-import { LoadingState } from "app/types/loadingState";
 import { PreventiveButtons } from "./PreventiveButtons";
 import WorkOrderOperationsInTable from "./WorkOrderOperationsInTable";
 

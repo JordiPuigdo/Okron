@@ -1,8 +1,9 @@
-import { Modal } from "designSystem/Modals/Modal";
-import GenerateCorrective from "./GenerateCorrective";
 import { SvgClose } from "app/icons/icons";
-import { useGlobalStore } from "app/stores/globalStore";
 import { StateWorkOrder } from "app/interfaces/workOrder";
+import { useGlobalStore } from "app/stores/globalStore";
+import { Modal } from "designSystem/Modals/Modal";
+
+import GenerateCorrective from "./GenerateCorrective";
 
 interface ModalGenerateCorrectiveProps {
   assetId: string;

@@ -1,18 +1,21 @@
-import * as XLSX from "xlsx";
+import {
+  formatDate,
+  translateOperatorType,
+  translateStateWorkOrder,
+  translateWorkOrderType,
+} from 'app/utils/utils';
+import * as XLSX from 'xlsx';
 
-import AssetService from "app/services/assetService";
-import { EntityTable } from "../interface/tableEntitys";
+import { entityStatusConfig } from '../interface/EntityStatusConfig';
 import {
   Column,
   ColumnFormat,
   ColumnnAlign,
-} from "../interface/interfaceTable";
-import { formatDate, translateWorkOrderType } from "app/utils/utils";
-
-import { entityStatusConfig } from "../interface/EntityStatusConfig";
+} from '../interface/interfaceTable';
+import { EntityTable } from '../interface/tableEntitys';
 
 export function onDelete(id: string, entity: EntityTable) {
-  const confirm = window.confirm("Segur que voleu eliminar aquest registre?");
+  const confirm = window.confirm('Segur que voleu eliminar aquest registre?');
   if (!confirm) return;
 
   switch (entity) {
@@ -56,7 +59,7 @@ export function onDelete(id: string, entity: EntityTable) {
 // }
 
 export const getNestedFieldValue = (rowData: any, key: string) => {
-  const keys = key.split(".");
+  const keys = key.split('.');
   let value = rowData;
   for (const k of keys) {
     if (Array.isArray(value)) {
@@ -65,7 +68,7 @@ export const getNestedFieldValue = (rowData: any, key: string) => {
     if (value && Object.prototype.hasOwnProperty.call(value, k)) {
       value = value[k];
     } else {
-      return "";
+      return '';
     }
   }
   return value;
@@ -74,7 +77,7 @@ export const getNestedFieldValue = (rowData: any, key: string) => {
 export const sortData = (
   data: any[],
   sortColumn: string,
-  sortOrder: "ASC" | "DESC"
+  sortOrder: 'ASC' | 'DESC'
 ): any[] => {
   return data.sort((a: any, b: any) => {
     if (!a.hasOwnProperty(sortColumn) || !b.hasOwnProperty(sortColumn)) {
@@ -84,7 +87,7 @@ export const sortData = (
     const aValue = a[sortColumn];
     const bValue = b[sortColumn];
 
-    if (sortOrder === "ASC") {
+    if (sortOrder === 'ASC') {
       return aValue > bValue ? 1 : -1;
     } else {
       return aValue < bValue ? 1 : -1;
@@ -93,12 +96,12 @@ export const sortData = (
 };
 
 export const filterByActiveStatus = (record: any, filterActive: boolean) =>
-  typeof record === "object" &&
-  record.hasOwnProperty("active") &&
+  typeof record === 'object' &&
+  record.hasOwnProperty('active') &&
   (!filterActive || record.active);
 export const filterByUnderStock = (record: any) =>
-  typeof record === "object" &&
-  record.hasOwnProperty("minium") &&
+  typeof record === 'object' &&
+  record.hasOwnProperty('minium') &&
   record.minium < record.stock;
 
 export const formatCellContent = (
@@ -107,10 +110,9 @@ export const formatCellContent = (
   entity: string
 ) => {
   let value = getNestedFieldValue(rowData, column.key);
-  let classNametd = "p-4";
-  let className = "font-normal";
+  let classNametd = 'p-4';
+  let className = 'font-normal';
 
-  // Custom format handling
   if (column.format === ColumnFormat.DATE)
     value = formatDate(value, false, false);
   if (column.format === ColumnFormat.DATETIME) value = formatDate(value);
@@ -118,15 +120,24 @@ export const formatCellContent = (
     className = getStatusClassName(value, entity);
     value = translateWorkOrderType(value);
   }
-
-  if (column.key === "active") {
-    className += " w-full";
-    className += value
-      ? " bg-green-500 p-2 rounded-xl text-white"
-      : " bg-red-500 p-2 rounded-xl text-white";
+  if (column.format === ColumnFormat.STATEWORKORDER) {
+    className = getStatusClassName(value, 'WORKORDERSTATE');
+    value = translateStateWorkOrder(value);
   }
 
-  if (column.align === ColumnnAlign.RIGHT) classNametd += " text-right pr-8";
+  if (column.format === ColumnFormat.OPERATORTYPE) {
+    className = getStatusClassName(value, entity);
+    value = translateOperatorType(value);
+  }
+
+  if (column.key === 'active') {
+    className += ' w-full';
+    className += value
+      ? ' bg-green-500 p-2 rounded-xl text-white'
+      : ' bg-red-500 p-2 rounded-xl text-white';
+  }
+
+  if (column.align === ColumnnAlign.RIGHT) classNametd += ' text-right pr-8';
   if (rowData.colorRow) classNametd += ` ${rowData.colorRow}`;
 
   return { value, classNametd, className };
@@ -148,7 +159,7 @@ export const getStatusClassName = (status: string, entity: string): string => {
     const style = config.colors[uppercaseStatus];
     return ` text-white rounded-full p-1 text-sm flex justify-center text-center  ${style}`;
   }
-  return "";
+  return '';
 };
 
 const validColumns = [ColumnFormat.DATE, ColumnFormat.DATETIME];
@@ -159,17 +170,17 @@ export const exportTableToExcel = (
   filename: string
 ) => {
   const filteredColumns = columns.filter(
-    (col) =>
-      col.label.toLocaleUpperCase() !== "ID" &&
-      col.label.toLocaleUpperCase() !== "ACTIU" &&
-      col.label.toLocaleUpperCase() !== "SPAREPARTID"
+    col =>
+      col.label.toLocaleUpperCase() !== 'ID' &&
+      col.label.toLocaleUpperCase() !== 'ACTIU' &&
+      col.label.toLocaleUpperCase() !== 'SPAREPARTID'
   );
 
-  const headers = filteredColumns.map((col) => col.label);
+  const headers = filteredColumns.map(col => col.label);
 
   // Step 2: Map data rows using the `key` property of each column
-  const rows = data.map((row) =>
-    filteredColumns.map((col) => {
+  const rows = data.map(row =>
+    filteredColumns.map(col => {
       const cellValue = row[col.key];
 
       return validColumns.includes(col.format)
@@ -183,7 +194,7 @@ export const exportTableToExcel = (
   // Step 3: Create worksheet and workbook
   const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
   // Step 4: Export to Excel
   XLSX.writeFile(workbook, `${filename}.xlsx`);

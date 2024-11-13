@@ -1,6 +1,4 @@
 import { CreateDocumentationRequest, DeleteDocumentationRequest } from "app/interfaces/Documentation";
-import { error } from "console";
-import { RESPONSE_LIMIT_DEFAULT } from "next/dist/server/api-utils";
 
 class DocumentationService {
     private baseUrl: string;

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
+import { SvgDelete, SvgSpinner } from "app/icons/icons";
 import {
   AddCommentToWorkOrderRequest,
   WorkOrderComment,
 } from "app/interfaces/workOrder";
 import WorkOrderService from "app/services/workOrderService";
-import { SvgDelete, SvgSpinner } from "app/icons/icons";
 import { useSessionStore } from "app/stores/globalStore";
 import { formatDate } from "app/utils/utils";
 
@@ -70,7 +70,7 @@ const WorkOrderOperatorComments: React.FC<IWorkOrderCommentOperator> = ({
 
   const handleDeleteComment = async (commentId: string) => {
     try {
-      var x = await workOrderService.deleteCommentToWorkOrder(
+      const x = await workOrderService.deleteCommentToWorkOrder(
         workOrderId,
         commentId
       );

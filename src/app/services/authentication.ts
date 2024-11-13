@@ -1,5 +1,5 @@
 import Operator from "app/interfaces/Operator";
-import { LoginUser, OperatorLogged } from "app/interfaces/User";
+import { LoginUser } from "app/interfaces/User";
 
 
 class AuthenticationService {

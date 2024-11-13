@@ -12,6 +12,7 @@ export interface LoginUser {
   agentId: string;
   username: string;
   permission: UserPermission;
+  userType: UserType;
 }
 
 export enum UserPermission {
@@ -20,6 +21,12 @@ export enum UserPermission {
   Administrator,
   SuperAdministrator,
   SpareParts,
+  Production,
+}
+
+export enum UserType {
+  Maintenance,
+  Production,
 }
 
 export interface OperatorLogged {

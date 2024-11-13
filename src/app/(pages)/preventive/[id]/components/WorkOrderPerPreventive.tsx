@@ -1,16 +1,17 @@
 "use client";
 
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import ca from "date-fns/locale/ca";
-import { SvgSpinner, SvgDetail } from "app/icons/icons";
+
+import { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+import { SvgDetail,SvgSpinner } from "app/icons/icons";
+import { GetWOByPreventiveIdRequest } from "app/interfaces/Preventive";
 import { WorkOrder } from "app/interfaces/workOrder";
 import PreventiveService from "app/services/preventiveService";
 import useRoutes from "app/utils/useRoutes";
 import { formatDate, translateStateWorkOrder } from "app/utils/utils";
+import ca from "date-fns/locale/ca";
 import { Button } from "designSystem/Button/Buttons";
-import { useEffect, useState } from "react";
-import { GetWOByPreventiveIdRequest } from "app/interfaces/Preventive";
 
 export const WorkOrderPerPreventive = ({ id }: { id: string }) => {
   const preventiveService = new PreventiveService(

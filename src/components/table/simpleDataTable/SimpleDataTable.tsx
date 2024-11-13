@@ -1,15 +1,14 @@
-"use client";
+'use client';
 
+import { useState } from 'react';
+import DatePicker from 'react-datepicker';
 import {
   SparePartDetailRequest,
   SparePartPerAssetResponse,
-} from "app/interfaces/SparePart";
-import { formatDate, formatDateQuery } from "app/utils/utils";
-import Link from "next/link";
-import { useState } from "react";
-import ca from "date-fns/locale/ca";
-import DatePicker from "react-datepicker";
-import SparePartService from "app/services/sparePartService";
+} from 'app/interfaces/SparePart';
+import SparePartService from 'app/services/sparePartService';
+import { formatDateQuery } from 'app/utils/utils';
+import ca from 'date-fns/locale/ca';
 
 export default function SimpleDataTable({
   title,
@@ -29,7 +28,7 @@ export default function SimpleDataTable({
 
   const [startDate, setStartDate] = useState<Date | null>(currentDate);
   const [endDate, setEndDate] = useState<Date | null>(new Date());
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
   const [sparePerMachine, setSparePartPerMachine] = useState<
     SparePartPerAssetResponse[] | null
@@ -165,12 +164,12 @@ export default function SimpleDataTable({
           Anterior
         </button>
 
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
           <button
             key={page}
             onClick={() => handlePaginationClick(page)}
             className={`mr-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300 ${
-              currentPage === page ? "bg-blue-600" : ""
+              currentPage === page ? 'bg-blue-600' : ''
             }`}
           >
             {page}

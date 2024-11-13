@@ -1,35 +1,29 @@
 "use client";
 
-import MainLayout from "components/layout/MainLayout";
-import SparePart, {
-  SparePartDetailRequest,
-  SparePartDetailResponse,
-  SparePartPerAssetResponse,
-} from "app/interfaces/SparePart";
-import { useRouter } from "next/navigation";
+import "react-datepicker/dist/react-datepicker.css";
+
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import SparePartService from "app/services/sparePartService";
-import Container from "components/layout/Container";
-import { formatDate, startOrEndDate, formatDateQuery } from "app/utils/utils";
-
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import ca from "date-fns/locale/ca";
-import Link from "next/link";
-import TableSparePartsConsumed from "../components/tableSparePartsConsumed";
-import SimpleDataTable from "components/table/simpleDataTable/SimpleDataTable";
-import SparePartTable from "../components/SparePartTable";
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@tremor/react";
 import { SvgSpinner } from "app/icons/icons";
 import {
   CreateDocumentationRequest,
   DeleteDocumentationRequest,
   ObjectToInsert,
 } from "app/interfaces/Documentation";
-import { useSessionStore } from "app/stores/globalStore";
-import DocumentationService from "app/services/documentationService";
+import SparePart, {
+  SparePartDetailRequest,
+  SparePartPerAssetResponse,
+} from "app/interfaces/SparePart";
 import { UserPermission } from "app/interfaces/User";
+import DocumentationService from "app/services/documentationService";
+import SparePartService from "app/services/sparePartService";
+import { useSessionStore } from "app/stores/globalStore";
+import { formatDateQuery } from "app/utils/utils";
+import Container from "components/layout/Container";
+import MainLayout from "components/layout/MainLayout";
+import { useRouter } from "next/navigation";
+
+import SparePartTable from "../components/SparePartTable";
 
 export default function EditSparePart({ params }: { params: { id: string } }) {
   const router = useRouter();

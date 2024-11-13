@@ -1,24 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import AssetService from "app/services/assetService";
+import { useEffect,useState } from "react";
+import DatePicker from "react-datepicker";
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@tremor/react";
+import PreventiveTable from "app/(pages)/preventive/preventiveTable/preventiveTable";
+import SparePartTable from "app/(pages)/spareParts/components/SparePartTable";
+import WorkOrderTable from "app/(pages)/workOrders/components/WorkOrderTable";
+import { SvgSpinner } from "app/icons/icons";
 import {
   Asset,
   CreateAssetRequest,
   UpdateAssetRequest,
 } from "app/interfaces/Asset";
-import MainLayout from "components/layout/MainLayout";
-import Container from "components/layout/Container";
-import AssetForm from "../components/assetForm";
-import { SvgSpinner } from "app/icons/icons";
-import PreventiveTable from "app/(pages)/preventive/preventiveTable/preventiveTable";
-import WorkOrderTable from "app/(pages)/workOrders/components/WorkOrderTable";
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@tremor/react";
-import SparePartTable from "app/(pages)/spareParts/components/SparePartTable";
-import DatePicker from "react-datepicker";
-import ca from "date-fns/locale/ca";
+import AssetService from "app/services/assetService";
 import WorkOrderService from "app/services/workOrderService";
 import { CostsObject } from "components/Costs/CostsObject";
+import Container from "components/layout/Container";
+import MainLayout from "components/layout/MainLayout";
+import ca from "date-fns/locale/ca";
+
+import AssetForm from "../components/assetForm";
 
 interface AssetCosts {
   totalCosts: number;
@@ -134,7 +135,7 @@ export default function AssetDetailsPage({
 
   async function caculateAssetCosts() {
     const workOrders = await getWorkOrders();
-    let totalCosts: AssetCosts = {
+    const totalCosts: AssetCosts = {
       totalCosts: 0,
       operatorCosts: 0,
       sparePartCosts: 0,

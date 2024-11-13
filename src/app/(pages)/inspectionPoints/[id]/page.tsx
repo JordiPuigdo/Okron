@@ -1,12 +1,11 @@
 "use client";
+import { useEffect, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { SvgSpinner } from "app/icons/icons";
 import InspectionPoint from "app/interfaces/inspectionPoint";
 import InspectionPointService from "app/services/inspectionPointService";
 import Container from "components/layout/Container";
 import MainLayout from "components/layout/MainLayout";
-import router from "next/router";
-import { useEffect, useState } from "react";
-import { SubmitHandler, set, useForm } from "react-hook-form";
 
 export default function EditInspectionPoint({
   params,

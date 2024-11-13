@@ -1,7 +1,7 @@
 "use client";
+import { useState } from "react";
 import { WorkOrderType } from "app/interfaces/workOrder";
 import { useSessionStore } from "app/stores/globalStore";
-import { useState } from "react";
 
 interface FilterWOTypeProps {
   onClick: (type: WorkOrderType) => void;

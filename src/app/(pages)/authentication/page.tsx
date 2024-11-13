@@ -1,11 +1,12 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import AuthenticationComponent from "./authentication";
 import { User } from "app/interfaces/User";
-import useRoutes from "app/utils/useRoutes";
-import { useSessionStore } from "app/stores/globalStore";
 import AuthenticationService from "app/services/authentication";
+import { useSessionStore } from "app/stores/globalStore";
+import useRoutes from "app/utils/useRoutes";
+import { useRouter } from "next/navigation";
+
+import AuthenticationComponent from "./authentication";
 
 export default function AuthenticationPage() {
   const [username, setUserName] = useState("");

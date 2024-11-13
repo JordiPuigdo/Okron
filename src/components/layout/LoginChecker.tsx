@@ -1,10 +1,10 @@
 "use client";
 import { ReactNode, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import useRoutes from "app/utils/useRoutes";
-import { useToken } from "app/utils/token";
 import { SvgSpinner } from "app/icons/icons";
 import { useSessionStore } from "app/stores/globalStore";
+import { useToken } from "app/utils/token";
+import useRoutes from "app/utils/useRoutes";
+import { useRouter } from "next/navigation";
 
 interface LoginCheckerProps {
   children: ReactNode;

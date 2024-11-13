@@ -1,8 +1,8 @@
-import MainLayout from "components/layout/MainLayout";
-import AuthenticationPage from "./(pages)/authentication/page";
-import Container from "components/layout/Container";
-import { Metadata } from "next";
 import LoginChecker from "components/layout/LoginChecker";
+import MainLayout from "components/layout/MainLayout";
+import { Metadata } from "next";
+
+import AuthenticationPage from "./(pages)/authentication/page";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://okron.io"),

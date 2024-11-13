@@ -1,15 +1,15 @@
 "use client";
-import { SvgSpinner } from "app/icons/icons";
-import MainLayout from "components/layout/MainLayout";
-import { Preventive } from "app/interfaces/Preventive";
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import { SvgSpinner } from "app/icons/icons";
+import { Preventive } from "app/interfaces/Preventive";
 import PreventiveService from "app/services/preventiveService";
 import Container from "components/layout/Container";
-import { useRouter } from "next/navigation";
-import PreventiveTable from "./preventiveTable/preventiveTable";
-import GeneratePreventive from "./components/GeneratePreventive";
+import MainLayout from "components/layout/MainLayout";
 import { Button } from "designSystem/Button/Buttons";
+import { useRouter } from "next/navigation";
+
+import GeneratePreventive from "./components/GeneratePreventive";
+import PreventiveTable from "./preventiveTable/preventiveTable";
 
 function PreventivePage() {
   const preventiveService = new PreventiveService(

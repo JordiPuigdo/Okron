@@ -1,4 +1,4 @@
-import WorkOrder, { AddCommentToWorkOrderRequest, AddWorkOrderOperatorTimes, CreateWorkOrderRequest, DeleteWorkOrderOperatorTimes, FinishWorkOrderOperatorTimes, SaveInspectionResultPointRequest, SearchWorkOrderFilters, StateWorkOrder, UpdateStateWorkOrder, UpdateWorkOrderOperatorTimes, WorkOrderComment, WorkOrderType } from 'app/interfaces/workOrder';
+import WorkOrder, { AddCommentToWorkOrderRequest, AddWorkOrderOperatorTimes, CreateWorkOrderRequest, DeleteWorkOrderOperatorTimes, FinishWorkOrderOperatorTimes, SaveInspectionResultPointRequest, SearchWorkOrderFilters, UpdateStateWorkOrder, UpdateWorkOrderOperatorTimes, WorkOrderComment, WorkOrderType } from 'app/interfaces/workOrder';
 
 class WorkOrderService {
   private baseUrl: string;
@@ -188,7 +188,7 @@ class WorkOrderService {
 
   async getWorkOrdersWithFilters(searchWorkOrderFilters: SearchWorkOrderFilters): Promise<WorkOrder[]> {
     try {
-      let url = `${this.baseUrl}GetWorkOrderWithFilters`;
+      const url = `${this.baseUrl}GetWorkOrderWithFilters`;
 
       const response = await fetch(url, {
         method: 'Post',

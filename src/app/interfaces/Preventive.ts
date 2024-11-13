@@ -1,8 +1,8 @@
-import Machine from "./machine";
-import SparePart from "./SparePart";
-import InspectionPoint from "./inspectionPoint";
-import Operator from "./Operator";
 import { Asset } from "./Asset";
+import InspectionPoint from "./inspectionPoint";
+import Machine from "./machine";
+import Operator from "./Operator";
+import SparePart from "./SparePart";
 
 export interface Preventive {
   id: string;

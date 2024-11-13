@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useForm, Controller, set } from "react-hook-form";
+import { Controller,useForm } from "react-hook-form";
 import Machine from "app/interfaces/machine";
+import Section from "app/interfaces/Section";
 import MachineService from "app/services/machineService";
 import SectionService from "app/services/sectionService";
-import Section from "app/interfaces/Section";
 
 type MachineFormProps = {
   machine: Machine;
@@ -32,7 +32,7 @@ const MachineForm: React.FC<MachineFormProps> = ({
   const [sections, setSections] = useState<Section[]>([]);
   useEffect(() => {
     async function getSection() {
-      var response = await sectionService.getSections();
+      const response = await sectionService.getSections();
       if (response.length > 0) {
         setSections(response);
         if (machine.section == null) {
@@ -62,9 +62,9 @@ const MachineForm: React.FC<MachineFormProps> = ({
         machineData
       );
       if (response) {
-        setTimeout(() => {
-          history.back();
-        }, 2000);
+        // setTimeout(() => {
+        //   history.back();
+        // }, 2000);
       }
       onSubmit(data);
     } catch (error) {
@@ -75,7 +75,7 @@ const MachineForm: React.FC<MachineFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
-      className="max-w-md mx-auto p-4 bg-white shadow-lg rounded-lg"
+      className="w-full max-w-md mx-auto p-4 bg-white shadow-lg rounded-lg"
     >
       {isSubmitSuccessful && (
         <div className="mb-4 text-green-500 text-center">

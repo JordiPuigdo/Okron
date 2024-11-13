@@ -1,4 +1,8 @@
 "use client";
+import "react-datepicker/dist/react-datepicker.css";
+
+import { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
 import { SvgSpinner } from "app/icons/icons";
 import SparePart, {
   SparePartDetailRequest,
@@ -6,6 +10,7 @@ import SparePart, {
 } from "app/interfaces/SparePart";
 import SparePartService from "app/services/sparePartService";
 import { useSessionStore } from "app/stores/globalStore";
+import { formatDateQuery } from "app/utils/utils";
 import DataTable from "components/table/DataTable";
 import {
   Column,
@@ -16,14 +21,8 @@ import {
   TableButtons,
 } from "components/table/interface/interfaceTable";
 import { EntityTable } from "components/table/interface/tableEntitys";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import ca from "date-fns/locale/ca";
-import { formatDateQuery } from "app/utils/utils";
 import { Button } from "designSystem/Button/Buttons";
-import { document } from "postcss";
 
 interface SparePartTableProps {
   enableFilterAssets?: boolean;

@@ -1,43 +1,39 @@
+import { useState } from 'react';
 import {
   SvgCheck,
   SvgPause,
   SvgPending,
   SvgSpinner,
   SvgStart,
-} from "app/icons/icons";
-import { UserPermission } from "app/interfaces/User";
+} from 'app/icons/icons';
+import { UserPermission } from 'app/interfaces/User';
 import {
   StateWorkOrder,
   UpdateStateWorkOrder,
   WorkOrder,
-} from "app/interfaces/workOrder";
-import WorkOrderService from "app/services/workOrderService";
-import { useSessionStore } from "app/stores/globalStore";
-import { startOrFinalizeTimeOperation } from "app/utils/utilsOperator";
-import { Button } from "designSystem/Button/Buttons";
-import { useState } from "react";
+} from 'app/interfaces/workOrder';
+import WorkOrderService from 'app/services/workOrderService';
+import { useSessionStore } from 'app/stores/globalStore';
+import { Button } from 'designSystem/Button/Buttons';
 
 interface WorkOrderButtonsProps {
   workOrder: WorkOrder;
   handleReload: () => void;
-  handleSubmit: () => void;
 }
 
 const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
   workOrder,
   handleReload,
-  handleSubmit,
 }: WorkOrderButtonsProps) => {
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
   const workOrderService = new WorkOrderService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+    process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
-  const { loginUser, operatorLogged } = useSessionStore((state) => state);
+  const { loginUser, operatorLogged } = useSessionStore(state => state);
 
   const toggleLoading = (id: StateWorkOrder) => {
-    setIsLoading((prevLoading) => ({
+    setIsLoading(prevLoading => ({
       ...prevLoading,
       [id]: !prevLoading[id],
     }));
@@ -45,7 +41,7 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
 
   function handleChangeStateWorkOrder(state: StateWorkOrder) {
     if (!operatorLogged) {
-      alert("Has de tenir un operari fitxat per fer aquesta acció");
+      alert('Has de tenir un operari fitxat per fer aquesta acció');
       return;
     }
     if (workOrder.stateWorkOrder == state) {
@@ -60,12 +56,12 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
         userId: loginUser?.agentId,
       },
     ];
-    workOrderService.updateStateWorkOrder(update).then((response) => {
+    workOrderService.updateStateWorkOrder(update).then(response => {
       if (response) {
         handleReload();
         toggleLoading(state);
       } else {
-        setErrorMessage("Error actualitzant el treball");
+        setErrorMessage('Error actualitzant el treball');
         toggleLoading(state);
       }
     });
@@ -155,7 +151,7 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
             {isLoading[StateWorkOrder.Waiting] ? (
               <SvgSpinner className="text-white" />
             ) : (
-              "Reobrir"
+              'Reobrir'
             )}
           </Button>
         )}

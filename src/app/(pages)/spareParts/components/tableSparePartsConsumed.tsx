@@ -1,17 +1,14 @@
 "use client";
 
+import { useState } from "react";
+import DatePicker from "react-datepicker";
 import {
   SparePartDetailRequest,
   SparePartPerAssetResponse,
 } from "app/interfaces/SparePart";
-import { formatDate, formatDateQuery } from "app/utils/utils";
-import Link from "next/link";
-import { useState } from "react";
-import ca from "date-fns/locale/ca";
-import DatePicker from "react-datepicker";
 import SparePartService from "app/services/sparePartService";
-import { SSG_GET_INITIAL_PROPS_CONFLICT } from "next/dist/lib/constants";
-import { SvgSpinner } from "app/icons/icons";
+import { formatDateQuery } from "app/utils/utils";
+import ca from "date-fns/locale/ca";
 
 export default function TableSparePartsConsumed({
   sparePartId,

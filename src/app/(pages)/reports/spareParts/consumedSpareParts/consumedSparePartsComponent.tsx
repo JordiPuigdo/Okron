@@ -1,18 +1,20 @@
 "use client";
 
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-import { useSparePartsHook } from "app/hooks/useSparePartsHook";
-import { useState } from "react";
-import { Button } from "designSystem/Button/Buttons";
-import SparePartsConsumedReportTable from "./component/SparePartsConsumedReportTable";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+
+import { useState } from "react";
+import DatePicker from "react-datepicker";
+import { useSparePartsHook } from "app/hooks/useSparePartsHook";
+import { SvgSpinner } from "app/icons/icons";
 import ca from "date-fns/locale/ca";
-import { SvgArrowRight, SvgSpinner } from "app/icons/icons";
-import SparePartBarchart from "./component/sparePartBarchart";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+import { Button } from "designSystem/Button/Buttons";
 import { useRouter } from "next/navigation";
+
+import SparePartBarchart from "./component/sparePartBarchart";
+import SparePartsConsumedReportTable from "./component/SparePartsConsumedReportTable";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);

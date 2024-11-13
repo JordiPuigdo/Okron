@@ -1,38 +1,34 @@
-"use client";
+'use client';
 
+import 'react-datepicker/dist/react-datepicker.css';
+
+import { useEffect, useState } from 'react';
+import DatePicker from 'react-datepicker';
+import { SvgSpinner } from 'app/icons/icons';
+import { Asset } from 'app/interfaces/Asset';
+import { OperatorType } from 'app/interfaces/Operator';
 import WorkOrder, {
   SearchWorkOrderFilters,
   StateWorkOrder,
-  UpdateStateWorkOrder,
   WorkOrderType,
-} from "app/interfaces/workOrder";
-import WorkOrderService from "app/services/workOrderService";
-import {
-  formatDate,
-  translateStateWorkOrder,
-  translateWorkOrderType,
-} from "app/utils/utils";
-import DataTable from "components/table/DataTable";
+} from 'app/interfaces/workOrder';
+import AssetService from 'app/services/assetService';
+import WorkOrderService from 'app/services/workOrderService';
+import { useSessionStore } from 'app/stores/globalStore';
+import { translateStateWorkOrder } from 'app/utils/utils';
+import AutocompleteSearchBar from 'components/selector/AutocompleteSearchBar';
+import { ElementList } from 'components/selector/ElementList';
+import DataTable from 'components/table/DataTable';
 import {
   Column,
   ColumnFormat,
   TableButtons,
-} from "components/table/interface/interfaceTable";
-import { useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import ca from "date-fns/locale/ca";
-import { SvgSpinner } from "app/icons/icons";
-import AutocompleteSearchBar from "components/selector/AutocompleteSearchBar";
-import { EntityTable } from "components/table/interface/tableEntitys";
-import { Asset } from "app/interfaces/Asset";
-import AssetService from "app/services/assetService";
-import { ElementList } from "components/selector/ElementList";
-import FinalizeWorkOrdersDaysBefore from "./FinalizeWorkOrdersDaysBefore";
-import { useSessionStore } from "app/stores/globalStore";
-import { UserPermission } from "app/interfaces/User";
-import { OperatorType } from "app/interfaces/Operator";
-import { Button } from "designSystem/Button/Buttons";
+} from 'components/table/interface/interfaceTable';
+import { EntityTable } from 'components/table/interface/tableEntitys';
+import ca from 'date-fns/locale/ca';
+import { Button } from 'designSystem/Button/Buttons';
+
+import FinalizeWorkOrdersDaysBefore from './FinalizeWorkOrdersDaysBefore';
 
 interface WorkOrderTableProps {
   enableFilterAssets?: boolean;
@@ -40,54 +36,54 @@ interface WorkOrderTableProps {
   enableDetail?: boolean;
   enableEdit: boolean;
   enableDelete: boolean;
-  assetId?: string | "";
+  assetId?: string | '';
   enableFinalizeWorkOrdersDayBefore?: boolean;
-  operatorId?: string | "";
+  operatorId?: string | '';
   workOrderType?: WorkOrderType;
   refresh?: boolean;
 }
 
 const columns: Column[] = [
   {
-    label: "ID",
-    key: "id",
+    label: 'ID',
+    key: 'id',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Num Sèrie",
-    key: "code",
+    label: 'Num Sèrie',
+    key: 'code',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Descripció",
-    key: "description",
+    label: 'Descripció',
+    key: 'description',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Tipus",
-    key: "workOrderType",
+    label: 'Tipus',
+    key: 'workOrderType',
     format: ColumnFormat.WORKORDERTYPE,
   },
   {
-    label: "Data Inici",
-    key: "startTime",
+    label: 'Data Inici',
+    key: 'startTime',
     format: ColumnFormat.DATETIME,
   },
   {
-    label: "Estat",
-    key: "stateWorkOrder",
+    label: 'Estat',
+    key: 'stateWorkOrder',
     format: ColumnFormat.STATEWORKORDER,
   },
   {
-    label: "Equip",
-    key: "asset.description",
+    label: 'Equip',
+    key: 'asset.description',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Operaris",
-    key: "operatorsNames",
+    label: 'Operaris',
+    key: 'operatorsNames',
     format: ColumnFormat.TEXT,
-    width: "w-1/4",
+    width: 'w-1/4',
   },
 ];
 
@@ -109,7 +105,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   refresh,
 }) => {
   const { operatorLogged, loginUser, setFilterWorkOrders, filterWorkOrders } =
-    useSessionStore((state) => state);
+    useSessionStore(state => state);
   const [startDate, setStartDate] = useState<Date | null>(
     filterWorkOrders?.startDateTime
       ? new Date(filterWorkOrders?.startDateTime)
@@ -121,7 +117,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
       : new Date()
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<string>("");
+  const [message, setMessage] = useState<string>('');
   const [workOrders, setWorkOrders] = useState<WorkOrder[] | []>([]);
   const [assets, setAssets] = useState<ElementList[]>([]);
   const [selectedStateFilter, setSelectedStateFilter] = useState<
@@ -130,11 +126,11 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   const [selectedTypeFilter, setSelectedTypeFilter] = useState<
     number | undefined
   >(undefined);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const workOrderService = new WorkOrderService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+    process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
 
   const tableButtons: TableButtons = {
@@ -164,17 +160,17 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
             });
           }
 
-          asset.childs.forEach((childAsset) => {
+          asset.childs.forEach(childAsset => {
             addAssetAndChildren(childAsset);
           });
         };
 
-        assets.forEach((asset) => {
+        assets.forEach(asset => {
           addAssetAndChildren(asset);
         });
         setAssets(elements);
       } catch (error) {
-        console.error("Error fetching assets:", error);
+        console.error('Error fetching assets:', error);
       }
     };
 
@@ -200,13 +196,13 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     let search: SearchWorkOrderFilters;
     try {
       search = {
-        assetId: "",
-        operatorId: operatorId || "",
+        assetId: '',
+        operatorId: operatorId || '',
         startDateTime: startDate!,
         endDateTime: endDate!,
       };
     } catch (error) {
-      console.error("Error fetching work orders:", error);
+      console.error('Error fetching work orders:', error);
       return;
     }
 
@@ -223,12 +219,12 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     //     : filterWorkOrders?.workOrderType,
     // };
     // setFilterWorkOrders(filters);
-    let workOrders = await workOrderService.getWorkOrdersWithFilters(search);
+    const workOrders = await workOrderService.getWorkOrdersWithFilters(search);
     if (workOrders.length == 0 && !firstLoad) {
-      setMessage("No hi ha ordres disponibles amb aquests filtres");
+      setMessage('No hi ha ordres disponibles amb aquests filtres');
 
       setTimeout(() => {
-        setMessage("");
+        setMessage('');
       }, 3000);
     }
 
@@ -279,17 +275,17 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
           <button
             type="button"
             className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
-            onClick={(e) => handleSearch()}
+            onClick={() => handleSearch()}
           >
             Buscar
-            {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+            {isLoading && <SvgSpinner style={{ marginLeft: '0.5rem' }} />}
           </button>
           {enableFinalizeWorkOrdersDayBefore && (
             <FinalizeWorkOrdersDaysBefore
               onFinalizeWorkOrdersDayBefore={searchWorkOrders}
             />
           )}
-          {message != "" && (
+          {message != '' && (
             <span className="text-red-500 ml-4">{message}</span>
           )}
         </div>
@@ -307,7 +303,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
               type="text"
               placeholder="Codi / Descripció"
               className="p-3 border border-gray-300 rounded-md w-full"
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
             <span>Estat: </span>
             <select
@@ -315,18 +311,18 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
               name="stateWorkOrder"
               className="p-3 border border-gray-300 rounded-md w-full "
               value={
-                selectedStateFilter !== undefined ? selectedStateFilter : ""
+                selectedStateFilter !== undefined ? selectedStateFilter : ''
               }
               onChange={handleStateFilterChange}
             >
               <option value="">-</option>
               {Object.values(StateWorkOrder)
-                .filter((value) => typeof value === "number" && value !== 4)
-                .map((state) => (
+                .filter(value => typeof value === 'number' && value !== 4)
+                .map(state => (
                   <option
                     key={state}
                     value={
-                      typeof state === "string" ? parseInt(state, 10) : state
+                      typeof state === 'string' ? parseInt(state, 10) : state
                     }
                   >
                     {translateStateWorkOrder(state)}
@@ -356,10 +352,10 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
                 });
               }}
             >
-              Correctius:{" "}
+              Correctius:{' '}
               {
                 filteredWorkOrders.filter(
-                  (x) => x.workOrderType == WorkOrderType.Corrective
+                  x => x.workOrderType == WorkOrderType.Corrective
                 ).length
               }
             </span>
@@ -386,10 +382,10 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
                 });
               }}
             >
-              Preventius:{" "}
+              Preventius:{' '}
               {
                 filteredWorkOrders.filter(
-                  (x) => x.workOrderType == WorkOrderType.Preventive
+                  x => x.workOrderType == WorkOrderType.Preventive
                 ).length
               }
             </span>
@@ -413,9 +409,9 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 
     if (isConfirmed) {
       workOrderService.deleteWorkOrder(orderId);
-      setWorkOrders((prevWorkOrders) =>
+      setWorkOrders(prevWorkOrders =>
         prevWorkOrders
-          .filter((prevWorkOrders) => prevWorkOrders.id !== orderId)
+          .filter(prevWorkOrders => prevWorkOrders.id !== orderId)
           .sort((a, b) => {
             const startTimeA = new Date(a.startTime).valueOf();
             const startTimeB = new Date(b.startTime).valueOf();
@@ -430,7 +426,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   const handleStateFilterChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    let selectedValue = event.target.value;
+    const selectedValue = event.target.value;
     if (!selectedValue) {
       setSelectedStateFilter(undefined);
     } else {
@@ -438,7 +434,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     }
   };
 
-  const filteredWorkOrders = workOrders.filter((order) => {
+  const filteredWorkOrders = workOrders.filter(order => {
     if (
       selectedStateFilter !== undefined &&
       order.stateWorkOrder !== selectedStateFilter
@@ -476,7 +472,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 
   const handleOnChecked = (id?: string) => {
     if (id != undefined) {
-      setSelectedRows((prevSelectedRows) => {
+      setSelectedRows(prevSelectedRows => {
         const newSelectedRows = new Set(prevSelectedRows);
         if (newSelectedRows.has(id)) {
           newSelectedRows.delete(id);
@@ -489,7 +485,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
       if (selectedRows.size === filteredWorkOrders.length) {
         setSelectedRows(new Set());
       } else {
-        setSelectedRows(new Set(filteredWorkOrders.map((row) => row.id)));
+        setSelectedRows(new Set(filteredWorkOrders.map(row => row.id)));
       }
     }
   };
@@ -499,7 +495,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 
     setIsUpdating(true);
 
-    const workOrders = Array.from(selectedRows).map((workOrderId) => ({
+    const workOrders = Array.from(selectedRows).map(workOrderId => ({
       workOrderId,
       state: StateWorkOrder.Finished,
       operatorId: operatorLogged?.idOperatorLogged,
@@ -508,15 +504,15 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
 
     await workOrderService
       .updateStateWorkOrder(workOrders)
-      .then((response) => {
+      .then(response => {
         if (response) {
           setResponseMessage({
-            message: "Ordres actualitzades correctament",
+            message: 'Ordres actualitzades correctament',
             isSuccess: true,
           });
           setTimeout(() => {
             setResponseMessage({
-              message: "",
+              message: '',
               isSuccess: true,
             });
           }, 2000);
@@ -525,13 +521,13 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
         } else {
           setTimeout(() => {
             setResponseMessage({
-              message: "Error actualitzant ordres",
+              message: 'Error actualitzant ordres',
               isSuccess: false,
             });
           }, 3000);
         }
       })
-      .catch((error) => {
+      .catch(error => {
         setTimeout(() => {
           setResponseMessage({
             message: error,
@@ -567,8 +563,8 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
               type="none"
               className={`text-white ${
                 selectedRows.size > 0 || !isUpdating
-                  ? " bg-blue-900 hover:bg-blue-950 "
-                  : " bg-gray-200 hover:cursor-not-allowed "
+                  ? ' bg-blue-900 hover:bg-blue-950 '
+                  : ' bg-gray-200 hover:cursor-not-allowed '
               }  rounded-lg text-sm `}
               size="lg"
               customStyles="align-middle flex"
@@ -585,7 +581,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
             {responseMessage && (
               <div
                 className={` ${
-                  responseMessage ? "text-green-500" : "text-red-500"
+                  responseMessage ? 'text-green-500' : 'text-red-500'
                 } text-center font-semibold p-2 items-center flex justify-center`}
               >
                 {responseMessage.message}

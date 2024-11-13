@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { SvgSpinner } from "app/icons/icons";
 import { User } from "app/interfaces/User";
 import UserService from "app/services/userService";
@@ -15,7 +16,6 @@ import {
 } from "components/table/interface/interfaceTable";
 import { EntityTable } from "components/table/interface/tableEntitys";
 import { Button } from "designSystem/Button/Buttons";
-import { useEffect, useState } from "react";
 
 const columns: Column[] = [
   {

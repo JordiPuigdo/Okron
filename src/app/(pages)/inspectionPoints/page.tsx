@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback,useEffect, useState } from "react";
 import InspectionPointService from "app/services/inspectionPointService";
-import InspectionPoint from "../../interfaces/inspectionPoint";
-import MainLayout from "components/layout/MainLayout";
 import Container from "components/layout/Container";
+import MainLayout from "components/layout/MainLayout";
+import DataTable from "components/table/DataTable";
 import {
   Column,
   ColumnFormat,
@@ -12,8 +12,9 @@ import {
   FiltersFormat,
   TableButtons,
 } from "components/table/interface/interfaceTable";
-import DataTable from "components/table/DataTable";
 import { EntityTable } from "components/table/interface/tableEntitys";
+
+import InspectionPoint from "../../interfaces/inspectionPoint";
 
 export default function InspectionPointsPage() {
   const [inspectionPoints, setInspectionPoints] = useState<InspectionPoint[]>(

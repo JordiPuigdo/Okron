@@ -1,7 +1,8 @@
 import React from "react";
+
 import { Column, ColumnFormat } from "../interface/interfaceTable";
-import { HeadTableActions } from "./ButtonsTable/TableActions";
 import { EntityTable } from "../interface/tableEntitys";
+import { HeadTableActions } from "./ButtonsTable/TableActions";
 
 interface TableHeaderProps {
   columns: Column[];

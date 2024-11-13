@@ -1,12 +1,11 @@
-"use client";
+'use client';
 
-import { SvgSpinner } from "app/icons/icons";
-import { UserPermission } from "app/interfaces/User";
-import WorkOrderService from "app/services/workOrderService";
-import { useSessionStore } from "app/stores/globalStore";
-import { formatDate } from "app/utils/utils";
-import { Button } from "designSystem/Button/Buttons";
-import { useState } from "react";
+import { useState } from 'react';
+import { SvgSpinner } from 'app/icons/icons';
+import { UserPermission } from 'app/interfaces/User';
+import WorkOrderService from 'app/services/workOrderService';
+import { useSessionStore } from 'app/stores/globalStore';
+import { Button } from 'designSystem/Button/Buttons';
 
 interface FinalizeWorkOrdersDaysBeforeProps {
   onFinalizeWorkOrdersDayBefore?: () => void;
@@ -15,7 +14,7 @@ interface FinalizeWorkOrdersDaysBeforeProps {
 const FinalizeWorkOrdersDaysBefore: React.FC<
   FinalizeWorkOrdersDaysBeforeProps
 > = ({ onFinalizeWorkOrdersDayBefore }) => {
-  const { loginUser } = useSessionStore((state) => state);
+  const { loginUser } = useSessionStore(state => state);
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
@@ -23,7 +22,7 @@ const FinalizeWorkOrdersDaysBefore: React.FC<
 
   const handleFinalizeWorkOrdersDayBefore = async () => {
     const isConfirmed = window.confirm(
-      "Segur que voleu finalitzar totes les ordres de treball pendents?"
+      'Segur que voleu finalitzar totes les ordres de treball pendents?'
     );
     if (!isConfirmed) return;
 
@@ -39,7 +38,7 @@ const FinalizeWorkOrdersDaysBefore: React.FC<
     <div className="flex items-center">
       <Button
         customStyles="bg-orange-500 text-sm text-white rounded-md font-semibold hover:bg-orange-600 justifty-center flex items-center "
-        onClick={(e) => handleFinalizeWorkOrdersDayBefore()}
+        onClick={() => handleFinalizeWorkOrdersDayBefore()}
       >
         Finalitzar Ordres{isLoading && <SvgSpinner />}
       </Button>

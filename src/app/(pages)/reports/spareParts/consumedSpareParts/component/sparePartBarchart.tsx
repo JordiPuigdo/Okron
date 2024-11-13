@@ -1,5 +1,4 @@
 import { SparePartsConsumedsReport } from "app/interfaces/SparePart";
-import { de } from "date-fns/locale";
 import { BarChartComponent } from "designSystem/BarChart/BarChartComponent";
 
 interface sparePartBarchart {

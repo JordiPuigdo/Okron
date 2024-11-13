@@ -1,5 +1,4 @@
 import { SparePartsConsumedsReport } from "app/interfaces/SparePart";
-import { columnsSparePartConsumedReport } from "./columnsReport";
 import DataTable from "components/table/DataTable";
 import {
   Filters,
@@ -7,6 +6,8 @@ import {
   TableButtons,
 } from "components/table/interface/interfaceTable";
 import { EntityTable } from "components/table/interface/tableEntitys";
+
+import { columnsSparePartConsumedReport } from "./columnsReport";
 
 interface SparePartsConsumedReportTableProps {
   sparePartsConsumeds: SparePartsConsumedsReport[];

@@ -1,8 +1,8 @@
 "use client";
+import { useEffect, useState } from "react";
 import Operator, { OperatorType } from "app/interfaces/Operator";
 import AutocompleteSearchBar from "components/selector/AutocompleteSearchBar";
 import { ElementList } from "components/selector/ElementList";
-import { useEffect, useState } from "react";
 
 interface ChooseOperatorV2Props {
   availableOperators: Operator[];

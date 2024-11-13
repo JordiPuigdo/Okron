@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
-import { usePathname } from "next/navigation";
-import SideNav from "./SideNav";
-import Header from "./Header";
+import React, { useEffect, useState } from "react";
+import Loader from "components/Loader/loader";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import Header from "./Header";
+import SideNav from "./SideNav";
 
 export default function MainLayout({
   children,
@@ -19,8 +21,14 @@ export default function MainLayout({
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+  const [loading, setLoading] = useState<boolean>(true);
+  useEffect(() => {
+    setTimeout(() => setLoading(false), 1000);
+  }, []);
 
-  return (
+  return loading ? (
+    <Loader />
+  ) : (
     <div className="min-h-screen flex flex-col">
       {/* <!-- ===== Page Wrapper Start ===== --> */}
       <div className="flex flex-1">
@@ -43,7 +51,7 @@ export default function MainLayout({
           {/* <!-- ===== Header End ===== --> */}
 
           {/* <!-- ===== Main Content Start ===== --> */}
-          <main className="flex-1 bg-gray-300">
+          <main className="flex-1 bg-okron-background">
             <div
               className={`mx-auto max-w-screen-3xl min-h-screen ${
                 menuOpen ? "ml-60" : ""
@@ -60,7 +68,7 @@ export default function MainLayout({
 
       {/* <!-- ===== Footer Start ===== --> */}
       {!hideHeader && (
-        <footer className={`${menuOpen ? "ml-60" : ""} bg-gray-300`}>
+        <footer className={`${menuOpen ? "ml-60" : ""} bg-okron-background`}>
           <div className="flex max-w-screen-xl2 md:p-4 2xl:p-4 border-t-2 border-gray-200 text-gray-600 mx-6">
             <div className="w-full">
               <p>Copyright © 2024 Okron AI Business</p>

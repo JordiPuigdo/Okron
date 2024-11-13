@@ -1,4 +1,4 @@
-import WorkOrder, { CreateWorkOrderRequest } from 'app/interfaces/workOrder';
+
 import Machine from '../../app/interfaces/machine'; // Import your Machine model
 
 class MachineService {

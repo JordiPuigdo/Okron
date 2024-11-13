@@ -1,4 +1,4 @@
-import { DonutChart, List, ListItem } from "@tremor/react";
+import { DonutChart } from "@tremor/react";
 import { WorkOrderType } from "app/interfaces/workOrder";
 import { translateWorkOrderType } from "app/utils/utils";
 

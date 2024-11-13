@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { Filters, FiltersFormat } from "../../interface/interfaceTable";
-import DatePicker from "react-datepicker";
-import ca from "date-fns/locale/ca";
-import { useSessionStore } from "app/stores/globalStore";
-import { EntityTable } from "components/table/interface/tableEntitys";
+import React, { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import { useSessionStore } from 'app/stores/globalStore';
+import { EntityTable } from 'components/table/interface/tableEntitys';
+import ca from 'date-fns/locale/ca';
+
+import { Filters, FiltersFormat } from '../../interface/interfaceTable';
 
 interface FiltersComponentProps {
   filters?: Filters[];
@@ -43,40 +44,6 @@ const FiltersComponent: React.FC<FiltersComponentProps> = ({
     }
   };
 
-  function handleFilterSpareParts(key: string, value: string) {
-    if (key === "code") {
-      setFilterSpareParts({
-        ...filterSpareParts,
-        code: value,
-      });
-    }
-    if (key === "description") {
-      setFilterSpareParts({
-        ...filterSpareParts,
-        description: value,
-      });
-    }
-    if (key === "family") {
-      setFilterSpareParts({
-        ...filterSpareParts,
-        family: value,
-      });
-    }
-
-    if (key === "refProvider") {
-      setFilterSpareParts({
-        ...filterSpareParts,
-        refSupplier: value,
-      });
-    }
-    if (key === "ubication") {
-      setFilterSpareParts({
-        ...filterSpareParts,
-        ubication: value,
-      });
-    }
-  }
-
   /* if (filterSpareParts !== undefined) {
     handleInputChange("code", filterSpareParts.code as string);
     handleInputChange("description", filterSpareParts.description as string);
@@ -101,9 +68,9 @@ const FiltersComponent: React.FC<FiltersComponentProps> = ({
                     value={
                       filterValues[filter.key]
                         ? filterValues[filter.key].toString()
-                        : ""
+                        : ''
                     }
-                    onChange={(e) =>
+                    onChange={e =>
                       handleInputChange(filter.key, e.target.value)
                     }
                   />
@@ -113,7 +80,7 @@ const FiltersComponent: React.FC<FiltersComponentProps> = ({
                     type="checkbox"
                     id={filter.key}
                     checked={!!filterValues[filter.key]}
-                    onChange={(e) =>
+                    onChange={e =>
                       handleInputChange(filter.key, e.target.checked)
                     }
                   />

@@ -1,11 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useEffect,useState } from "react";
+import { SvgSpinner } from "app/icons/icons";
 import { Asset } from "app/interfaces/Asset";
 import AssetService from "app/services/assetService";
-import { SvgSpinner } from "app/icons/icons";
-import { ButtonTypesTable } from "components/table/DataTable";
 import { LoadingState } from "app/types/loadingState";
+import { ButtonTypesTable } from "components/table/DataTable";
+import Link from "next/link";
 
 interface Props {
   asset: Asset;

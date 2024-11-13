@@ -1,8 +1,8 @@
+import { useState } from "react";
 import { SvgRepeat, SvgSpinner } from "app/icons/icons";
 import { Preventive } from "app/interfaces/Preventive";
 import PreventiveService from "app/services/preventiveService";
 import { useSessionStore } from "app/stores/globalStore";
-import { useState } from "react";
 
 interface PreventiveButtonsProps {
   preventive: Preventive;

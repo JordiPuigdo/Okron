@@ -1,11 +1,11 @@
-import { extend } from "dayjs";
-import { Asset } from "./Asset";
-import Operator from "./Operator";
-import SparePart from "./SparePart";
-import InspectionPoint from "./inspectionPoint";
-import Machine from "./machine";
-import { BaseModel } from "./BaseModel";
-import { Preventive } from "./Preventive";
+import { Asset } from './Asset';
+import { BaseModel } from './BaseModel';
+import InspectionPoint from './inspectionPoint';
+import Machine from './machine';
+import Operator from './Operator';
+import { Preventive } from './Preventive';
+import SparePart from './SparePart';
+import { UserType } from './User';
 
 export interface WorkOrder extends BaseModel {
   id: string;
@@ -28,6 +28,7 @@ export interface WorkOrder extends BaseModel {
   preventive?: Preventive;
   plannedDuration: string;
   operatorsNames?: string;
+  originWorkOrder?: OriginWorkOrder;
 }
 
 export default WorkOrder;
@@ -46,6 +47,12 @@ export enum StateWorkOrder {
   Finished,
   Requested,
   PendingToValidate,
+  Open,
+}
+
+export enum OriginWorkOrder {
+  Maintenance,
+  Production,
 }
 
 export interface WorkOrderInspectionPoint {
@@ -80,6 +87,7 @@ export interface CreateWorkOrderRequest {
   sparePartId?: string[];
   userId?: string;
   operatorCreatorId: string;
+  originWorkOrder: UserType;
 }
 
 export interface AddWorkOrderOperatorTimes {

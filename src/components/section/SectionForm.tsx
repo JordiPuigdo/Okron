@@ -1,11 +1,11 @@
-"use client";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import Section from "app/interfaces/Section";
-import SectionService from "app/services/sectionService";
-import useRoutes from "app/utils/useRoutes";
-import { useRouter } from "next/navigation";
-import { SvgSpinner } from "app/icons/icons";
+'use client';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { SvgSpinner } from 'app/icons/icons';
+import Section from 'app/interfaces/Section';
+import SectionService from 'app/services/sectionService';
+import useRoutes from 'app/utils/useRoutes';
+import { useRouter } from 'next/navigation';
 
 interface SectionFormProps {
   id?: string;
@@ -13,9 +13,9 @@ interface SectionFormProps {
 
 const SectionForm: React.FC<SectionFormProps> = ({ id }) => {
   const sectionService = new SectionService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+    process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
-  const { register, handleSubmit, reset, setValue } = useForm<Section>();
+  const { register, handleSubmit, setValue } = useForm<Section>();
   const [loading, setLoading] = useState(false);
   const [section, SetSection] = useState<Section | undefined>(undefined);
   const [messageNotification, setMessageNotification] = useState<
@@ -29,18 +29,18 @@ const SectionForm: React.FC<SectionFormProps> = ({ id }) => {
     async function getSection() {
       await sectionService
         .getSection(id!)
-        .then((sectionData) => {
+        .then(sectionData => {
           SetSection(sectionData);
-          setValue("id", sectionData.id);
-          setValue("code", sectionData.code);
-          setValue("description", sectionData.description);
+          setValue('id', sectionData.id);
+          setValue('code', sectionData.code);
+          setValue('description', sectionData.description);
         })
         .catch((error: any) => {
-          console.error("error: ", error);
+          console.error('error: ', error);
         });
     }
 
-    if (id != "id") {
+    if (id != 'id') {
       getSection();
     }
   }, [id]);
@@ -50,19 +50,19 @@ const SectionForm: React.FC<SectionFormProps> = ({ id }) => {
     try {
       if (section) {
         await sectionService.updateSection(data);
-        setMessageNotification("Secció actualitzada");
+        setMessageNotification('Secció actualitzada');
         setTimeout(() => {
           router.push(ROUTES.configuration.section);
         }, 2000);
       } else {
         await sectionService.createSection(data.code, data.description);
-        setMessageNotification("Secció creada");
+        setMessageNotification('Secció creada');
         setTimeout(() => {
           router.push(ROUTES.configuration.section);
         }, 2000);
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
     }
   };
 
@@ -70,12 +70,12 @@ const SectionForm: React.FC<SectionFormProps> = ({ id }) => {
     try {
       setLoading(true);
       await sectionService.deleteSection(section!.id);
-      setMessageNotification("Secció eliminada");
+      setMessageNotification('Secció eliminada');
       setTimeout(() => {
         router.push(ROUTES.configuration.section);
       }, 2000);
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
     }
   }
 
@@ -89,8 +89,8 @@ const SectionForm: React.FC<SectionFormProps> = ({ id }) => {
           Codi:
           <input
             type="text"
-            {...register("code")}
-            defaultValue={section?.code || ""}
+            {...register('code')}
+            defaultValue={section?.code || ''}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </label>
@@ -98,8 +98,8 @@ const SectionForm: React.FC<SectionFormProps> = ({ id }) => {
           Descripció:
           <input
             type="text"
-            defaultValue={section?.description || ""}
-            {...register("description")}
+            defaultValue={section?.description || ''}
+            {...register('description')}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </label>
@@ -109,7 +109,7 @@ const SectionForm: React.FC<SectionFormProps> = ({ id }) => {
             disabled={loading}
             className="bg-blue-500 hover:bg-blue-700 text-white flex items-center font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
-            {section ? "Actualitzar" : "Crear"}
+            {section ? 'Actualitzar' : 'Crear'}
             {loading && <SvgSpinner />}
           </button>
           {section && (
@@ -127,7 +127,7 @@ const SectionForm: React.FC<SectionFormProps> = ({ id }) => {
             type="button"
             disabled={loading}
             className="bg-gray-500 hover:bg-gray-700 text-white flex items-center font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            onClick={(e) => {
+            onClick={() => {
               router.push(ROUTES.configuration.section);
             }}
           >

@@ -1,14 +1,14 @@
+import { useEffect, useState } from "react";
+import Machine from "app/interfaces/machine";
 import WorkOrder, {
   AddWorkOrderOperatorTimes,
   FinishWorkOrderOperatorTimes,
   StateWorkOrder,
 } from "app/interfaces/workOrder";
-import Machine from "app/interfaces/machine";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 import MachineService from "app/services/machineService";
 import WorkOrderService from "app/services/workOrderService";
 import MainLayout from "components/layout/MainLayout";
+import { useRouter } from "next/router";
 
 const MachineDetailsPage = () => {
   const router = useRouter();

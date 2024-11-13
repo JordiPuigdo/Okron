@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Preventive } from "app/interfaces/Preventive";
 import PreventiveService from "app/services/preventiveService";
 import DataTable from "components/table/DataTable";
@@ -9,7 +10,6 @@ import {
   TableButtons,
 } from "components/table/interface/interfaceTable";
 import { EntityTable } from "components/table/interface/tableEntitys";
-import { useEffect, useState } from "react";
 
 interface PreventiveTableProps {
   enableFilters: boolean;

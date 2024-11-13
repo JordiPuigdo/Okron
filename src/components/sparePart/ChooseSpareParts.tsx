@@ -1,20 +1,18 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { SvgConsumeSparePart, SvgRestoreSparePart } from "app/icons/icons";
 import SparePart, {
   ConsumeSparePart,
   RestoreSparePart,
 } from "app/interfaces/SparePart";
 import { WorkOrderSparePart } from "app/interfaces/workOrder";
-import { useEffect, useState } from "react";
 import SparePartService from "app/services/sparePartService";
-import {
-  checkOperatorCreated,
-  formatDate,
-  isOperatorLogged,
-} from "app/utils/utils";
-import { useSessionStore } from "app/stores/globalStore";
 import WorkOrderService from "app/services/workOrderService";
-import { SvgConsumeSparePart, SvgRestoreSparePart } from "app/icons/icons";
+import { useSessionStore } from "app/stores/globalStore";
+import {
+  formatDate,
+} from "app/utils/utils";
 import Link from "next/link";
 
 interface ChooseSparePartsProps {

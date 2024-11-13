@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef,useState } from 'react';
 
-import ElementListComponent, { ElementList } from "./ElementList";
-import SearchInput from "./SearchInput";
+import ElementListComponent, { ElementList } from './ElementList';
+import SearchInput from './SearchInput';
 
 type AutocompleteSearchBarProps = {
   elements: ElementList[];
@@ -18,7 +18,7 @@ const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
   disabled = false,
   selectedId,
 }) => {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [selectedElementIndex, setSelectedElementIndex] = useState<number>(-1);
   const [searchResults, setSearchResults] = useState<ElementList[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -29,11 +29,11 @@ const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
   }
 
   const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentId("");
+    setCurrentId('');
     setQuery(event.target.value);
     setSelectedElementIndex(-1);
     setSearchResults(
-      elements.filter((element) =>
+      elements.filter(element =>
         element.description
           .toLowerCase()
           .includes(event.target.value.toLowerCase())
@@ -42,19 +42,19 @@ const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "ArrowUp") {
-      setSelectedElementIndex((prevIndex) =>
+    if (event.key === 'ArrowUp') {
+      setSelectedElementIndex(prevIndex =>
         prevIndex === -1 ? searchResults.length - 1 : prevIndex - 1
       );
-    } else if (event.key === "ArrowDown") {
-      setSelectedElementIndex((prevIndex) =>
+    } else if (event.key === 'ArrowDown') {
+      setSelectedElementIndex(prevIndex =>
         prevIndex === searchResults.length - 1 ? -1 : prevIndex + 1
       );
-    } else if (event.key === "Enter") {
+    } else if (event.key === 'Enter') {
       if (selectedElementIndex !== -1) {
         const selectedElement = searchResults[selectedElementIndex];
         setCurrentId(selectedElement.id);
-        setQuery("");
+        setQuery('');
         setSelectedElementIndex(-1);
         setSearchResults([]);
       }
@@ -63,7 +63,7 @@ const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
 
   const handleElementClick = (element: ElementList) => {
     setCurrentId(element.id);
-    setQuery("");
+    setQuery('');
     setSelectedElementIndex(-1);
   };
 
@@ -71,9 +71,9 @@ const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
     const activeElement = document.getElementById(`element-${index}`);
     if (activeElement) {
       activeElement.scrollIntoView({
-        block: "nearest",
-        inline: "start",
-        behavior: "smooth",
+        block: 'nearest',
+        inline: 'start',
+        behavior: 'smooth',
       });
     }
   };
@@ -88,14 +88,14 @@ const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        setQuery("");
+        setQuery('');
         setSearchResults([]);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [selectedElementIndex]);
 
@@ -110,7 +110,7 @@ const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
         disabled={disabled}
       />
 
-      {query !== "" && searchResults.length > 0 && (
+      {query !== '' && searchResults.length > 0 && (
         <ElementListComponent
           elements={searchResults}
           selectedElementIndex={selectedElementIndex}

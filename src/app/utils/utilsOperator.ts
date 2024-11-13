@@ -1,6 +1,5 @@
-import OperatorService from "app/services/operatorService";
-import WorkOrderService from "app/services/workOrderService";
 import { AddWorkOrderOperatorTimes, FinishWorkOrderOperatorTimes, StateWorkOrder, WorkOrderOperatorTimes } from "app/interfaces/workOrder";
+import WorkOrderService from "app/services/workOrderService";
 
 const workOrderService = new WorkOrderService(process.env.NEXT_PUBLIC_API_BASE_URL!);
 

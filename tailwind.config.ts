@@ -103,6 +103,7 @@ const config: Config = {
           paused: "#4b5664",
           pendingValidate: "#8d000e",
           requested: "#ff5c6b",
+          background: "#f1f5f9",
         },
       },
       boxShadow: {

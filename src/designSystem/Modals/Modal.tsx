@@ -1,10 +1,9 @@
-"use client";
+'use client';
 
-import { ReactNode, useEffect, useRef, useState } from "react";
-import { useGlobalStore } from "app/stores/globalStore";
-
-import { twMerge } from "tailwind-merge";
-import Container from "components/layout/Container";
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import { useGlobalStore } from 'app/stores/globalStore';
+import Container from 'components/layout/Container';
+import { twMerge } from 'tailwind-merge';
 
 export const ModalBackground = ({
   isVisible,
@@ -17,8 +16,8 @@ export const ModalBackground = ({
     <div
       className={`${
         isVisible
-          ? "opacity-1 pointer-events-auto"
-          : "opacity-0 pointer-events-none"
+          ? 'opacity-1 pointer-events-auto'
+          : 'opacity-0 pointer-events-none'
       } transition-all fixed top-0 right-0 bottom-0 w-full bg-hg-black/50 z-40 `}
       onClick={onClick}
     ></div>
@@ -31,7 +30,7 @@ export const Modal2 = ({
   width,
   height,
   className,
-  type = "right",
+  type = 'right',
   hideModalBackground = false,
   children,
   ...rest
@@ -41,7 +40,7 @@ export const Modal2 = ({
   width?: string;
   height?: string;
   className?: string;
-  type?: "right" | "bottom" | "center";
+  type?: 'right' | 'bottom' | 'center';
   children: ReactNode;
   [key: string]: any;
 }) => {
@@ -51,20 +50,20 @@ export const Modal2 = ({
   }, [isVisible]);
 
   let animationStyles = `
-    ${type === "right" ? "translate-x-[105%]" : " "}
-    ${type === "bottom" ? "translate-y-[105%]" : " "}
-    ${type === "center" ? "translate-y-[200%]" : " "}
+    ${type === 'right' ? 'translate-x-[105%]' : ' '}
+    ${type === 'bottom' ? 'translate-y-[105%]' : ' '}
+    ${type === 'center' ? 'translate-y-[200%]' : ' '}
   `;
 
   if (isVisible && isModalOpen) {
     animationStyles = `
-      ${type === "right" ? "translate-x-[0%]" : ""}
-      ${type === "bottom" ? "translate-y-[0%]" : ""}
-      ${type === "center" ? "translate-y-[0%]" : ""}
+      ${type === 'right' ? 'translate-x-[0%]' : ''}
+      ${type === 'bottom' ? 'translate-y-[0%]' : ''}
+      ${type === 'center' ? 'translate-y-[0%]' : ''}
     `;
   }
 
-  if (type === "center") {
+  if (type === 'center') {
     return (
       <div
         className={`transition-all fixed inset-0 z-50 ${animationStyles}`}
@@ -74,9 +73,9 @@ export const Modal2 = ({
           <div
             className={twMerge(
               `transition-all mx-auto bg-white rounded-2xl relative top-1/2 -translate-y-1/2
-              ${width ? width : "w-full"}
-              ${height ? height : "h-full"}
-              ${className ? className : ""}`
+              ${width ? width : 'w-full'}
+              ${height ? height : 'h-full'}
+              ${className ? className : ''}`
             )}
             {...rest}
           >
@@ -91,12 +90,12 @@ export const Modal2 = ({
     <div
       className={twMerge(
         `text-hg-black transition-all fixed right-0 bottom-0 bg-white z-50 shadow-centered-black overflow-y-auto
-          ${type === "right" ? "top-0" : ""}
-          ${type === "bottom" ? "" : ""}
-          ${width ? width : "w-full"}
-          ${height ? height : "h-full"}
+          ${type === 'right' ? 'top-0' : ''}
+          ${type === 'bottom' ? '' : ''}
+          ${width ? width : 'w-full'}
+          ${height ? height : 'h-full'}
           ${animationStyles}
-          ${className ? className : ""}`
+          ${className ? className : ''}`
       )}
       {...rest}
     >
@@ -111,7 +110,7 @@ export const Modal = ({
   width,
   height,
   className,
-  type = "right",
+  type = 'right',
   hideModalBackground = false,
   children,
   ...rest
@@ -121,12 +120,12 @@ export const Modal = ({
   width?: string;
   height?: string;
   className?: string;
-  type?: "right" | "bottom" | "center";
+  type?: 'right' | 'bottom' | 'center';
   children: ReactNode;
   [key: string]: any;
 }) => {
   const { isModalOpen, setIsModalOpen, setShowModalBackground } =
-    useGlobalStore((state) => state);
+    useGlobalStore(state => state);
 
   useEffect(() => {
     if (!hideModalBackground) {
@@ -137,28 +136,28 @@ export const Modal = ({
   }, [isVisible]);
 
   let animationStyles = `
-    ${type === "right" ? "translate-x-[105%]" : " "}
-    ${type === "bottom" ? "translate-y-[105%]" : " "}
-    ${type === "center" ? "translate-y-[200%]" : " "}
+    ${type === 'right' ? 'translate-x-[105%]' : ' '}
+    ${type === 'bottom' ? 'translate-y-[105%]' : ' '}
+    ${type === 'center' ? 'translate-y-[200%]' : ' '}
   `;
 
   if (isVisible && isModalOpen) {
     animationStyles = `
-      ${type === "right" ? "translate-x-[0%]" : ""}
-      ${type === "bottom" ? "translate-y-[0%]" : ""}
-      ${type === "center" ? "translate-y-[0%]" : ""}
+      ${type === 'right' ? 'translate-x-[0%]' : ''}
+      ${type === 'bottom' ? 'translate-y-[0%]' : ''}
+      ${type === 'center' ? 'translate-y-[0%]' : ''}
     `;
   }
 
-  if (type === "center") {
+  if (type === 'center') {
     return (
       <div className={`transition-all fixed inset-0 z-50 ${animationStyles}`}>
         <div
           className={twMerge(
             `transition-all mx-auto bg-white rounded-2xl relative top-1/2 -translate-y-1/2
-              ${width ? width : "w-full"}
-              ${height ? height : "h-full"}
-              ${className ? className : ""}`
+              ${width ? width : 'w-full'}
+              ${height ? height : 'h-full'}
+              ${className ? className : ''}`
           )}
           {...rest}
         >
@@ -172,12 +171,12 @@ export const Modal = ({
     <div
       className={twMerge(
         `text-hg-black transition-all fixed right-0 bottom-0 bg-white z-50 shadow-centered-black overflow-y-auto
-          ${type === "right" ? "top-0" : ""}
-          ${type === "bottom" ? "" : ""}
-          ${width ? width : "w-full"}
-          ${height ? height : "h-full"}
+          ${type === 'right' ? 'top-0' : ''}
+          ${type === 'bottom' ? '' : ''}
+          ${width ? width : 'w-full'}
+          ${height ? height : 'h-full'}
           ${animationStyles}
-          ${className ? className : ""}`
+          ${className ? className : ''}`
       )}
       {...rest}
     >
@@ -205,10 +204,10 @@ export const SwipeModal = ({
   useEffect(() => {
     if (modalRef.current) {
       if (isOpen) {
-        (modalRef.current as HTMLDivElement).style.transform = "translateY(0)";
+        (modalRef.current as HTMLDivElement).style.transform = 'translateY(0)';
       } else {
         (modalRef.current as HTMLDivElement).style.transform =
-          "translateY(105%)";
+          'translateY(105%)';
       }
     }
   }, [isOpen]);
@@ -239,18 +238,18 @@ export const SwipeModal = ({
     }
   };
 
-  const handleTouchEnd = (e: any) => {
+  const handleTouchEnd = () => {
     setIsDragging(false);
     if (deltaYScroll < 100 && modalRef.current) {
-      (modalRef.current as HTMLDivElement).style.transform = "translateY(0)";
+      (modalRef.current as HTMLDivElement).style.transform = 'translateY(0)';
     }
   };
 
   return (
     <div
       className={twMerge(`transition-all z-50 translate-y-[105%] rounded-t-2xl fixed w-full overflow-hidden bg-white bottom-0 left-0 right-0 swipe-modal 
-        ${isOpen ? "translate-y-0" : ""}
-        ${className ? className : ""}
+        ${isOpen ? 'translate-y-0' : ''}
+        ${className ? className : ''}
       `)}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}

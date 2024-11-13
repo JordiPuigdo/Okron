@@ -1,13 +1,14 @@
-import { OperatorType } from "app/interfaces/Operator";
+import { OperatorType } from 'app/interfaces/Operator';
+import { DowntimesReasonsType } from 'app/interfaces/Production/Downtimes';
 import {
   StateWorkOrder,
   WorkOrderEventType,
   WorkOrderType,
-} from "app/interfaces/workOrder";
-import { useSessionStore } from "app/stores/globalStore";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
+} from 'app/interfaces/workOrder';
+import { useSessionStore } from 'app/stores/globalStore';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -15,19 +16,21 @@ dayjs.extend(timezone);
 export const translateStateWorkOrder = (state: any): string => {
   switch (state) {
     case StateWorkOrder.Waiting:
-      return "Pendent";
+      return 'Pendent';
     case StateWorkOrder.OnGoing:
-      return "En curs";
+      return 'En curs';
     case StateWorkOrder.Paused:
-      return "Pausada";
+      return 'Pausada';
     case StateWorkOrder.Finished:
-      return "Finalitzada";
+      return 'Finalitzada';
     case StateWorkOrder.PendingToValidate:
-      return "Pendent Validar";
+      return 'Pendent Validar';
     case StateWorkOrder.Requested:
-      return "Sol·licitat";
+      return 'Sol·licitat';
+    case StateWorkOrder.Open:
+      return 'Oberta';
     default:
-      return "";
+      return '';
   }
 };
 
@@ -38,19 +41,19 @@ export const translateWorkOrderEventType = (
     /*case WorkOrderEventType.Requested:
       return "Sol·licitud";*/
     case WorkOrderEventType.Waiting:
-      return "Pendent";
+      return 'Pendent';
     case WorkOrderEventType.Started:
-      return "En curs";
+      return 'En curs';
     case WorkOrderEventType.Paused:
-      return "Pausada";
+      return 'Pausada';
     case WorkOrderEventType.PendingToValidate:
-      return "Validació Pendent";
+      return 'Validació Pendent';
     case WorkOrderEventType.Finished:
-      return "Finalitzada";
+      return 'Finalitzada';
     case WorkOrderEventType.Created:
-      return "Creada";
+      return 'Creada';
     default:
-      return "";
+      return '';
   }
 };
 
@@ -60,24 +63,24 @@ export const formatDate = (
   includeSeconds: boolean = true
 ) => {
   if (!dateString) {
-    return "";
+    return '';
   }
-  if (dateString.length > 0 && dateString.includes("0001")) {
-    return "";
+  if (dateString.length > 0 && dateString.includes('0001')) {
+    return '';
   }
   const newDate = new Date(dateString);
   const date = dayjs(newDate);
 
   if (!date.isValid()) {
-    return "";
+    return '';
   }
 
-  let formatString = "DD/MM/YYYY";
+  let formatString = 'DD/MM/YYYY';
 
   if (includeHours) {
-    formatString += " HH:mm";
+    formatString += ' HH:mm';
     if (includeSeconds) {
-      formatString += ":ss";
+      formatString += ':ss';
     }
   }
 
@@ -88,9 +91,9 @@ export const translateWorkOrderType = (
   workOrderType: WorkOrderType
 ): string => {
   const translations: { [key in WorkOrderType]: string } = {
-    [WorkOrderType.Preventive]: "Preventiu",
-    [WorkOrderType.Corrective]: "Correctiu",
-    [WorkOrderType.Predicitve]: "",
+    [WorkOrderType.Preventive]: 'Preventiu',
+    [WorkOrderType.Corrective]: 'Correctiu',
+    [WorkOrderType.Predicitve]: '',
   };
 
   return translations[workOrderType];
@@ -98,21 +101,21 @@ export const translateWorkOrderType = (
 export const validateEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const validDomains = [
-    "gmail.com",
-    "hotmail.com",
-    "hotmail.es",
-    "hotmail.fr",
-    "hotmail.it",
-    "yahoo.es",
-    "yahoo.com",
-    "icloud.com",
-    "holaglow.com",
-    "outlook.com",
-    "outlook.es",
-    "live.com",
-    "me.com",
-    "msn.com",
-    "telefonica.net",
+    'gmail.com',
+    'hotmail.com',
+    'hotmail.es',
+    'hotmail.fr',
+    'hotmail.it',
+    'yahoo.es',
+    'yahoo.com',
+    'icloud.com',
+    'holaglow.com',
+    'outlook.com',
+    'outlook.es',
+    'live.com',
+    'me.com',
+    'msn.com',
+    'telefonica.net',
   ];
 
   const isValidFormat = emailRegex.test(email);
@@ -121,21 +124,21 @@ export const validateEmail = (email: string) => {
     return false;
   }
 
-  const [, domain] = email.split("@");
+  const [, domain] = email.split('@');
   const isDomainValid = validDomains.includes(domain);
 
   return isDomainValid;
 };
 
 export const isOperatorLogged = () => {
-  const { operatorLogged } = useSessionStore((state) => state);
+  const { operatorLogged } = useSessionStore(state => state);
 
   return operatorLogged == undefined ? false : true;
 };
 
 export function checkOperatorCreated() {
   if (!isOperatorLogged) {
-    alert("Operari no assignat");
+    alert('Operari no assignat');
     return false;
   } else {
     return true;
@@ -171,13 +174,27 @@ export function formatDateQuery(date: Date, startDate: boolean) {
 export const translateOperatorType = (operatorType: any): string => {
   switch (operatorType) {
     case OperatorType.Maintenance:
-      return "Manteniment";
+      return 'Manteniment';
     case OperatorType.Production:
-      return "Producció";
+      return 'Producció';
     case OperatorType.Quality:
-      return "Qualitat";
+      return 'Qualitat';
     default:
-      return "";
+      return '';
+  }
+};
+
+export const translateDowntimeReasonType = (
+  type: DowntimesReasonsType
+): string => {
+  switch (type) {
+    case DowntimesReasonsType.Maintanance:
+      return 'Manteniment';
+
+    case DowntimesReasonsType.Production:
+      return 'Producció';
+    default:
+      return '';
   }
 };
 
@@ -201,7 +218,7 @@ export function differenceBetweenDates(date1: Date, date2: Date) {
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-  const pad = (num: number) => num.toString().padStart(2, "0");
+  const pad = (num: number) => num.toString().padStart(2, '0');
   const fullTime = `${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
   return {
     days,

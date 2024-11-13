@@ -1,11 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { SvgSpinner } from "app/icons/icons";
 import { Asset } from "app/interfaces/Asset";
-import { useRouter } from "next/navigation";
 import useRoutes from "app/utils/useRoutes";
-import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 interface AssetFormProps {
   id: string;

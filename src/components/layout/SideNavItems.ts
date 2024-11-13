@@ -1,6 +1,6 @@
-import { SideNavItem, generateKey } from "app/types/SideNavItem";
-import { SvgGear, SvgMachine, SvgSparePart } from "app/icons/icons";
-import { UserPermission } from "app/interfaces/User";
+import { SvgGear } from "app/icons/icons";
+import { UserPermission, UserType } from "app/interfaces/User";
+import { generateKey,SideNavItem } from "app/types/SideNavItem";
 
 export const SIDENAV_ITEMS: SideNavItem[] = [
   {
@@ -9,18 +9,21 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     path: "",
     submenu: true,
     permission: [UserPermission.Administrator],
+    userType: [UserType.Maintenance],
     submenuItems: [
       {
         key: generateKey(),
         title: "Configuració",
         path: "/preventive",
         permission: [UserPermission.Administrator],
+        userType: [UserType.Maintenance],
       },
       {
         key: generateKey(),
         title: "Punts Inspecció",
         path: "/inspectionPoints",
         permission: [UserPermission.Administrator],
+        userType: [UserType.Maintenance],
       },
     ],
   },
@@ -29,12 +32,14 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     title: "Avaries",
     path: "/corrective",
     permission: [UserPermission.Administrator, UserPermission.Worker],
+    userType: [UserType.Maintenance, UserType.Production],
   },
   {
     key: generateKey(),
     title: "Ordres de treball",
     path: "/workOrders",
     permission: [UserPermission.Administrator, UserPermission.Worker],
+    userType: [UserType.Maintenance],
   },
   {
     key: generateKey(),
@@ -45,6 +50,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
       UserPermission.Worker,
       UserPermission.SpareParts,
     ],
+    userType: [UserType.Maintenance],
     //icon : SvgSparePart,
   },
   {
@@ -52,6 +58,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     title: "Reports",
     path: "/reports/spareParts/consumedSpareParts",
     permission: [UserPermission.Administrator, UserPermission.SpareParts],
+    userType: [UserType.Maintenance],
     //icon : SvgSparePart,
   },
   {
@@ -59,6 +66,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     title: "Configuració",
     path: "",
     permission: [UserPermission.Administrator],
+    userType: [UserType.Maintenance, UserType.Production],
     submenu: true,
     icon: SvgGear,
     submenuItems: [
@@ -67,30 +75,34 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         title: "Actius i Equips",
         path: "/assets",
         permission: [UserPermission.Administrator],
+        userType: [UserType.Maintenance],
       },
       {
         key: generateKey(),
         title: "Seccions",
         path: "/section",
+        userType: [UserType.Production],
         permission: [UserPermission.Administrator],
       },
       {
         key: generateKey(),
         title: "Màquines",
         path: "/machines",
-        //icon: SvgMachine,
+        userType: [UserType.Production],
         permission: [UserPermission.Administrator],
       },
       {
         key: generateKey(),
         title: "Operaris",
         path: "/operators",
+        userType: [UserType.Production, UserType.Maintenance],
         permission: [UserPermission.Administrator],
       },
       {
         key: generateKey(),
         title: "Usuaris",
         path: "/users",
+        userType: [UserType.Production, UserType.Maintenance],
         permission: [UserPermission.Administrator],
       },
     ],

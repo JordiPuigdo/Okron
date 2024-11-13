@@ -1,9 +1,9 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useSessionStore } from "app/stores/globalStore";
-import { useEffect, useState } from "react";
 import useRoutes from "app/utils/useRoutes";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type Header = {
   setOpenMenu: React.Dispatch<React.SetStateAction<boolean>>;

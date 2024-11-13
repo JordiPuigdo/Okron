@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import ModalGenerateCorrective from "app/(pages)/corrective/components/ModalGenerateCorrective";
+import { SvgSpinner } from "app/icons/icons";
 import WorkOrder, {
   ResultInspectionPoint,
   SaveInspectionResultPointRequest,
@@ -6,10 +8,8 @@ import WorkOrder, {
   WorkOrderInspectionPoint,
 } from "app/interfaces/workOrder";
 import WorkOrderService from "app/services/workOrderService";
-import { SvgSpinner } from "app/icons/icons";
 import { useGlobalStore, useSessionStore } from "app/stores/globalStore";
 import { checkAllInspectionPoints } from "app/utils/utilsInspectionPoints";
-import ModalGenerateCorrective from "app/(pages)/corrective/components/ModalGenerateCorrective";
 
 interface CompleteInspectionPointsProps {
   workOrderInspectionPoints: WorkOrderInspectionPoint[];

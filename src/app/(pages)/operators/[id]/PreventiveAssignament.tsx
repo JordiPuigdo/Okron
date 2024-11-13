@@ -1,11 +1,12 @@
 "use client";
+import { useEffect, useState } from "react";
 import {
   AssignOperatorToPreventivesRequest,
   Preventive,
 } from "app/interfaces/Preventive";
-import { useEffect, useState } from "react";
-import PreventiveOperatorTable from "./PreventiveOperatorTable";
 import PreventiveService from "app/services/preventiveService";
+
+import PreventiveOperatorTable from "./PreventiveOperatorTable";
 
 interface PreventiveAssignmentProps {
   operatorId: string;

@@ -1,4 +1,4 @@
-import { ConsumedSparePartsChartProps } from "../page";
+import { ConsumedSparePartsChartProps } from '../DashboardMM/DashboardMM';
 
 export default function ConsumedsSparePart({
   chartConsumedSpareParts,

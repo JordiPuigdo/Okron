@@ -1,8 +1,8 @@
 "use client";
-import { useSessionStore } from "app/stores/globalStore";
 import { useEffect, useState } from "react";
 import WorkOrderTable from "app/(pages)/workOrders/components/WorkOrderTable";
 import { WorkOrderType } from "app/interfaces/workOrder";
+import { useSessionStore } from "app/stores/globalStore";
 
 interface WorkOrderComponentProps {
   workOrderType?: WorkOrderType;

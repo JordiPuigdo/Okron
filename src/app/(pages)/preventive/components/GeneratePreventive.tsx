@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { SvgClose, SvgSpinner } from "app/icons/icons";
 import { Preventive } from "app/interfaces/Preventive";
 import { UserPermission } from "app/interfaces/User";
@@ -9,7 +10,6 @@ import { useGlobalStore, useSessionStore } from "app/stores/globalStore";
 import { formatDate } from "app/utils/utils";
 import { Button } from "designSystem/Button/Buttons";
 import { Modal } from "designSystem/Modals/Modal";
-import { useEffect, useState } from "react";
 
 interface PreventiveCreateds {
   key: Preventive;

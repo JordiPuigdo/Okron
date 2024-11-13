@@ -1,31 +1,28 @@
-import { useSparePartsHook } from "app/hooks/useSparePartsHook";
+import React, { useEffect, useState } from 'react';
+import { useSparePartsHook } from 'app/hooks/useSparePartsHook';
 import {
   SvgCheck,
   SvgClose,
-  SvgDelete,
   SvgDetail,
   SvgInspectionPoints,
   SvgPause,
   SvgSparePart,
   SvgSpinner,
   SvgStart,
-} from "app/icons/icons";
-import SparePart from "app/interfaces/SparePart";
+} from 'app/icons/icons';
 import WorkOrder, {
   StateWorkOrder,
   UpdateStateWorkOrder,
   WorkOrderSparePart,
   WorkOrderType,
-} from "app/interfaces/workOrder";
-import SparePartService from "app/services/sparePartService";
-import WorkOrderService from "app/services/workOrderService";
-import { useGlobalStore, useSessionStore } from "app/stores/globalStore";
-import useRoutes from "app/utils/useRoutes";
-import { checkAllInspectionPoints } from "app/utils/utilsInspectionPoints";
-import ChooseSpareParts from "components/sparePart/ChooseSpareParts";
-import { Button } from "designSystem/Button/Buttons";
-import { Modal } from "designSystem/Modals/Modal";
-import React, { useEffect, useState } from "react";
+} from 'app/interfaces/workOrder';
+import WorkOrderService from 'app/services/workOrderService';
+import { useGlobalStore, useSessionStore } from 'app/stores/globalStore';
+import useRoutes from 'app/utils/useRoutes';
+import { checkAllInspectionPoints } from 'app/utils/utilsInspectionPoints';
+import ChooseSpareParts from 'components/sparePart/ChooseSpareParts';
+import { Button } from 'designSystem/Button/Buttons';
+import { Modal } from 'designSystem/Modals/Modal';
 
 interface WorkOrderOperationsInTableProps {
   workOrderId: string;
@@ -50,24 +47,24 @@ export default function WorkOrderOperationsInTable({
   const Routes = useRoutes();
   const [isLoading, setIsLoading] = useState<{ [key: string]: boolean }>({});
 
-  const { operatorLogged, loginUser } = useSessionStore((state) => state);
-  const { isModalOpen } = useGlobalStore((state) => state);
+  const { operatorLogged, loginUser } = useSessionStore(state => state);
+  const { isModalOpen } = useGlobalStore(state => state);
   const [showModal, setShowModal] = useState(false);
 
   function handleInspectionPoints(workOrderId: string) {
     if (!operatorLogged) {
-      alert("Has de tenir un operari fitxat per fer aquesta acció");
+      alert('Has de tenir un operari fitxat per fer aquesta acció');
       return;
     }
-    toggleLoading(workOrderId + "_InspectionPoints");
+    toggleLoading(workOrderId + '_InspectionPoints');
     checkAllInspectionPoints(workOrder.workOrderInspectionPoint!, workOrderId);
     setIsPassInspectionPoints(!isPassInspectionPoints);
-    toggleLoading(workOrderId + "_InspectionPoints");
+    toggleLoading(workOrderId + '_InspectionPoints');
     setIsPassInspectionPoints(!isPassInspectionPoints);
   }
 
   const toggleLoading = (id: string) => {
-    setIsLoading((prevLoading) => ({
+    setIsLoading(prevLoading => ({
       ...prevLoading,
       [id]: !prevLoading[id],
     }));
@@ -79,7 +76,7 @@ export default function WorkOrderOperationsInTable({
       const allInspectionPointsChecked =
         workOrder.workOrderInspectionPoint !== undefined
           ? workOrder.workOrderInspectionPoint.every(
-              (inspectionPoint) => inspectionPoint.check
+              inspectionPoint => inspectionPoint.check
             )
           : false;
       setIsPassInspectionPoints(allInspectionPointsChecked ?? false);
@@ -89,21 +86,21 @@ export default function WorkOrderOperationsInTable({
   async function handleChangeStateWorkOrder(state: StateWorkOrder) {
     toggleLoading(
       workOrderId +
-        (state === StateWorkOrder.PendingToValidate ? "_Validate" : "_Sign")
+        (state === StateWorkOrder.PendingToValidate ? '_Validate' : '_Sign')
     );
 
     if (!operatorLogged) {
-      alert("Has de tenir un operari fitxat per fer aquesta acció");
+      alert('Has de tenir un operari fitxat per fer aquesta acció');
       toggleLoading(
         workOrderId +
-          (state === StateWorkOrder.PendingToValidate ? "_Validate" : "_Sign")
+          (state === StateWorkOrder.PendingToValidate ? '_Validate' : '_Sign')
       );
       return;
     }
     if (workOrder.stateWorkOrder == state) {
       toggleLoading(
         workOrderId +
-          (state === StateWorkOrder.PendingToValidate ? "_Validate" : "_Sign")
+          (state === StateWorkOrder.PendingToValidate ? '_Validate' : '_Sign')
       );
       return;
     }
@@ -116,7 +113,7 @@ export default function WorkOrderOperationsInTable({
         userId: loginUser?.agentId,
       },
     ];
-    await workOrderService.updateStateWorkOrder(update).then((response) => {
+    await workOrderService.updateStateWorkOrder(update).then(response => {
       if (response) {
         workOrder.stateWorkOrder = state;
         onChangeStateWorkOrder && onChangeStateWorkOrder();
@@ -126,13 +123,13 @@ export default function WorkOrderOperationsInTable({
     });
     toggleLoading(
       workOrderId +
-        (state === StateWorkOrder.PendingToValidate ? "_Validate" : "_Sign")
+        (state === StateWorkOrder.PendingToValidate ? '_Validate' : '_Sign')
     );
   }
 
   function handleSparePartsModal() {
     if (!operatorLogged) {
-      alert("Has de tenir un operari fitxat per fer aquesta acció");
+      alert('Has de tenir un operari fitxat per fer aquesta acció');
       return;
     }
     setShowModal(true);
@@ -154,51 +151,51 @@ export default function WorkOrderOperationsInTable({
     validStates.includes(workOrder.stateWorkOrder)
       ? `${
           workOrder.stateWorkOrder == StateWorkOrder.OnGoing
-            ? "bg-gray-500"
-            : "bg-okron-onGoing "
+            ? 'bg-gray-500'
+            : 'bg-okron-onGoing '
         } hover:${
           workOrder.stateWorkOrder == StateWorkOrder.OnGoing
-            ? "bg-okron-hoverWaiting"
-            : "bg-okron-hoverOnGoing"
+            ? 'bg-okron-hoverWaiting'
+            : 'bg-okron-hoverOnGoing'
         }`
-      : "bg-gray-200 pointer-events-none"
+      : 'bg-gray-200 pointer-events-none'
   } text-white  rounded flex gap-1 w-full justify-center items-center `;
 
   const classNameValidate = `${
     validStates.includes(workOrder.stateWorkOrder)
       ? `${
           workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
-            ? "bg-emerald-700"
-            : "bg-okron-finished "
+            ? 'bg-emerald-700'
+            : 'bg-okron-finished '
         } hover:${
           workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
-            ? "bg-emerald-900 pointer-events-none"
-            : "bg-okron-hoverPendingToValidate"
+            ? 'bg-emerald-900 pointer-events-none'
+            : 'bg-okron-hoverPendingToValidate'
         }`
-      : "bg-gray-200 pointer-events-none"
+      : 'bg-gray-200 pointer-events-none'
   } text-white  rounded flex gap-1 w-full justify-center items-center `;
 
   const classNameSpareParts = `${
     validStates.includes(workOrder.stateWorkOrder)
       ? `${
           workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
-            ? "bg-emerald-700"
-            : "bg-gray-500 "
+            ? 'bg-emerald-700'
+            : 'bg-gray-500 '
         } hover:${
           workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
-            ? "bg-emerald-900 pointer-events-none"
-            : "bg-gray-700"
+            ? 'bg-emerald-900 pointer-events-none'
+            : 'bg-gray-700'
         }`
-      : "bg-gray-200 pointer-events-none"
+      : 'bg-gray-200 pointer-events-none'
   } text-white  rounded flex gap-1 w-full justify-center items-center `;
 
   const classNamePreventive = `
     ${
       validStates.includes(workOrder.stateWorkOrder)
-        ? `${isPassInspectionPoints ? "bg-lime-700" : "bg-red-500"} hover:${
-            isPassInspectionPoints ? "cursor-not-allowed" : "bg-red-700"
+        ? `${isPassInspectionPoints ? 'bg-lime-700' : 'bg-red-500'} hover:${
+            isPassInspectionPoints ? 'cursor-not-allowed' : 'bg-red-700'
           }`
-        : "bg-gray-200 pointer-events-none"
+        : 'bg-gray-200 pointer-events-none'
     } text-white rounded p-2 flex gap-2 justify-center align-middle w-full`;
 
   if (enableActions)
@@ -217,7 +214,7 @@ export default function WorkOrderOperationsInTable({
           }}
           className={classNameOnGoing}
         >
-          {isLoading[workOrderId + "_Sign"] ? (
+          {isLoading[workOrderId + '_Sign'] ? (
             <SvgSpinner className="text-white" />
           ) : workOrder.stateWorkOrder == StateWorkOrder.OnGoing ? (
             <SvgPause className="text-white" />
@@ -236,7 +233,7 @@ export default function WorkOrderOperationsInTable({
             }
           }}
         >
-          {isLoading[workOrderId + "_Validate"] ? <SvgSpinner /> : <SvgCheck />}
+          {isLoading[workOrderId + '_Validate'] ? <SvgSpinner /> : <SvgCheck />}
         </Button>
 
         {workOrder.workOrderType == WorkOrderType.Corrective && (
@@ -247,7 +244,7 @@ export default function WorkOrderOperationsInTable({
             type="none"
             className={`${classNameSpareParts}`}
           >
-            {isLoading[workOrderId + "_SpareParts"] ? (
+            {isLoading[workOrderId + '_SpareParts'] ? (
               <SvgSpinner />
             ) : (
               <SvgSparePart />
@@ -261,11 +258,11 @@ export default function WorkOrderOperationsInTable({
             }}
             type="none"
             customStyles={`${
-              isPassInspectionPoints ? "cursor-not-allowed" : ""
+              isPassInspectionPoints ? 'cursor-not-allowed' : ''
             }`}
             className={`${classNamePreventive} text-white rounded p-2 flex gap-2 justify-center align-middle w-full`}
           >
-            {isLoading[workOrderId + "_InspectionPoints"] ? (
+            {isLoading[workOrderId + '_InspectionPoints'] ? (
               <SvgSpinner />
             ) : (
               <SvgInspectionPoints />
@@ -276,13 +273,13 @@ export default function WorkOrderOperationsInTable({
         <Button
           type="none"
           onClick={() => {
-            toggleLoading(workOrderId + "_Detail");
+            toggleLoading(workOrderId + '_Detail');
           }}
-          href={`${Routes.workOrders + "/" + workOrder.id}`}
+          href={`${Routes.workOrders + '/' + workOrder.id}`}
           className={`bg-okron-btDetail hover:bg-okron-btnDetailHover rounded flex text-center p-2 w-full justify-center align-middle text-white`}
           customStyles="justify-center align-middle"
         >
-          {isLoading[workOrderId + "_Detail"] ? <SvgSpinner /> : <SvgDetail />}
+          {isLoading[workOrderId + '_Detail'] ? <SvgSpinner /> : <SvgDetail />}
         </Button>
       </div>
     );
@@ -291,13 +288,13 @@ export default function WorkOrderOperationsInTable({
       <Button
         type="none"
         onClick={() => {
-          toggleLoading(workOrderId + "_Detail");
+          toggleLoading(workOrderId + '_Detail');
         }}
-        href={`${Routes.workOrders + "/" + workOrder.id}`}
+        href={`${Routes.workOrders + '/' + workOrder.id}`}
         className={`bg-okron-btDetail hover:bg-okron-btnDetailHover rounded flex text-center p-2 w-full justify-center align-middle text-white`}
         customStyles="justify-center align-middle"
       >
-        {isLoading[workOrderId + "_Detail"] ? <SvgSpinner /> : <SvgDetail />}
+        {isLoading[workOrderId + '_Detail'] ? <SvgSpinner /> : <SvgDetail />}
       </Button>
     );
 }
@@ -311,7 +308,7 @@ export const SparePartsModal = ({
   workOrder,
   isFinished,
 }: SparePartsModalProps) => {
-  const { setIsModalOpen } = useGlobalStore((state) => state);
+  const { setIsModalOpen } = useGlobalStore(state => state);
 
   const { spareParts, sparePartsError, fetchSpareParts } = useSparePartsHook();
 
@@ -328,8 +325,8 @@ export const SparePartsModal = ({
   }, []);*/
 
   useEffect(() => {
-    workOrder.workOrderSpareParts?.forEach((x) => {
-      setSelectedSpareParts((prevSelected) => [...prevSelected, x]);
+    workOrder.workOrderSpareParts?.forEach(x => {
+      setSelectedSpareParts(prevSelected => [...prevSelected, x]);
     });
   }, [selectedSpareParts]);
 

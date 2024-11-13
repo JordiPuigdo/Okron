@@ -1,6 +1,6 @@
 import WorkOrder, { SearchWorkOrderFilters } from "app/interfaces/workOrder";
 import WorkOrderService from "app/services/workOrderService";
-import useSWR, { Fetcher } from "swr";
+import { Fetcher } from "swr";
 
 const workOrderService = new WorkOrderService(
   process.env.NEXT_PUBLIC_API_BASE_URL!

@@ -1,4 +1,4 @@
-import { WorkOrderType, StateWorkOrder } from "./workOrder";
+import { StateWorkOrder,WorkOrderType } from "./workOrder";
 
 export interface Corrective {
     id?: string

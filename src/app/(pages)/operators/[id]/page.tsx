@@ -1,17 +1,16 @@
-"use client";
+'use client';
 
-import OperatorForm from "components/OperatorForm";
-import MainLayout from "components/layout/MainLayout";
-import Operator, { OperatorType } from "app/interfaces/Operator";
-import { BaseSyntheticEvent, useEffect, useState } from "react";
-import OperatorService from "app/services/operatorService";
-import Container from "components/layout/Container";
-import {
-  AssignOperatorToPreventivesRequest,
-  Preventive,
-} from "app/interfaces/Preventive";
-import PreventiveService from "app/services/preventiveService";
-import PreventiveAssignment from "./PreventiveAssignament";
+import { BaseSyntheticEvent, useEffect, useState } from 'react';
+import Operator, { OperatorType } from 'app/interfaces/Operator';
+import { Preventive } from 'app/interfaces/Preventive';
+import OperatorService from 'app/services/operatorService';
+import PreventiveService from 'app/services/preventiveService';
+import Container from 'components/layout/Container';
+import MainLayout from 'components/layout/MainLayout';
+import OperatorForm from 'components/OperatorForm';
+
+import PreventiveAssignment from './PreventiveAssignament';
+import { SvgMachines } from 'app/icons/icons';
 
 export default function EditOperatorPage({
   params,
@@ -19,10 +18,10 @@ export default function EditOperatorPage({
   params: { id: string };
 }) {
   const operatorService = new OperatorService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+    process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
   const preventiveService = new PreventiveService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+    process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
   const [isUpdateSuccessful, setIsUpdateSuccessful] = useState<boolean | null>(
     null
@@ -43,7 +42,7 @@ export default function EditOperatorPage({
       );
       return operatorData;
     } catch (error) {
-      console.error("Error fetching operator data:", error);
+      console.error('Error fetching operator data:', error);
       return null;
     }
   };
@@ -54,7 +53,7 @@ export default function EditOperatorPage({
         await preventiveService.getPreventiveByOperatorId(params.id as string);
       return operatorPreventives;
     } catch (error) {
-      console.error("Error fetching operator preventives:", error);
+      console.error('Error fetching operator preventives:', error);
       return null;
     }
   };
@@ -64,7 +63,7 @@ export default function EditOperatorPage({
       const preventives = await preventiveService.getPreventives();
       return preventives;
     } catch (error) {
-      console.error("Error fetching preventives:", error);
+      console.error('Error fetching preventives:', error);
       return null;
     }
   };
@@ -72,7 +71,7 @@ export default function EditOperatorPage({
   const updateOperator = async (operator: Operator) => {
     if (operator.operatorType == null)
       operator.operatorType = OperatorType.Maintenance;
-    await operatorService.updateOperator(operator).then((data) => {
+    await operatorService.updateOperator(operator).then(data => {
       if (data) {
         setIsUpdateSuccessful(true);
         setTimeout(() => {
@@ -92,17 +91,17 @@ export default function EditOperatorPage({
   useEffect(() => {
     setIsUpdateSuccessful(null);
     if (params.id) {
-      fetchOperatorData().then((data) => {
+      fetchOperatorData().then(data => {
         if (data) {
           setOperatorData(data);
         }
       });
-      fetchOperatorPreventives().then((data) => {
+      fetchOperatorPreventives().then(data => {
         if (data) {
           setOperatorPreventives(data);
         }
       });
-      fetchPreventives().then((data) => {
+      fetchPreventives().then(data => {
         if (data) {
           setPreventives(data);
         }
@@ -111,9 +110,23 @@ export default function EditOperatorPage({
     }
   }, [params.id]);
 
+  const renderHeader = () => {
+    return (
+      <div className="flex p-2 my-2">
+        <div className="w-full flex flex-col gap-2 items">
+          <h2 className="text-2xl font-bold text-black flex gap-2">
+            <SvgMachines />
+            {operatorData?.code} - {operatorData?.name}
+          </h2>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <MainLayout>
       <Container>
+        {renderHeader()}
         {operatorData && (
           <OperatorForm
             operator={operatorData}
