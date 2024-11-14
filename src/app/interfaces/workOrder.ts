@@ -73,6 +73,7 @@ export interface WorkOrderOperatorTimes {
 }
 
 export interface UpdateWorkOrderRequest extends CreateWorkOrderRequest {
+  downtimeReason?: DowntimesReasons;
   startTime?: Date;
 }
 
@@ -91,7 +92,7 @@ export interface CreateWorkOrderRequest {
   userId?: string;
   operatorCreatorId: string;
   originWorkOrder: UserType;
-  downtimeReason?: DowntimesReasons;
+  downtimeReasonId?: string;
 }
 
 export interface AddWorkOrderOperatorTimes {
