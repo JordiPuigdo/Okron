@@ -79,12 +79,18 @@ const DownTimeReasonsConfigured: React.FC<DownTimeReasonsConfiguredProps> = ({
     setDowntimeReasons(prev => prev.filter(reason => reason.id !== id));
   };
 
-  const filteredReasons =
-    filteredReasonType !== undefined && filteredReasonType.toString() !== '-1'
-      ? downtimeReasons.filter(
-          reason => reason.downTimeType === filteredReasonType
-        )
-      : downtimeReasons;
+  const filteredReasons = downtimeReasons.filter(reason => {
+    const matchesType =
+      filteredReasonType !== undefined && filteredReasonType.toString() !== '-1'
+        ? reason.downTimeType === filteredReasonType
+        : true;
+
+    const matchesSearchTerm =
+      searchTerm.trim() === '' ||
+      reason.description.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return matchesType && matchesSearchTerm;
+  });
 
   const totalPages = Math.ceil(filteredReasons.length / itemsPerPage);
   const displayedReasons = filteredReasons.slice(

@@ -1,30 +1,30 @@
-"use client";
+'use client';
 
-import "react-datepicker/dist/react-datepicker.css";
+import 'react-datepicker/dist/react-datepicker.css';
 
-import { useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { SvgSpinner } from "app/icons/icons";
-import { Asset } from "app/interfaces/Asset";
-import InspectionPoint from "app/interfaces/inspectionPoint";
-import Operator from "app/interfaces/Operator";
-import { CreatePreventiveRequest, Preventive } from "app/interfaces/Preventive";
-import AssetService from "app/services/assetService";
-import InspectionPointService from "app/services/inspectionPointService";
-import MachineService from "app/services/machineService";
-import OperatorService from "app/services/operatorService";
-import PreventiveService from "app/services/preventiveService";
-import ChooseElement from "components/ChooseElement";
-import ChooseInspectionPoint from "components/inspectionPoint/ChooseInspectionPoint";
-import Container from "components/layout/Container";
-import MainLayout from "components/layout/MainLayout";
-import ChooseOperatorV2 from "components/operator/ChooseOperatorV2";
-import { ElementList } from "components/selector/ElementList";
-import ca from "date-fns/locale/ca";
-import { Button } from "designSystem/Button/Buttons";
-import OkronTimePicker from "designSystem/TimePicker/OkronTimePicker";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from 'react';
+import DatePicker from 'react-datepicker';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { SvgMachines, SvgSpinner } from 'app/icons/icons';
+import { Asset } from 'app/interfaces/Asset';
+import InspectionPoint from 'app/interfaces/inspectionPoint';
+import Operator from 'app/interfaces/Operator';
+import { CreatePreventiveRequest, Preventive } from 'app/interfaces/Preventive';
+import AssetService from 'app/services/assetService';
+import InspectionPointService from 'app/services/inspectionPointService';
+import MachineService from 'app/services/machineService';
+import OperatorService from 'app/services/operatorService';
+import PreventiveService from 'app/services/preventiveService';
+import ChooseElement from 'components/ChooseElement';
+import ChooseInspectionPoint from 'components/inspectionPoint/ChooseInspectionPoint';
+import Container from 'components/layout/Container';
+import MainLayout from 'components/layout/MainLayout';
+import ChooseOperatorV2 from 'components/operator/ChooseOperatorV2';
+import { ElementList } from 'components/selector/ElementList';
+import ca from 'date-fns/locale/ca';
+import { Button } from 'designSystem/Button/Buttons';
+import OkronTimePicker from 'designSystem/TimePicker/OkronTimePicker';
+import { useRouter } from 'next/navigation';
 
 const PreventiveForm = () => {
   const router = useRouter();
@@ -42,8 +42,8 @@ const PreventiveForm = () => {
   const operatorService = new OperatorService(apiURL);
   const machineService = new MachineService(apiURL);
   const { register, handleSubmit, setValue } = useForm<Preventive>();
-  const [filterText, setFilterText] = useState<string>("");
-  const filteredInspectionPoints = availableInspectionPoints.filter((point) =>
+  const [filterText, setFilterText] = useState<string>('');
+  const filteredInspectionPoints = availableInspectionPoints.filter(point =>
     point.description.toLowerCase().includes(filterText.toLowerCase())
   );
   const [operators, setOperators] = useState<Operator[]>([]);
@@ -62,14 +62,14 @@ const PreventiveForm = () => {
     const fetchInspectionPoints = async () => {
       try {
         const points = await inspectionPointService.getAllInspectionPoints();
-        setAvailableInspectionPoints(points.filter((x) => x.active == true));
+        setAvailableInspectionPoints(points.filter(x => x.active == true));
       } catch (error) {
-        console.error("Error fetching inspection points:", error);
+        console.error('Error fetching inspection points:', error);
       }
     };
 
     const fetchOperators = async () => {
-      await operatorService.getOperators().then((workOperator) => {
+      await operatorService.getOperators().then(workOperator => {
         setOperators(workOperator);
       });
     };
@@ -86,18 +86,18 @@ const PreventiveForm = () => {
               description: asset.description,
             });
           }
-          asset.childs.forEach((childAsset) => {
+          asset.childs.forEach(childAsset => {
             addAssetAndChildren(childAsset);
           });
         };
 
-        assets.forEach((asset) => {
+        assets.forEach(asset => {
           addAssetAndChildren(asset);
         });
 
         setAssets(elements);
       } catch (error) {
-        console.error("Error al obtener activos:", error);
+        console.error('Error al obtener activos:', error);
       }
     };
 
@@ -106,21 +106,21 @@ const PreventiveForm = () => {
     fetchAssets();
     let counter = 1;
     const params = new URLSearchParams(window.location.search);
-    const numberPreventive = params.get("counter");
+    const numberPreventive = params.get('counter');
     if (numberPreventive || 0 > 0) {
       counter = 1;
     }
   }, []);
 
   const handleDeleteInspectionPointSelected = (inspectionPointId: string) => {
-    setSelectedInspectionPoints((prevSelected) =>
-      prevSelected.filter((id) => id !== inspectionPointId)
+    setSelectedInspectionPoints(prevSelected =>
+      prevSelected.filter(id => id !== inspectionPointId)
     );
   };
 
   const handleInspectionPointSelected = (inspectionPointId: string) => {
-    if (inspectionPointId == "") return;
-    setSelectedInspectionPoints((prevSelected) => [
+    if (inspectionPointId == '') return;
+    setSelectedInspectionPoints(prevSelected => [
       ...prevSelected,
       inspectionPointId,
     ]);
@@ -135,16 +135,16 @@ const PreventiveForm = () => {
       startExecution: startDate!,
       days: preventiveDays,
       counter: 0,
-      assetId: selectedAssets.map((asset) => asset),
-      inspectionPointId: selectedInspectionPoints.map((point) => point),
-      operatorId: selectedOperator.map((operator) => operator),
-      plannedDuration: "00:00",
+      assetId: selectedAssets.map(asset => asset),
+      inspectionPointId: selectedInspectionPoints.map(point => point),
+      operatorId: selectedOperator.map(operator => operator),
+      plannedDuration: '00:00',
     };
     return createPreventiveRequest;
   }
 
   function getTimeDuration(timeStr: string): Duration {
-    const [hours, minutes] = timeStr.split(":").map(Number);
+    const [hours, minutes] = timeStr.split(':').map(Number);
     return { hours, minutes };
   }
 
@@ -152,7 +152,7 @@ const PreventiveForm = () => {
     handleSubmit(onSubmit)();
   };
 
-  const onSubmit: SubmitHandler<Preventive> = async (data) => {
+  const onSubmit: SubmitHandler<Preventive> = async data => {
     setIsLoading(true);
     try {
       if (!notValidForm(data)) {
@@ -187,36 +187,36 @@ const PreventiveForm = () => {
     const invalidFields = [];
 
     if (!preventive.code || preventive.code.trim().length === 0) {
-      invalidFields.push("Code");
+      invalidFields.push('Code');
     }
 
     if (!preventive.description || preventive.description.trim().length === 0) {
-      invalidFields.push("Description");
+      invalidFields.push('Description');
     }
 
     if (!startDate) {
-      invalidFields.push("StartDate");
+      invalidFields.push('StartDate');
     }
 
     if (preventiveDays === 0) {
-      invalidFields.push("PreventiveDays");
+      invalidFields.push('PreventiveDays');
     }
 
     if (selectedInspectionPoints.length === 0) {
-      invalidFields.push("SelectedInspectionPoints");
+      invalidFields.push('SelectedInspectionPoints');
     }
 
     if (selectedOperator.length === 0) {
-      invalidFields.push("SelectedOperator");
+      invalidFields.push('SelectedOperator');
     }
 
     if (selectedAssets.length === 0) {
-      invalidFields.push("SelectedAssets");
+      invalidFields.push('SelectedAssets');
     }
 
     if (invalidFields.length > 0) {
-      console.log("Invalid fields:", invalidFields);
-      alert("Falten dades per assignar al preventiu");
+      console.log('Invalid fields:', invalidFields);
+      alert('Falten dades per assignar al preventiu');
       return false;
     }
 
@@ -224,14 +224,14 @@ const PreventiveForm = () => {
   }
 
   const handleDeleteSelectedOperator = (operatorId: string) => {
-    setSelectedOperator((prevSelected) =>
-      prevSelected.filter((id) => id !== operatorId)
+    setSelectedOperator(prevSelected =>
+      prevSelected.filter(id => id !== operatorId)
     );
   };
 
   const handleSelectedOperator = (operatorId: string) => {
-    if (operatorId == "") return;
-    setSelectedOperator((prevSelected) => [...prevSelected, operatorId]);
+    if (operatorId == '') return;
+    setSelectedOperator(prevSelected => [...prevSelected, operatorId]);
   };
 
   const handleCancel = () => {
@@ -239,34 +239,42 @@ const PreventiveForm = () => {
   };
 
   const handleAssetSelected = (assetId: string) => {
-    if (assetId == "") return;
-    setSelectedAsset((prevSelected) => [...prevSelected, assetId]);
+    if (assetId == '') return;
+    setSelectedAsset(prevSelected => [...prevSelected, assetId]);
   };
 
   const handleDeleteSelectedAsset = (assetId: string) => {
-    setSelectedAsset((prevSelected) =>
-      prevSelected.filter((id) => id !== assetId)
-    );
+    setSelectedAsset(prevSelected => prevSelected.filter(id => id !== assetId));
   };
 
   const handleTimePickerChange = (time: string) => {
-    const [hours, minutes] = time.split(":").map(Number);
+    const [hours, minutes] = time.split(':').map(Number);
     const currentTimeExecution = new Date();
     currentTimeExecution.setHours(hours, minutes, 0, 0);
     setTimeExecution(currentTimeExecution);
   };
-
+  const renderHeader = () => {
+    return (
+      <div className="flex p-2 my-2">
+        <div className="w-full flex flex-col gap-2 items">
+          <h2 className="text-2xl font-bold text-black flex gap-2">
+            <SvgMachines />
+            Nova Revisió
+          </h2>
+        </div>
+      </div>
+    );
+  };
   return (
     <MainLayout>
       <Container>
         <div className="w-full">
+          {renderHeader()}
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="mx-auto bg-white p-8 rounded shadow-md"
-            style={{ display: "flex", flexDirection: "column", width: "100%" }}
+            style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
           >
-            <p className="text-2xl font-bold text-black">Nova revisió</p>
-
             <div className="grid grid-cols-4 w-full gap-4 py-4">
               <div className="col-span-2">
                 <label
@@ -276,7 +284,7 @@ const PreventiveForm = () => {
                   Codi
                 </label>
                 <input
-                  {...register("code")}
+                  {...register('code')}
                   id="code"
                   type="text"
                   className="form-input border border-gray-300 rounded-md w-full"
@@ -290,7 +298,7 @@ const PreventiveForm = () => {
                   Descripció
                 </label>
                 <input
-                  {...register("description")}
+                  {...register('description')}
                   id="description"
                   type="text"
                   className="form-input border border-gray-300 rounded-md w-full"
@@ -307,7 +315,7 @@ const PreventiveForm = () => {
                 </label>
                 <input
                   value={preventiveDays}
-                  onChange={(e) => setPreventiveDays(parseInt(e.target.value))}
+                  onChange={e => setPreventiveDays(parseInt(e.target.value))}
                   id="days"
                   type="number"
                   className="form-input border border-gray-300 rounded-md w-full"
@@ -340,10 +348,10 @@ const PreventiveForm = () => {
                     </label>
                     <OkronTimePicker
                       selectedTime={
-                        timeExecution?.toLocaleTimeString("ca-ES", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        }) || "00:00"
+                        timeExecution?.toLocaleTimeString('ca-ES', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        }) || '00:00'
                       }
                       onTimeChange={handleTimePickerChange}
                       startTme={0}
@@ -355,7 +363,7 @@ const PreventiveForm = () => {
               </div>
             </div>
 
-            {error && <p style={{ color: "red" }}>{error}</p>}
+            {error && <p style={{ color: 'red' }}>{error}</p>}
 
             <div className="flex flex-row gap-4 py-4 w-full">
               <ChooseInspectionPoint
@@ -378,7 +386,7 @@ const PreventiveForm = () => {
                 onElementSelected={handleAssetSelected}
                 onDeleteElementSelected={handleDeleteSelectedAsset}
                 placeholder="Buscar Equip"
-                mapElement={(asset) => ({
+                mapElement={asset => ({
                   id: asset.id,
                   description: asset.description,
                 })}

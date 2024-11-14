@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 type SearchInputProps = {
   value: string;
@@ -7,6 +7,7 @@ type SearchInputProps = {
   inputRef: React.RefObject<HTMLInputElement>;
   placeholder?: string;
   disabled?: boolean;
+  className?: string;
 };
 
 const SearchInput: React.FC<SearchInputProps> = ({
@@ -14,13 +15,14 @@ const SearchInput: React.FC<SearchInputProps> = ({
   onChange,
   onKeyDown,
   inputRef,
-  placeholder = "Buscar",
+  placeholder = 'Buscar',
   disabled = false,
+  className = '',
 }) => {
   return (
     <input
       type="text"
-      className="p-3 text-sm border border-gray-300 rounded-md w-full"
+      className={`p-3 text-sm border border-gray-300 rounded-md w-full ${className}`}
       value={value}
       onChange={onChange}
       onKeyDown={onKeyDown}

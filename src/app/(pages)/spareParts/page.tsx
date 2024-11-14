@@ -1,13 +1,13 @@
-"use client";
-import { UserPermission } from "app/interfaces/User";
-import { useSessionStore } from "app/stores/globalStore";
-import Container from "components/layout/Container";
-import MainLayout from "components/layout/MainLayout";
+'use client';
+import { UserPermission } from 'app/interfaces/User';
+import { useSessionStore } from 'app/stores/globalStore';
+import Container from 'components/layout/Container';
+import MainLayout from 'components/layout/MainLayout';
 
-import SparePartTable from "./components/SparePartTable";
+import SparePartTable from './components/SparePartTable';
 
 function SparePartsPage() {
-  const { loginUser } = useSessionStore((state) => state);
+  const { loginUser } = useSessionStore(state => state);
   const validPermission = [
     UserPermission.Administrator,
     UserPermission.SpareParts,
@@ -16,9 +16,6 @@ function SparePartsPage() {
   return (
     <MainLayout>
       <Container>
-        <div className="p-2">
-          <p>Menu {">"} Recanvis</p>
-        </div>
         <div className="mt-2">
           <SparePartTable
             enableFilters={true}

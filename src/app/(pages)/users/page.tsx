@@ -1,51 +1,51 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { SvgSpinner } from "app/icons/icons";
-import { User } from "app/interfaces/User";
-import UserService from "app/services/userService";
-import Container from "components/layout/Container";
-import MainLayout from "components/layout/MainLayout";
-import DataTable from "components/table/DataTable";
+import { useEffect, useState } from 'react';
+import { SvgSpinner } from 'app/icons/icons';
+import { User } from 'app/interfaces/User';
+import UserService from 'app/services/userService';
+import Container from 'components/layout/Container';
+import MainLayout from 'components/layout/MainLayout';
+import DataTable from 'components/table/DataTable';
 import {
   Column,
   ColumnFormat,
   Filters,
   FiltersFormat,
   TableButtons,
-} from "components/table/interface/interfaceTable";
-import { EntityTable } from "components/table/interface/tableEntitys";
-import { Button } from "designSystem/Button/Buttons";
+} from 'components/table/interface/interfaceTable';
+import { EntityTable } from 'components/table/interface/tableEntitys';
+import { Button } from 'designSystem/Button/Buttons';
 
 const columns: Column[] = [
   {
-    label: "ID",
-    key: "id",
+    label: 'ID',
+    key: 'id',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Usuari",
-    key: "username",
+    label: 'Usuari',
+    key: 'username',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Actiu",
-    key: "active",
+    label: 'Actiu',
+    key: 'active',
     format: ColumnFormat.BOOLEAN,
   },
 ];
 
 const filters: Filters[] = [
   {
-    key: "description",
-    label: "Descripció",
+    key: 'description',
+    label: 'Descripció',
     format: FiltersFormat.TEXT,
   },
 ];
 
 const tableButtons: TableButtons = {
-  edit: true,
-  delete: true,
+  edit: false,
+  delete: false,
 };
 export default function UsersPage() {
   const userService = new UserService(process.env.NEXT_PUBLIC_API_BASE_URL!);
@@ -54,7 +54,7 @@ export default function UsersPage() {
   const [isLoadingCreate, setIsLoadingCreate] = useState(false);
 
   const fetchUsers = async () => {
-    await userService.getUsers().then((data) => {
+    await userService.getUsers().then(data => {
       if (data) {
         setUsers(data);
       }
@@ -73,14 +73,6 @@ export default function UsersPage() {
             <p>Carregant dades...</p>
           ) : (
             <div className="flex flex-col gap-4">
-              <Button
-                type="create"
-                onClick={() => setIsLoadingCreate(true)}
-                customStyles="flex gap-2 w-[10%] justify-center"
-              >
-                Crear Usuari
-                {isLoadingCreate && <SvgSpinner className="w-6 h-6" />}
-              </Button>
               <DataTable
                 data={users}
                 columns={columns}

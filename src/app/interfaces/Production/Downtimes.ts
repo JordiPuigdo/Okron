@@ -1,4 +1,12 @@
 import { BaseModel } from '../BaseModel';
+import Operator from '../Operator';
+
+export interface Downtimes extends BaseModel {
+  startTime: string;
+  endTime: string;
+  totalTime: string;
+  operator: Operator;
+}
 
 export interface DowntimesReasons extends BaseModel {
   description: string;

@@ -11,6 +11,7 @@ import Operator, { OperatorType } from 'app/interfaces/Operator';
 import SparePart from 'app/interfaces/SparePart';
 import { UserPermission } from 'app/interfaces/User';
 import WorkOrder, {
+  OriginWorkOrder,
   StateWorkOrder,
   UpdateWorkOrderRequest,
   WorkOrderComment,
@@ -43,6 +44,10 @@ import { Button } from 'designSystem/Button/Buttons';
 import { useRouter } from 'next/navigation';
 
 import WorkOrderButtons from './WorkOrderButtons';
+import { da } from 'date-fns/locale';
+import DowntimesComponent from './Downtimes';
+import ModalDowntimeReasons from 'app/(pages)/corrective/components/ModalDowntimeReasons';
+import { DowntimesReasons } from 'app/interfaces/Production/Downtimes';
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -116,7 +121,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const { operatorLogged } = useSessionStore(state => state);
   const [workOrderTimeExceeded, setWorkOrderTimeExceeded] =
     useState<boolean>(false);
-
+  const [showDowntimeReasonsModal, setShowDowntimeReasonsModal] =
+    useState(false);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -349,8 +355,19 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     setIsLoading(prevLoading => ({ ...prevLoading, [id]: !prevLoading[id] }));
   }
 
+  function isValidData() {
+    const workOrderHasOperators = selectedOperators.length > 0;
+
+    return workOrderHasOperators;
+  }
+
   const onSubmit: SubmitHandler<WorkOrder> = async data => {
     toggleLoading('SAVE');
+    if (!isValidData()) {
+      alert('Has de seleccionar almenys un operari');
+      toggleLoading('SAVE');
+      return;
+    }
     try {
       const updatedWorkOrderData: UpdateWorkOrderRequest = {
         id: id,
@@ -361,8 +378,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         operatorCreatorId:
           operatorLogged?.idOperatorLogged || selectedOperators[0].id,
         originWorkOrder: loginUser!.userType,
+        downtimeReason: data.downtimeReason,
       };
-
       await workOrderService.updateWorkOrder(updatedWorkOrderData);
 
       setShowSuccessMessage(true);
@@ -571,9 +588,33 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                       isFinished ||
                       loginUser?.permission != UserPermission.Administrator
                     }
+                    className={
+                      selectedOperators.length == 0 ? ' border-red-500 ' : ''
+                    }
                   />
                 )}
             </div>
+            {currentWorkOrder?.originWorkOrder ==
+              OriginWorkOrder.Production && (
+              <div className="w-full">
+                <label
+                  htmlFor="operators"
+                  className="block text-sm font-medium text-gray-700 py-2"
+                >
+                  Motiu Aturada
+                </label>
+                <input
+                  className={`p-3 border text-sm border-gray-300 rounded-md w-full ${
+                    currentWorkOrder.downtimeReason?.machineId == ''
+                      ? 'border-red-500'
+                      : ''
+                  }`}
+                  value={currentWorkOrder.downtimeReason?.description}
+                  readOnly
+                  onClick={() => setShowDowntimeReasonsModal(true)}
+                />
+              </div>
+            )}
           </div>
           <div className="py-4 flex gap-2">
             {loginUser?.permission == UserPermission.Administrator && (
@@ -675,12 +716,24 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     }
   });
 
+  function onSelectedDowntimeReasons(downtimeReasons: DowntimesReasons) {
+    setValue('downtimeReason', downtimeReasons);
+    currentWorkOrder!.downtimeReason = downtimeReasons;
+    setShowDowntimeReasonsModal(false);
+  }
+
   if (!currentWorkOrder) return <>Carregant Dades</>;
   return (
     <>
       {renderHeader()}
       <div className="flex gap-2 rounded bg-blue-900 my-2 p-2">
         <div className=" w-full">
+          {showDowntimeReasonsModal && (
+            <ModalDowntimeReasons
+              selectedId={'660d51627f5a70171fab1641'}
+              onSelectedDowntimeReasons={onSelectedDowntimeReasons}
+            />
+          )}
           {renderForm()}
           {totalCosts > 0 &&
             loginUser?.permission == UserPermission.Administrator && (
@@ -723,6 +776,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             : 'flex-col '
         }`}
       >
+        {currentWorkOrder?.originWorkOrder == OriginWorkOrder.Production &&
+          currentWorkOrder.downtimes && (
+            <DowntimesComponent downtime={currentWorkOrder.downtimes!} />
+          )}
         <div className="flex w-full">
           <WorkOrderOperatorTimesComponent
             operators={aviableOperators!}

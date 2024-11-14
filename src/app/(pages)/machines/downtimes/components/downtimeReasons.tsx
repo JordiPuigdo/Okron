@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   DowntimesReasons,
   DowntimesReasonsRequest,
-} from "app/interfaces/Production/Downtimes";
-import DowntimesService from "app/services/downtimesService";
+} from 'app/interfaces/Production/Downtimes';
+import DowntimesService from 'app/services/downtimesService';
 
 interface UseCreateDowntimeReasonProps {
   machineId: string;
@@ -22,7 +22,7 @@ export const useCreateDowntimeReason = ({
 
   const [formValues, setFormValues] = useState<DowntimesReasonsRequest>({
     machineId: machineId,
-    description: "",
+    description: '',
     downTimeType: 0,
   });
 
@@ -33,9 +33,9 @@ export const useCreateDowntimeReason = ({
   ) => {
     const { name, value } = e.target;
 
-    const updatedValue = name === "downTimeType" ? parseInt(value, 10) : value;
+    const updatedValue = name === 'downTimeType' ? parseInt(value, 10) : value;
 
-    setFormValues((prevValues) => ({ ...prevValues, [name]: updatedValue }));
+    setFormValues(prevValues => ({ ...prevValues, [name]: updatedValue }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,8 +48,8 @@ export const useCreateDowntimeReason = ({
       );
       setFormValues({
         machineId: downtime.machineId,
-        description: "",
-        downTimeType: 0,
+        description: '',
+        downTimeType: downtime.downTimeType,
       });
       if (onSuccess) onSuccess(downtime);
     } catch (error) {

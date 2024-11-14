@@ -1,4 +1,4 @@
-import { useEffect, useRef,useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import ElementListComponent, { ElementList } from './ElementList';
 import SearchInput from './SearchInput';
@@ -9,6 +9,7 @@ type AutocompleteSearchBarProps = {
   placeholder: string;
   disabled?: boolean;
   selectedId?: string | null;
+  className?: string;
 };
 
 const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
@@ -17,6 +18,7 @@ const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
   placeholder,
   disabled = false,
   selectedId,
+  className = '',
 }) => {
   const [query, setQuery] = useState('');
   const [selectedElementIndex, setSelectedElementIndex] = useState<number>(-1);
@@ -108,6 +110,7 @@ const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
         inputRef={inputRef}
         placeholder={placeholder}
         disabled={disabled}
+        className={className}
       />
 
       {query !== '' && searchResults.length > 0 && (

@@ -86,7 +86,36 @@ export const formatDate = (
 
   return date.format(formatString);
 };
+export function formatTimeSpan(timeSpan: string): string {
+  // Check for the min TimeSpan value
+  const MIN_TIME_SPAN = '-10675199.02:48:05.4775808';
 
+  if (timeSpan === MIN_TIME_SPAN) {
+    return ''; // Return empty string for the min value
+  }
+
+  // TimeSpan format example: "-10675199.02:48:05.4775808" or "02:30:00"
+  const regex = /([-+]?)(?:(\d+)\.)?(\d+):(\d+):(\d+)/;
+  const match = timeSpan.match(regex);
+
+  if (!match) {
+    return timeSpan; // Return as is if it doesn't match expected format
+  }
+
+  const sign = match[1];
+  const days = match[2] || '0';
+  const hours = match[3];
+  const minutes = match[4];
+  const seconds = match[5];
+
+  // Convert negative sign, if necessary
+  const totalHours = parseInt(hours) + parseInt(days) * 24;
+  const formattedHours = totalHours.toString().padStart(2, '0');
+  const formattedMinutes = minutes.padStart(2, '0');
+  const formattedSeconds = seconds.padStart(2, '0');
+
+  return `${sign}${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+}
 export const translateWorkOrderType = (
   workOrderType: WorkOrderType
 ): string => {

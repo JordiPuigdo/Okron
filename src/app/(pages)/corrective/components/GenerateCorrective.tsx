@@ -7,23 +7,25 @@ import { useOperatorHook } from 'app/hooks/useOperatorsHook';
 import { SvgMachines, SvgSpinner } from 'app/icons/icons';
 import { Asset } from 'app/interfaces/Asset';
 import { Corrective } from 'app/interfaces/Corrective';
-import Operator from 'app/interfaces/Operator';
 import { UserType } from 'app/interfaces/User';
-import {
-  CreateWorkOrderRequest,
-  StateWorkOrder,
-  WorkOrderType,
-} from 'app/interfaces/workOrder';
+import { StateWorkOrder, WorkOrderType } from 'app/interfaces/workOrder';
 import AssetService from 'app/services/assetService';
-import OperatorService from 'app/services/operatorService';
 import WorkOrderService from 'app/services/workOrderService';
-import { useSessionStore } from 'app/stores/globalStore';
+import { useGlobalStore, useSessionStore } from 'app/stores/globalStore';
 import { translateStateWorkOrder } from 'app/utils/utils';
 import ChooseElement from 'components/ChooseElement';
 import AutocompleteSearchBar from 'components/selector/AutocompleteSearchBar';
 import { ElementList } from 'components/selector/ElementList';
 import { ca } from 'date-fns/locale';
 import { useRouter } from 'next/navigation';
+import ModalDowntimeReasons from './ModalDowntimeReasons';
+import { DowntimesReasons } from 'app/interfaces/Production/Downtimes';
+import { SuccessfulMessage } from 'components/Alerts/SuccesfullMessage';
+import { ErrorMessage } from 'components/Alerts/ErrorMessage';
+import {
+  convertToCreateWorkOrderRequest,
+  isValidData,
+} from './utilsGenerateCorrective';
 
 interface GenerateCorrectiveProps {
   assetId?: string | null;
@@ -37,23 +39,18 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
   stateWorkOrder,
   operatorIds,
 }) => {
-  const operatorService = new OperatorService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ''
-  );
-
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
   const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
-  const [operatorsAvailable, setOperatorsAvailable] = useState<Operator[]>([]);
   const [selectedOperator, setSelectedOperator] = useState<string[]>([]);
   const [selectedId, setSelectedId] = useState<string>('');
-
+  const [selectedDowntimeReasons, setSelectedDowntimeReasons] = useState<
+    DowntimesReasons | undefined
+  >(undefined);
   const [assets, setAssets] = useState<ElementList[]>([]);
 
-  const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingPage, setIsLoadingPage] = useState(true);
   const { register, handleSubmit, setValue } = useForm<Corrective>();
 
   const router = useRouter();
@@ -67,17 +64,17 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
   const [stateCorrective, setStateCorrective] = useState<StateWorkOrder>(
     stateWorkOrder ?? StateWorkOrder.Waiting
   );
-
-  const { operators, fetchAllOperators } = useOperatorHook();
+  const [showDowntimeReasonsModal, setShowDowntimeReasonsModal] =
+    useState(false);
+  const { operators } = useOperatorHook();
+  const { isModalOpen } = useGlobalStore();
 
   async function fetchFormData() {
-    //  await fetchOperators();
     await createCode();
     await fetchAssets();
     if (operatorIds != undefined) {
       setSelectedOperator(operatorIds);
     }
-    setIsLoadingPage(false);
   }
 
   async function createCode() {
@@ -92,7 +89,7 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
         setValue('code', code);
       })
       .catch(error => {
-        setErrorMessage('Error Operaris: ' + error);
+        // setErrorMessage('Error Operaris: ' + error);  TODO-ERROR
       });
   }
 
@@ -133,26 +130,11 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
     fetchFormData();
   }, []);
 
-  function convertToCreateWorkOrderRequest(
-    corrective: Corrective
-  ): CreateWorkOrderRequest {
-    const createWorkOrderRequest: CreateWorkOrderRequest = {
-      code: corrective.code,
-      description: corrective.description,
-      initialDateTime: corrective.startTime,
-      assetId: selectedId,
-      operatorId: selectedOperator.map(operator => operator),
-      stateWorkOrder:
-        loginUser?.userType !== UserType.Maintenance
-          ? StateWorkOrder.Open
-          : corrective.stateWorkOrder,
-      workOrderType: 0,
-      userId: loginUser?.agentId,
-      operatorCreatorId: operatorLogged!.idOperatorLogged,
-      originWorkOrder: loginUser!.userType,
-    };
-    return createWorkOrderRequest;
-  }
+  useEffect(() => {
+    if (loginUser?.userType === UserType.Production && selectedId.length > 0) {
+      setShowDowntimeReasonsModal(true);
+    }
+  }, [selectedId]);
 
   useEffect(() => {
     setValue('stateWorkOrder', StateWorkOrder.Waiting);
@@ -160,7 +142,15 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
 
   const onSubmit: SubmitHandler<Corrective> = async data => {
     setIsLoading(true);
-    if (!isValidData(data)) {
+    if (
+      !isValidData(
+        data,
+        selectedId,
+        loginUser!,
+        selectedOperator,
+        selectedDowntimeReasons
+      )
+    ) {
       setIsLoading(false);
       alert('Falten dades per completar');
       return;
@@ -172,7 +162,17 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
     }
     data.startTime = startDate || new Date();
     await workOrderService
-      .createWorkOrder(convertToCreateWorkOrderRequest(data), data.machineId)
+      .createWorkOrder(
+        convertToCreateWorkOrderRequest(
+          data,
+          selectedId,
+          loginUser!,
+          selectedOperator,
+          selectedDowntimeReasons,
+          operatorLogged
+        ),
+        data.machineId
+      )
       .then(aviableMachines => {
         setShowSuccessMessage(true);
         setTimeout(() => {
@@ -181,20 +181,9 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
       })
       .catch(error => {
         setIsLoading(false);
-        setErrorMessage('Error Màquines: ' + error);
+        // setErrorMessage('Error Màquines: ' + error); TODO-ERROR
       });
   };
-
-  function isValidData(corrective: Corrective): boolean {
-    const hasDescription = corrective.description?.trim().length > 0;
-    const requiresOperator = loginUser?.userType === UserType.Maintenance;
-
-    return (
-      hasDescription &&
-      !!selectedId &&
-      (!requiresOperator || !!selectedOperator)
-    );
-  }
 
   const handleSelectedOperator = (id: string) => {
     setSelectedOperator([...selectedOperator, id]);
@@ -203,6 +192,15 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
     setSelectedOperator(prevSelected =>
       prevSelected.filter(id => id !== operatorId)
     );
+  };
+
+  useEffect(() => {
+    setShowDowntimeReasonsModal(isModalOpen);
+  }, [isModalOpen]);
+
+  const onSelectedDowntimeReasons = (downtimeReasons: DowntimesReasons) => {
+    setShowDowntimeReasonsModal(false);
+    setSelectedDowntimeReasons(downtimeReasons);
   };
 
   const renderHeader = () => {
@@ -221,6 +219,12 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
   };
   return (
     <>
+      {showDowntimeReasonsModal && (
+        <ModalDowntimeReasons
+          selectedId={selectedId}
+          onSelectedDowntimeReasons={onSelectedDowntimeReasons}
+        />
+      )}
       {renderHeader()}
       <div className=" bg-white rounded-xl p-4 mt-6">
         <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
@@ -295,6 +299,7 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
                       className="bg-okron-btDelete hover:bg-okron-btDeleteHover text-white rounded-xl py-2 px-4 text-sm"
                       onClick={e => {
                         setSelectedId('');
+                        setSelectedDowntimeReasons(undefined);
                       }}
                     >
                       Eliminar
@@ -303,35 +308,58 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
                 </div>
               )}
             </div>
-            {loginUser?.userType === UserType.Maintenance && (
-              <div className="mb-6 sm:w-1/2 sm:ml-6">
-                <label
-                  htmlFor="stateWorkOrder"
-                  className="block text-xl font-medium text-gray-700 mb-2"
-                >
-                  Estat
-                </label>
-                <select
-                  {...register('stateWorkOrder', { valueAsNumber: true })}
-                  id="stateWorkOrder"
-                  name="stateWorkOrder"
-                  className="p-3 border border-gray-300 rounded-md w-full"
-                  onChange={e =>
-                    setStateCorrective(
-                      e.target.value as unknown as StateWorkOrder
-                    )
-                  }
-                  value={stateCorrective}
-                >
-                  <option value={StateWorkOrder.OnGoing}>
-                    {translateStateWorkOrder(StateWorkOrder.OnGoing)}
-                  </option>
-                  <option value={StateWorkOrder.Waiting}>
-                    {translateStateWorkOrder(StateWorkOrder.Waiting)}
-                  </option>
-                </select>
-              </div>
-            )}
+            <div className="mb-6 sm:w-1/2 sm:ml-6">
+              {loginUser?.userType === UserType.Maintenance ? (
+                <>
+                  <label
+                    htmlFor="stateWorkOrder"
+                    className="block text-xl font-medium text-gray-700 mb-2"
+                  >
+                    Estat
+                  </label>
+                  <select
+                    {...register('stateWorkOrder', { valueAsNumber: true })}
+                    id="stateWorkOrder"
+                    name="stateWorkOrder"
+                    className="p-3 border border-gray-300 rounded-md w-full"
+                    onChange={e =>
+                      setStateCorrective(
+                        e.target.value as unknown as StateWorkOrder
+                      )
+                    }
+                    value={stateCorrective}
+                  >
+                    <option value={StateWorkOrder.OnGoing}>
+                      {translateStateWorkOrder(StateWorkOrder.OnGoing)}
+                    </option>
+                    <option value={StateWorkOrder.Waiting}>
+                      {translateStateWorkOrder(StateWorkOrder.Waiting)}
+                    </option>
+                  </select>
+                </>
+              ) : (
+                <>
+                  <label
+                    htmlFor="stateWorkOrder"
+                    className="block text-xl font-medium text-gray-700 mb-2"
+                  >
+                    Motiu
+                  </label>
+                  <input
+                    className="p-3 border border-gray-300 rounded-md w-full"
+                    readOnly
+                    value={
+                      selectedDowntimeReasons != undefined
+                        ? selectedDowntimeReasons?.description
+                        : ''
+                    }
+                    onClick={() =>
+                      selectedId.length > 0 && setShowDowntimeReasonsModal(true)
+                    }
+                  />
+                </>
+              )}
+            </div>
           </div>
           {loginUser?.userType === UserType.Maintenance && (
             <div className="flex flex-col sm:flex-row">
@@ -409,15 +437,21 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
           </div>
 
           {showSuccessMessage && (
-            <div className="bg-green-200 text-green-800 p-4 rounded mb-4">
-              Avaria creada correctament
-            </div>
+            <SuccessfulMessage
+              title={'Averia creada'}
+              message={
+                descriptionCorrective !== undefined
+                  ? descriptionCorrective!
+                  : ''
+              }
+            />
           )}
 
           {showErrorMessage && (
-            <div className="bg-red-200 text-red-800 p-4 rounded mb-4">
-              Error al crear Avaria
-            </div>
+            <ErrorMessage
+              title={'Error al crear avaría'}
+              message="Contacte amb el teu responsable"
+            />
           )}
         </form>
       </div>

@@ -91,9 +91,7 @@ const CreateDowntimeReasons: React.FC<DowntimesReasonsProps> = ({ id }) => {
             disabled={isSubmitting}
             className="flex items-center justify-center gap-2 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
-            {!isSubmitting && (
-              <SvgCreate className="text-white" /> // Control SVG size
-            )}
+            {!isSubmitting && <SvgCreate className="text-white" />}
             {isSubmitting ? 'Creant...' : 'Crear'}
           </button>
         </div>

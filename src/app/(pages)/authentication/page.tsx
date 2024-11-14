@@ -1,25 +1,25 @@
-"use client";
-import { useState } from "react";
-import { User } from "app/interfaces/User";
-import AuthenticationService from "app/services/authentication";
-import { useSessionStore } from "app/stores/globalStore";
-import useRoutes from "app/utils/useRoutes";
-import { useRouter } from "next/navigation";
+'use client';
+import { useState } from 'react';
+import { User } from 'app/interfaces/User';
+import AuthenticationService from 'app/services/authentication';
+import { useSessionStore } from 'app/stores/globalStore';
+import useRoutes from 'app/utils/useRoutes';
+import { useRouter } from 'next/navigation';
 
-import AuthenticationComponent from "./authentication";
+import AuthenticationComponent from './authentication';
 
 export default function AuthenticationPage() {
-  const [username, setUserName] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUserName] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const ROUTES = useRoutes();
-  const [errorMessage, setErrorMessage] = useState<string | undefined>("");
-  const [errorEmail, setErrorEmail] = useState<string | undefined>("");
-  const { setLoginUser } = useSessionStore((state) => state);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>('');
+  const [errorEmail, setErrorEmail] = useState<string | undefined>('');
+  const { setLoginUser } = useSessionStore(state => state);
 
   const authService = new AuthenticationService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+    process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
 
   const handleUserNameChange = (event: any) => {
@@ -45,11 +45,11 @@ export default function AuthenticationPage() {
           setLoginUser(data);
           router.push(ROUTES.menu);
         } else {
-          handleErrorMessage("Login Incorrecte");
+          handleErrorMessage('Login Incorrecte');
         }
       })
       .catch((err: any) => {
-        handleErrorMessage("Login Incorrecte");
+        handleErrorMessage('Login Incorrecte');
       });
   };
 
@@ -59,8 +59,8 @@ export default function AuthenticationPage() {
     setTimeout(() => {
       setErrorMessage(undefined);
     }, 3000);
-    setUserName("");
-    setPassword("");
+    setUserName('');
+    setPassword('');
   }
 
   return (

@@ -4,6 +4,7 @@ import InspectionPoint from './inspectionPoint';
 import Machine from './machine';
 import Operator from './Operator';
 import { Preventive } from './Preventive';
+import { Downtimes, DowntimesReasons } from './Production/Downtimes';
 import SparePart from './SparePart';
 import { UserType } from './User';
 
@@ -29,6 +30,8 @@ export interface WorkOrder extends BaseModel {
   plannedDuration: string;
   operatorsNames?: string;
   originWorkOrder?: OriginWorkOrder;
+  downtimeReason?: DowntimesReasons;
+  downtimes?: Downtimes;
 }
 
 export default WorkOrder;
@@ -88,6 +91,7 @@ export interface CreateWorkOrderRequest {
   userId?: string;
   operatorCreatorId: string;
   originWorkOrder: UserType;
+  downtimeReason?: DowntimesReasons;
 }
 
 export interface AddWorkOrderOperatorTimes {

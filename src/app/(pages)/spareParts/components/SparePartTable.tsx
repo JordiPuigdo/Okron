@@ -1,17 +1,17 @@
-"use client";
-import "react-datepicker/dist/react-datepicker.css";
+'use client';
+import 'react-datepicker/dist/react-datepicker.css';
 
-import { useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
-import { SvgSpinner } from "app/icons/icons";
+import { useEffect, useState } from 'react';
+import DatePicker from 'react-datepicker';
+import { SvgCreate, SvgMachines, SvgSpinner } from 'app/icons/icons';
 import SparePart, {
   SparePartDetailRequest,
   SparePartPerAssetResponse,
-} from "app/interfaces/SparePart";
-import SparePartService from "app/services/sparePartService";
-import { useSessionStore } from "app/stores/globalStore";
-import { formatDateQuery } from "app/utils/utils";
-import DataTable from "components/table/DataTable";
+} from 'app/interfaces/SparePart';
+import SparePartService from 'app/services/sparePartService';
+import { useSessionStore } from 'app/stores/globalStore';
+import { formatDateQuery } from 'app/utils/utils';
+import DataTable from 'components/table/DataTable';
 import {
   Column,
   ColumnFormat,
@@ -19,10 +19,10 @@ import {
   Filters,
   FiltersFormat,
   TableButtons,
-} from "components/table/interface/interfaceTable";
-import { EntityTable } from "components/table/interface/tableEntitys";
-import ca from "date-fns/locale/ca";
-import { Button } from "designSystem/Button/Buttons";
+} from 'components/table/interface/interfaceTable';
+import { EntityTable } from 'components/table/interface/tableEntitys';
+import ca from 'date-fns/locale/ca';
+import { Button } from 'designSystem/Button/Buttons';
 
 interface SparePartTableProps {
   enableFilterAssets?: boolean;
@@ -30,7 +30,7 @@ interface SparePartTableProps {
   enableDetail?: boolean;
   enableEdit?: boolean;
   enableDelete?: boolean;
-  assetId?: string | "";
+  assetId?: string | '';
   enableCreate?: boolean;
   sparePartId?: string;
   withoutStock?: boolean;
@@ -40,143 +40,143 @@ interface SparePartTableProps {
 
 const columns: Column[] = [
   {
-    label: "ID",
-    key: "id",
+    label: 'ID',
+    key: 'id',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Codi",
-    key: "code",
+    label: 'Codi',
+    key: 'code',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Descripció",
-    key: "description",
+    label: 'Descripció',
+    key: 'description',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Família",
-    key: "family",
+    label: 'Família',
+    key: 'family',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Ref. Proveïdor",
-    key: "refProvider",
+    label: 'Ref. Proveïdor',
+    key: 'refProvider',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Ubicació",
-    key: "ubication",
+    label: 'Ubicació',
+    key: 'ubication',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Mín",
-    key: "minium",
+    label: 'Mín',
+    key: 'minium',
     format: ColumnFormat.NUMBER,
     align: ColumnnAlign.RIGHT,
   },
   {
-    label: "Màx",
-    key: "maximum",
+    label: 'Màx',
+    key: 'maximum',
     format: ColumnFormat.NUMBER,
   },
   {
-    label: "Stock",
-    key: "stock",
+    label: 'Stock',
+    key: 'stock',
     format: ColumnFormat.NUMBER,
   },
   {
-    key: "lastMovementConsume",
-    label: "Últim Consum",
+    key: 'lastMovementConsume',
+    label: 'Últim Consum',
     format: ColumnFormat.DATETIME,
   },
   {
-    label: "Actiu",
-    key: "active",
+    label: 'Actiu',
+    key: 'active',
     format: ColumnFormat.BOOLEAN,
   },
 ];
 
 const columnsPerAsset: Column[] = [
   {
-    label: "ID",
-    key: "id",
+    label: 'ID',
+    key: 'id',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Codi OT",
-    key: "workOrderCode",
+    label: 'Codi OT',
+    key: 'workOrderCode',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Data Consum",
-    key: "dateConsume",
+    label: 'Data Consum',
+    key: 'dateConsume',
     format: ColumnFormat.DATE,
   },
   {
-    label: "Descripció OT",
-    key: "workOrderDescription",
+    label: 'Descripció OT',
+    key: 'workOrderDescription',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Operari",
-    key: "operatorName",
+    label: 'Operari',
+    key: 'operatorName',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Codi Recanvi",
-    key: "sparePartCode",
+    label: 'Codi Recanvi',
+    key: 'sparePartCode',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Descripció Recanvi",
-    key: "sparePartDescription",
+    label: 'Descripció Recanvi',
+    key: 'sparePartDescription',
     format: ColumnFormat.TEXT,
   },
   {
-    label: "Quantitat",
-    key: "sparePartQuantity",
+    label: 'Quantitat',
+    key: 'sparePartQuantity',
     format: ColumnFormat.NUMBER,
   },
 ];
 
 const filtersPerAsset: Filters[] = [
   {
-    key: "sparePartCode",
-    label: "Codi Recanvi",
+    key: 'sparePartCode',
+    label: 'Codi Recanvi',
     format: FiltersFormat.TEXT,
   },
   {
-    key: "sparePartDescription",
-    label: "Descripció Recanvi",
+    key: 'sparePartDescription',
+    label: 'Descripció Recanvi',
     format: FiltersFormat.TEXT,
   },
 ];
 
 const filters: Filters[] = [
   {
-    key: "code",
-    label: "Codi",
+    key: 'code',
+    label: 'Codi',
     format: FiltersFormat.TEXT,
   },
   {
-    key: "description",
-    label: "Descripció",
+    key: 'description',
+    label: 'Descripció',
     format: FiltersFormat.TEXT,
   },
   {
-    key: "family",
-    label: "Família",
+    key: 'family',
+    label: 'Família',
     format: FiltersFormat.TEXT,
   },
   {
-    key: "refProvider",
-    label: "Referència Proveïdor",
+    key: 'refProvider',
+    label: 'Referència Proveïdor',
     format: FiltersFormat.TEXT,
   },
   {
-    key: "ubication",
-    label: "Ubicació",
+    key: 'ubication',
+    label: 'Ubicació',
     format: FiltersFormat.TEXT,
   },
 ];
@@ -202,11 +202,11 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
   const sparePartService = new SparePartService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
-  const { loginUser, setFilterSpareParts } = useSessionStore((state) => state);
+  const { loginUser, setFilterSpareParts } = useSessionStore(state => state);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<string>("");
+  const [message, setMessage] = useState<string>('');
 
   const tableButtons: TableButtons = {
     edit: enableEdit,
@@ -219,12 +219,12 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
       try {
         const data = await sparePartService.getSpareParts(withoutStock);
         if (timer > 0) {
-          setSpareParts(data.filter((sparePart) => sparePart.active == true));
+          setSpareParts(data.filter(sparePart => sparePart.active == true));
           return;
         }
         setSpareParts(data);
       } catch (error) {
-        console.error("Error fetching operators:", error);
+        console.error('Error fetching operators:', error);
       } finally {
         setLoading(false);
       }
@@ -242,11 +242,11 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
 
   const handleSparePartActiveChange = async (id: string) => {
     const isConfirmed = window.confirm(
-      "Segur que voleu eliminar aquest recanvi?"
+      'Segur que voleu eliminar aquest recanvi?'
     );
     if (isConfirmed) {
-      await sparePartService.deleteSparePart(id).then((data) => {
-        setSpareParts(spareParts.filter((sparePart) => sparePart.id !== id));
+      await sparePartService.deleteSparePart(id).then(data => {
+        setSpareParts(spareParts.filter(sparePart => sparePart.id !== id));
       });
     }
   };
@@ -261,7 +261,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
       refSupplier: refSupplier,
       ubication: ubication,
     });*/
-    const test = window.document.getElementById("filter-code");
+    const test = window.document.getElementById('filter-code');
     debugger;
     const x: SparePartDetailRequest = {
       assetId: assetId,
@@ -272,20 +272,20 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
 
     await sparePartService
       .getSparePartHistoryByDates(x)
-      .then((response) => {
+      .then(response => {
         if (response.length == 0) {
-          setMessage("No hi ha recanvis disponibles amb aquests filtres");
+          setMessage('No hi ha recanvis disponibles amb aquests filtres');
           setTimeout(() => {
-            setMessage("");
+            setMessage('');
           }, 3000);
         } else {
           setSparePartsPerAsset(response);
         }
       })
-      .catch((error) => {
+      .catch(error => {
         setMessage(error);
         setTimeout(() => {
-          setMessage("");
+          setMessage('');
         });
       });
     setIsLoading(false);
@@ -329,14 +329,40 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
           <button
             type="button"
             className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
-            onClick={(e) => handleSearch()}
+            onClick={e => handleSearch()}
           >
             Buscar
-            {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+            {isLoading && <SvgSpinner style={{ marginLeft: '0.5rem' }} />}
           </button>
-          {message != "" && (
+          {message != '' && (
             <span className="text-red-500 ml-4">{message}</span>
           )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderHeader = () => {
+    return (
+      <div className="flex p-2 my-2">
+        <div className="w-full flex flex-col gap-2  justify-between">
+          <h2 className="text-2xl font-bold text-black flex gap-2 flex-grow">
+            <SvgMachines />
+            Recanvis
+          </h2>
+          <span className="text-l self-start">Inici - Llistat de Recanvis</span>
+        </div>
+        <div className="w-full flex flex-col justify-end items-end gap-2 ">
+          <Button
+            type="create"
+            onClick={() => setIsLoading(true)}
+            customStyles="gap-2 flex"
+            href="/spareParts/sparePartForm"
+          >
+            <SvgCreate />
+            Crear Recanvi
+            {isLoading && <SvgSpinner className="w-6 h-6" />}
+          </Button>
         </div>
       </div>
     );
@@ -351,17 +377,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
           ) : (
             <>
               {loginUser != undefined && loginUser?.permission > 0 && (
-                <div className="mb-4">
-                  <Button
-                    type="create"
-                    onClick={() => setIsLoading(true)}
-                    customStyles="gap-2 flex"
-                    href="/spareParts/sparePartForm"
-                  >
-                    Crear Recanvi
-                    {isLoading && <SvgSpinner className="w-6 h-6" />}
-                  </Button>
-                </div>
+                <>{renderHeader()}</>
               )}
             </>
           )}

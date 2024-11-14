@@ -33,11 +33,12 @@ class DowntimesService {
   }
 
   async getDowntimesReasonsByMachineId(
-    machineId: string
+    machineId: string,
+    showDefault: boolean = false
   ): Promise<DowntimesReasons[]> {
     try {
       const response = await fetch(
-        `${this.baseUrl}DowntimeReasons/machine/${machineId}`
+        `${this.baseUrl}DowntimeReasons/machine/${machineId}?showDefault=${showDefault}`
       );
 
       if (!response.ok) {

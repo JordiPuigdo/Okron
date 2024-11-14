@@ -17,7 +17,7 @@ import { EntityTable } from 'components/table/interface/tableEntitys';
 import { Button } from 'designSystem/Button/Buttons';
 
 import OperatorForm from '../../../components/OperatorForm';
-import { SvgMachines } from 'app/icons/icons';
+import { SvgCreate, SvgMachines } from 'app/icons/icons';
 
 function OperatorsPage() {
   const [operators, setOperators] = useState<Operator[]>([]);
@@ -160,7 +160,12 @@ const renderHeader = (operators: Operator[]) => {
           <span className="text-l">Inici - Llistat de Operaris</span>
         </div>
         <div className="w-full flex justify-end items-center">
-          <Button onClick={toggleFormVisibility} className="py-4">
+          <Button
+            onClick={toggleFormVisibility}
+            className="py-4"
+            customStyles="flex gap-2"
+          >
+            {!isFormVisible && <SvgCreate className="text-white" />}
             {isFormVisible ? 'Tancar' : 'Crear Operari'}
           </Button>
         </div>

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import AutocompleteSearchBar from "components/selector/AutocompleteSearchBar";
-import { ElementList } from "components/selector/ElementList";
+import React, { useEffect, useState } from 'react';
+import AutocompleteSearchBar from 'components/selector/AutocompleteSearchBar';
+import { ElementList } from 'components/selector/ElementList';
 
 interface ChooseElementProps<T> {
   elements: T[];
@@ -11,6 +11,7 @@ interface ChooseElementProps<T> {
   mapElement: (element: T) => { id: string; description: string };
   labelText?: string;
   disabled?: boolean;
+  className?: string;
 }
 
 const ChooseElement = <T,>({
@@ -20,21 +21,22 @@ const ChooseElement = <T,>({
   onDeleteElementSelected,
   placeholder,
   mapElement,
-  labelText = "",
+  labelText = '',
   disabled = false,
+  className = '',
 }: ChooseElementProps<T>) => {
   const [selectedItems, setSelectedItems] = useState<ElementList[]>([]);
   const [filteredElements, setFilteredElements] = useState<ElementList[]>([]);
 
   useEffect(() => {
     const selectedItems = elements
-      .filter((element) => selectedElements.includes(mapElement(element).id))
+      .filter(element => selectedElements.includes(mapElement(element).id))
       .map(mapElement);
     setSelectedItems(selectedItems);
 
     const filteredElements = elements
       .filter(
-        (element) =>
+        element =>
           !selectedElements.includes(mapElement(element).id) &&
           mapElement(element).description.toLowerCase()
       )
@@ -44,10 +46,10 @@ const ChooseElement = <T,>({
 
   const handleElementSelected = (id: string) => {
     const selectedItem = elements.find(
-      (element) => mapElement(element).id === id
+      element => mapElement(element).id === id
     );
     if (selectedItem) {
-      setSelectedItems((prevSelected) => [
+      setSelectedItems(prevSelected => [
         ...prevSelected,
         mapElement(selectedItem),
       ]);
@@ -56,8 +58,8 @@ const ChooseElement = <T,>({
   };
 
   const handleDeleteElementSelected = (id: string) => {
-    setSelectedItems((prevSelected) =>
-      prevSelected.filter((item) => item.id !== id)
+    setSelectedItems(prevSelected =>
+      prevSelected.filter(item => item.id !== id)
     );
     onDeleteElementSelected(id);
   };
@@ -65,7 +67,7 @@ const ChooseElement = <T,>({
   return (
     <div className="flex flex-row gap-8 w-full">
       <div className="w-full">
-        {labelText !== "" && (
+        {labelText !== '' && (
           <label className="block text-gray-700 font-bold mb-2 text-lg">
             {labelText}
           </label>
@@ -75,9 +77,10 @@ const ChooseElement = <T,>({
           setCurrentId={handleElementSelected}
           placeholder={placeholder}
           disabled={disabled}
+          className={className}
         />
         <div className="p-2">
-          {selectedItems.map((item) => (
+          {selectedItems.map(item => (
             <div
               key={item.id}
               className="flex items-center justify-between mb-2 border-b-2 border-gray-800 p-2"
