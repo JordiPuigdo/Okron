@@ -44,6 +44,10 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
       alert('Has de tenir un operari fitxat per fer aquesta acció');
       return;
     }
+    if (hasDefaultReason && state == StateWorkOrder.PendingToValidate) {
+      alert("Tens el motiu per defecte, no pots canviar l'estat");
+      return;
+    }
     if (workOrder.stateWorkOrder == state) {
       return;
     }
@@ -66,6 +70,10 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
       }
     });
   }
+
+  const hasDefaultReason =
+    workOrder?.downtimeReason != undefined &&
+    workOrder.downtimeReason.machineId == '';
 
   return (
     <div className="flex gap-2">

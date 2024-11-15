@@ -48,6 +48,8 @@ import { da } from 'date-fns/locale';
 import DowntimesComponent from './Downtimes';
 import ModalDowntimeReasons from 'app/(pages)/corrective/components/ModalDowntimeReasons';
 import { DowntimesReasons } from 'app/interfaces/Production/Downtimes';
+import { useAssetHook } from 'app/hooks/useAssetHook';
+import AutocompleteSearchBar from 'components/selector/AutocompleteSearchBar';
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -124,6 +126,12 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [showDowntimeReasonsModal, setShowDowntimeReasonsModal] =
     useState(false);
   const [showModal, setShowModal] = useState(false);
+
+  const [selectedAssetId, setSelectedAssetId] = useState<string | undefined>(
+    undefined
+  );
+
+  const { assets, assetsError, fetchAllAssets } = useAssetHook();
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -203,7 +211,9 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       setValue('description', responseWorkOrder.description);
       setValue('stateWorkOrder', responseWorkOrder.stateWorkOrder);
       setValue('startTime', responseWorkOrder.startTime);
+      setValue('downtimeReason', responseWorkOrder.downtimeReason);
 
+      setSelectedAssetId(responseWorkOrder.asset!.id);
       const finalData = new Date(responseWorkOrder.startTime);
       setStartDate(finalData);
       const operatorsToAdd = aviableOperators?.filter((operator: any) =>
@@ -344,7 +354,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
 
   function parseDuration(duration: string): number {
     const [hours, minutes] = duration.split(':').map(Number);
-    return (hours * 3600 + minutes * 60) * 1000; // convert to milliseconds
+    return (hours * 3600 + minutes * 60) * 1000;
   }
 
   const handleSubmitForm = async () => {
@@ -355,19 +365,22 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     setIsLoading(prevLoading => ({ ...prevLoading, [id]: !prevLoading[id] }));
   }
 
-  function isValidData() {
+  function isValidData(data: WorkOrder) {
     const workOrderHasOperators = selectedOperators.length > 0;
-
-    return workOrderHasOperators;
+    const hasChangeState =
+      hasDefaultReason &&
+      data.stateWorkOrder == StateWorkOrder.PendingToValidate;
+    return workOrderHasOperators && !hasChangeState;
   }
 
   const onSubmit: SubmitHandler<WorkOrder> = async data => {
     toggleLoading('SAVE');
-    if (!isValidData()) {
+    if (!isValidData(data)) {
       alert('Has de seleccionar almenys un operari');
       toggleLoading('SAVE');
       return;
     }
+
     try {
       const updatedWorkOrderData: UpdateWorkOrderRequest = {
         id: id,
@@ -380,6 +393,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         originWorkOrder: loginUser!.userType,
         downtimeReason: data.downtimeReason,
       };
+
       await workOrderService.updateWorkOrder(updatedWorkOrderData);
 
       setShowSuccessMessage(true);
@@ -398,26 +412,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     }, 2000);
   };
 
-  function isWorkOrderInProgress(workOrder: WorkOrder): boolean {
-    const { startTime, plannedDuration } = workOrder;
-    const duration = parseTimeDuration(plannedDuration);
-    const endDate = new Date(startTime);
-    endDate.setHours(endDate.getHours() + duration.hours);
-    endDate.setMinutes(endDate.getMinutes() + duration.minutes);
-    return endDate > new Date(); // Compare with current date
-  }
-
-  function parseTimeDuration(timeDuration: string): {
-    hours: number;
-    minutes: number;
-  } {
-    const [hours, minutes] = timeDuration.split(':').map(Number);
-    return { hours, minutes };
-  }
-
   function handleSelectOperator(operatorId: string) {
     const operator = aviableOperators?.find(x => x.id === operatorId);
     setSelectedOperators([...selectedOperators, operator!]);
+    setValue('operatorId', selectedOperators.map(x => x.id).concat(','));
   }
 
   function handleDeleteSelectedOperator(operatorId: string) {
@@ -425,6 +423,23 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       prevSelected.filter(x => x.id !== operatorId)
     );
   }
+
+  const hasDefaultReason =
+    currentWorkOrder?.downtimeReason != undefined &&
+    currentWorkOrder.downtimeReason.machineId == '';
+
+  const handleStateChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = parseInt(event.target.value, 10);
+
+    if (
+      selectedValue === StateWorkOrder.PendingToValidate &&
+      hasDefaultReason
+    ) {
+      setValue('stateWorkOrder', currentWorkOrder!.stateWorkOrder);
+      alert("Tens el motiu per defecte, no pots canviar l'estat");
+    }
+  };
+
   const renderHeader = () => {
     return (
       <div className="flex p-4 items-center flex-col sm:flex-row bg-white rounded shadow-md border-2 border-blue-900">
@@ -467,6 +482,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   };
 
   const renderForm = () => {
+    function handleSelectedAsset(id: string): void {
+      //throw new Error('Function not implemented.');
+    }
+
     return (
       <>
         <form
@@ -521,6 +540,9 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                   isFinished ||
                   loginUser?.permission != UserPermission.Administrator
                 }
+                onChange={e => {
+                  handleStateChange(e);
+                }}
               >
                 {Object.values(StateWorkOrder)
                   .filter(
@@ -596,24 +618,45 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             </div>
             {currentWorkOrder?.originWorkOrder ==
               OriginWorkOrder.Production && (
-              <div className="w-full">
-                <label
-                  htmlFor="operators"
-                  className="block text-sm font-medium text-gray-700 py-2"
-                >
-                  Motiu Aturada
-                </label>
-                <input
-                  className={`p-3 border text-sm border-gray-300 rounded-md w-full ${
-                    currentWorkOrder.downtimeReason?.machineId == ''
-                      ? 'border-red-500'
-                      : ''
-                  }`}
-                  value={currentWorkOrder.downtimeReason?.description}
-                  readOnly
-                  onClick={() => setShowDowntimeReasonsModal(true)}
-                />
-              </div>
+              <>
+                <div className="w-full">
+                  <label
+                    htmlFor="operators"
+                    className="block text-sm font-medium text-gray-700 py-2"
+                  >
+                    Motiu Aturada
+                  </label>
+                  <input
+                    className={`p-3 border text-sm border-gray-300 rounded-md w-full ${
+                      currentWorkOrder.downtimeReason?.machineId == ''
+                        ? 'border-red-500'
+                        : ''
+                    }`}
+                    value={currentWorkOrder.downtimeReason?.description}
+                    readOnly
+                    onClick={() => setShowDowntimeReasonsModal(true)}
+                  />
+                </div>
+                <div className="w-full">
+                  <label
+                    htmlFor="asset"
+                    className="block text-sm font-medium text-gray-700 py-2"
+                  >
+                    Equip
+                  </label>
+                  <ChooseElement
+                    elements={assets!}
+                    mapElement={asset => ({
+                      id: asset.id,
+                      description: asset.description,
+                    })}
+                    placeholder="Buscar un Equip"
+                    selectedElements={selectedAssetId!}
+                    onElementSelected={handleSelectedAsset}
+                    onDeleteElementSelected={handleSelectedAsset}
+                  />
+                </div>
+              </>
             )}
           </div>
           <div className="py-4 flex gap-2">

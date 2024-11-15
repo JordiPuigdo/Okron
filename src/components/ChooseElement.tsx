@@ -4,7 +4,7 @@ import { ElementList } from 'components/selector/ElementList';
 
 interface ChooseElementProps<T> {
   elements: T[];
-  selectedElements: string[];
+  selectedElements: string[] | string;
   onElementSelected: (id: string) => void;
   onDeleteElementSelected: (id: string) => void;
   placeholder: string;

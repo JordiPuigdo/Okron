@@ -1,11 +1,18 @@
-import { ResultInspectionPoint, SaveInspectionResultPointRequest, WorkOrderInspectionPoint } from "app/interfaces/workOrder";
-import WorkOrderService from "app/services/workOrderService";
+import {
+  ResultInspectionPoint,
+  SaveInspectionResultPointRequest,
+  WorkOrderInspectionPoint,
+} from 'app/interfaces/workOrder';
+import WorkOrderService from 'app/services/workOrderService';
 
-  const workOrderService = new WorkOrderService(
-    process.env.NEXT_PUBLIC_API_BASE_URL!
-  );
-  
-export async function checkAllInspectionPoints(workOrderInspectionPoints: WorkOrderInspectionPoint[], workOrderId: string): Promise<WorkOrderInspectionPoint[]> {
+const workOrderService = new WorkOrderService(
+  process.env.NEXT_PUBLIC_API_BASE_URL!
+);
+
+export async function checkAllInspectionPoints(
+  workOrderInspectionPoints: WorkOrderInspectionPoint[],
+  workOrderId: string
+): Promise<WorkOrderInspectionPoint[]> {
   const updatedPoints: WorkOrderInspectionPoint[] = [];
 
   for (const inspectionPoint of workOrderInspectionPoints) {
@@ -16,7 +23,9 @@ export async function checkAllInspectionPoints(workOrderInspectionPoints: WorkOr
     };
 
     try {
-      const response = await workOrderService.saveInspectionPointResult(saveInspectionPointResult);
+      const response = await workOrderService.saveInspectionPointResult(
+        saveInspectionPointResult
+      );
 
       const updatedPoint: WorkOrderInspectionPoint = {
         ...inspectionPoint,
