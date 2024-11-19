@@ -1,35 +1,33 @@
-"use client";
-import { useState } from "react";
-import { OperatorLogged } from "app/interfaces/User";
-import AuthenticationService from "app/services/authentication";
-import { useSessionStore } from "app/stores/globalStore";
-import { Button } from "designSystem/Button/Buttons";
+'use client';
+import { useState } from 'react';
+import { OperatorLogged } from 'app/interfaces/User';
+import AuthenticationService from 'app/services/authentication';
+import { useSessionStore } from 'app/stores/globalStore';
+import { SvgSearch } from 'app/icons/icons';
 
 export default function SignOperator() {
-  const { setOperatorLogged, operatorLogged } = useSessionStore(
-    (state) => state
-  );
-  const [codeOperator, setCodeOperator] = useState("");
-  const [errorSign, setErrorSign] = useState<string | undefined>("");
+  const { setOperatorLogged, operatorLogged } = useSessionStore(state => state);
+  const [codeOperator, setCodeOperator] = useState('');
+  const [errorSign, setErrorSign] = useState<string | undefined>('');
 
   const authService = new AuthenticationService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+    process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
 
   function signOperator() {
     if (operatorLogged?.codeOperatorLogged) {
-      setCodeOperator("");
+      setCodeOperator('');
       setOperatorLogged(undefined);
-      if (codeOperator == "") return;
+      if (codeOperator == '') return;
     }
-    if (!/^\d+$/.test(codeOperator) || codeOperator == "") {
-      setCodeOperator("");
-      alert("Codi de operari només pot ser númeric");
+    if (!/^\d+$/.test(codeOperator) || codeOperator == '') {
+      setCodeOperator('');
+      alert('Codi de operari només pot ser númeric');
       return;
     }
     authService
       .LoginOperator(codeOperator)
-      .then((x) => {
+      .then(x => {
         if (x.id != undefined) {
           const op: OperatorLogged = {
             codeOperatorLogged: x.code,
@@ -38,45 +36,44 @@ export default function SignOperator() {
             operatorLoggedType: x.operatorType,
           };
           setOperatorLogged(op);
-          setCodeOperator("");
+          setCodeOperator('');
         } else {
-          setErrorSign("Operari no trobat!");
-          setCodeOperator("");
+          setErrorSign('Operari no trobat!');
+          setCodeOperator('');
           setTimeout(() => {
             setErrorSign(undefined);
           }, 4000);
         }
       })
-      .catch((err) => {
+      .catch(err => {
         setErrorSign(err);
       });
   }
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-4">
+      <div className="relative flex items-center">
         <input
           type="text"
           placeholder="Codi Operari"
-          className="rounded-sm text-sm"
+          className="w-full pl-10 pr-24 py-2 text-sm rounded-md border border-gray-300 focus:outline-none"
           value={codeOperator}
-          onChange={(e) => setCodeOperator(e.target.value)}
-          onKeyUp={(e) => {
-            if (e.key === "Enter") {
+          onChange={e => setCodeOperator(e.target.value)}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
               signOperator();
             }
           }}
         />
-        <Button
-          customStyles={` ${
-            operatorLogged?.codeOperatorLogged ? "bg-blue-500 " : "bg-red-500 "
-          } rounded-md text-white text-sm justifty-center flex items-center hover:${
-            operatorLogged?.codeOperatorLogged ? "bg-blue-700" : "bg-red-700"
-          }`}
+        <div className="absolute left-3 text-gray-500">
+          <SvgSearch />
+        </div>
+        <button
           onClick={signOperator}
+          className="absolute right-2 px-4 py-1 bg-okron-main text-white text-sm font-semibold rounded-md hover:bg-okron-hoverButtonMain"
         >
-          {operatorLogged?.codeOperatorLogged ? "Desfitxar" : "Fitxar"}
-        </Button>
+          {operatorLogged?.codeOperatorLogged ? 'Desfitxar' : 'Fitxar'}
+        </button>
       </div>
       {errorSign && (
         <div className="flex px-2">

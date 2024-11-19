@@ -1,4 +1,4 @@
-import { BarChart } from "@tremor/react";
+import { BarChart } from '@tremor/react';
 
 interface BarChartComponentProps {
   chartData: any[];
@@ -10,7 +10,7 @@ interface BarChartComponentProps {
 }
 
 const dataFormatter = (number: number) =>
-  Intl.NumberFormat("us").format(number).toString();
+  Intl.NumberFormat('us').format(number).toString();
 
 export function BarChartComponent({
   chartData,
@@ -18,17 +18,17 @@ export function BarChartComponent({
   category,
   title,
   showLegend = true,
-  yAxisWidth = 200,
+  yAxisWidth = 90,
 }: BarChartComponentProps) {
   return (
-    <div className="w-full flex flex-col justify-center items-center">
-      <p className="text-lg font-medium">{title}</p>
+    <div className="w-full mx-auto">
+      <p className="text-2xl p-2 mb-4 font-semibold text-left">{title}</p>
       <BarChart
-        className={`${!showLegend && "pt-8"}`}
+        className={`${!showLegend && 'pt-8'}`}
         data={chartData}
         index={index}
         categories={category}
-        colors={["blue", "rose"]}
+        colors={['blue', 'rose']}
         valueFormatter={dataFormatter}
         yAxisWidth={yAxisWidth} // Wider Y-axis
         showAnimation={true} // Smooth animation

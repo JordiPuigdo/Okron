@@ -1,7 +1,7 @@
-import { Column, ColumnFormat } from "../interface/interfaceTable";
-import { EntityTable } from "../interface/tableEntitys";
-import { formatCellContent } from "../utils/TableUtils";
-import { TableButtonsComponent } from "./ButtonsTable/TableActions";
+import { Column, ColumnFormat } from '../interface/interfaceTable';
+import { EntityTable } from '../interface/tableEntitys';
+import { formatCellContent } from '../utils/TableUtils';
+import { TableButtonsComponent } from './ButtonsTable/TableActions';
 
 interface TableRowComponentProps {
   rowIndex: number;
@@ -34,7 +34,7 @@ export const TableRowComponent: React.FC<TableRowComponentProps> = ({
 }) => {
   if (rowData.length == 0) return null;
   return (
-    <tr className={`${rowIndex % 2 === 0 ? "" : "bg-gray-100"}`}>
+    <tr className={`${rowIndex % 2 === 0 ? '' : 'bg-gray-100'}`}>
       {enableCheckbox && (
         <td
           className="p-4 hover:cursor-pointer"
@@ -50,8 +50,8 @@ export const TableRowComponent: React.FC<TableRowComponentProps> = ({
         </td>
       )}
       {columns
-        .filter((column) => column.key.toLocaleUpperCase() !== "ID")
-        .map((column) => {
+        .filter(column => column.key.toLocaleUpperCase() !== 'ID')
+        .map(column => {
           const { value, classNametd, className } = formatCellContent(
             column,
             rowData,
@@ -62,8 +62,8 @@ export const TableRowComponent: React.FC<TableRowComponentProps> = ({
               <label className={className}>
                 {column.format === ColumnFormat.BOOLEAN
                   ? value
-                    ? "Actiu"
-                    : "Inactiu"
+                    ? 'Actiu'
+                    : 'Inactiu'
                   : value}
               </label>
             </td>

@@ -1,15 +1,24 @@
-import { SvgGear } from "app/icons/icons";
+import {  SvgAvarie, SvgGear, SvgOrder, SvgPanel, SvgRecanvi, SvgReport, SvgReview } from "app/icons/icons";
 import { UserPermission, UserType } from "app/interfaces/User";
 import { generateKey,SideNavItem } from "app/types/SideNavItem";
 
 export const SIDENAV_ITEMS: SideNavItem[] = [
+    {
+    key: generateKey(),
+    title: "Panel",
+    icon: SvgPanel,
+    path: "/menu",
+    permission: [UserPermission.Administrator, UserPermission.Worker],
+    userType: [UserType.Maintenance, UserType.Production],
+  },
   {
     key: generateKey(),
     title: "Revisions",
     path: "",
-    submenu: true,
     permission: [UserPermission.Administrator],
-    userType: [UserType.Maintenance],
+    userType: [UserType.Maintenance], 
+    submenu: true,
+    icon: SvgReview,
     submenuItems: [
       {
         key: generateKey(),
@@ -31,6 +40,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     key: generateKey(),
     title: "Avaries",
     path: "/corrective",
+    icon: SvgAvarie,
     permission: [UserPermission.Administrator, UserPermission.Worker],
     userType: [UserType.Maintenance, UserType.Production],
   },
@@ -38,6 +48,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     key: generateKey(),
     title: "Ordres de treball",
     path: "/workOrders",
+    icon: SvgOrder,
     permission: [UserPermission.Administrator, UserPermission.Worker],
     userType: [UserType.Maintenance],
   },
@@ -45,21 +56,21 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     key: generateKey(),
     title: "Recanvis",
     path: "/spareParts",
+    icon: SvgRecanvi,
     permission: [
       UserPermission.Administrator,
       UserPermission.Worker,
       UserPermission.SpareParts,
     ],
     userType: [UserType.Maintenance],
-    //icon : SvgSparePart,
   },
   {
     key: generateKey(),
     title: "Reports",
+    icon: SvgReport,
     path: "/reports/spareParts/consumedSpareParts",
     permission: [UserPermission.Administrator, UserPermission.SpareParts],
     userType: [UserType.Maintenance],
-    //icon : SvgSparePart,
   },
   {
     key: generateKey(),

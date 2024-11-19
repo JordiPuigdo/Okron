@@ -21,6 +21,7 @@ import { DonutChartComponent } from 'designSystem/DonutChart/DonutChartComponent
 
 import CostXAsset from '../components/CostXAsset';
 import OTsXAsset from '../components/OTsXAsset';
+import ButtonsSections from '../components/ButtonsSections';
 import WorkOrdersDashboard from '../components/WorkOrdersDashboard';
 
 interface WorkOrdersChartProps {
@@ -42,7 +43,7 @@ export interface ConsumedSparePartsChartProps {
   totalStock: number;
 }
 
-interface WorkOrderTypeChartProps {
+export interface WorkOrderTypeChartProps {
   workOrderType: WorkOrderType;
   value: number;
   index: string;
@@ -85,6 +86,11 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
   const [chartConsumedSpareParts, setChartConsumedSpareParts] = useState<any[]>(
     []
   );
+  const [selectedButton, setSelectedButton] = useState<string | null>('Costes');
+
+  const handleButtonClick = (buttonName: string) => {
+    setSelectedButton(buttonName);
+  };
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -109,17 +115,19 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
   const { fetchWithFilters } = useWorkOrders();
 
   const stateColors: { [key in StateWorkOrder]: string } = {
-    [StateWorkOrder.Waiting]: 'border-red-500',
-    [StateWorkOrder.OnGoing]: 'border-yellow-500',
-    [StateWorkOrder.Paused]: 'border-gray-300',
-    [StateWorkOrder.PendingToValidate]: 'border-red-200',
-    [StateWorkOrder.Requested]: 'border-red-500',
-    [StateWorkOrder.Finished]: 'border-green-500',
-    [StateWorkOrder.Open]: 'border-green-500',
+    [StateWorkOrder.Waiting]: 'bg-okron-pending',
+    [StateWorkOrder.OnGoing]: 'bg-okron-onCourse',
+    [StateWorkOrder.Paused]: 'bg-okron-paused',
+    [StateWorkOrder.PendingToValidate]: 'bg-okron-pendingValidate',
+    [StateWorkOrder.Requested]: 'bg-red-500',
+    [StateWorkOrder.Finished]: 'bg-okron-finished',
+    [StateWorkOrder.Open]: 'bg-green-500',
   };
 
-  const handleFilterClick = (filter: number) => {
+  const handleFilterClick = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const filter = parseInt(e.target.value, 10);
     if (filter === selectedFilter) return;
+
     setSelectedFilter(filter);
     switch (filter) {
       case 0:
@@ -130,6 +138,8 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
         break;
       case 2:
         fetchData(currentDate);
+        break;
+      default:
         break;
     }
   };
@@ -368,53 +378,55 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
 
   if (loginUser?.permission !== UserPermission.Administrator) return <></>;
   return (
-    <div className="flex flex-col w-full gap-4">
-      <div className="flex flex-col bg-white gap-4 w-full items-center p-4 rounded-xl border-2 border-blue-950">
+    <div className="flex flex-col w-full gap-4 p-4">
+      <div className="flex flex-col gap-4 w-full items-center p-4">
         <div className="flex justify-start w-full gap-2 py-4">
-          {Filter.map(filter => (
-            <Button
-              key={filter.key}
-              type="none"
-              className={`rounded-md text-white ${
-                filter.key === selectedFilter
-                  ? 'bg-blue-950 hover:cursor-default'
-                  : 'bg-blue-500 hover:bg-blue-600 '
-              }`}
-              customStyles="flex text-center"
-              onClick={() => handleFilterClick(filter.key)}
+          <div className="flex justify-center items-center">
+            <select
+              className="border-2 border-okron-main text-okron-main bg-transparent rounded-md p-3 w-40 focus:outline-none focus:ring-2 focus:ring-okron-main cursor-pointer"
+              value={selectedFilter !== null ? selectedFilter : 0}
+              onChange={handleFilterClick}
             >
-              {filter.label}
-            </Button>
-          ))}
-          <div className="flex flex-col w-full border-l-2 pl-2 p-1 border-blue-950 bg-gray-200 rounded-sm">
-            <span>Data:</span>
-            <span>
-              {selectedFilter == 0
-                ? firstDayOfMonth.toLocaleDateString('en-GB')
-                : selectedFilter === 1
-                ? firstDayOfWeek.toLocaleDateString('en-GB')
-                : currentDate.toLocaleDateString('en-GB')}{' '}
-              {' - '} {currentDate.toLocaleDateString('en-GB')}
-            </span>
+              {Filter.map(filter => (
+                <option key={filter.key} value={filter.key}>
+                  {filter.label}
+                </option>
+              ))}
+            </select>
           </div>
-          <div className="flex flex-col justify-start w-full border-l-2 pl-2 p-1 border-blue-950 bg-gray-200 rounded-sm">
-            <span>Minuts: </span>
-            <span>
-              {Math.round(totalMinutes).toLocaleString().replace(',', '.')}
-            </span>
-          </div>
-          <div className="flex flex-col justify-start w-full border-l-2 pl-2 p-1 border-blue-950 bg-gray-200 rounded-sm">
-            <span>Cost Material: </span>
-            <span>
-              {Math.round(totalCosts).toLocaleString().replace(',', '.')} €
-            </span>
+          <div className="flex space-x-4 bg-white shadow-md rounded-lg p-4 w-full ml-10">
+            <div className="flex flex-col sm:flex-row sm:items-center space-x-2 w-full">
+              <span className="font-semibold">Data:</span>
+              <span>
+                {selectedFilter == 0
+                  ? firstDayOfMonth.toLocaleDateString('en-GB')
+                  : selectedFilter === 1
+                  ? firstDayOfWeek.toLocaleDateString('en-GB')
+                  : currentDate.toLocaleDateString('en-GB')}{' '}
+                {' - '} {currentDate.toLocaleDateString('en-GB')}
+              </span>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center space-x-2 w-full">
+              <span className="font-semibold">Minuts:</span>
+              <span>
+                {Math.round(totalMinutes).toLocaleString().replace(',', '.')}
+              </span>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center space-x-2 w-full">
+              <span className="font-semibold">Cost Material:</span>
+              <span>
+                {Math.round(totalCosts).toLocaleString().replace(',', '.')} €
+              </span>
+            </div>
           </div>
         </div>
         <div className="flex gap-4 text-white w-full  ">
           {workOrderState.map(workOrderType => (
             <div
               key={workOrderType.statWorkOrder}
-              className={`flex flex-col justify-center gap-4 p-4 bg-gray-900 w-full border-t-4 ${workOrderType.color} rounded`}
+              className={`flex flex-col justify-center gap-4 p-4 bg-gray-900 w-full  ${workOrderType.color} rounded`}
             >
               <div className="flex w-full items-center justify-center">
                 <p className="text-lg font-semibold text-white">
@@ -430,101 +442,119 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
           ))}
         </div>
       </div>
-
-      <div className="flex flex-row gap-4">
-        <div className="border-2 p-2 border-blue-950 w-full rounded-xl bg-white justify-center">
-          <DonutChartComponent
-            chartData={workOrderTypeChartData}
-            category={['Preventius', 'Correctius']}
-            index="index"
-            title="Correctius vs Preventius"
-          />
-        </div>
-        <div className="flex w-full bg-white rounded-xl p-2 border-2 border-blue-950">
-          <WorkOrdersDashboard
-            workOrders={workOrders.sort((a, b) => {
-              const dateA = new Date(a.startTime).getTime();
-              const dateB = new Date(b.startTime).getTime();
-              return dateB - dateA;
-            })}
-          />
-        </div>
-      </div>
-
-      <div className="flex flex-grow w-full gap-4 items-center">
-        <div className="flex flex-grow border-2  border-blue-950 w-full rounded-xl bg-white p-2">
-          <BarChartComponent
-            category={['Preventius', 'Correctius']}
-            chartData={chartData}
-            index="operator"
-            title="Ordres de treball per operari"
-          />
-        </div>
-        <div className="flex flex-grow border-2  border-blue-950 w-full rounded-xl bg-white p-2">
-          <CostXAsset workOrders={workOrders} />
-        </div>
-      </div>
-      {chartAssets.length > 0 && (
-        <div className="flex flex-row w-full  justify-center gap-4">
-          <div className=" border-2 border-blue-950 bg-white p-4 rounded-xl w-full">
-            <OTsXAsset chartAssets={chartAssets} />
+      <ButtonsSections
+        selectedButton={selectedButton}
+        handleButtonClick={handleButtonClick}
+      />
+      {selectedButton === 'Costes' ? (
+        <div className="flex flex-grow gap-4">
+          <div className="border-2 p-2 w-full rounded-xl bg-white justify-center">
+            <p className="text-2xl font-semibold p-2 text-left">Costes</p>
+            <WorkOrdersDashboard
+              workOrders={workOrders.sort((a, b) => {
+                const dateA = new Date(a.startTime).getTime();
+                const dateB = new Date(b.startTime).getTime();
+                return dateB - dateA;
+              })}
+            />
           </div>
-          <div className=" border-2 border-blue-950 bg-white p-4 rounded-xl w-full">
-            <p className="text-lg font-semibold mb-4 items-center w-full">
-              Top Recanvis mes consumits
+          <div className="flex w-full bg-white rounded-xl p-2 border-2 ">
+            <CostXAsset workOrders={workOrders} />
+          </div>
+        </div>
+      ) : selectedButton === 'Recambios' ? (
+        <div className="flex flex-col w-full gap-4 items-center">
+          <div className="flex flex-grow w-full rounded-xl p-2">
+            {chartAssets.length > 0 && (
+              <div className="flex flex-row w-full  justify-center gap-4">
+                <div className=" border-2  bg-white p-4 rounded-xl w-full">
+                  <OTsXAsset chartAssets={chartAssets} />
+                </div>
+                <div className=" border-2 bg-white p-4 rounded-xl w-full">
+                  <p className="text-2xl mb-4 font-semibold text-left">
+                    Top Recanvis mes consumits
+                  </p>
+                  <ul className="grid grid-rows-3 gap-4 w-full">
+                    {chartConsumedSpareParts.map((consumedSparePart, index) => (
+                      <li
+                        key={index}
+                        className="bg-gray-100 p-4 rounded-md shadow-md flex justify-between items-center gap-4"
+                      >
+                        <div className="flex flex-col space-y-2 w-full">
+                          <div className="flex justify-between items-center w-full mb-2">
+                            <span className="text-lg font-semibold">
+                              {consumedSparePart.sparePart}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              {index === 0 && (
+                                <span className="bg-red-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
+                                  1r
+                                </span>
+                              )}
+                              {index === 1 && (
+                                <span className="bg-yellow-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
+                                  2n
+                                </span>
+                              )}
+                              {index === 2 && (
+                                <span className="bg-green-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
+                                  3r
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex space-x-2 gap-2">
+                            <div className="px-4 py-1 font-semibold rounded-full bg-[#FCE0CE] text-[#F17A2D]">
+                              {consumedSparePart.number} Consums
+                            </div>
+
+                            <div className="px-4 py-1 font-semibold rounded-full bg-[#DAF2DB] text-[#4DB559]">
+                              {consumedSparePart.totalStock} Stock
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col w-full bg-white rounded-xl border-2 p-2">
+            <p className="text-2xl p-2 mb-4 font-semibold text-left">
+              Recanvis sota stock
             </p>
-            <ul className="grid grid-rows-3 gap-4 w-full">
-              {chartConsumedSpareParts.map((consumedSparePart, index) => (
-                <li
-                  key={index}
-                  className="bg-gray-100 p-4 rounded-md shadow-md flex justify-between items-center gap-4"
-                >
-                  <div>
-                    <span className="text-lg font-semibold">
-                      {consumedSparePart.sparePart}
-                    </span>
-                    <span className="block text-sm text-gray-500">
-                      Total consums: {consumedSparePart.number}
-                    </span>
-                    <span className="block text-sm text-gray-500">
-                      Stock: {consumedSparePart.totalStock}
-                    </span>
-                  </div>
-                  {index === 0 && (
-                    <span className="bg-red-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-                      1r
-                    </span>
-                  )}
-                  {index === 1 && (
-                    <span className="bg-yellow-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-                      2n
-                    </span>
-                  )}
-                  {index === 2 && (
-                    <span className="bg-green-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-                      3r
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
+
+            <SparePartTable
+              enableFilters={true}
+              enableDetail={false}
+              enableCreate={false}
+              withoutStock={true}
+              enableFilterActive={false}
+              timer={60000}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-grow gap-4">
+          <div className="flex w-full bg-white rounded-xl p-2 border-2 ">
+            <DonutChartComponent
+              chartData={workOrderTypeChartData}
+              title="Correctius vs Preventius"
+            />
+          </div>
+          <div className="flex w-full bg-white rounded-xl p-2 border-2 ">
+            <BarChartComponent
+              category={['Preventius', 'Correctius']}
+              chartData={chartData}
+              index="operator"
+              title="Ordres de treball per operari"
+            />
           </div>
         </div>
       )}
-
-      <div className="flex flex-col w-full bg-white rounded-xl border-2 border-blue-950">
-        <p className="text-lg font-semibold mb-4 p-2 items-center w-full">
-          Recanvis sota stock
-        </p>
-        <SparePartTable
-          enableFilters={true}
-          enableDetail={false}
-          enableCreate={false}
-          withoutStock={true}
-          enableFilterActive={false}
-          timer={60000}
-        />
-      </div>
     </div>
   );
 };

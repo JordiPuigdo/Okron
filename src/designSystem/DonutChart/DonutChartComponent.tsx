@@ -1,68 +1,36 @@
-import { DonutChart } from "@tremor/react";
-import { WorkOrderType } from "app/interfaces/workOrder";
-import { translateWorkOrderType } from "app/utils/utils";
-
-const datahero = [
-  {
-    name: "Preventius",
-    value: 13,
-  },
-  {
-    name: "Correctius",
-    value: 21,
-  },
-];
-
-const dataFormatter = (number: number) => number.toLocaleString("es-ES");
+import { WorkOrderType } from 'app/interfaces/workOrder';
+import { translateWorkOrderType } from 'app/utils/utils';
+import DonutChart from './DonutChart';
 export interface DonutChartComponentProps {
   chartData: any[];
-  index: string;
-  category: string[];
   title: string;
 }
 
 export const DonutChartComponent = ({
   chartData,
-  index,
-  category,
   title,
 }: DonutChartComponentProps) => (
-  <div className="w-full flex flex-col items-center p-4 space-y-4">
-    <p className="text-lg font-semibold text-center">{title}</p>
-
-    <div className="flex w-full space-x-4 p-2 items-center">
-      <div className="flex-1 flex flex-col space-y-3 p-4">
-        {chartData.map((item) => (
-          <div key={item.name} className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <span
-                className={`inline-block w-5 h-5 rounded-full ${
-                  item.workOrderType === WorkOrderType.Preventive
-                    ? "bg-blue-500"
-                    : "bg-red-500"
-                }`}
-              ></span>
-              <span className="font-medium text-gray-700">
-                {translateWorkOrderType(item.workOrderType as WorkOrderType)}
-              </span>
-            </div>
-            <div className="text-lg font-semibold text-gray-900">
-              {item.value}
-            </div>
+  <div className="w-full flex flex-col p-4">
+    <p className="text-2xl font-semibold text-left">{title}</p>
+    <div className="flex flex-col items-center space-y-4">
+      <div className="flex justify-center w-full">
+        <DonutChart chartData={chartData} />
+      </div>
+      <div className="flex flex-col items-end w-full space-y-2">
+        {chartData.map(item => (
+          <div key={item.name} className="flex items-center space-x-2">
+            <span
+              className={`inline-block w-2 h-2 rounded-full ${
+                item.workOrderType === WorkOrderType.Preventive
+                  ? 'bg-blue-500'
+                  : 'bg-red-500'
+              }`}
+            ></span>
+            <span className="font-sm text-gray-500 text-sm">
+              {translateWorkOrderType(item.workOrderType as WorkOrderType)}
+            </span>
           </div>
         ))}
-      </div>
-      <div className="flex-1 bg-white p-4 ">
-        <DonutChart
-          data={chartData}
-          index={index}
-          variant="pie"
-          colors={["blue", "rose"]}
-          valueFormatter={dataFormatter}
-          onValueChange={(v) => console.log(v)}
-          className="text-black"
-          noDataText="No hi ha resultats amb aquests filtres"
-        />
       </div>
     </div>
   </div>

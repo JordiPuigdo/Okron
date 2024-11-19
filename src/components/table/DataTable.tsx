@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
-import { SvgExportExcel, SvgSpinner } from "app/icons/icons";
-import { useSessionStore } from "app/stores/globalStore";
-import useRoutes from "app/utils/useRoutes";
+import { useEffect, useState } from 'react';
+import { SvgExportExcel, SvgSpinner } from 'app/icons/icons';
+import { useSessionStore } from 'app/stores/globalStore';
+import useRoutes from 'app/utils/useRoutes';
 
-import { RenderFilters } from "./components/Filters/RenderFilters";
-import { TableBodyComponent } from "./components/TableBody";
-import { TableHeader } from "./components/TableHeader";
-import { Column, Filters, TableButtons } from "./interface/interfaceTable";
-import { EntityTable } from "./interface/tableEntitys";
-import Pagination from "./Pagination";
-import { exportTableToExcel, sortData } from "./utils/TableUtils";
+import { RenderFilters } from './components/Filters/RenderFilters';
+import { TableBodyComponent } from './components/TableBody';
+import { TableHeader } from './components/TableHeader';
+import { Column, Filters, TableButtons } from './interface/interfaceTable';
+import { EntityTable } from './interface/tableEntitys';
+import Pagination from './Pagination';
+import { exportTableToExcel, sortData } from './utils/TableUtils';
 
 interface DataTableProps {
   data: any[];
@@ -48,8 +48,8 @@ const DataTable: React.FC<DataTableProps> = ({
 }: DataTableProps) => {
   const itemsPerPageOptions = [5, 10, 15, 20, 25, 50];
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortColumn, setSortColumn] = useState("");
-  const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("ASC");
+  const [sortColumn, setSortColumn] = useState('');
+  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('ASC');
   const [itemsPerPage, setItemsPerPage] = useState(itemsPerPageOptions[1]);
 
   const [filteredData, setFilteredData] = useState<any[]>([...data]);
@@ -62,10 +62,10 @@ const DataTable: React.FC<DataTableProps> = ({
   );
   const [totalRecords, setTotalRecords] = useState(data.length);
   const ROUTES = useRoutes();
-  const [pathDetail, setPathDetail] = useState<string>("");
+  const [pathDetail, setPathDetail] = useState<string>('');
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const { loginUser, setFilterSpareParts, filterSpareParts } = useSessionStore(
-    (state) => state
+    state => state
   );
 
   const handlePageChange = (page: number) => {
@@ -106,21 +106,21 @@ const DataTable: React.FC<DataTableProps> = ({
         setPathDetail(ROUTES.configuration.machines);
         break;
       default:
-        setPathDetail("error");
+        setPathDetail('error');
     }
   }, []);
 
   const handleSortChange = async (sortedBy: string) => {
-    if (sortedBy == "") return;
+    if (sortedBy == '') return;
   };
 
   const handleSort = (columnKey: string) => {
     const order =
-      sortColumn === columnKey && sortOrder === "ASC" ? "DESC" : "ASC";
+      sortColumn === columnKey && sortOrder === 'ASC' ? 'DESC' : 'ASC';
     setSortColumn(columnKey);
     setSortOrder(order);
 
-    const sortText = columnKey + " : " + order;
+    const sortText = columnKey + ' : ' + order;
     handleSortChange(sortText);
   };
 
@@ -139,13 +139,13 @@ const DataTable: React.FC<DataTableProps> = ({
     data = sortData(data, sortColumn, sortOrder);
 
     const filterByActiveStatus = (record: any) =>
-      typeof record === "object" &&
-      record.hasOwnProperty("active") &&
+      typeof record === 'object' &&
+      record.hasOwnProperty('active') &&
       (!filterActive || record.active);
 
     const filterByUnderStock = (record: any) =>
-      typeof record === "object" &&
-      record.hasOwnProperty("minium") &&
+      typeof record === 'object' &&
+      record.hasOwnProperty('minium') &&
       record.minium > 0 &&
       record.stock < record.minium;
 
@@ -176,13 +176,13 @@ const DataTable: React.FC<DataTableProps> = ({
   ]);
 
   const handleFilterChange = (key: string, value: string | boolean | Date) => {
-    const keys = key.split(".");
-    const filteredData = data.filter((item) => {
+    const keys = key.split('.');
+    const filteredData = data.filter(item => {
       const nestedPropertyValue = keys.reduce(
         (obj, prop) => obj && obj[prop],
         item
       );
-      if (value === "") return true;
+      if (value === '') return true;
       if (nestedPropertyValue) {
         const itemValue = String(nestedPropertyValue);
         const filterValue = String(value);
@@ -197,7 +197,7 @@ const DataTable: React.FC<DataTableProps> = ({
     if (enableFilterActive && filterActive) {
       setFilteredData(
         filteredData
-          .filter((x) => x["active"] == filterActive)
+          .filter(x => x['active'] == filterActive)
           .slice(indexOfFirstRecord, indexOfLastRecord)
       );
     } else {
@@ -210,7 +210,7 @@ const DataTable: React.FC<DataTableProps> = ({
   };
 
   const handleSelectedRow = (id: string) => {
-    setSelectedRows((prevSelectedRows) => {
+    setSelectedRows(prevSelectedRows => {
       const newSelectedRows = new Set(prevSelectedRows);
       if (newSelectedRows.has(id)) {
         newSelectedRows.delete(id);
@@ -226,7 +226,7 @@ const DataTable: React.FC<DataTableProps> = ({
     if (selectedRows.size === data.length) {
       setSelectedRows(new Set());
     } else {
-      setSelectedRows(new Set(data.map((row) => row.id))); // Select all rows
+      setSelectedRows(new Set(data.map(row => row.id))); // Select all rows
     }
     onChecked && onChecked();
   };
@@ -309,12 +309,10 @@ const DataTable: React.FC<DataTableProps> = ({
             <div className="flex align-bottom items-center mt-auto w-full">
               <select
                 value={itemsPerPage}
-                onChange={(e) =>
-                  handleItemsPerPageChange(Number(e.target.value))
-                }
+                onChange={e => handleItemsPerPageChange(Number(e.target.value))}
                 className="text-sm bg-blue-gray-100 rounded-lg border border-gray-500"
               >
-                {itemsPerPageOptions.map((option) => (
+                {itemsPerPageOptions.map(option => (
                   <option key={option} value={option}>
                     {option}
                   </option>

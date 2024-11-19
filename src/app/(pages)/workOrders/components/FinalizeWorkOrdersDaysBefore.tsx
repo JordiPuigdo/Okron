@@ -37,7 +37,7 @@ const FinalizeWorkOrdersDaysBefore: React.FC<
   return (
     <div className="flex items-center">
       <Button
-        customStyles="bg-orange-500 text-sm text-white rounded-md font-semibold hover:bg-orange-600 justifty-center flex items-center "
+        customStyles="bg-okron-main text-sm text-white rounded-md font-semibold hover:bg-okron-hoverButtonMain justifty-center flex items-center "
         onClick={() => handleFinalizeWorkOrdersDayBefore()}
       >
         Finalitzar Ordres{isLoading && <SvgSpinner />}

@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { SvgClose, SvgSpinner } from "app/icons/icons";
-import { Preventive } from "app/interfaces/Preventive";
-import { UserPermission } from "app/interfaces/User";
-import PreventiveService from "app/services/preventiveService";
-import WorkOrderService from "app/services/workOrderService";
-import { useGlobalStore, useSessionStore } from "app/stores/globalStore";
-import { formatDate } from "app/utils/utils";
-import { Button } from "designSystem/Button/Buttons";
-import { Modal } from "designSystem/Modals/Modal";
+import { useEffect, useState } from 'react';
+import { SvgClose, SvgSpinner } from 'app/icons/icons';
+import { Preventive } from 'app/interfaces/Preventive';
+import { UserPermission } from 'app/interfaces/User';
+import PreventiveService from 'app/services/preventiveService';
+import WorkOrderService from 'app/services/workOrderService';
+import { useGlobalStore, useSessionStore } from 'app/stores/globalStore';
+import { formatDate } from 'app/utils/utils';
+import { Button } from 'designSystem/Button/Buttons';
+import { Modal } from 'designSystem/Modals/Modal';
 
 interface PreventiveCreateds {
   key: Preventive;
@@ -23,16 +23,16 @@ const GeneratePreventive = () => {
   >([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const preventiveService = new PreventiveService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+    process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
   const workOrderService = new WorkOrderService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+    process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
 
-  const { loginUser, operatorLogged } = useSessionStore((state) => state);
-  const { setIsModalOpen } = useGlobalStore((state) => state);
+  const { loginUser, operatorLogged } = useSessionStore(state => state);
+  const { setIsModalOpen } = useGlobalStore(state => state);
 
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     if (preventivesCreated != null && preventivesCreated?.length > 0) {
@@ -42,7 +42,7 @@ const GeneratePreventive = () => {
 
   const generateWorkOrders = async () => {
     if (operatorLogged == undefined) {
-      alert("Has de tenir un operari fitxat per fer aquesta acció");
+      alert('Has de tenir un operari fitxat per fer aquesta acció');
       return;
     }
     setIsLoading(true);
@@ -52,22 +52,22 @@ const GeneratePreventive = () => {
     );
     if (preventives?.length! > 0) {
       const prevCreat: PreventiveCreateds[] = [];
-      preventives?.forEach((x) => {
-        if (prevCreat.find((y) => y.key.id === x.id)) {
-          prevCreat.find((y) => y.key.id === x.id)!.value++;
+      preventives?.forEach(x => {
+        if (prevCreat.find(y => y.key.id === x.id)) {
+          prevCreat.find(y => y.key.id === x.id)!.value++;
         } else {
           prevCreat.push({ key: x, value: 0 });
         }
       });
-      setPreventivesCreated(prevCreat.map((x) => x.key));
+      setPreventivesCreated(prevCreat.map(x => x.key));
       workOrderService.cleanCache();
       /*  setTimeout(() => {
         setPreventivesCreated([]);
       }, 10000);*/
     } else {
-      setMessage("Avui no hi ha revisions per crear");
+      setMessage('Avui no hi ha revisions per crear');
       setTimeout(() => {
-        setMessage("");
+        setMessage('');
       }, 3000);
     }
 
@@ -101,14 +101,14 @@ const GeneratePreventive = () => {
                 <>
                   <p className="text-black font-semibold">
                     {(preventivesCreated?.length || 0 > 0) &&
-                      "Revisions creades:"}
+                      'Revisions creades:'}
                   </p>
                   {preventivesCreated?.map((preventive, index) => (
                     <div key={index}>
                       {preventive.code} - {preventive.description}
                     </div>
                   ))}
-                  {message != "" && (
+                  {message != '' && (
                     <span className="text-red-500">{message}</span>
                   )}
                 </>
@@ -117,10 +117,8 @@ const GeneratePreventive = () => {
         </Modal>
         <div className="flex items-center">
           <Button
-            type="others"
             onClick={generateWorkOrders}
-            className="bg-orange-500 text-sm text-white rounded-md font-semibold hover:bg-orange-600 "
-            customStyles="flex"
+            customStyles="bg-white border-okron-main text-okron-main text-sm rounded-md font-semibold hover:bg-[#E7DDFC] hover:border-okron-main border-2"
           >
             Generar Revisions {formatDate(new Date(), false, false)}
             {isLoading && <SvgSpinner className="w-6 h-6" />}
