@@ -378,8 +378,8 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
 
   if (loginUser?.permission !== UserPermission.Administrator) return <></>;
   return (
-    <div className="flex flex-col w-full gap-4 p-4">
-      <div className="flex flex-col gap-4 w-full items-center p-4">
+    <div className="flex flex-col w-full gap-4 p-2">
+      <div className="flex flex-col gap-4 w-full items-center p-2">
         <div className="flex justify-start w-full gap-2 py-4">
           <div className="flex justify-center items-center">
             <select
@@ -394,10 +394,10 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
               ))}
             </select>
           </div>
-          <div className="flex space-x-4 bg-white shadow-md rounded-lg p-4 w-full ml-10">
-            <div className="flex flex-col sm:flex-row sm:items-center space-x-2 w-full">
-              <span className="font-semibold">Data:</span>
-              <span>
+          <div className="flex flex-col lg:flex-row lg:space-x-4 space-y-4 bg-white shadow-md rounded-lg p-4 w-full ml-0 lg:ml-10">
+            <div className="flex flex-col lg:flex-row lg:items-center w-full">
+              <span className="font-semibold lg:mr-2">Data:</span>
+              <span className="text-sm lg:text-base">
                 {selectedFilter == 0
                   ? firstDayOfMonth.toLocaleDateString('en-GB')
                   : selectedFilter === 1
@@ -407,26 +407,27 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center space-x-2 w-full">
-              <span className="font-semibold">Minuts:</span>
-              <span>
+            <div className="flex flex-col lg:flex-row lg:items-center w-full">
+              <span className="font-semibold lg:mr-2">Minuts:</span>
+              <span className="text-sm lg:text-base">
                 {Math.round(totalMinutes).toLocaleString().replace(',', '.')}
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center space-x-2 w-full">
-              <span className="font-semibold">Cost Material:</span>
-              <span>
+            <div className="flex flex-col lg:flex-row lg:items-center w-full">
+              <span className="font-semibold lg:mr-2">Cost Material:</span>
+              <span className="text-sm lg:text-base">
                 {Math.round(totalCosts).toLocaleString().replace(',', '.')} €
               </span>
             </div>
           </div>
         </div>
+
         <div className="flex gap-4 text-white w-full  ">
           {workOrderState.map(workOrderType => (
             <div
               key={workOrderType.statWorkOrder}
-              className={`flex flex-col justify-center gap-4 p-4 bg-gray-900 w-full  ${workOrderType.color} rounded`}
+              className={`flex flex-col justify-center gap-4 p-2 bg-gray-900 w-full  ${workOrderType.color} rounded`}
             >
               <div className="flex w-full items-center justify-center">
                 <p className="text-lg font-semibold text-white">
@@ -447,34 +448,42 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
         handleButtonClick={handleButtonClick}
       />
       {selectedButton === 'Costes' ? (
-        <div className="flex flex-grow gap-4">
+        <div className="flex flex-col lg:flex-row flex-grow gap-4">
           <div className="border-2 p-2 w-full rounded-xl bg-white justify-center">
-            <p className="text-2xl font-semibold p-2 text-left">Costes</p>
-            <WorkOrdersDashboard
-              workOrders={workOrders.sort((a, b) => {
-                const dateA = new Date(a.startTime).getTime();
-                const dateB = new Date(b.startTime).getTime();
-                return dateB - dateA;
-              })}
-            />
+            <p className="text-lg lg:text-2xl font-semibold p-2 text-left">
+              Costes
+            </p>
+            {workOrders.length > 0 ? (
+              <WorkOrdersDashboard
+                workOrders={workOrders.sort((a, b) => {
+                  const dateA = new Date(a.startTime).getTime();
+                  const dateB = new Date(b.startTime).getTime();
+                  return dateB - dateA;
+                })}
+              />
+            ) : (
+              <span className="font-sm p-3 text-gray-500 text-sm mt-2">
+                No hi ha resultats amb aquests filtres.
+              </span>
+            )}
           </div>
-          <div className="flex w-full bg-white rounded-xl p-2 border-2 ">
+          <div className="flex w-full bg-white rounded-xl p-2 border-2">
             <CostXAsset workOrders={workOrders} />
           </div>
         </div>
       ) : selectedButton === 'Recambios' ? (
         <div className="flex flex-col w-full gap-4 items-center">
-          <div className="flex flex-grow w-full rounded-xl p-2">
+          <div className="flex flex-col lg:flex-grow w-full rounded-xl p-2">
             {chartAssets.length > 0 && (
-              <div className="flex flex-row w-full  justify-center gap-4">
-                <div className=" border-2  bg-white p-4 rounded-xl w-full">
+              <div className="flex flex-col lg:flex-row w-full justify-center gap-4">
+                <div className="border-2 bg-white p-4 rounded-xl w-full">
                   <OTsXAsset chartAssets={chartAssets} />
                 </div>
-                <div className=" border-2 bg-white p-4 rounded-xl w-full">
-                  <p className="text-2xl mb-4 font-semibold text-left">
-                    Top Recanvis mes consumits
+                <div className="border-2 bg-white p-4 rounded-xl w-full">
+                  <p className="text-lg lg:text-2xl mb-4 font-semibold text-left">
+                    Top Recanvis més consumits
                   </p>
-                  <ul className="grid grid-rows-3 gap-4 w-full">
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                     {chartConsumedSpareParts.map((consumedSparePart, index) => (
                       <li
                         key={index}
@@ -482,7 +491,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
                       >
                         <div className="flex flex-col space-y-2 w-full">
                           <div className="flex justify-between items-center w-full mb-2">
-                            <span className="text-lg font-semibold">
+                            <span className="text-base lg:text-lg font-semibold">
                               {consumedSparePart.sparePart}
                             </span>
                             <div className="flex items-center gap-2">
@@ -504,7 +513,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
                             </div>
                           </div>
 
-                          <div className="flex space-x-2 gap-2">
+                          <div className="flex flex-wrap gap-2">
                             <div className="px-4 py-1 font-semibold rounded-full bg-[#FCE0CE] text-[#F17A2D]">
                               {consumedSparePart.number} Consums
                             </div>
@@ -523,7 +532,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
           </div>
 
           <div className="flex flex-col w-full bg-white rounded-xl border-2 p-2">
-            <p className="text-2xl p-2 mb-4 font-semibold text-left">
+            <p className="text-lg lg:text-2xl p-2 mb-4 font-semibold text-left">
               Recanvis sota stock
             </p>
 
@@ -538,14 +547,14 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
           </div>
         </div>
       ) : (
-        <div className="flex flex-grow gap-4">
-          <div className="flex w-full bg-white rounded-xl p-2 border-2 ">
+        <div className="flex flex-col lg:flex-row flex-grow gap-4">
+          <div className="flex w-full bg-white rounded-xl p-2 border-2">
             <DonutChartComponent
               chartData={workOrderTypeChartData}
               title="Correctius vs Preventius"
             />
           </div>
-          <div className="flex w-full bg-white rounded-xl p-2 border-2 ">
+          <div className="flex w-full bg-white rounded-xl p-2 border-2">
             <BarChartComponent
               category={['Preventius', 'Correctius']}
               chartData={chartData}

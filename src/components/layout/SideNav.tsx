@@ -73,7 +73,13 @@ const MenuItem = ({
               <div className="flex flex-row items-center hover:text-okron-main">
                 <span className="font-sm text-l flex text-gray-700 p-1 w-full hover:text-okron-main mb-1 rounded-md items-center">
                   {item.icon && (
-                    <item.icon className="mr-2 min-w-[16px] min-h-[16px] hover:text-okron-main" />
+                    <item.icon
+                      className={` ${
+                        menuOpen
+                          ? 'min-w-[16px] min-h-[16px] mr-4'
+                          : 'min-w-[24px] min-h-[24px] mb-1'
+                      } hover:text-okron-main`}
+                    />
                   )}
 
                   {menuOpen && item.title}
@@ -99,7 +105,11 @@ const MenuItem = ({
                           }}
                         >
                           {subItem.icon && (
-                            <subItem.icon className="mr-2 w-6 h-6" />
+                            <subItem.icon
+                              className={`${
+                                menuOpen ? 'w-6 h-6 ml-2' : 'w-8 h-8 mb-2'
+                              }`}
+                            />
                           )}
 
                           {menuOpen && subItem.title}
@@ -125,7 +135,13 @@ const MenuItem = ({
               }}
             >
               {item.icon && (
-                <item.icon className="mr-2 min-w-[16px] min-h-[16px] hover:text-okron-main" />
+                <item.icon
+                  className={`${
+                    menuOpen
+                      ? 'min-w-[16px] min-h-[16px] mr-2'
+                      : 'min-w-[24px] min-h-[24px] mb-2'
+                  } hover:text-okron-main`}
+                />
               )}
               {menuOpen && item.title}
             </span>
