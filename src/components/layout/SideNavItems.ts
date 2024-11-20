@@ -1,4 +1,4 @@
-import {  SvgAvarie, SvgGear, SvgOrder, SvgPanel, SvgRecanvi, SvgReport, SvgReview } from "app/icons/icons";
+import {  SvgActiu, SvgAvarie, SvgGear, SvgInspect, SvgMachine, SvgMenu, SvgOperari, SvgOrder, SvgPanel, SvgRecanvi, SvgReport, SvgReview, SvgUsers } from "app/icons/icons";
 import { UserPermission, UserType } from "app/interfaces/User";
 import { generateKey,SideNavItem } from "app/types/SideNavItem";
 
@@ -24,6 +24,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         key: generateKey(),
         title: "Configuració",
         path: "/preventive",
+        icon: SvgGear,
         permission: [UserPermission.Administrator],
         userType: [UserType.Maintenance],
       },
@@ -31,6 +32,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         key: generateKey(),
         title: "Punts Inspecció",
         path: "/inspectionPoints",
+        icon: SvgInspect,
         permission: [UserPermission.Administrator],
         userType: [UserType.Maintenance],
       },
@@ -85,6 +87,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         key: generateKey(),
         title: "Actius i Equips",
         path: "/assets",
+        icon: SvgActiu,
         permission: [UserPermission.Administrator],
         userType: [UserType.Maintenance],
       },
@@ -92,6 +95,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         key: generateKey(),
         title: "Seccions",
         path: "/section",
+        icon: SvgMenu,
         userType: [UserType.Production],
         permission: [UserPermission.Administrator],
       },
@@ -99,6 +103,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         key: generateKey(),
         title: "Màquines",
         path: "/machines",
+        icon: SvgMachine,
         userType: [UserType.Production],
         permission: [UserPermission.Administrator],
       },
@@ -106,6 +111,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         key: generateKey(),
         title: "Operaris",
         path: "/operators",
+        icon: SvgOperari,
         userType: [UserType.Production, UserType.Maintenance],
         permission: [UserPermission.Administrator],
       },
@@ -113,6 +119,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         key: generateKey(),
         title: "Usuaris",
         path: "/users",
+        icon: SvgUsers,
         userType: [UserType.Production, UserType.Maintenance],
         permission: [UserPermission.Administrator],
       },

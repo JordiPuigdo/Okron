@@ -89,14 +89,14 @@ const MenuItem = ({
             </button>
 
             {subMenuOpen && (
-              <div className="my-2 ml-2 flex flex-col">
+              <div className="ml-2 flex flex-col">
                 {item.submenuItems
                   ?.filter(x => x.userType?.includes(userType))
                   .map((subItem, idx) => {
                     return (
                       <Link key={idx} href={subItem.path}>
                         <span
-                          className="text-sm font-semibold text-gray-700 flex p-1 hover:text-purple-900 rounded-md items-center"
+                          className="text-sm font-small text-gray-700 flex hover:text-okron-main rounded-md mb-2 items-center"
                           onClick={() => {
                             setIsLoading(prevLoading => ({
                               ...prevLoading,
@@ -107,8 +107,10 @@ const MenuItem = ({
                           {subItem.icon && (
                             <subItem.icon
                               className={`${
-                                menuOpen ? 'w-6 h-6 ml-2' : 'w-8 h-8 mb-2'
-                              }`}
+                                menuOpen
+                                  ? 'min-w-[16px] min-h-[16px] mr-2'
+                                  : 'min-w-[14px] min-h-[14px]'
+                              } hover:text-okron-main`}
                             />
                           )}
 
@@ -126,7 +128,7 @@ const MenuItem = ({
         ) : (
           <Link href={item.path}>
             <span
-              className="font-sm text-l flex text-gray-700 gap-2 p-1 w-full hover:text-okron-main rounded-md items-center"
+              className="font-sm text-l flex text-gray-700 flex gap-2 p-1 w-full hover:text-okron-main rounded-md items-center"
               onClick={() => {
                 setIsLoading(prevLoading => ({
                   ...prevLoading,
