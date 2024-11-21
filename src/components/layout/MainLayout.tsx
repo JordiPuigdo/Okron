@@ -16,7 +16,7 @@ export default function MainLayout({
   hideHeader?: boolean;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const route = usePathname();
+  const pathname = usePathname();
   const toggleMenu = () => {
     setMenuOpen(prevState => !prevState);
   };
@@ -33,17 +33,18 @@ export default function MainLayout({
       <div className="flex flex-1">
         <div
           className={`fixed top-0 left-0 h-full bg-white text-white transition-all duration-400 ease-in-out z-50 pt-6 pl-2 transform ${
-            menuOpen ? 'w-60' : 'w-16'
+            menuOpen ? 'w-60' : !menuOpen && pathname === '/' ? 'w-0' : 'w-16'
           }`}
         >
-          <SideNav setOpenMenu={toggleMenu} menuOpen={menuOpen} />
+          {!hideHeader && (
+            <SideNav setOpenMenu={toggleMenu} menuOpen={menuOpen} />
+          )}
         </div>
 
         <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
           <div className={`fixed top-0 w-full z-50 ${menuOpen ? '' : ''}`}>
             {!hideHeader && <Header setOpenMenu={toggleMenu} />}
           </div>
-
           <main className="flex-1 bg-okron-background">
             <div
               className={`mx-auto max-w-screen-3xl min-h-screen ${
