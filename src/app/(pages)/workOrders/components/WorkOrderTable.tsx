@@ -8,6 +8,7 @@ import { SvgSpinner } from 'app/icons/icons';
 import { Asset } from 'app/interfaces/Asset';
 import { OperatorType } from 'app/interfaces/Operator';
 import WorkOrder, {
+  OriginWorkOrder,
   SearchWorkOrderFilters,
   StateWorkOrder,
   WorkOrderType,
@@ -200,6 +201,8 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
         operatorId: operatorId || '',
         startDateTime: startDate!,
         endDateTime: endDate!,
+        originWorkOrder: OriginWorkOrder.Maintenance,
+        userType: loginUser!.userType,
       };
     } catch (error) {
       console.error('Error fetching work orders:', error);

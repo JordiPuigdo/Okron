@@ -5,6 +5,7 @@ import { useWorkOrders } from 'app/hooks/useWorkOrders';
 import { SvgSpinner } from 'app/icons/icons';
 import { LoginUser, UserPermission } from 'app/interfaces/User';
 import WorkOrder, {
+  OriginWorkOrder,
   SearchWorkOrderFilters,
   StateWorkOrder,
   WorkOrderType,
@@ -158,6 +159,8 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
       operatorId: '',
       startDateTime: date,
       endDateTime: currentDate,
+      userType: loginUser.userType,
+      originWorkOrder: OriginWorkOrder.Maintenance,
     };
 
     await fetchWithFilters(filters).then(response => {

@@ -1,25 +1,27 @@
-"use client";
+'use client';
 
-import { useEffect,useState } from "react";
-import DatePicker from "react-datepicker";
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@tremor/react";
-import PreventiveTable from "app/(pages)/preventive/preventiveTable/preventiveTable";
-import SparePartTable from "app/(pages)/spareParts/components/SparePartTable";
-import WorkOrderTable from "app/(pages)/workOrders/components/WorkOrderTable";
-import { SvgSpinner } from "app/icons/icons";
+import { useEffect, useState } from 'react';
+import DatePicker from 'react-datepicker';
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@tremor/react';
+import PreventiveTable from 'app/(pages)/preventive/preventiveTable/preventiveTable';
+import SparePartTable from 'app/(pages)/spareParts/components/SparePartTable';
+import WorkOrderTable from 'app/(pages)/workOrders/components/WorkOrderTable';
+import { SvgSpinner } from 'app/icons/icons';
 import {
   Asset,
   CreateAssetRequest,
   UpdateAssetRequest,
-} from "app/interfaces/Asset";
-import AssetService from "app/services/assetService";
-import WorkOrderService from "app/services/workOrderService";
-import { CostsObject } from "components/Costs/CostsObject";
-import Container from "components/layout/Container";
-import MainLayout from "components/layout/MainLayout";
-import ca from "date-fns/locale/ca";
+} from 'app/interfaces/Asset';
+import AssetService from 'app/services/assetService';
+import WorkOrderService from 'app/services/workOrderService';
+import { CostsObject } from 'components/Costs/CostsObject';
+import Container from 'components/layout/Container';
+import MainLayout from 'components/layout/MainLayout';
+import ca from 'date-fns/locale/ca';
 
-import AssetForm from "../components/assetForm";
+import AssetForm from '../components/assetForm';
+import { OriginWorkOrder } from 'app/interfaces/workOrder';
+import { useSessionStore } from 'app/stores/globalStore';
 
 interface AssetCosts {
   totalCosts: number;
@@ -39,10 +41,10 @@ export default function AssetDetailsPage({
   const [currentAsset, setCurrentAsset] = useState<Asset | null>(null);
   const [parentId, setParentId] = useState<string | null>(null);
   const [levelGetted, setLevelGetted] = useState<number | null>(null);
-  const [message, setMessage] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [message, setMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const workOrderService = new WorkOrderService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+    process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
   const [assetCosts, setAssetCosts] = useState<AssetCosts>({
     totalCosts: 0,
@@ -51,9 +53,10 @@ export default function AssetDetailsPage({
   });
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
+  const { loginUser } = useSessionStore();
 
   useEffect(() => {
-    if (id !== "0") {
+    if (id !== '0') {
       setLoading(true);
       assetService
         .getAssetById(id as string)
@@ -61,8 +64,8 @@ export default function AssetDetailsPage({
           setCurrentAsset(asset);
           setLoading(false);
         })
-        .catch((error) => {
-          console.error("Error fetching asset data:", error);
+        .catch(error => {
+          console.error('Error fetching asset data:', error);
           setLoading(false);
         });
     }
@@ -71,8 +74,8 @@ export default function AssetDetailsPage({
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const parentId = urlParams.get("parentId");
-    const level = urlParams.get("level");
+    const parentId = urlParams.get('parentId');
+    const level = urlParams.get('level');
 
     setParentId(parentId);
     setLevelGetted(level?.toString() ? parseInt(level) : 1);
@@ -81,7 +84,7 @@ export default function AssetDetailsPage({
   const onSubmit = async (data: any) => {
     try {
       setLoading(true);
-      if (id !== "0") {
+      if (id !== '0') {
         const newData: UpdateAssetRequest = {
           code: data.code,
           description: data.description,
@@ -91,9 +94,9 @@ export default function AssetDetailsPage({
           parentId: data.parentId,
           createWorkOrder: data.createWorkOrder,
         };
-        await assetService.updateAsset(id, newData).then((data) => {
+        await assetService.updateAsset(id, newData).then(data => {
           if (data) {
-            setMessage("Actualitzat correctament");
+            setMessage('Actualitzat correctament');
             setTimeout(() => {
               history.back();
             }, 2000);
@@ -111,9 +114,9 @@ export default function AssetDetailsPage({
         };
         await assetService
           .createAsset(newData)
-          .then((data) => {
+          .then(data => {
             if (data) {
-              setMessage("Creat correctament");
+              setMessage('Creat correctament');
               setTimeout(() => {
                 history.back();
               }, 2000);
@@ -121,14 +124,14 @@ export default function AssetDetailsPage({
               setErrorMessage("Error creant l'equip");
             }
           })
-          .catch((x) => {
-            setErrorMessage("Error : " + x.message);
+          .catch(x => {
+            setErrorMessage('Error : ' + x.message);
           });
       }
 
       setLoading(false);
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error('Error submitting form:', error);
       setLoading(false);
     }
   };
@@ -140,7 +143,7 @@ export default function AssetDetailsPage({
       operatorCosts: 0,
       sparePartCosts: 0,
     };
-    workOrders?.forEach((workOrder) => {
+    workOrders?.forEach(workOrder => {
       const operatorCosts = workOrder.workOrderOperatorTimes?.reduce(
         (acc, x) => acc + x.operator.priceHour,
         0
@@ -163,10 +166,12 @@ export default function AssetDetailsPage({
         assetId: id,
         startDateTime: startDate!,
         endDateTime: endDate!,
+        userType: loginUser!.userType,
+        originWorkOrder: OriginWorkOrder.Maintenance,
       });
       return workOrders;
     } catch (error) {
-      console.error("Error fetching work orders:", error);
+      console.error('Error fetching work orders:', error);
     }
   }
 
@@ -184,7 +189,7 @@ export default function AssetDetailsPage({
                   loading={loading}
                   assetData={currentAsset != null ? currentAsset : undefined}
                   level={levelGetted!}
-                  parentId={parentId != null ? parentId : ""}
+                  parentId={parentId != null ? parentId : ''}
                   onSubmit={onSubmit}
                 />
                 <div className="flex flex-col gap-5">
@@ -228,7 +233,7 @@ export default function AssetDetailsPage({
                 </div>
               )}
             </div>
-            {id != "0" && (
+            {id != '0' && (
               <div className="flex flex-col gap-4">
                 <div>
                   <TabGroup className="bord">

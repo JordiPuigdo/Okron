@@ -127,6 +127,8 @@ export interface SearchWorkOrderFilters {
   operatorId?: string;
   assetId?: string;
   stateWorkOrder?: StateWorkOrder;
+  userType: UserType;
+  originWorkOrder: OriginWorkOrder;
 }
 
 export enum WorkOrderType {
