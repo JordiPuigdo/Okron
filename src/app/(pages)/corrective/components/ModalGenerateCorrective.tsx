@@ -1,15 +1,17 @@
-import { SvgClose } from "app/icons/icons";
-import { StateWorkOrder } from "app/interfaces/workOrder";
-import { useGlobalStore } from "app/stores/globalStore";
-import { Modal } from "designSystem/Modals/Modal";
+import { SvgClose } from 'app/icons/icons';
+import { StateWorkOrder } from 'app/interfaces/workOrder';
+import { useGlobalStore } from 'app/stores/globalStore';
+import { Modal } from 'designSystem/Modals/Modal';
 
-import GenerateCorrective from "./GenerateCorrective";
+import GenerateCorrective from './GenerateCorrective';
 
 interface ModalGenerateCorrectiveProps {
   assetId: string;
   description: string;
   stateWorkOrder: StateWorkOrder;
   operatorIds?: string[];
+  originalWorkOrderId?: string;
+  originalWorkOrderCode?: string;
 }
 
 const ModalGenerateCorrective: React.FC<ModalGenerateCorrectiveProps> = ({
@@ -17,8 +19,10 @@ const ModalGenerateCorrective: React.FC<ModalGenerateCorrectiveProps> = ({
   description,
   stateWorkOrder,
   operatorIds,
+  originalWorkOrderId,
+  originalWorkOrderCode,
 }) => {
-  const { setIsModalOpen } = useGlobalStore((state) => state);
+  const { setIsModalOpen } = useGlobalStore(state => state);
   return (
     <Modal
       isVisible={true}
@@ -44,6 +48,9 @@ const ModalGenerateCorrective: React.FC<ModalGenerateCorrectiveProps> = ({
         description={description}
         stateWorkOrder={stateWorkOrder}
         operatorIds={operatorIds}
+        showReasons={false}
+        originalWorkOrderId={originalWorkOrderId}
+        originalWorkOrderCode={originalWorkOrderCode}
       />
     </Modal>
   );

@@ -31,6 +31,7 @@ const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
   }
 
   const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    debugger;
     setCurrentId('');
     setQuery(event.target.value);
     setSelectedElementIndex(-1);

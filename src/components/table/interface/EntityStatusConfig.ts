@@ -26,6 +26,7 @@ export const entityStatusConfig: Record<string, StatusConfig> = {
       '1': 'bg-okron-preventive',
       '0': 'bg-okron-corrective',
       '2': 'bg-okron-btDetail',
+      '3': 'bg-okron-btDetail',
     },
   },
   WORKORDERSTATE: {
@@ -42,6 +43,7 @@ export const entityStatusConfig: Record<string, StatusConfig> = {
       '4': 'bg-okron-finished',
       '5': 'bg-okron-pendingValidate',
       '6': 'bg-okron-btCreate',
+      '7': 'bg-okron-finished',
     },
   },
   OPERATOR: {

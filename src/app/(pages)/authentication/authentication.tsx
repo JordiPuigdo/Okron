@@ -1,4 +1,4 @@
-import { SvgSpinner } from "app/icons/icons";
+import { SvgSpinner } from 'app/icons/icons';
 
 interface AuthenticationProps {
   username: string;

@@ -1,11 +1,15 @@
 import { Downtimes } from 'app/interfaces/Production/Downtimes';
-import { formatDate, formatTimeSpan } from 'app/utils/utils';
+import {
+  formatDate,
+  formatTimeSpan,
+  translateOperatorType,
+} from 'app/utils/utils';
 
 interface DowntimesProps {
-  downtime: Downtimes;
+  downtimes: Downtimes[];
 }
 
-export default function DowntimesComponent({ downtime }: DowntimesProps) {
+export default function DowntimesComponent({ downtimes }: DowntimesProps) {
   return (
     <div className="p-2 bg-white rounded-lg w-full">
       <div className="flex flex-row items-center py-2 text-lg font-semibold">
@@ -41,21 +45,25 @@ export default function DowntimesComponent({ downtime }: DowntimesProps) {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          <tr>
-            <td className="p-2 whitespace-nowrap w-1/4">
-              {formatDate(downtime.startTime)}
-            </td>
-            <td className="p-2 whitespace-nowrap w-1/4">
-              {formatDate(downtime.endTime)}
-            </td>
-            <td className="p-2 whitespace-nowrap w-1/4">
-              {' '}
-              {formatTimeSpan(downtime.totalTime)}
-            </td>
-            <td className="p-2 whitespace-nowrap w-1/4">
-              {downtime.operator.name}
-            </td>
-          </tr>
+          {downtimes.map((downtime, index) => (
+            <tr key={index}>
+              <td className="p-2 whitespace-nowrap w-1/4">
+                {formatDate(downtime.startTime)}
+              </td>
+              <td className="p-2 whitespace-nowrap w-1/4">
+                {downtime.endTime ? formatDate(downtime.endTime) : 'N/A'}
+              </td>
+              <td className="p-2 whitespace-nowrap w-1/4">
+                {downtime.totalTime
+                  ? formatTimeSpan(downtime.totalTime)
+                  : 'N/A'}
+              </td>
+              <td className="p-2 whitespace-nowrap w-1/4">
+                {downtime.operator.name} -{' '}
+                {translateOperatorType(downtime.operator.operatorType)}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

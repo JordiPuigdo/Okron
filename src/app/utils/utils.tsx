@@ -28,7 +28,9 @@ export const translateStateWorkOrder = (state: any): string => {
     case StateWorkOrder.Requested:
       return 'Sol·licitat';
     case StateWorkOrder.Open:
-      return 'Oberta';
+      return 'Obert';
+    case StateWorkOrder.Closed:
+      return 'Tancat';
     default:
       return '';
   }
@@ -123,6 +125,7 @@ export const translateWorkOrderType = (
     [WorkOrderType.Preventive]: 'Preventiu',
     [WorkOrderType.Corrective]: 'Correctiu',
     [WorkOrderType.Predicitve]: '',
+    [WorkOrderType.Ticket]: 'Tiquet',
   };
 
   return translations[workOrderType];

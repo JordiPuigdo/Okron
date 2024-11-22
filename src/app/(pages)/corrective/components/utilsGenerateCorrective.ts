@@ -4,6 +4,7 @@ import { LoginUser, OperatorLogged, UserType } from 'app/interfaces/User';
 import {
   CreateWorkOrderRequest,
   StateWorkOrder,
+  WorkOrderType,
 } from 'app/interfaces/workOrder';
 
 export function isValidData(
@@ -33,7 +34,9 @@ export function convertToCreateWorkOrderRequest(
   loginUser: LoginUser,
   selectedOperator: string[],
   selectedDowntimeReasons: DowntimesReasons | undefined,
-  operatorLogged: OperatorLogged
+  operatorLogged: OperatorLogged,
+  originalWorkOrderId: string,
+  originalWorkOrderCode: string
 ): CreateWorkOrderRequest {
   const createWorkOrderRequest: CreateWorkOrderRequest = {
     code: corrective.code,
@@ -45,11 +48,16 @@ export function convertToCreateWorkOrderRequest(
       loginUser?.userType !== UserType.Maintenance
         ? StateWorkOrder.Open
         : corrective.stateWorkOrder,
-    workOrderType: 0,
+    workOrderType:
+      loginUser.userType == UserType.Production
+        ? WorkOrderType.Ticket
+        : WorkOrderType.Corrective,
     userId: loginUser?.agentId,
     operatorCreatorId: operatorLogged!.idOperatorLogged,
-    originWorkOrder: loginUser!.userType,
+    originWorkOrder: loginUser?.userType,
     downtimeReasonId: selectedDowntimeReasons?.id || '',
+    originalWorkOrderId: originalWorkOrderId || '',
+    originalWorkOrderCode: originalWorkOrderCode || '',
   };
   return createWorkOrderRequest;
 }

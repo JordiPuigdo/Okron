@@ -59,7 +59,7 @@ const Header: React.FC<Header> = ({ setOpenMenu }) => {
         <div>
           {loginUser?.permission == UserPermission.Administrator &&
             pathname === '/menu' &&
-            loginUser!.userType == UserType.Maintenance && (
+            loginUser?.userType == UserType.Maintenance && (
               <div className="flex flex-row gap-2 bg-white rounded-xl">
                 <FinalizeWorkOrdersDaysBefore />
                 <GeneratePreventive />

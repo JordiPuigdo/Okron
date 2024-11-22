@@ -23,6 +23,8 @@ import { checkAllInspectionPoints } from 'app/utils/utilsInspectionPoints';
 import ChooseSpareParts from 'components/sparePart/ChooseSpareParts';
 import { Button } from 'designSystem/Button/Buttons';
 import { Modal } from 'designSystem/Modals/Modal';
+import { UserType } from 'app/interfaces/User';
+import { current } from 'tailwindcss/colors';
 
 interface WorkOrderOperationsInTableProps {
   workOrderId: string;
@@ -83,6 +85,10 @@ export default function WorkOrderOperationsInTable({
     }
   }, []);
 
+  const hasDefaultReason =
+    workOrder?.downtimeReason != undefined &&
+    workOrder.downtimeReason.machineId == '';
+
   async function handleChangeStateWorkOrder(state: StateWorkOrder) {
     toggleLoading(
       workOrderId +
@@ -95,6 +101,10 @@ export default function WorkOrderOperationsInTable({
         workOrderId +
           (state === StateWorkOrder.PendingToValidate ? '_Validate' : '_Sign')
       );
+      return;
+    }
+    if (hasDefaultReason) {
+      alert("Tens el motiu per defecte, no pots canviar l'estat");
       return;
     }
     if (workOrder.stateWorkOrder == state) {
@@ -145,6 +155,7 @@ export default function WorkOrderOperationsInTable({
     StateWorkOrder.Waiting,
     StateWorkOrder.OnGoing,
     StateWorkOrder.Paused,
+    StateWorkOrder.Open,
   ];
 
   const classNameOnGoing = `${
@@ -204,71 +215,94 @@ export default function WorkOrderOperationsInTable({
         {showModal && (
           <SparePartsModal workOrder={workOrder} isFinished={false} />
         )}
-        <Button
-          type="none"
-          size="md"
-          onClick={() => {
-            workOrder.stateWorkOrder == StateWorkOrder.OnGoing
-              ? handleChangeStateWorkOrder(StateWorkOrder.Paused)
-              : handleChangeStateWorkOrder(StateWorkOrder.OnGoing);
-          }}
-          className={classNameOnGoing}
-        >
-          {isLoading[workOrderId + '_Sign'] ? (
-            <SvgSpinner className="text-white" />
-          ) : workOrder.stateWorkOrder == StateWorkOrder.OnGoing ? (
-            <SvgPause className="text-white" />
-          ) : (
-            <SvgStart />
+        {loginUser?.userType == UserType.Maintenance &&
+          workOrder.workOrderType != WorkOrderType.Ticket && (
+            <Button
+              type="none"
+              size="md"
+              onClick={() => {
+                workOrder.stateWorkOrder == StateWorkOrder.OnGoing
+                  ? handleChangeStateWorkOrder(StateWorkOrder.Paused)
+                  : handleChangeStateWorkOrder(StateWorkOrder.OnGoing);
+              }}
+              className={classNameOnGoing}
+            >
+              {isLoading[workOrderId + '_Sign'] ? (
+                <SvgSpinner className="text-white" />
+              ) : workOrder.stateWorkOrder == StateWorkOrder.OnGoing ? (
+                <SvgPause className="text-white" />
+              ) : (
+                <SvgStart />
+              )}
+            </Button>
           )}
-        </Button>
-
-        <Button
-          type="none"
-          className={`${classNameValidate}`}
-          onClick={() => {
-            if (!validStates.includes(workOrder.stateWorkOrder)) return;
-            if (workOrder.stateWorkOrder != StateWorkOrder.PendingToValidate) {
-              handleChangeStateWorkOrder(StateWorkOrder.PendingToValidate);
-            }
-          }}
-        >
-          {isLoading[workOrderId + '_Validate'] ? <SvgSpinner /> : <SvgCheck />}
-        </Button>
-
-        {workOrder.workOrderType == WorkOrderType.Corrective && (
+        {((loginUser?.userType == UserType.Maintenance &&
+          workOrder.workOrderType != WorkOrderType.Ticket) ||
+          loginUser?.userType == UserType.Production) && (
           <Button
-            onClick={() => {
-              handleSparePartsModal();
-            }}
             type="none"
-            className={`${classNameSpareParts}`}
+            className={`${classNameValidate}`}
+            onClick={() => {
+              if (
+                !validStates.includes(workOrder.stateWorkOrder) &&
+                workOrder.workOrderType != WorkOrderType.Ticket
+              )
+                return;
+
+              if (
+                workOrder.stateWorkOrder != StateWorkOrder.PendingToValidate
+              ) {
+                handleChangeStateWorkOrder(
+                  loginUser?.userType == UserType.Maintenance
+                    ? StateWorkOrder.PendingToValidate
+                    : StateWorkOrder.Closed
+                );
+              }
+            }}
           >
-            {isLoading[workOrderId + '_SpareParts'] ? (
+            {isLoading[workOrderId + '_Validate'] ? (
               <SvgSpinner />
             ) : (
-              <SvgSparePart />
+              <SvgCheck />
             )}
           </Button>
         )}
-        {workOrder.workOrderType == WorkOrderType.Preventive && (
-          <Button
-            onClick={() => {
-              !isPassInspectionPoints && handleInspectionPoints(workOrderId);
-            }}
-            type="none"
-            customStyles={`${
-              isPassInspectionPoints ? 'cursor-not-allowed' : ''
-            }`}
-            className={`${classNamePreventive} text-white rounded p-2 flex gap-2 justify-center align-middle w-full`}
-          >
-            {isLoading[workOrderId + '_InspectionPoints'] ? (
-              <SvgSpinner />
-            ) : (
-              <SvgInspectionPoints />
-            )}
-          </Button>
-        )}
+
+        {workOrder.workOrderType == WorkOrderType.Corrective &&
+          loginUser?.userType == UserType.Maintenance && (
+            <Button
+              onClick={() => {
+                handleSparePartsModal();
+              }}
+              type="none"
+              className={`${classNameSpareParts}`}
+            >
+              {isLoading[workOrderId + '_SpareParts'] ? (
+                <SvgSpinner />
+              ) : (
+                <SvgSparePart />
+              )}
+            </Button>
+          )}
+        {workOrder.workOrderType == WorkOrderType.Preventive &&
+          loginUser?.userType == UserType.Maintenance && (
+            <Button
+              onClick={() => {
+                !isPassInspectionPoints && handleInspectionPoints(workOrderId);
+              }}
+              type="none"
+              customStyles={`${
+                isPassInspectionPoints ? 'cursor-not-allowed' : ''
+              }`}
+              className={`${classNamePreventive} text-white rounded p-2 flex gap-2 justify-center align-middle w-full`}
+            >
+              {isLoading[workOrderId + '_InspectionPoints'] ? (
+                <SvgSpinner />
+              ) : (
+                <SvgInspectionPoints />
+              )}
+            </Button>
+          )}
 
         <Button
           type="none"

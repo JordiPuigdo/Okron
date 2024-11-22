@@ -9,7 +9,7 @@ import ModalGenerateCorrective from 'app/(pages)/corrective/components/ModalGene
 import { SvgSpinner } from 'app/icons/icons';
 import Operator, { OperatorType } from 'app/interfaces/Operator';
 import SparePart from 'app/interfaces/SparePart';
-import { UserPermission } from 'app/interfaces/User';
+import { UserPermission, UserType } from 'app/interfaces/User';
 import WorkOrder, {
   OriginWorkOrder,
   StateWorkOrder,
@@ -44,12 +44,14 @@ import { Button } from 'designSystem/Button/Buttons';
 import { useRouter } from 'next/navigation';
 
 import WorkOrderButtons from './WorkOrderButtons';
-import { da } from 'date-fns/locale';
+import { da, is } from 'date-fns/locale';
 import DowntimesComponent from './Downtimes';
 import ModalDowntimeReasons from 'app/(pages)/corrective/components/ModalDowntimeReasons';
 import { DowntimesReasons } from 'app/interfaces/Production/Downtimes';
 import { useAssetHook } from 'app/hooks/useAssetHook';
 import AutocompleteSearchBar from 'components/selector/AutocompleteSearchBar';
+import { log } from 'console';
+import Link from 'next/link';
 
 type WorkOrdeEditFormProps = {
   id: string;
@@ -365,17 +367,33 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     setIsLoading(prevLoading => ({ ...prevLoading, [id]: !prevLoading[id] }));
   }
 
-  function isValidData(data: WorkOrder) {
-    const workOrderHasOperators = selectedOperators.length > 0;
-    const hasChangeState =
-      hasDefaultReason &&
-      data.stateWorkOrder == StateWorkOrder.PendingToValidate;
-    return workOrderHasOperators && !hasChangeState;
+  function isValidData(data: WorkOrder): Promise<string> {
+    return new Promise(resolve => {
+      const workOrderHasOperators =
+        currentWorkOrder?.workOrderType !== WorkOrderType.Ticket &&
+        selectedOperators.length === 0;
+
+      if (workOrderHasOperators) {
+        resolve('Falta seleccionar almenys un operari');
+      }
+
+      const hasChangeState =
+        hasDefaultReason &&
+        data.stateWorkOrder === StateWorkOrder.PendingToValidate;
+
+      if (hasChangeState) {
+        resolve('L’estat de l’ordre no ha canviat correctament');
+      }
+
+      // No issues found
+      resolve('');
+    });
   }
 
   const onSubmit: SubmitHandler<WorkOrder> = async data => {
     toggleLoading('SAVE');
-    if (!isValidData(data)) {
+    const errorMessage = isValidData(data);
+    if ((await errorMessage).length > 0) {
       alert('Has de seleccionar almenys un operari');
       toggleLoading('SAVE');
       return;
@@ -386,14 +404,18 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         id: id,
         description: data.description,
         stateWorkOrder: data.stateWorkOrder,
-        operatorId: selectedOperators.map(x => x.id),
+        operatorId:
+          selectedOperators.length > 0 ? selectedOperators.map(x => x.id) : [],
         startTime: startDate || new Date(),
         operatorCreatorId:
-          operatorLogged?.idOperatorLogged || selectedOperators[0].id,
-        originWorkOrder: loginUser!.userType,
+          operatorLogged?.idOperatorLogged ||
+          (selectedOperators.length > 0 ? selectedOperators[0].id : ''),
+        originWorkOrder:
+          loginUser?.userType != undefined
+            ? loginUser.userType
+            : UserType.Maintenance,
         downtimeReason: data.downtimeReason,
       };
-
       await workOrderService.updateWorkOrder(updatedWorkOrderData);
 
       setShowSuccessMessage(true);
@@ -465,7 +487,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         <div className="items-center text-center w-full">
           <div className="mb-4">
             <span className="text-2xl font-bold text-black mx-auto">
-              Ordre de Treball - {currentWorkOrder?.code}
+              {currentWorkOrder?.workOrderType == WorkOrderType.Ticket
+                ? 'Ticket'
+                : 'Ordre de Treball'}{' '}
+              - {currentWorkOrder?.code}
             </span>
           </div>
           <div>
@@ -480,6 +505,11 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       </div>
     );
   };
+
+  const isDisabledField =
+    isFinished ||
+    loginUser?.permission != UserPermission.Administrator ||
+    loginUser?.userType == UserType.Production;
 
   const renderForm = () => {
     function handleSelectedAsset(id: string): void {
@@ -513,10 +543,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 id="description"
                 name="description"
                 className="p-3 border text-sm border-gray-300 rounded-md w-full"
-                disabled={
-                  isFinished ||
-                  loginUser?.permission != UserPermission.Administrator
-                }
+                disabled={isDisabledField}
                 onKeyPress={e => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -536,20 +563,26 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 id="stateWorkOrder"
                 name="stateWorkOrder"
                 className="p-3 text-sm border border-gray-300 rounded-md w-full"
-                disabled={
-                  isFinished ||
-                  loginUser?.permission != UserPermission.Administrator
-                }
+                disabled={isDisabledField}
                 onChange={e => {
                   handleStateChange(e);
                 }}
               >
                 {Object.values(StateWorkOrder)
-                  .filter(
-                    value =>
-                      typeof value === 'number' &&
-                      (isFinished || value !== StateWorkOrder.Finished)
-                  )
+                  .filter(value => {
+                    if (typeof value !== 'number') return false;
+
+                    if (
+                      currentWorkOrder?.workOrderType === WorkOrderType.Ticket
+                    ) {
+                      return (
+                        value === StateWorkOrder.Open ||
+                        value === StateWorkOrder.Closed
+                      );
+                    }
+
+                    return !isFinished && value !== StateWorkOrder.Finished;
+                  })
                   .map(state => (
                     <option
                       key={state}
@@ -570,10 +603,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 Data Inici
               </label>
               <DatePicker
-                disabled={
-                  isFinished ||
-                  loginUser?.permission != UserPermission.Administrator
-                }
+                disabled={isDisabledField}
                 id="startDate"
                 selected={startDate}
                 onChange={(date: Date) => setStartDate(date)}
@@ -582,40 +612,40 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 className="p-3 border border-gray-300 rounded-md text-sm"
               />
             </div>
-            <div className="w-full">
-              <label
-                htmlFor="operators"
-                className="block text-sm font-medium text-gray-700 py-2"
-              >
-                Operaris
-              </label>
-              {aviableOperators !== undefined &&
-                aviableOperators?.length > 0 && (
-                  <ChooseElement
-                    elements={aviableOperators!
-                      .filter(x => x.operatorType == OperatorType.Maintenance)
-                      .map(x => ({
-                        id: x.id,
-                        description: x.name,
-                      }))}
-                    onDeleteElementSelected={handleDeleteSelectedOperator}
-                    onElementSelected={handleSelectOperator}
-                    placeholder={'Selecciona un Operari'}
-                    selectedElements={selectedOperators.map(x => x.id)}
-                    mapElement={aviableOperators => ({
-                      id: aviableOperators.id,
-                      description: aviableOperators.description,
-                    })}
-                    disabled={
-                      isFinished ||
-                      loginUser?.permission != UserPermission.Administrator
-                    }
-                    className={
-                      selectedOperators.length == 0 ? ' border-red-500 ' : ''
-                    }
-                  />
-                )}
-            </div>
+            {currentWorkOrder?.workOrderType != WorkOrderType.Ticket && (
+              <div className="w-full">
+                <label
+                  htmlFor="operators"
+                  className="block text-sm font-medium text-gray-700 py-2"
+                >
+                  Operaris
+                </label>
+
+                {aviableOperators !== undefined &&
+                  aviableOperators?.length > 0 && (
+                    <ChooseElement
+                      elements={aviableOperators!
+                        .filter(x => x.operatorType == OperatorType.Maintenance)
+                        .map(x => ({
+                          id: x.id,
+                          description: x.name,
+                        }))}
+                      onDeleteElementSelected={handleDeleteSelectedOperator}
+                      onElementSelected={handleSelectOperator}
+                      placeholder={'Selecciona un Operari'}
+                      selectedElements={selectedOperators.map(x => x.id)}
+                      mapElement={aviableOperators => ({
+                        id: aviableOperators.id,
+                        description: aviableOperators.description,
+                      })}
+                      disabled={isDisabledField}
+                      className={
+                        selectedOperators.length == 0 ? ' border-red-500 ' : ''
+                      }
+                    />
+                  )}
+              </div>
+            )}
             {currentWorkOrder?.originWorkOrder ==
               OriginWorkOrder.Production && (
               <>
@@ -635,25 +665,6 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                     value={currentWorkOrder.downtimeReason?.description}
                     readOnly
                     onClick={() => setShowDowntimeReasonsModal(true)}
-                  />
-                </div>
-                <div className="w-full">
-                  <label
-                    htmlFor="asset"
-                    className="block text-sm font-medium text-gray-700 py-2"
-                  >
-                    Equip
-                  </label>
-                  <ChooseElement
-                    elements={assets!}
-                    mapElement={asset => ({
-                      id: asset.id,
-                      description: asset.description,
-                    })}
-                    placeholder="Buscar un Equip"
-                    selectedElements={selectedAssetId!}
-                    onElementSelected={handleSelectedAsset}
-                    onDeleteElementSelected={handleSelectedAsset}
                   />
                 </div>
               </>
@@ -713,19 +724,36 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                       )}
                     </Button>
                   )}
-                {currentWorkOrder?.workOrderType == WorkOrderType.Preventive &&
-                  currentWorkOrder?.preventive?.id != undefined && (
+                {((currentWorkOrder?.workOrderType == WorkOrderType.Ticket &&
+                  loginUser?.userType == UserType.Maintenance) ||
+                  (currentWorkOrder?.workOrderType ==
+                    WorkOrderType.Preventive &&
+                    currentWorkOrder?.preventive?.id != undefined)) && (
+                  <Button
+                    type="none"
+                    className="bg-red-700 hover:bg-red-900 text-white font-semibold p2- rounded-l"
+                    customStyles="flex"
+                    onClick={() => {
+                      setShowModal(true);
+                    }}
+                  >
+                    Crear Avaria
+                  </Button>
+                )}
+                {currentWorkOrder?.originalWorkOrderId && (
+                  <Link
+                    href={`/workOrders/${currentWorkOrder.originalWorkOrderId}`}
+                    passHref
+                  >
                     <Button
                       type="none"
-                      className="bg-red-700 hover:bg-red-900 text-white font-semibold p2- rounded-l"
+                      className="bg-green-700 hover:bg-green-900 text-white font-semibold p2- rounded-l"
                       customStyles="flex"
-                      onClick={() => {
-                        setShowModal(true);
-                      }}
                     >
-                      Crear Avaria
+                      Veure Tiquet
                     </Button>
-                  )}
+                  </Link>
+                )}
               </>
             )}
           </div>
@@ -793,12 +821,15 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         <div className="p-2 bg-white rounded-lg shadow-md  w-full  flex flex-col">
           {currentWorkOrder && (
             <>
-              <div>
-                <WorkOrderButtons
-                  workOrder={currentWorkOrder}
-                  handleReload={fetchWorkOrder}
-                />
-              </div>
+              {currentWorkOrder.workOrderType != WorkOrderType.Ticket && (
+                <div>
+                  <WorkOrderButtons
+                    workOrder={currentWorkOrder}
+                    handleReload={fetchWorkOrder}
+                  />
+                </div>
+              )}
+
               <div className="py-2">
                 <WorkOrderOperatorComments
                   workOrderComments={workOrderComments}
@@ -821,22 +852,24 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       >
         {currentWorkOrder?.originWorkOrder == OriginWorkOrder.Production &&
           currentWorkOrder.downtimes && (
-            <DowntimesComponent downtime={currentWorkOrder.downtimes!} />
+            <DowntimesComponent downtimes={currentWorkOrder.downtimes} />
           )}
-        <div className="flex w-full">
-          <WorkOrderOperatorTimesComponent
-            operators={aviableOperators!}
-            workOrderOperatortimes={workOrderOperatorTimes}
-            setWorkOrderOperatortimes={setworkOrderOperatorTimes}
-            workOrderId={currentWorkOrder.id}
-            isFinished={
-              currentWorkOrder.stateWorkOrder == StateWorkOrder.Finished ||
-              currentWorkOrder.stateWorkOrder ==
-                StateWorkOrder.PendingToValidate ||
-              currentWorkOrder.stateWorkOrder == StateWorkOrder.Waiting
-            }
-          />
-        </div>
+        {currentWorkOrder?.workOrderType != WorkOrderType.Ticket && (
+          <div className="flex w-full">
+            <WorkOrderOperatorTimesComponent
+              operators={aviableOperators!}
+              workOrderOperatortimes={workOrderOperatorTimes}
+              setWorkOrderOperatortimes={setworkOrderOperatorTimes}
+              workOrderId={currentWorkOrder.id}
+              isFinished={
+                currentWorkOrder.stateWorkOrder == StateWorkOrder.Finished ||
+                currentWorkOrder.stateWorkOrder ==
+                  StateWorkOrder.PendingToValidate ||
+                currentWorkOrder.stateWorkOrder == StateWorkOrder.Waiting
+              }
+            />
+          </div>
+        )}
         <div className="flex flex-grow w-full">
           {currentWorkOrder.workOrderType === WorkOrderType.Preventive && (
             <CompleteInspectionPoints
@@ -932,6 +965,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           description={currentWorkOrder.description}
           stateWorkOrder={StateWorkOrder.OnGoing}
           operatorIds={currentWorkOrder?.operatorId}
+          originalWorkOrderId={currentWorkOrder.id}
+          originalWorkOrderCode={currentWorkOrder.code}
         />
       )}
     </>

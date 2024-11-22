@@ -32,12 +32,18 @@ interface GenerateCorrectiveProps {
   description?: string | null;
   stateWorkOrder?: StateWorkOrder | null;
   operatorIds?: string[];
+  showReasons?: boolean;
+  originalWorkOrderId?: string;
+  originalWorkOrderCode?: string;
 }
 const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
   assetId,
   description,
   stateWorkOrder,
   operatorIds,
+  showReasons = true,
+  originalWorkOrderId,
+  originalWorkOrderCode,
 }) => {
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ''
@@ -68,6 +74,7 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
     useState(false);
   const { operators } = useOperatorHook();
   const { isModalOpen } = useGlobalStore();
+  const [code, setCode] = useState<string>('');
 
   async function fetchFormData() {
     await createCode();
@@ -79,13 +86,19 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
 
   async function createCode() {
     await workOrderService
-      .countByWorkOrderType(WorkOrderType.Corrective)
+      .countByWorkOrderType(
+        loginUser?.userType == UserType.Production
+          ? WorkOrderType.Ticket
+          : WorkOrderType.Corrective
+      )
       .then(numberCorrectives => {
         numberCorrectives = numberCorrectives += 1;
         const paddedCounter = numberCorrectives
           ? numberCorrectives.toString().padStart(4, '0')
           : '0000';
-        const code = 'COR' + paddedCounter;
+        let code = loginUser?.userType == UserType.Production ? 'TICK' : 'COR';
+        code = code + paddedCounter;
+        setCode(code);
         setValue('code', code);
       })
       .catch(error => {
@@ -169,7 +182,9 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
           loginUser!,
           selectedOperator,
           selectedDowntimeReasons,
-          operatorLogged
+          operatorLogged,
+          originalWorkOrderId || '',
+          originalWorkOrderCode || ''
         ),
         data.machineId
       )
@@ -219,7 +234,7 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
   };
   return (
     <>
-      {showDowntimeReasonsModal && (
+      {showDowntimeReasonsModal && showReasons && (
         <ModalDowntimeReasons
           selectedId={selectedId}
           onSelectedDowntimeReasons={onSelectedDowntimeReasons}
@@ -438,7 +453,11 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
 
           {showSuccessMessage && (
             <SuccessfulMessage
-              title={'Averia creada'}
+              title={
+                loginUser?.userType == UserType.Production
+                  ? 'Tiquet Creat ' + code
+                  : 'Averia Creada ' + code
+              }
               message={
                 descriptionCorrective !== undefined
                   ? descriptionCorrective!

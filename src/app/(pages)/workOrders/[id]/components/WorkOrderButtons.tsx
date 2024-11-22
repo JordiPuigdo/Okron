@@ -6,7 +6,7 @@ import {
   SvgSpinner,
   SvgStart,
 } from 'app/icons/icons';
-import { UserPermission } from 'app/interfaces/User';
+import { UserPermission, UserType } from 'app/interfaces/User';
 import {
   StateWorkOrder,
   UpdateStateWorkOrder,
@@ -79,57 +79,64 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
     <div className="flex gap-2">
       {workOrder.stateWorkOrder != StateWorkOrder.Finished && (
         <>
-          {loginUser?.permission == UserPermission.Administrator && (
+          {loginUser?.permission == UserPermission.Administrator &&
+            loginUser?.userType == UserType.Maintenance && (
+              <Button
+                disabled={workOrder.stateWorkOrder == StateWorkOrder.Waiting}
+                onClick={() =>
+                  handleChangeStateWorkOrder(StateWorkOrder.Waiting)
+                }
+                type="none"
+                customStyles="flex justify-center items-center bg-okron-waiting h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverPending w-full"
+                className="w-full"
+              >
+                {isLoading[StateWorkOrder.Waiting] ? (
+                  <SvgSpinner className="text-white" />
+                ) : (
+                  <SvgPending />
+                )}
+              </Button>
+            )}
+          {loginUser?.userType == UserType.Maintenance && (
             <Button
-              disabled={workOrder.stateWorkOrder == StateWorkOrder.Waiting}
-              onClick={() => handleChangeStateWorkOrder(StateWorkOrder.Waiting)}
+              disabled={
+                workOrder.stateWorkOrder == StateWorkOrder.OnGoing ||
+                workOrder.stateWorkOrder ==
+                  (StateWorkOrder.Finished as StateWorkOrder) ||
+                workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
+              }
+              onClick={() => handleChangeStateWorkOrder(StateWorkOrder.OnGoing)}
               type="none"
-              customStyles="flex justify-center items-center bg-okron-waiting h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverPending w-full"
               className="w-full"
+              customStyles="flex justify-center items-center bg-okron-onGoing h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverOnGoing w-full"
             >
-              {isLoading[StateWorkOrder.Waiting] ? (
+              {isLoading[StateWorkOrder.OnGoing] ? (
                 <SvgSpinner className="text-white" />
               ) : (
-                <SvgPending />
+                <SvgStart />
               )}
             </Button>
           )}
-          <Button
-            disabled={
-              workOrder.stateWorkOrder == StateWorkOrder.OnGoing ||
-              workOrder.stateWorkOrder ==
-                (StateWorkOrder.Finished as StateWorkOrder) ||
-              workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
-            }
-            onClick={() => handleChangeStateWorkOrder(StateWorkOrder.OnGoing)}
-            type="none"
-            className="w-full"
-            customStyles="flex justify-center items-center bg-okron-onGoing h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverOnGoing w-full"
-          >
-            {isLoading[StateWorkOrder.OnGoing] ? (
-              <SvgSpinner className="text-white" />
-            ) : (
-              <SvgStart />
-            )}
-          </Button>
-          <Button
-            disabled={
-              workOrder.stateWorkOrder == StateWorkOrder.Paused ||
-              workOrder.stateWorkOrder ==
-                (StateWorkOrder.Finished as StateWorkOrder) ||
-              workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
-            }
-            onClick={() => handleChangeStateWorkOrder(StateWorkOrder.Paused)}
-            type="none"
-            className="w-full"
-            customStyles="flex justify-center items-center bg-gray-500 h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverWaiting w-full"
-          >
-            {isLoading[StateWorkOrder.Paused] ? (
-              <SvgSpinner className="text-white" />
-            ) : (
-              <SvgPause />
-            )}
-          </Button>
+          {loginUser?.userType == UserType.Maintenance && (
+            <Button
+              disabled={
+                workOrder.stateWorkOrder == StateWorkOrder.Paused ||
+                workOrder.stateWorkOrder ==
+                  (StateWorkOrder.Finished as StateWorkOrder) ||
+                workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
+              }
+              onClick={() => handleChangeStateWorkOrder(StateWorkOrder.Paused)}
+              type="none"
+              className="w-full"
+              customStyles="flex justify-center items-center bg-gray-500 h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverWaiting w-full"
+            >
+              {isLoading[StateWorkOrder.Paused] ? (
+                <SvgSpinner className="text-white" />
+              ) : (
+                <SvgPause />
+              )}
+            </Button>
+          )}
           <Button
             disabled={
               workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate

@@ -1,10 +1,10 @@
-"use client";
-import { ReactNode, useEffect, useState } from "react";
-import { SvgSpinner } from "app/icons/icons";
-import { useSessionStore } from "app/stores/globalStore";
-import { useToken } from "app/utils/token";
-import useRoutes from "app/utils/useRoutes";
-import { useRouter } from "next/navigation";
+'use client';
+import { ReactNode, useEffect, useState } from 'react';
+import { SvgSpinner } from 'app/icons/icons';
+import { useSessionStore } from 'app/stores/globalStore';
+import { useToken } from 'app/utils/token';
+import useRoutes from 'app/utils/useRoutes';
+import { useRouter } from 'next/navigation';
 
 interface LoginCheckerProps {
   children: ReactNode;
@@ -19,7 +19,7 @@ const LoginChecker: React.FC<LoginCheckerProps> = ({
   const ROUTES = useRoutes();
   const [isLoaded, setIsLoaded] = useState(false);
   const { isValidToken, clearUserLoginResponse } = useToken();
-  const { loginUser } = useSessionStore((state) => state);
+  const { loginUser } = useSessionStore(state => state);
   const [loginAttempts, setLoginAttempts] = useState(0);
 
   useEffect(() => {
@@ -36,8 +36,8 @@ const LoginChecker: React.FC<LoginCheckerProps> = ({
           return;
         }
       }
-      setIsLoaded(true);
     }
+    setIsLoaded(true);
 
     const loginTimer = setTimeout(() => {
       if (loginUser !== undefined || loginAttempts > 1) {
@@ -50,12 +50,7 @@ const LoginChecker: React.FC<LoginCheckerProps> = ({
   }, [loginUser, loginAttempts]);
 
   if (isLoaded) return <>{children}</>;
-  else
-    return (
-      <div className="items-center justify-center flex-col p-4  h-[800px]">
-        <SvgSpinner className="w-full justify-center" />
-      </div>
-    );
+  return <></>;
 };
 
 export default LoginChecker;

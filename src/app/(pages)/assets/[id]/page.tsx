@@ -22,6 +22,7 @@ import ca from 'date-fns/locale/ca';
 import AssetForm from '../components/assetForm';
 import { OriginWorkOrder } from 'app/interfaces/workOrder';
 import { useSessionStore } from 'app/stores/globalStore';
+import { UserType } from 'app/interfaces/User';
 
 interface AssetCosts {
   totalCosts: number;
@@ -166,7 +167,10 @@ export default function AssetDetailsPage({
         assetId: id,
         startDateTime: startDate!,
         endDateTime: endDate!,
-        userType: loginUser!.userType,
+        userType:
+          loginUser?.userType != undefined
+            ? loginUser.userType
+            : UserType.Maintenance,
         originWorkOrder: OriginWorkOrder.Maintenance,
       });
       return workOrders;

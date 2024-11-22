@@ -1,14 +1,14 @@
-import { useState } from "react";
-import { SvgDelete, SvgDetail, SvgSpinner } from "app/icons/icons";
-import { LoginUser, UserPermission } from "app/interfaces/User";
-import { LoadingState } from "app/types/loadingState";
-import Link from "next/link";
+import { useState } from 'react';
+import { SvgDelete, SvgDetail, SvgSpinner } from 'app/icons/icons';
+import { LoginUser, UserPermission } from 'app/interfaces/User';
+import { LoadingState } from 'app/types/loadingState';
+import Link from 'next/link';
 
-import { ButtonTypesTable } from "../../DataTable";
-import { TableButtons } from "../../interface/interfaceTable";
-import { EntityTable } from "../../interface/tableEntitys";
-import { PreventiveButtons } from "./PreventiveButtons";
-import WorkOrderOperationsInTable from "./WorkOrderOperationsInTable";
+import { ButtonTypesTable } from '../../DataTable';
+import { TableButtons } from '../../interface/interfaceTable';
+import { EntityTable } from '../../interface/tableEntitys';
+import { PreventiveButtons } from './PreventiveButtons';
+import WorkOrderOperationsInTable from './WorkOrderOperationsInTable';
 
 interface HeadTableActionsProps {
   tableButtons: TableButtons;
@@ -49,7 +49,7 @@ export const TableButtonsComponent = ({
   pathDetail,
   onDelete,
 }: TableButtonsComponentProps) => {
-  let colorRow = "";
+  let colorRow = '';
   if (item.colorRow) {
     colorRow = item.colorRow;
   }
@@ -68,7 +68,7 @@ export const TableButtonsComponent = ({
           />
         )}
         {entity == EntityTable.PREVENTIVE && (
-          <PreventiveButtons preventive={item} userId={loginUser!.agentId} />
+          <PreventiveButtons preventive={item} userId={loginUser?.agentId} />
         )}
         {EntityTable.WORKORDER == entity && (
           <>
@@ -109,7 +109,7 @@ export const TableButtonsComponentStandard = ({
     isLoading: boolean
   ) => {
     const loadingKey = `${id}_${buttonType}`;
-    setLoadingState((prevLoadingState) => ({
+    setLoadingState(prevLoadingState => ({
       ...prevLoadingState,
       [loadingKey]: isLoading,
     }));
@@ -132,14 +132,14 @@ export const TableButtonsComponentStandard = ({
       {canEdit && (
         <>
           {tableButtons.edit && (
-            <Link href={pathDetail} onClick={(e) => {}}>
+            <Link href={pathDetail} onClick={e => {}}>
               <p
                 className="flex items-center font-medium text-white rounded-xl bg-okron-btEdit hover:bg-okron-btEditHover"
                 onClick={() => {
                   toggleLoading(pathDetail, ButtonTypesTable.Edit, true);
                 }}
               >
-                {loadingState[pathDetail + "_" + ButtonTypesTable.Edit] ? (
+                {loadingState[pathDetail + '_' + ButtonTypesTable.Edit] ? (
                   <SvgSpinner className="p-2" />
                 ) : (
                   <SvgDetail className="p-2" />
@@ -152,7 +152,7 @@ export const TableButtonsComponentStandard = ({
               className="flex items-center text-white rounded-xl bg-okron-btDelete hover:bg-okron-btDeleteHover hover:cursor-pointer"
               onClick={() => handleDelete(item.id)}
             >
-              {loadingState[pathDetail + "_" + ButtonTypesTable.Delete] ? (
+              {loadingState[pathDetail + '_' + ButtonTypesTable.Delete] ? (
                 <SvgSpinner className="p-2" />
               ) : (
                 <SvgDelete className="p-2" />

@@ -30,6 +30,8 @@ import ca from 'date-fns/locale/ca';
 import { Button } from 'designSystem/Button/Buttons';
 
 import FinalizeWorkOrdersDaysBefore from './FinalizeWorkOrdersDaysBefore';
+import { UserType } from 'app/interfaces/User';
+import { baseColumns, columnsTicket } from './utilsWorkOrderTable';
 
 interface WorkOrderTableProps {
   enableFilterAssets?: boolean;
@@ -43,50 +45,6 @@ interface WorkOrderTableProps {
   workOrderType?: WorkOrderType;
   refresh?: boolean;
 }
-
-const columns: Column[] = [
-  {
-    label: 'ID',
-    key: 'id',
-    format: ColumnFormat.TEXT,
-  },
-  {
-    label: 'Num Sèrie',
-    key: 'code',
-    format: ColumnFormat.TEXT,
-  },
-  {
-    label: 'Descripció',
-    key: 'description',
-    format: ColumnFormat.TEXT,
-  },
-  {
-    label: 'Tipus',
-    key: 'workOrderType',
-    format: ColumnFormat.WORKORDERTYPE,
-  },
-  {
-    label: 'Data Inici',
-    key: 'startTime',
-    format: ColumnFormat.DATETIME,
-  },
-  {
-    label: 'Estat',
-    key: 'stateWorkOrder',
-    format: ColumnFormat.STATEWORKORDER,
-  },
-  {
-    label: 'Equip',
-    key: 'asset.description',
-    format: ColumnFormat.TEXT,
-  },
-  {
-    label: 'Operaris',
-    key: 'operatorsNames',
-    format: ColumnFormat.TEXT,
-    width: 'w-1/4',
-  },
-];
 
 interface ResponseMessage {
   message: string;
@@ -201,7 +159,10 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
         operatorId: operatorId || '',
         startDateTime: startDate!,
         endDateTime: endDate!,
-        originWorkOrder: OriginWorkOrder.Maintenance,
+        originWorkOrder:
+          loginUser?.userType == UserType.Maintenance
+            ? OriginWorkOrder.Maintenance
+            : OriginWorkOrder.Production,
         userType: loginUser!.userType,
       };
     } catch (error) {
@@ -546,18 +507,24 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     <>
       <div className="flex flex-col gap-4">
         {enableFilters && renderFilterWorkOrders()}
-        <DataTable
-          columns={columns}
-          data={filteredWorkOrders}
-          tableButtons={tableButtons}
-          entity={EntityTable.WORKORDER}
-          onDelete={handleDeleteOrder}
-          enableFilterActive={false}
-          enableCheckbox={
-            operatorLogged?.operatorLoggedType == OperatorType.Quality
-          }
-          onChecked={handleOnChecked}
-        />
+        {filteredWorkOrders.length > 0 && (
+          <DataTable
+            columns={
+              loginUser?.userType == UserType.Maintenance
+                ? baseColumns
+                : columnsTicket
+            }
+            data={filteredWorkOrders}
+            tableButtons={tableButtons}
+            entity={EntityTable.WORKORDER}
+            onDelete={handleDeleteOrder}
+            enableFilterActive={false}
+            enableCheckbox={
+              operatorLogged?.operatorLoggedType == OperatorType.Quality
+            }
+            onChecked={handleOnChecked}
+          />
+        )}
       </div>
       {filteredWorkOrders.length > 0 &&
         operatorLogged?.operatorLoggedType == OperatorType.Quality && (

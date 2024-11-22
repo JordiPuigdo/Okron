@@ -31,7 +31,8 @@ export interface WorkOrder extends BaseModel {
   operatorsNames?: string;
   originWorkOrder?: OriginWorkOrder;
   downtimeReason?: DowntimesReasons;
-  downtimes?: Downtimes;
+  downtimes?: Downtimes[];
+  originalWorkOrderId?: string;
 }
 
 export default WorkOrder;
@@ -51,6 +52,7 @@ export enum StateWorkOrder {
   Requested,
   PendingToValidate,
   Open,
+  Closed,
 }
 
 export enum OriginWorkOrder {
@@ -93,6 +95,8 @@ export interface CreateWorkOrderRequest {
   operatorCreatorId: string;
   originWorkOrder: UserType;
   downtimeReasonId?: string;
+  originalWorkOrderId?: string;
+  originalWorkOrderCode?: string;
 }
 
 export interface AddWorkOrderOperatorTimes {
@@ -135,6 +139,7 @@ export enum WorkOrderType {
   Corrective = 0,
   Preventive = 1,
   Predicitve = 2,
+  Ticket = 3,
 }
 
 export interface SaveInspectionResultPointRequest {

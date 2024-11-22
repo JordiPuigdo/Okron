@@ -1,32 +1,30 @@
-import Container from "components/layout/Container";
-import MainLayout from "components/layout/MainLayout";
+'use client';
 
-import WorkOrderTable from "./components/WorkOrderTable";
+import Container from 'components/layout/Container';
+import MainLayout from 'components/layout/MainLayout';
+
+import WorkOrderTable from './components/WorkOrderTable';
+import { SvgMachines } from 'app/icons/icons';
+import { useSessionStore } from 'app/stores/globalStore';
+import { UserType } from 'app/interfaces/User';
 
 export default function WorkOrdersPage() {
   const renderHeader = () => {
+    const { loginUser } = useSessionStore(state => state);
+    const name =
+      loginUser?.userType == UserType.Maintenance
+        ? 'Ordres de treball'
+        : 'Tiquets';
     return (
-      <div className="flex px-4 sm:px-12 items-center flex-col sm:flex-row mb-8">
-        <div className="cursor-pointer mb-4 sm:mb-0">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            className="w-6 h-6 inline-block mr-2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
+      <div className="flex w-full">
+        <div className="w-full flex flex-col gap-2 items">
+          <h2 className="text-2xl font-bold text-black flex gap-2">
+            <SvgMachines />
+            {name}
+          </h2>
+          <span className="text-l">Inici - Llistat de {name}</span>
         </div>
-
-        <h2 className="text-2xl font-bold text-black mx-auto">
-          Històric Ordres de treball
-        </h2>
+        <div className="w-full flex justify-end items-center"></div>
       </div>
     );
   };
@@ -34,10 +32,8 @@ export default function WorkOrdersPage() {
   return (
     <MainLayout>
       <Container>
-        <div className="p-2">
-          <p>Menu {">"} Ordres de treball</p>
-        </div>
-        <div className="mt-2">
+        {renderHeader()}
+        <div className="mt-4">
           <WorkOrderTable
             enableFilterAssets={true}
             enableFilters={true}
