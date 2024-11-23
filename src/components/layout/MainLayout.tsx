@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import Loader from 'components/Loader/loader';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 
 import Header from './Header';
 import SideNav from './SideNav';
@@ -15,13 +14,22 @@ export default function MainLayout({
   children: React.ReactNode;
   hideHeader?: boolean;
 }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const savedMenuOpen = localStorage.getItem('menuOpen') === 'true';
+    setMenuOpen(savedMenuOpen);
+  }, []);
+
   const toggleMenu = () => {
-    setMenuOpen(prevState => !prevState);
+    setMenuOpen(prevState => {
+      const newState = !prevState;
+      localStorage.setItem('menuOpen', String(newState));
+      return newState;
+    });
   };
 
-  const [loading, setLoading] = useState<boolean>(true);
   useEffect(() => {
     setTimeout(() => setLoading(false), 1000);
   }, []);
@@ -32,8 +40,8 @@ export default function MainLayout({
     <div className="min-h-screen flex flex-col">
       <div className="flex flex-1">
         <div
-          className={`fixed top-0 left-0 h-full bg-white text-white transition-all duration-400 ease-in-out z-50 pt-6 pl-2 transform ${
-            menuOpen ? 'w-60' : !menuOpen && pathname === '/' ? 'w-0' : 'w-16'
+          className={`fixed mt-2 top-0 left-0 h-full bg-white text-white transition-all duration-400 ease-in-out z-50 pt-6 ${
+            menuOpen ? 'pl-3 w-60' : 'w-16'
           }`}
         >
           {!hideHeader && (

@@ -118,7 +118,7 @@ const GeneratePreventive = () => {
         <div className="flex items-center">
           <Button
             onClick={generateWorkOrders}
-            customStyles="bg-white border-okron-main text-okron-main text-sm rounded-md font-semibold hover:bg-[#E7DDFC] hover:border-okron-main border-2"
+            customStyles="bg-white border-okron-main text-okron-main text-sm sm:text-xs md:text-sm lg:text-base rounded-md font-semibold hover:bg-[#E7DDFC] hover:border-okron-main border-2 w-full overflow-hidden text-ellipsis whitespace-nowrap"
           >
             Generar Revisions {formatDate(new Date(), false, false)}
             {isLoading && <SvgSpinner className="w-6 h-6" />}

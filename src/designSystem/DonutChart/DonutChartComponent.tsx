@@ -24,7 +24,8 @@ export const DonutChartComponent = ({
                 className={`inline-block w-2 h-2 rounded-full ${
                   item.workOrderType === WorkOrderType.Preventive
                     ? 'bg-blue-500'
-                    : 'bg-red-500'
+                    : item.workOrderType === WorkOrderType.Corrective &&
+                      'bg-red-500'
                 }`}
               ></span>
               <span className="font-sm text-gray-500 text-sm">
