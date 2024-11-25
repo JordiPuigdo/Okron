@@ -12,26 +12,34 @@ import DownTimeReasonsConfigured from './components/downtimeConfigured';
 import { useCreateDowntimeReason } from './components/downtimeReasons';
 
 export interface DowntimesReasonsProps {
-  id: string;
+  assetId?: string;
+  machineId?: string;
 }
 
-export default function Downtimes({ id }: DowntimesReasonsProps) {
+export default function Downtimes({
+  assetId = '',
+  machineId = '',
+}: DowntimesReasonsProps) {
   return (
     <div className="w-full bg-white shadow-lg rounded-lg p-4">
       <div className="flex flex-col gap-2">
         <div className="w-full">
           <span className="font-bold">Nou Motiu Aturada</span>
-          <CreateDowntimeReasons id={id} />
+          <CreateDowntimeReasons assetId={assetId} machineId={machineId} />
         </div>
       </div>
     </div>
   );
 }
 
-const CreateDowntimeReasons: React.FC<DowntimesReasonsProps> = ({ id }) => {
+const CreateDowntimeReasons: React.FC<DowntimesReasonsProps> = ({
+  assetId,
+  machineId,
+}) => {
   const { formValues, isSubmitting, handleChange, handleSubmit } =
     useCreateDowntimeReason({
-      machineId: id,
+      machineId: machineId,
+      assetId: assetId,
       onSuccess: downtime => setNewDowntimeReason(downtime),
       onError: error => alert(`Error: ${error.message}`),
     });
@@ -99,7 +107,8 @@ const CreateDowntimeReasons: React.FC<DowntimesReasonsProps> = ({ id }) => {
       <div className="w-full py-4 border-t-2 border-gray-200">
         <span className="font-bold py-4">Motius Aturada Configurats</span>
         <DownTimeReasonsConfigured
-          machineId={id}
+          machineId={machineId}
+          asssetId={assetId}
           addDowntimeReason={newDowntimeReason}
         />
       </div>

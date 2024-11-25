@@ -105,6 +105,16 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
   const [firstLoad, setFirstLoad] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
 
+  const validStates: StateWorkOrder[] =
+    loginUser?.userType === UserType.Production
+      ? [StateWorkOrder.Open, StateWorkOrder.Closed]
+      : [
+          StateWorkOrder.Waiting,
+          StateWorkOrder.Paused,
+          StateWorkOrder.OnGoing,
+          StateWorkOrder.PendingToValidate,
+          StateWorkOrder.Finished,
+        ];
   useEffect(() => {
     const fetchAssets = async () => {
       try {
@@ -280,7 +290,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
               onChange={handleStateFilterChange}
             >
               <option value="">-</option>
-              {Object.values(StateWorkOrder)
+              {Object.values(validStates)
                 .filter(value => typeof value === 'number' && value !== 4)
                 .map(state => (
                   <option
@@ -293,66 +303,72 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
                   </option>
                 ))}
             </select>
-            <span
-              className={`text-white rounded-full p-3 w-full text-center bg-okron-corrective font-semibold hover:cursor-pointer`}
-              onClick={() => {
-                if (
-                  selectedTypeFilter == WorkOrderType.Corrective ||
-                  filterWorkOrders?.workOrderType == WorkOrderType.Corrective
-                ) {
-                  setSelectedTypeFilter(undefined);
-                  setFilterWorkOrders({
-                    startDateTime: startDate!,
-                    endDateTime: endDate!,
-                    workOrderType: undefined,
-                  });
-                  return;
-                }
-                setSelectedTypeFilter(WorkOrderType.Corrective);
-                setFilterWorkOrders({
-                  startDateTime: startDate!,
-                  endDateTime: endDate!,
-                  workOrderType: WorkOrderType.Corrective,
-                });
-              }}
-            >
-              Correctius:{' '}
-              {
-                filteredWorkOrders.filter(
-                  x => x.workOrderType == WorkOrderType.Corrective
-                ).length
-              }
-            </span>
-            <span
-              className="text-white rounded-full p-3 w-full text-center bg-okron-preventive font-semibold hover:cursor-pointer"
-              onClick={() => {
-                if (
-                  selectedTypeFilter == WorkOrderType.Preventive ||
-                  filterWorkOrders?.workOrderType == WorkOrderType.Preventive
-                ) {
-                  setSelectedTypeFilter(undefined);
-                  setFilterWorkOrders({
-                    startDateTime: startDate!,
-                    endDateTime: endDate!,
-                    workOrderType: undefined,
-                  });
-                  return;
-                }
-                setSelectedTypeFilter(WorkOrderType.Preventive);
-                setFilterWorkOrders({
-                  startDateTime: startDate!,
-                  endDateTime: endDate!,
-                  workOrderType: WorkOrderType.Preventive,
-                });
-              }}
-            >
-              Preventius:{' '}
-              {
-                filteredWorkOrders.filter(
-                  x => x.workOrderType == WorkOrderType.Preventive
-                ).length
-              }
-            </span>
+            {loginUser?.userType == UserType.Maintenance && (
+              <>
+                <span
+                  className={`text-white rounded-full p-3 w-full text-center bg-okron-corrective font-semibold hover:cursor-pointer`}
+                  onClick={() => {
+                    if (
+                      selectedTypeFilter == WorkOrderType.Corrective ||
+                      filterWorkOrders?.workOrderType ==
+                        WorkOrderType.Corrective
+                    ) {
+                      setSelectedTypeFilter(undefined);
+                      setFilterWorkOrders({
+                        startDateTime: startDate!,
+                        endDateTime: endDate!,
+                        workOrderType: undefined,
+                      });
+                      return;
+                    }
+                    setSelectedTypeFilter(WorkOrderType.Corrective);
+                    setFilterWorkOrders({
+                      startDateTime: startDate!,
+                      endDateTime: endDate!,
+                      workOrderType: WorkOrderType.Corrective,
+                    });
+                  }}
+                >
+                  Correctius:{' '}
+                  {
+                    filteredWorkOrders.filter(
+                      x => x.workOrderType == WorkOrderType.Corrective
+                    ).length
+                  }
+                </span>
+                <span
+                  className="text-white rounded-full p-3 w-full text-center bg-okron-preventive font-semibold hover:cursor-pointer"
+                  onClick={() => {
+                    if (
+                      selectedTypeFilter == WorkOrderType.Preventive ||
+                      filterWorkOrders?.workOrderType ==
+                        WorkOrderType.Preventive
+                    ) {
+                      setSelectedTypeFilter(undefined);
+                      setFilterWorkOrders({
+                        startDateTime: startDate!,
+                        endDateTime: endDate!,
+                        workOrderType: undefined,
+                      });
+                      return;
+                    }
+                    setSelectedTypeFilter(WorkOrderType.Preventive);
+                    setFilterWorkOrders({
+                      startDateTime: startDate!,
+                      endDateTime: endDate!,
+                      workOrderType: WorkOrderType.Preventive,
+                    });
+                  }}
+                >
+                  Preventius:{' '}
+                  {
+                    filteredWorkOrders.filter(
+                      x => x.workOrderType == WorkOrderType.Preventive
+                    ).length
+                  }
+                </span>
+              </>
+            )}
           </div>
         )}
       </div>

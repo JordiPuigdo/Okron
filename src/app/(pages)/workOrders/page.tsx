@@ -9,8 +9,8 @@ import { useSessionStore } from 'app/stores/globalStore';
 import { UserType } from 'app/interfaces/User';
 
 export default function WorkOrdersPage() {
+  const { loginUser } = useSessionStore(state => state);
   const renderHeader = () => {
-    const { loginUser } = useSessionStore(state => state);
     const name =
       loginUser?.userType == UserType.Maintenance
         ? 'Ordres de treball'
@@ -24,7 +24,6 @@ export default function WorkOrdersPage() {
           </h2>
           <span className="text-l">Inici - Llistat de {name}</span>
         </div>
-        <div className="w-full flex justify-end items-center"></div>
       </div>
     );
   };
@@ -39,7 +38,9 @@ export default function WorkOrdersPage() {
             enableFilters={true}
             enableEdit={true}
             enableDelete={true}
-            enableFinalizeWorkOrdersDayBefore={true}
+            enableFinalizeWorkOrdersDayBefore={
+              loginUser?.userType == UserType.Maintenance ? true : false
+            }
           />
         </div>
       </Container>

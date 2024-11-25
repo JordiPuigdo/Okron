@@ -27,7 +27,8 @@ export enum DowntimesReasonsType {
 
 export interface DowntimesReasonsRequest {
   description: string;
-  machineId: string;
+  machineId?: string;
+  assetId?: string;
   downTimeType: DowntimesReasonsType;
 }
 

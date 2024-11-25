@@ -73,7 +73,7 @@ export default function EditMachinePage({
                 throw new Error('Function not implemented.');
               }}
             />
-            <Downtimes id={machineData.id} />
+            <Downtimes machineId={machineData.id} />
           </div>
         )}
       </Container>

@@ -10,12 +10,14 @@ import DowntimesService from 'app/services/downtimesService';
 import { translateDowntimeReasonType } from 'app/utils/utils';
 
 interface DownTimeReasonsConfiguredProps {
-  machineId: string;
+  machineId?: string;
+  asssetId?: string;
   addDowntimeReason: DowntimesReasons | null;
 }
 
 const DownTimeReasonsConfigured: React.FC<DownTimeReasonsConfiguredProps> = ({
-  machineId,
+  machineId = '',
+  asssetId = '',
   addDowntimeReason,
 }) => {
   const [downtimeReasons, setDowntimeReasons] = useState<DowntimesReasons[]>(
@@ -38,7 +40,7 @@ const DownTimeReasonsConfigured: React.FC<DownTimeReasonsConfiguredProps> = ({
       try {
         const data =
           await downtimeReasonsService.getDowntimesReasonsByMachineId(
-            machineId
+            machineId != '' ? machineId : asssetId
           );
         if (data) setDowntimeReasons(data);
       } catch (err) {

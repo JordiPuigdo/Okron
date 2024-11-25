@@ -6,12 +6,14 @@ import {
 import DowntimesService from 'app/services/downtimesService';
 
 interface UseCreateDowntimeReasonProps {
-  machineId: string;
+  machineId?: string;
+  assetId?: string;
   onSuccess?: (downtime: DowntimesReasons) => void;
   onError?: (error: Error) => void;
 }
 
 export const useCreateDowntimeReason = ({
+  assetId,
   machineId,
   onSuccess,
   onError,
@@ -21,6 +23,7 @@ export const useCreateDowntimeReason = ({
   );
 
   const [formValues, setFormValues] = useState<DowntimesReasonsRequest>({
+    assetId: assetId,
     machineId: machineId,
     description: '',
     downTimeType: 0,

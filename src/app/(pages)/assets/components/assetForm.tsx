@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { SvgSpinner } from "app/icons/icons";
-import { Asset } from "app/interfaces/Asset";
-import useRoutes from "app/utils/useRoutes";
-import { useRouter } from "next/navigation";
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { SvgSpinner } from 'app/icons/icons';
+import { Asset } from 'app/interfaces/Asset';
+import useRoutes from 'app/utils/useRoutes';
+import { useRouter } from 'next/navigation';
 
 interface AssetFormProps {
   id: string;
@@ -43,13 +43,10 @@ const AssetForm: React.FC<AssetFormProps> = ({
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <div className="mb-4">
-        <p className="font-semibold">Ruta: {assetData?.path}</p>
-      </div>
-      <div className="mb-4">
         <label className="block text-gray-700 mb-2">Codi:</label>
         <input
           type="text"
-          {...register("code", { required: true })}
+          {...register('code', { required: true })}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
         />
       </div>
@@ -57,7 +54,7 @@ const AssetForm: React.FC<AssetFormProps> = ({
         <label className="block text-gray-700 mb-2">Descripció:</label>
         <input
           type="text"
-          {...register("description", { required: true })}
+          {...register('description', { required: true })}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
         />
       </div>
@@ -68,7 +65,7 @@ const AssetForm: React.FC<AssetFormProps> = ({
         <input
           type="checkbox"
           defaultChecked={assetData?.createWorkOrder || true}
-          {...register("createWorkOrder")}
+          {...register('createWorkOrder')}
           className="px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
         />
       </div>
@@ -77,7 +74,7 @@ const AssetForm: React.FC<AssetFormProps> = ({
         <input
           type="checkbox"
           defaultChecked={assetData?.active || true}
-          {...register("active")}
+          {...register('active')}
           className="px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
         />
       </div>
@@ -87,7 +84,7 @@ const AssetForm: React.FC<AssetFormProps> = ({
           disabled={loading}
           className="flex items-center justify-center bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300 ease-in-out"
         >
-          {loading ? <SvgSpinner /> : id !== "0" ? "Actualitzar" : "Afegir"}
+          {loading ? <SvgSpinner /> : id !== '0' ? 'Actualitzar' : 'Afegir'}
         </button>
         <button
           type="button"
@@ -97,7 +94,7 @@ const AssetForm: React.FC<AssetFormProps> = ({
             router.push(ROUTES.configuration.assets);
           }}
         >
-          {loading ? <SvgSpinner /> : "Cancelar"}
+          {loading ? <SvgSpinner /> : 'Cancelar'}
         </button>
       </div>
     </form>

@@ -261,8 +261,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
       refSupplier: refSupplier,
       ubication: ubication,
     });*/
-    const test = window.document.getElementById('filter-code');
-    debugger;
+
     const x: SparePartDetailRequest = {
       assetId: assetId,
       id: sparePartId,

@@ -1,34 +1,26 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import DatePicker from 'react-datepicker';
+
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@tremor/react';
 import PreventiveTable from 'app/(pages)/preventive/preventiveTable/preventiveTable';
 import SparePartTable from 'app/(pages)/spareParts/components/SparePartTable';
 import WorkOrderTable from 'app/(pages)/workOrders/components/WorkOrderTable';
-import { SvgSpinner } from 'app/icons/icons';
+import { SvgMachines, SvgSpinner } from 'app/icons/icons';
 import {
   Asset,
   CreateAssetRequest,
   UpdateAssetRequest,
 } from 'app/interfaces/Asset';
 import AssetService from 'app/services/assetService';
-import WorkOrderService from 'app/services/workOrderService';
-import { CostsObject } from 'components/Costs/CostsObject';
+
 import Container from 'components/layout/Container';
 import MainLayout from 'components/layout/MainLayout';
-import ca from 'date-fns/locale/ca';
 
 import AssetForm from '../components/assetForm';
-import { OriginWorkOrder } from 'app/interfaces/workOrder';
 import { useSessionStore } from 'app/stores/globalStore';
-import { UserType } from 'app/interfaces/User';
-
-interface AssetCosts {
-  totalCosts: number;
-  operatorCosts: number;
-  sparePartCosts: number;
-}
+import { CostsObjectComponent } from 'components/Costs/CostsObject';
+import Downtimes from 'app/(pages)/machines/downtimes/downtime';
 
 export default function AssetDetailsPage({
   params,
@@ -44,16 +36,7 @@ export default function AssetDetailsPage({
   const [levelGetted, setLevelGetted] = useState<number | null>(null);
   const [message, setMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const workOrderService = new WorkOrderService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ''
-  );
-  const [assetCosts, setAssetCosts] = useState<AssetCosts>({
-    totalCosts: 0,
-    operatorCosts: 0,
-    sparePartCosts: 0,
-  });
-  const [startDate, setStartDate] = useState<Date | null>(new Date());
-  const [endDate, setEndDate] = useState<Date | null>(new Date());
+
   const { loginUser } = useSessionStore();
 
   useEffect(() => {
@@ -137,47 +120,21 @@ export default function AssetDetailsPage({
     }
   };
 
-  async function caculateAssetCosts() {
-    const workOrders = await getWorkOrders();
-    const totalCosts: AssetCosts = {
-      totalCosts: 0,
-      operatorCosts: 0,
-      sparePartCosts: 0,
-    };
-    workOrders?.forEach(workOrder => {
-      const operatorCosts = workOrder.workOrderOperatorTimes?.reduce(
-        (acc, x) => acc + x.operator.priceHour,
-        0
-      );
-      const sparePartCosts = workOrder.workOrderSpareParts?.reduce(
-        (acc, x) => acc + x.sparePart.price,
-        0
-      );
-      totalCosts.operatorCosts += operatorCosts || 0;
-      totalCosts.sparePartCosts += sparePartCosts || 0;
-      totalCosts.totalCosts += (operatorCosts || 0) + (sparePartCosts || 0);
-    });
-
-    setAssetCosts(totalCosts);
-  }
-
-  async function getWorkOrders() {
-    try {
-      const workOrders = await workOrderService.getWorkOrdersWithFilters({
-        assetId: id,
-        startDateTime: startDate!,
-        endDateTime: endDate!,
-        userType:
-          loginUser?.userType != undefined
-            ? loginUser.userType
-            : UserType.Maintenance,
-        originWorkOrder: OriginWorkOrder.Maintenance,
-      });
-      return workOrders;
-    } catch (error) {
-      console.error('Error fetching work orders:', error);
-    }
-  }
+  const renderHeader = () => {
+    return (
+      <div className="flex w-full py-4">
+        <div className="w-full flex flex-col gap-2 items">
+          <h2 className="text-2xl font-bold text-black flex gap-2">
+            <SvgMachines />
+            {currentAsset?.path}
+          </h2>
+          <span className="text-l">
+            Equip: {currentAsset?.code} - {currentAsset?.description}
+          </span>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <MainLayout>
@@ -186,46 +143,27 @@ export default function AssetDetailsPage({
           <SvgSpinner className="items-center justify-center" />
         ) : (
           <>
-            <div className="p-4 bg-white shadow-md rounded-md w-full">
-              <div className="flex flex-row justify-start gap-12">
-                <AssetForm
-                  id={id}
-                  loading={loading}
-                  assetData={currentAsset != null ? currentAsset : undefined}
-                  level={levelGetted!}
-                  parentId={parentId != null ? parentId : ''}
-                  onSubmit={onSubmit}
-                />
-                <div className="flex flex-col gap-5">
-                  <div className="flex flex-row items-center gap-4">
-                    <span className="font-semibold">Costos entre dates</span>
-                    <DatePicker
-                      id="startDate"
-                      selected={startDate}
-                      onChange={(date: Date) => setStartDate(date)}
-                      dateFormat="dd/MM/yyyy"
-                      locale={ca}
-                      className="p-3 border border-gray-300 rounded-md text-sm"
-                    />
-                    <DatePicker
-                      id="endDate"
-                      selected={endDate}
-                      onChange={(date: Date) => setEndDate(date)}
-                      dateFormat="dd/MM/yyyy"
-                      locale={ca}
-                      className="p-3 border border-gray-300 rounded-md text-sm"
-                    />
-                    <button
-                      type="button"
-                      className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300 ease-in-out"
-                      onClick={caculateAssetCosts}
-                    >
-                      Calcular
-                    </button>
-                  </div>
-                  <CostsObject {...assetCosts} />
+            {renderHeader()}
+            <div className="flex flex-row gap-5">
+              <div className="w-full flex flex-col gap-5">
+                <div className="flex justify-start gap-12 bg-white shadow-md rounded-md w-full p-4">
+                  <AssetForm
+                    id={id}
+                    loading={loading}
+                    assetData={currentAsset != null ? currentAsset : undefined}
+                    level={levelGetted!}
+                    parentId={parentId != null ? parentId : ''}
+                    onSubmit={onSubmit}
+                  />
+                </div>
+                <div className="w-full flex flex-col gap-5 bg-white shadow-md rounded-md p-4">
+                  <CostsObjectComponent assetId={id} loginUser={loginUser!} />
                 </div>
               </div>
+              <div>
+                <Downtimes assetId={id} />
+              </div>
+
               {message && (
                 <div className="bg-green-200 text-green-800 p-4 rounded my-4">
                   {message}
