@@ -41,7 +41,7 @@ export default function MainLayout({
       <div className="flex flex-1">
         <div
           className={`fixed mt-2 top-0 left-0 h-full bg-white text-white transition-all duration-400 ease-in-out z-50 pt-6 ${
-            menuOpen ? 'pl-3 w-60' : 'w-16'
+            menuOpen ? 'pl-3 w-60' : !hideHeader && !menuOpen && 'w-16'
           }`}
         >
           {!hideHeader && (
