@@ -378,7 +378,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
 
   if (loginUser?.permission !== UserPermission.Administrator) return <></>;
   return (
-    <div className="flex flex-col w-full gap-4 p-2">
+    <div className="flex flex-col w-full gap-4">
       <div className="flex flex-col gap-4 w-full items-center p-2">
         <div className="flex justify-start w-full gap-2 py-4">
           <div className="flex justify-center items-center">

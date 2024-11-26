@@ -27,7 +27,7 @@ const SideNav: React.FC<SideNavProps> = ({ menuOpen }) => {
 
   return (
     <div className="flex flex-col md:px-4 h-full">
-      <div className="pt-14 flex flex-col flex-grow">
+      <div className="pt-16 flex flex-col flex-grow">
         {otherItems.map((item, idx) => {
           return (
             item.permission.includes(loginPermission) &&
@@ -153,7 +153,10 @@ const MenuItem = ({
 
                         {menuOpen && subItem.title}
                         {isLoading[subItem.key] && (
-                          <SvgSpinner style={{ marginLeft: '0.5rem' }} />
+                          <SvgSpinner
+                            style={{ marginLeft: '0.5rem' }}
+                            className="w-5 h-5 text-okron-main"
+                          />
                         )}
                       </span>
                     </Link>
@@ -165,10 +168,14 @@ const MenuItem = ({
         ) : (
           <Link href={item.path}>
             <span
-              className={`font-sm text-l flex text-gray-700 flex gap-2 p-1 w-full hover:text-okron-main rounded-md items-center ${
+              className={`font-sm text-l flex text-gray-700  gap-2 p-1 w-full hover:text-okron-main rounded-md items-center ${
                 isActive ? 'bg-[#F2F2F2] text-okron-main' : ''
               }`}
               onClick={() => {
+                if (isActive) {
+                  setSubMenuOpen(false);
+                  return;
+                }
                 setIsLoading(prevLoading => ({
                   ...prevLoading,
                   [item.key]: true,
@@ -185,6 +192,12 @@ const MenuItem = ({
                 />
               )}
               {menuOpen && item.title}
+              {isLoading[item.key] && (
+                <SvgSpinner
+                  style={{ marginLeft: '0.2rem' }}
+                  className="w-5 h-5 text-okron-main"
+                />
+              )}
             </span>
           </Link>
         )}
