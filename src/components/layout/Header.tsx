@@ -34,19 +34,19 @@ const Header: React.FC<Header> = ({ setOpenMenu }) => {
   }
 
   return (
-    <header className="flex items-center justify-between bg-white text-lg font-semibold text-white p-2 w-full sticky transition-all shadow-md">
-      <div className="flex items-center gap-3 pl-4">
+    <header className="flex items-center justify-between bg-white text-lg font-semibold text-white p-4 w-full sticky transition-all shadow-md">
+      <div className="flex items-center gap-3 pl-1">
         <button onClick={handleMenuClick}>
-          <SvgMenu />
+          <SvgMenu width={30} height={30} className="text-okron-main" />
         </button>
         <Link
-          className="flex items-center font-semibold text-lg text-gray-900 p-1 bg-white rounded-md"
+          className="hidden md:flex sm:flex items-center font-semibold text-lg text-gray-900 p-1 bg-white rounded-md"
           href={'/menu'}
         >
           <SvgLogo />
         </Link>
         <div className="flex items-center ml-6">
-          {pathname === '/menu' && <SignOperator />}
+          <SignOperator />
         </div>
       </div>
       <div className="flex items-center gap-4">

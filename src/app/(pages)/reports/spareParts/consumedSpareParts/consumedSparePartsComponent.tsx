@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import "react-datepicker/dist/react-datepicker.css";
+import 'react-datepicker/dist/react-datepicker.css';
 
-import { useState } from "react";
-import DatePicker from "react-datepicker";
-import { useSparePartsHook } from "app/hooks/useSparePartsHook";
-import { SvgSpinner } from "app/icons/icons";
-import ca from "date-fns/locale/ca";
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
-import { Button } from "designSystem/Button/Buttons";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import { useSparePartsHook } from 'app/hooks/useSparePartsHook';
+import { SvgSpinner } from 'app/icons/icons';
+import ca from 'date-fns/locale/ca';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import { Button } from 'designSystem/Button/Buttons';
+import { useRouter } from 'next/navigation';
 
-import SparePartBarchart from "./component/sparePartBarchart";
-import SparePartsConsumedReportTable from "./component/SparePartsConsumedReportTable";
+import SparePartBarchart from './component/sparePartBarchart';
+import SparePartsConsumedReportTable from './component/SparePartsConsumedReportTable';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -30,12 +30,12 @@ export default function ConsumedSparePartsComponent() {
 
   const { sparePartsConsumeds, isLoading, isError, reloadSparePartsConsumeds } =
     useSparePartsHook().fetchSparePartsConsumedsHook(
-      dayjs(from).format("YYYY-MM-DDTHH:mm:ss"),
-      dayjs(to).format("YYYY-MM-DDTHH:mm:ss")
+      dayjs(from).format('YYYY-MM-DDTHH:mm:ss'),
+      dayjs(to).format('YYYY-MM-DDTHH:mm:ss')
     );
 
   return (
-    <div>
+    <div className="flex flex-col p-2 my-2">
       <div className="flex flex-col gap-4 bg-white rounded-xl p-4 shadow-md">
         <div className="w-full flex flex-row text-xl font-semibold p-2 items-center border-b-2 border-gray-300">
           <div className="flex cursor-pointer " onClick={() => router.back()}>
@@ -61,14 +61,14 @@ export default function ConsumedSparePartsComponent() {
         <div className="flex gap-4">
           <DatePicker
             selected={from}
-            onChange={(e) => (e ? setFrom(e) : setFrom(new Date()))}
+            onChange={e => (e ? setFrom(e) : setFrom(new Date()))}
             locale={ca}
             dateFormat="dd/MM/yyyy"
             className="border border-gray-300 p-2 rounded-md mr-4 w-full"
           />
           <DatePicker
             selected={to}
-            onChange={(e) => (e ? setTo(e) : setTo(new Date()))}
+            onChange={e => (e ? setTo(e) : setTo(new Date()))}
             dateFormat="dd/MM/yyyy"
             locale={ca}
             className="border border-gray-300 p-2 rounded-md mr-4 w-full"

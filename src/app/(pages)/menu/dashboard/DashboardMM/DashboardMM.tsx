@@ -381,7 +381,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
 
   if (loginUser?.permission !== UserPermission.Administrator) return <></>;
   return (
-    <div className="flex flex-col w-full gap-4 p-2">
+    <div className="flex flex-col w-full gap-4">
       <div className="flex flex-col gap-4 w-full items-center p-2">
         <div className="flex justify-start w-full gap-2 py-4">
           <div className="flex justify-center items-center">
@@ -397,11 +397,11 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
               ))}
             </select>
           </div>
-          <div className="flex flex-col lg:flex-row lg:space-x-4 space-y-4 bg-white shadow-md rounded-lg p-4 w-full ml-0 lg:ml-10">
-            <div className="flex flex-col lg:flex-row lg:items-center w-full">
-              <span className="font-semibold lg:mr-2">Data:</span>
-              <span className="text-sm lg:text-base">
-                {selectedFilter == 0
+          <div className="flex flex-col lg:flex-row bg-white shadow-md rounded-lg p-4 w-full ml-0 lg:ml-10 space-y-4 lg:space-y-0 lg:divide-x-2 divide-gray-200">
+            <div className="flex items-center w-full lg:justify-start px-0 lg:pr-6">
+              <span className="text-gray-500 font-semibold">Data:</span>
+              <span className="font-bold ml-2">
+                {selectedFilter === 0
                   ? firstDayOfMonth.toLocaleDateString('en-GB')
                   : selectedFilter === 1
                   ? firstDayOfWeek.toLocaleDateString('en-GB')
@@ -409,17 +409,18 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
                 {' - '} {currentDate.toLocaleDateString('en-GB')}
               </span>
             </div>
-
-            <div className="flex flex-col lg:flex-row lg:items-center w-full">
-              <span className="font-semibold lg:mr-2">Minuts:</span>
-              <span className="text-sm lg:text-base">
+            <div className="flex items-center w-full lg:justify-start px-0 lg:px-6">
+              <span className="text-gray-500 font-semibold">Minuts:</span>
+              <span className="font-bold ml-2">
                 {Math.round(totalMinutes).toLocaleString().replace(',', '.')}
               </span>
             </div>
 
-            <div className="flex flex-col lg:flex-row lg:items-center w-full">
-              <span className="font-semibold lg:mr-2">Cost Material:</span>
-              <span className="text-sm lg:text-base">
+            <div className="flex items-center w-full lg:justify-start px-0 lg:pl-6">
+              <span className="text-gray-500 font-semibold">
+                Cost Material:
+              </span>
+              <span className="font-bold ml-2">
                 {Math.round(totalCosts).toLocaleString().replace(',', '.')} €
               </span>
             </div>
@@ -486,7 +487,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
                   <p className="text-lg lg:text-2xl mb-4 font-semibold text-left">
                     Top Recanvis més consumits
                   </p>
-                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                  <ul className="grid grid-rows-3 gap-4 w-full">
                     {chartConsumedSpareParts.map((consumedSparePart, index) => (
                       <li
                         key={index}

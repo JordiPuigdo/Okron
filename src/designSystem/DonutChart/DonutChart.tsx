@@ -57,8 +57,8 @@ const CustomLabel: React.FC<CustomLabelProps> = ({
 
 const DonutChart = ({ chartData }: DonutChartComponentProps) => {
   const data = [
-    { name: 'Preventiu', value: 23, color: '#4285F4', strokeWidth: 6 },
-    { name: 'Correctiu', value: 1, color: '#E14F62', strokeWidth: 15 },
+    { name: 'Preventiu', value: 0, color: '#4285F4', strokeWidth: 6 },
+    { name: 'Correctiu', value: 0, color: '#E14F62', strokeWidth: 15 },
   ];
 
   const updatedData = data.map(item => ({

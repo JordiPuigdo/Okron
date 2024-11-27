@@ -241,7 +241,7 @@ const GenerateCorrective: React.FC<GenerateCorrectiveProps> = ({
         />
       )}
       {renderHeader()}
-      <div className=" bg-white rounded-xl p-4 mt-6">
+      <div className=" bg-white rounded-xl p-4">
         <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
           <div className="flex flex-col sm:flex-row">
             <div className="mb-6 sm:w-1/2">
