@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { SvgSpinner } from 'app/icons/icons';
+import { SvgMachines, SvgSpinner } from 'app/icons/icons';
 import { User } from 'app/interfaces/User';
 import UserService from 'app/services/userService';
 import Container from 'components/layout/Container';
@@ -68,7 +68,8 @@ export default function UsersPage() {
   return (
     <MainLayout>
       <Container>
-        <>
+        <div>
+          {renderHeader()}
           {isLoading ? (
             <p>Carregant dades...</p>
           ) : (
@@ -81,8 +82,25 @@ export default function UsersPage() {
               />
             </div>
           )}
-        </>
+        </div>
       </Container>
     </MainLayout>
   );
 }
+
+const renderHeader = () => {
+  return (
+    <div className="flex flex-col p-2 my-2">
+      <div className="flex w-full">
+        <div className="w-full flex flex-col gap-2 items">
+          <h2 className="text-2xl font-bold text-black flex gap-2">
+            <SvgMachines />
+            Usuaris
+          </h2>
+          <span className="text-l">Inici - Llistat de Usuaris</span>
+        </div>
+        <div className="w-full flex justify-end items-center"></div>
+      </div>
+    </div>
+  );
+};
