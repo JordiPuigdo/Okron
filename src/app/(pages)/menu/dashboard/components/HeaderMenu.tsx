@@ -26,7 +26,7 @@ export const HeaderMenu = () => {
       {/* <div className="flex flex-row gap-4 bg-white p-4 rounded-xl">
         <FilterWOType onClick={handleFilterWOType} />
       </div> */}
-      <div>
+      <div className="pt-5">
         <WorkOrderComponent workOrderType={workOrderType} />
       </div>
     </>
