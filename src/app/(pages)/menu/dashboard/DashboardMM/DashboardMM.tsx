@@ -196,16 +196,18 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
           updatedWorkOrderTypes[index].value++;
         }
 
-        const workOrderType = workOrder.workOrderType;
-        if (workOrderTypeMap.has(workOrderType)) {
-          workOrderTypeMap.get(workOrderType)!.value++;
-        } else {
-          const workOrderTypeChartProps: WorkOrderTypeChartProps = {
-            workOrderType: workOrderType,
-            value: 1,
-            index: translateWorkOrderType(workOrderType),
-          };
-          workOrderTypeMap.set(workOrderType, workOrderTypeChartProps);
+        if (workOrder.workOrderType != WorkOrderType.Ticket) {
+          const workOrderType = workOrder.workOrderType;
+          if (workOrderTypeMap.has(workOrderType)) {
+            workOrderTypeMap.get(workOrderType)!.value++;
+          } else {
+            const workOrderTypeChartProps: WorkOrderTypeChartProps = {
+              workOrderType: workOrderType,
+              value: 1,
+              index: translateWorkOrderType(workOrderType),
+            };
+            workOrderTypeMap.set(workOrderType, workOrderTypeChartProps);
+          }
         }
 
         const operatorId = workOrder.operatorId?.map(op => op) || [];
