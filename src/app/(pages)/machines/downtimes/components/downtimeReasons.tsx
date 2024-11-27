@@ -50,6 +50,7 @@ export const useCreateDowntimeReason = ({
         formValues
       );
       setFormValues({
+        assetId: downtime.assetId,
         machineId: downtime.machineId,
         description: '',
         downTimeType: downtime.downTimeType,

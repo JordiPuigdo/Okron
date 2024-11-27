@@ -81,7 +81,7 @@ const DowntimeReasonsModal: React.FC<DowntimeReasonsModalProps> = ({
   const itemsPerPage = 6;
   useEffect(() => {
     downtimeService
-      .getDowntimesReasonsByMachineId('660d51627f5a70171fab1641', true)
+      .getDowntimesReasonsByMachineId(selectedId, true)
       .then(response => {
         setDowntimeReasons(response);
         setFilteredDowntimeReasons(response);

@@ -106,6 +106,14 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
   },
   {
     key: generateKey(),
+    title: 'Reports',
+    icon: SvgReport,
+    path: '/reports/downtimesReport',
+    permission: [UserPermission.Administrator, UserPermission.SpareParts],
+    userType: [UserType.Production],
+  },
+  {
+    key: generateKey(),
     title: 'Configuració',
     path: '',
     permission: [UserPermission.Administrator],
@@ -119,7 +127,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         path: '/assets',
         icon: SvgActiu,
         permission: [UserPermission.Administrator],
-        userType: [UserType.Maintenance],
+        userType: [UserType.Maintenance, UserType.Production],
       },
       {
         key: generateKey(),
@@ -134,8 +142,8 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         title: 'Màquines',
         path: '/machines',
         icon: SvgMachine,
-        userType: [UserType.Production],
-        permission: [UserPermission.Administrator],
+        userType: [],
+        permission: [],
       },
       {
         key: generateKey(),

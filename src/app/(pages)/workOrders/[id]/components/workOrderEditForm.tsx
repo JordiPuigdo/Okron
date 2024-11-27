@@ -34,7 +34,7 @@ import {
   translateWorkOrderEventType,
 } from 'app/utils/utils';
 import ChooseElement from 'components/ChooseElement';
-import { CostsObject } from 'components/Costs/CostsObject';
+
 import CompleteInspectionPoints from 'components/inspectionPoint/CompleteInspectionPoint';
 import WorkOrderOperatorComments from 'components/operator/WorkOrderCommentOperator';
 import WorkOrderOperatorTimesComponent from 'components/operator/WorkOrderOperatorTimes';
@@ -508,6 +508,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
 
   const isDisabledField =
     isFinished ||
+    currentWorkOrder?.stateWorkOrder == StateWorkOrder.Closed ||
     loginUser?.permission != UserPermission.Administrator ||
     loginUser?.userType == UserType.Production;
 
@@ -658,13 +659,15 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                   </label>
                   <input
                     className={`p-3 border text-sm border-gray-300 rounded-md w-full ${
-                      currentWorkOrder.downtimeReason?.machineId == ''
+                      currentWorkOrder.downtimeReason?.assetId == ''
                         ? 'border-red-500'
                         : ''
                     }`}
                     value={currentWorkOrder.downtimeReason?.description}
                     readOnly
-                    onClick={() => setShowDowntimeReasonsModal(true)}
+                    onClick={() =>
+                      !isDisabledField && setShowDowntimeReasonsModal(true)
+                    }
                   />
                 </div>
               </>
@@ -801,12 +804,12 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         <div className=" w-full">
           {showDowntimeReasonsModal && (
             <ModalDowntimeReasons
-              selectedId={'660d51627f5a70171fab1641'}
+              selectedId={currentWorkOrder.asset?.id || ''}
               onSelectedDowntimeReasons={onSelectedDowntimeReasons}
             />
           )}
           {renderForm()}
-          {totalCosts > 0 &&
+          {/*totalCosts > 0 &&
             loginUser?.permission == UserPermission.Administrator && (
               <div className="flex flex-grow pt-2">
                 <CostsObject
@@ -815,7 +818,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                   totalCosts={totalCosts}
                 />
               </div>
-            )}
+            )*/}
         </div>
 
         <div className="p-2 bg-white rounded-lg shadow-md  w-full  flex flex-col">

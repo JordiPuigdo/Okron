@@ -87,7 +87,7 @@ export default function WorkOrderOperationsInTable({
 
   const hasDefaultReason =
     workOrder?.downtimeReason != undefined &&
-    workOrder.downtimeReason.machineId == '';
+    workOrder.downtimeReason.assetId == '';
 
   async function handleChangeStateWorkOrder(state: StateWorkOrder) {
     toggleLoading(

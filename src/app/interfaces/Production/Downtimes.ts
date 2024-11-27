@@ -17,6 +17,7 @@ export enum OriginDowntime {
 export interface DowntimesReasons extends BaseModel {
   description: string;
   machineId: string;
+  assetId: string;
   downTimeType: DowntimesReasonsType;
 }
 

@@ -24,7 +24,7 @@ export default function Downtimes({
     <div className="w-full bg-white shadow-lg rounded-lg p-4">
       <div className="flex flex-col gap-2">
         <div className="w-full">
-          <span className="font-bold">Nou Motiu Aturada</span>
+          <span className="font-bold">Nou Motiu Aturada </span>
           <CreateDowntimeReasons assetId={assetId} machineId={machineId} />
         </div>
       </div>
@@ -51,6 +51,8 @@ const CreateDowntimeReasons: React.FC<DowntimesReasonsProps> = ({
     <>
       <form onSubmit={handleSubmit} className="flex flex-row gap-2 my-4 ">
         <div className="flex items-center gap-4">
+          <input type="hidden" name="assetId" value={assetId} />
+          <input type="hidden" name="machineId" value={machineId} />
           <label
             htmlFor="description"
             className="text-sm font-medium text-gray-700"
