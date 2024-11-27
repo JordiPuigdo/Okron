@@ -62,11 +62,11 @@ const WorkOrdersDashboard: React.FC<WorkOrdersDashboardProps> = ({
         <table className="table-auto w-full border-collapse">
           <thead className="sticky top-0 bg-white z-10">
             <tr className="text-left text-gray-400 text-sm">
-              <th className="p-3">Fecha</th>
-              <th className="p-3">Tipo</th>
+              <th className="p-3">Data</th>
+              <th className="p-3">Tipus</th>
               <th>Total OTs</th>
-              <th>Minutos</th>
-              <th className="p-3 text-right">Costo</th>
+              <th>Minuts</th>
+              <th className="p-3 text-right">Cost</th>
             </tr>
           </thead>
           <tbody className="text-sm">

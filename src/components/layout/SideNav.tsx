@@ -10,13 +10,8 @@ import Link from 'next/link';
 
 import { SIDENAV_ITEMS } from './SideNavItems';
 
-type SideNavProps = {
-  setOpenMenu: React.Dispatch<React.SetStateAction<boolean>>;
-  menuOpen: boolean;
-};
-
-const SideNav: React.FC<SideNavProps> = ({ menuOpen }) => {
-  const { loginUser } = useSessionStore(state => state);
+const SideNav: React.FC = () => {
+  const { loginUser, isMenuOpen } = useSessionStore(state => state);
   const loginPermission = loginUser?.permission!;
   const loginUserType = loginUser?.userType!;
 
@@ -37,7 +32,7 @@ const SideNav: React.FC<SideNavProps> = ({ menuOpen }) => {
                 key={idx}
                 item={item}
                 userType={loginUserType}
-                menuOpen={menuOpen}
+                menuOpen={isMenuOpen}
               />
             )
           );
@@ -53,7 +48,7 @@ const SideNav: React.FC<SideNavProps> = ({ menuOpen }) => {
               key={configItem.key}
               item={configItem}
               userType={loginUserType}
-              menuOpen={menuOpen}
+              menuOpen={isMenuOpen}
             />
           )}
       </div>
@@ -90,11 +85,11 @@ const MenuItem = ({
           <>
             <button
               onClick={toggleSubMenu}
-              className={`w-full hover:text-okron-main ${
+              className={`w-full  hover:text-okron-main ${
                 isActive ? 'bg-[#F2F2F2]' : ''
               }`}
             >
-              <div className="flex flex-row items-center hover:text-okron-main">
+              <div className="flex flex-row items-center hover:text-okron-main ">
                 <span
                   className={`font-sm text-l flex text-gray-700 p-1 w-full mb-1 rounded-md items-center ${
                     isActive ? 'bg-[#F2F2F2] text-okron-main' : ''
@@ -115,14 +110,20 @@ const MenuItem = ({
                   {menuOpen && item.title}
                 </span>
                 {subMenuOpen && menuOpen ? (
-                  <SvgArrowDown />
+                  <div className="flex justify-center">
+                    <SvgArrowDown className=" w-6 h-6 " />
+                  </div>
                 ) : (
-                  !subMenuOpen && menuOpen && <SvgArrowRight />
+                  <div className="flex justify-center">
+                    {!subMenuOpen && menuOpen && (
+                      <SvgArrowRight className=" w-6 h-6 " />
+                    )}
+                  </div>
                 )}
               </div>
             </button>
 
-            {subMenuOpen && (
+            {subMenuOpen && item.title != 'Configuració' && (
               <div className="ml-2 flex flex-col">
                 {item.submenuItems?.map((subItem, idx) => {
                   const isSubItemActive = pathname === subItem.path;
@@ -164,11 +165,54 @@ const MenuItem = ({
                 })}
               </div>
             )}
+            {item.title == 'Configuració' && (
+              <div className="ml-2 flex flex-col">
+                {item.submenuItems?.map((subItem, idx) => {
+                  const isSubItemActive = pathname === subItem.path;
+                  if (!subMenuOpen) return <div className="p-3 m-0.5"></div>;
+                  return (
+                    <Link key={idx} href={subItem.path}>
+                      <span
+                        className={` text-sm font-small text-gray-700 flex hover:text-okron-main rounded-md mb-2 items-center ${
+                          isSubItemActive ? 'bg-[#F2F2F2] text-okron-main' : ''
+                        }`}
+                        onClick={() => {
+                          setIsLoading(prevLoading => ({
+                            ...prevLoading,
+                            [subItem.key]: true,
+                          }));
+                        }}
+                      >
+                        {subItem.icon && (
+                          <subItem.icon
+                            className={`${
+                              menuOpen
+                                ? 'min-w-[16px] min-h-[16px] mr-2'
+                                : 'min-w-[14px] min-h-[14px]'
+                            } ${
+                              isSubItemActive ? 'text-okron-main' : ''
+                            } hover:text-okron-main`}
+                          />
+                        )}
+
+                        {menuOpen && subItem.title}
+                        {isLoading[subItem.key] && (
+                          <SvgSpinner
+                            style={{ marginLeft: '0.5rem' }}
+                            className="w-5 h-5 text-okron-main"
+                          />
+                        )}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </>
         ) : (
           <Link href={item.path}>
             <span
-              className={`font-sm text-l flex text-gray-700  gap-2 p-1 w-full hover:text-okron-main rounded-md items-center ${
+              className={`font-sm text-l flex text-gray-700 gap-2 p-1 w-full hover:text-okron-main rounded-md items-center ${
                 isActive ? 'bg-[#F2F2F2] text-okron-main' : ''
               }`}
               onClick={() => {
@@ -192,6 +236,7 @@ const MenuItem = ({
                 />
               )}
               {menuOpen && item.title}
+
               {isLoading[item.key] && (
                 <SvgSpinner
                   style={{ marginLeft: '0.2rem' }}

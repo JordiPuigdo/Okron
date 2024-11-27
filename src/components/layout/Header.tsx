@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useSessionStore } from 'app/stores/globalStore';
 import useRoutes from 'app/utils/useRoutes';
 import Link from 'next/link';
@@ -10,21 +9,21 @@ import { UserPermission, UserType } from 'app/interfaces/User';
 import FinalizeWorkOrdersDaysBefore from 'app/(pages)/workOrders/components/FinalizeWorkOrdersDaysBefore';
 import GeneratePreventive from 'app/(pages)/preventive/components/GeneratePreventive';
 
-type Header = {
-  setOpenMenu: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const Header: React.FC<Header> = ({ setOpenMenu }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const { loginUser, operatorLogged, setLoginUser, setOperatorLogged } =
-    useSessionStore(state => state);
+const Header: React.FC = () => {
+  const {
+    loginUser,
+    operatorLogged,
+    setLoginUser,
+    setOperatorLogged,
+    setIsMenuOpen,
+    isMenuOpen,
+  } = useSessionStore(state => state);
   const router = useRouter();
   const ROUTES = useRoutes();
   const pathname = usePathname();
 
   const handleMenuClick = () => {
-    setOpenMenu(!menuOpen);
-    setMenuOpen(!menuOpen);
+    setIsMenuOpen(!isMenuOpen);
   };
 
   function logOut() {

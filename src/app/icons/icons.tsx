@@ -840,13 +840,14 @@ export const SvgRepeat = (props: SVGProps<SVGSVGElement>) => (
 
 export const SvgArrowRight = (props: SVGProps<SVGSVGElement>) => (
   <svg
-    width={18}
-    height={28}
-    viewBox="0 0 24 24"
-    fill="none"
+    width={12}
+    height={12}
+    fill="currentColor"
+    viewBox="0 0 22 28"
     xmlns="http://www.w3.org/2000/svg"
     stroke="#6b7280"
     stroke-width="1.56"
+    {...props}
   >
     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
     <g
@@ -870,13 +871,14 @@ export const SvgArrowRight = (props: SVGProps<SVGSVGElement>) => (
 
 export const SvgArrowDown = (props: SVGProps<SVGSVGElement>) => (
   <svg
-    width={18}
-    height={28}
-    viewBox="0 0 24 24"
-    fill="none"
+    width={12}
+    height={12}
+    fill="currentColor"
+    viewBox="0 0 22 28"
     xmlns="http://www.w3.org/2000/svg"
     stroke="#6b7280"
     stroke-width="1.56"
+    {...props}
   >
     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
     <g

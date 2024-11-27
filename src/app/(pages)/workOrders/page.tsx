@@ -16,7 +16,7 @@ export default function WorkOrdersPage() {
         ? 'Ordres de treball'
         : 'Tiquets';
     return (
-      <div className="flex w-full">
+      <div className="flex p-2 my-2">
         <div className="w-full flex flex-col gap-2 items">
           <h2 className="text-2xl font-bold text-black flex gap-2">
             <SvgMachines />

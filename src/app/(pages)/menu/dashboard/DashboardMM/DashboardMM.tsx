@@ -87,7 +87,9 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
   const [chartConsumedSpareParts, setChartConsumedSpareParts] = useState<any[]>(
     []
   );
-  const [selectedButton, setSelectedButton] = useState<string | null>('Costes');
+  const [selectedButton, setSelectedButton] = useState<string | null>(
+    'Ordres de treball'
+  );
 
   const handleButtonClick = (buttonName: string) => {
     setSelectedButton(buttonName);
@@ -123,6 +125,7 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
     [StateWorkOrder.Requested]: 'bg-red-500',
     [StateWorkOrder.Finished]: 'bg-okron-finished',
     [StateWorkOrder.Open]: 'bg-green-500',
+    [StateWorkOrder.Closed]: 'bg-okron-finished',
   };
 
   const handleFilterClick = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -451,11 +454,11 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
         selectedButton={selectedButton}
         handleButtonClick={handleButtonClick}
       />
-      {selectedButton === 'Costes' ? (
+      {selectedButton === 'Costos' ? (
         <div className="flex flex-col lg:flex-row flex-grow gap-4">
           <div className="border-2 p-2 w-full rounded-xl bg-white justify-center">
             <p className="text-lg lg:text-2xl font-semibold p-2 text-left">
-              Costes
+              Costos
             </p>
             {workOrders.length > 0 ? (
               <WorkOrdersDashboard
@@ -475,66 +478,8 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
             <CostXAsset workOrders={workOrders} />
           </div>
         </div>
-      ) : selectedButton === 'Recambios' ? (
+      ) : selectedButton === 'Recanvis' ? (
         <div className="flex flex-col w-full gap-4 items-center">
-          <div className="flex flex-col lg:flex-grow w-full rounded-xl p-2">
-            {chartAssets.length > 0 && (
-              <div className="flex flex-col lg:flex-row w-full justify-center gap-4">
-                <div className="border-2 bg-white p-4 rounded-xl w-full">
-                  <OTsXAsset chartAssets={chartAssets} />
-                </div>
-                <div className="border-2 bg-white p-4 rounded-xl w-full">
-                  <p className="text-lg lg:text-2xl mb-4 font-semibold text-left">
-                    Top Recanvis més consumits
-                  </p>
-                  <ul className="grid grid-rows-3 gap-4 w-full">
-                    {chartConsumedSpareParts.map((consumedSparePart, index) => (
-                      <li
-                        key={index}
-                        className="bg-gray-100 p-4 rounded-md shadow-md flex justify-between items-center gap-4"
-                      >
-                        <div className="flex flex-col space-y-2 w-full">
-                          <div className="flex justify-between items-center w-full mb-2">
-                            <span className="text-base lg:text-lg font-semibold">
-                              {consumedSparePart.sparePart}
-                            </span>
-                            <div className="flex items-center gap-2">
-                              {index === 0 && (
-                                <span className="bg-red-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-                                  1r
-                                </span>
-                              )}
-                              {index === 1 && (
-                                <span className="bg-yellow-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-                                  2n
-                                </span>
-                              )}
-                              {index === 2 && (
-                                <span className="bg-green-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-                                  3r
-                                </span>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="flex flex-wrap gap-2">
-                            <div className="px-4 py-1 font-semibold rounded-full bg-[#FCE0CE] text-[#F17A2D]">
-                              {consumedSparePart.number} Consums
-                            </div>
-
-                            <div className="px-4 py-1 font-semibold rounded-full bg-[#DAF2DB] text-[#4DB559]">
-                              {consumedSparePart.totalStock} Stock
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-          </div>
-
           <div className="flex flex-col w-full bg-white rounded-xl border-2 p-2">
             <p className="text-lg lg:text-2xl p-2 mb-4 font-semibold text-left">
               Recanvis sota stock

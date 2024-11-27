@@ -19,7 +19,7 @@ import { generateKey, SideNavItem } from 'app/types/SideNavItem';
 export const SIDENAV_ITEMS: SideNavItem[] = [
   {
     key: generateKey(),
-    title: 'Panel',
+    title: 'Dashboard',
     icon: SvgPanel,
     path: '/menu',
     permission: [UserPermission.Administrator, UserPermission.Worker],

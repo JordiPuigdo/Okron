@@ -1,6 +1,4 @@
-import { useState } from 'react';
-
-const BUTTONS = ['Costes', 'Recambios', 'Ordenes de trabajo'];
+const BUTTONS = ['Costos', 'Recanvis', 'Ordres de treball'];
 
 export default function ButtonsSections({
   selectedButton,

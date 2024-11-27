@@ -1,13 +1,14 @@
-import { LoginUser, OperatorLogged } from "app/interfaces/User";
-import { FilterSpareParts, FilterWorkOrders } from "app/types/filters";
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { LoginUser, OperatorLogged } from 'app/interfaces/User';
+import { FilterSpareParts, FilterWorkOrders } from 'app/types/filters';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 interface SessionStore {
   loginUser: LoginUser | undefined;
   operatorLogged: OperatorLogged | undefined;
   filterWorkOrders: FilterWorkOrders | undefined;
   filterSpareParts: FilterSpareParts | undefined;
+  isMenuOpen: boolean;
 }
 
 interface SessionActions {
@@ -15,30 +16,35 @@ interface SessionActions {
   setOperatorLogged: (operatorLogged: OperatorLogged | undefined) => void;
   setFilterWorkOrders: (filterWorkOrders: FilterWorkOrders | undefined) => void;
   setFilterSpareParts: (filterSpareParts: FilterSpareParts | undefined) => void;
+  setIsMenuOpen: (isMenuOpen: boolean) => void;
 }
 
 export const useSessionStore = create(
   persist<SessionStore & SessionActions>(
-    (set) => ({
+    set => ({
       loginUser: undefined,
       operatorLogged: undefined,
       filterWorkOrders: undefined,
       filterSpareParts: undefined,
-      setLoginUser: (value) => {
+      isMenuOpen: false,
+      setLoginUser: value => {
         set({ loginUser: value });
       },
-      setOperatorLogged: (value) => {
+      setOperatorLogged: value => {
         set({ operatorLogged: value });
       },
-      setFilterWorkOrders: (value) => {
+      setFilterWorkOrders: value => {
         set({ filterWorkOrders: value });
       },
-      setFilterSpareParts: (value) => {
+      setFilterSpareParts: value => {
         set({ filterSpareParts: value });
+      },
+      setIsMenuOpen: value => {
+        set({ isMenuOpen: value });
       },
     }),
     {
-      name: "session-storage",
+      name: 'session-storage',
       version: 2,
       storage: createJSONStorage(() => sessionStorage),
     }
@@ -57,7 +63,7 @@ interface GlobalActions {
   setIsMainScrollEnabled: (value: boolean) => void;
 }
 
-export const useGlobalStore = create<GlobalStore & GlobalActions>((set) => ({
+export const useGlobalStore = create<GlobalStore & GlobalActions>(set => ({
   isModalOpen: false,
   showModalBackground: false,
   isMainScrollEnabled: true,

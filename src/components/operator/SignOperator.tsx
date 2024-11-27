@@ -51,7 +51,7 @@ export default function SignOperator() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 ml-4">
       <div className="relative flex items-center">
         <input
           type="text"
