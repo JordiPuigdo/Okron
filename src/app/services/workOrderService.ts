@@ -235,7 +235,7 @@ class WorkOrderService {
 
   async countByWorkOrderType(workOrderType : WorkOrderType ): Promise<number> {
     try {
-      const url = `${this.baseUrl}CountByWorkOrderType?workOrderTypeDto=${workOrderType}`;
+      const url = `${this.baseUrl}CountByWorkOrderType?type=${workOrderType}`;
       const response = await fetch(url, {
         method: 'GET',
         headers: {
