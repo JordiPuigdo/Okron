@@ -1,15 +1,78 @@
+import { EditableCell } from 'app/(pages)/machines/downtimes/components/EditingCell';
 import { Downtimes } from 'app/interfaces/Production/Downtimes';
+import WorkOrderService from 'app/services/workOrderService';
 import {
+  calculateTimeDifference,
   formatDate,
   formatTimeSpan,
+  isValidDateTimeFormat,
   translateOperatorType,
+  validateFormattedDateTime,
 } from 'app/utils/utils';
+import dayjs from 'dayjs';
+import { useState } from 'react';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
+dayjs.extend(customParseFormat);
 
 interface DowntimesProps {
   downtimes: Downtimes[];
+  workOrderId: string;
 }
 
-export default function DowntimesComponent({ downtimes }: DowntimesProps) {
+export default function DowntimesComponent({
+  downtimes,
+  workOrderId,
+}: DowntimesProps) {
+  const workOrderService = new WorkOrderService(
+    process.env.NEXT_PUBLIC_API_BASE_URL || ''
+  );
+
+  const [downtimesWorkorder, setDowntimesWorkorder] =
+    useState<Downtimes[]>(downtimes);
+
+  function handleUpdate(
+    id: string,
+    newValue: string,
+    startDate: boolean
+  ): void {
+    if (!validateFormattedDateTime(newValue)) {
+      alert('Format incorrecte, dia/mes/any hores:minuts:segons');
+
+      return;
+    }
+
+    const format = 'DD/MM/YYYY HH:mm:ss';
+    const dateToSend = dayjs(newValue, format).utc().format(format);
+
+    const newDate = dayjs(newValue, format).utc().format();
+
+    workOrderService.UpdateDowntime({
+      startDate: startDate == true ? dateToSend : '',
+      endDate: startDate == false ? dateToSend : '',
+      workOrderId: workOrderId,
+      downtimeId: id,
+    });
+
+    setDowntimesWorkorder(prev =>
+      prev.map(x =>
+        x.id === id
+          ? {
+              ...x,
+              startTime: startDate ? newDate : x.startTime,
+              endTime: !startDate ? newDate : x.endTime,
+              totalTime: calculateTimeDifference(
+                startDate ? newDate : x.startTime,
+                !startDate ? newDate : x.endTime
+              ),
+            }
+          : x
+      )
+    );
+  }
+
   return (
     <div className="p-2 bg-white rounded-lg w-full">
       <div className="flex flex-row items-center py-2 text-lg font-semibold">
@@ -45,13 +108,23 @@ export default function DowntimesComponent({ downtimes }: DowntimesProps) {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {downtimes.map((downtime, index) => (
+          {downtimesWorkorder.map((downtime, index) => (
             <tr key={index}>
               <td className="p-2 whitespace-nowrap w-1/4">
-                {formatDate(downtime.startTime)}
+                <EditableCell
+                  value={formatDate(downtime.startTime)}
+                  onUpdate={newValue =>
+                    handleUpdate(downtime.id, newValue, true)
+                  }
+                />
               </td>
               <td className="p-2 whitespace-nowrap w-1/4">
-                {downtime.endTime ? formatDate(downtime.endTime) : 'N/A'}
+                <EditableCell
+                  value={formatDate(downtime.endTime)}
+                  onUpdate={newValue =>
+                    handleUpdate(downtime.id, newValue, false)
+                  }
+                />
               </td>
               <td className="p-2 whitespace-nowrap w-1/4">
                 {downtime.totalTime

@@ -7,6 +7,7 @@ export interface Downtimes extends BaseModel {
   totalTime: string;
   operator: Operator;
   originDowntime: OriginDowntime;
+  id: string;
 }
 
 export enum OriginDowntime {
@@ -35,4 +36,11 @@ export interface DowntimesReasonsRequest {
 
 export interface DowntimesReasonsUpdateRequest extends DowntimesReasonsRequest {
   id: string;
+}
+
+export interface UpdateDowntimesRequest {
+  startDate: string;
+  endDate: string;
+  workOrderId: string;
+  downtimeId: string;
 }

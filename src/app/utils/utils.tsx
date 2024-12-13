@@ -9,7 +9,9 @@ import { useSessionStore } from 'app/stores/globalStore';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
+dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -70,6 +72,7 @@ export const formatDate = (
   if (dateString.length > 0 && dateString.includes('0001')) {
     return '';
   }
+
   const newDate = new Date(dateString);
   const date = dayjs(newDate);
 
@@ -88,6 +91,30 @@ export const formatDate = (
 
   return date.format(formatString);
 };
+
+export function calculateTimeDifference(
+  datefrom: string,
+  dateto: string
+): string {
+  const date1 = new Date(datefrom);
+  const date2 = new Date(dateto);
+  const differenceInMilliseconds = Math.abs(date1.getTime() - date2.getTime());
+  const hours = Math.floor(differenceInMilliseconds / (1000 * 60 * 60));
+  const minutes = Math.floor(
+    (differenceInMilliseconds % (1000 * 60 * 60)) / (1000 * 60)
+  );
+  const seconds = Math.floor((differenceInMilliseconds % (1000 * 60)) / 1000);
+
+  return `${hours.toString().padStart(2, '0')}:${minutes
+    .toString()
+    .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+export function validateFormattedDateTime(dateString: string): boolean {
+  const format = 'DD/MM/YYYY HH:mm:ss';
+  return dayjs(dateString, format).format(format) === dateString;
+}
+
 export function formatTimeSpan(timeSpan: string): string {
   // Check for the min TimeSpan value
   const MIN_TIME_SPAN = '-10675199.02:48:05.4775808';
@@ -259,4 +286,50 @@ export function differenceBetweenDates(date1: Date, date2: Date) {
     seconds,
     fullTime,
   };
+}
+
+export function isValidDateTimeFormat(dateTime: string): boolean {
+  // Regular expression to match "DD/MM/YYYY HH:mm:ss" format
+  const dateTimeRegex =
+    /^(0[1-9]|[1-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4} (0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$/;
+
+  if (!dateTimeRegex.test(dateTime)) {
+    return false; // String does not match the format
+  }
+
+  // Extract parts of the date and time
+  const [, day, month, year, hour, minute, second] =
+    dateTime.match(dateTimeRegex) || [];
+
+  // Convert to numbers for validation
+  const dayNum = parseInt(day, 10);
+  const monthNum = parseInt(month, 10);
+  const yearNum = parseInt(year, 10);
+  const hourNum = parseInt(hour, 10);
+  const minuteNum = parseInt(minute, 10);
+  const secondNum = parseInt(second, 10);
+
+  // Validate ranges
+  if (
+    monthNum < 1 ||
+    monthNum > 12 ||
+    dayNum < 1 ||
+    dayNum > 31 || // Note: further checks for month and leap year needed
+    hourNum < 0 ||
+    hourNum > 23 ||
+    minuteNum < 0 ||
+    minuteNum > 59 ||
+    secondNum < 0 ||
+    secondNum > 59
+  ) {
+    return false;
+  }
+
+  // Check for valid days in the month
+  const daysInMonth = new Date(yearNum, monthNum, 0).getDate();
+  if (dayNum > daysInMonth) {
+    return false;
+  }
+
+  return true; // String is a valid "DD/MM/YYYY HH:mm:ss" format
 }

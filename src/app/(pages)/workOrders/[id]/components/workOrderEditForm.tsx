@@ -509,8 +509,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const isDisabledField =
     isFinished ||
     currentWorkOrder?.stateWorkOrder == StateWorkOrder.Closed ||
-    loginUser?.permission != UserPermission.Administrator ||
-    loginUser?.userType == UserType.Production;
+    loginUser?.permission != UserPermission.Administrator;
 
   const renderForm = () => {
     function handleSelectedAsset(id: string): void {
@@ -855,7 +854,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       >
         {currentWorkOrder?.originWorkOrder == OriginWorkOrder.Production &&
           currentWorkOrder.downtimes && (
-            <DowntimesComponent downtimes={currentWorkOrder.downtimes} />
+            <DowntimesComponent
+              downtimes={currentWorkOrder.downtimes}
+              workOrderId={currentWorkOrder.id}
+            />
           )}
         {currentWorkOrder?.workOrderType != WorkOrderType.Ticket && (
           <div className="flex w-full">

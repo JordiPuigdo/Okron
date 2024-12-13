@@ -1,4 +1,17 @@
-import WorkOrder, { AddCommentToWorkOrderRequest, AddWorkOrderOperatorTimes, CreateWorkOrderRequest, DeleteWorkOrderOperatorTimes, FinishWorkOrderOperatorTimes, SaveInspectionResultPointRequest, SearchWorkOrderFilters, UpdateStateWorkOrder, UpdateWorkOrderOperatorTimes, WorkOrderComment, WorkOrderType } from 'app/interfaces/workOrder';
+import { UpdateDowntimesRequest } from 'app/interfaces/Production/Downtimes';
+import WorkOrder, {
+  AddCommentToWorkOrderRequest,
+  AddWorkOrderOperatorTimes,
+  CreateWorkOrderRequest,
+  DeleteWorkOrderOperatorTimes,
+  FinishWorkOrderOperatorTimes,
+  SaveInspectionResultPointRequest,
+  SearchWorkOrderFilters,
+  UpdateStateWorkOrder,
+  UpdateWorkOrderOperatorTimes,
+  WorkOrderComment,
+  WorkOrderType,
+} from 'app/interfaces/workOrder';
 
 class WorkOrderService {
   private baseUrl: string;
@@ -7,7 +20,10 @@ class WorkOrderService {
     this.baseUrl = baseUrl;
   }
 
-    async createWorkOrder(WorkOrder: CreateWorkOrderRequest, machineId : string): Promise<void> {
+  async createWorkOrder(
+    WorkOrder: CreateWorkOrderRequest,
+    machineId: string
+  ): Promise<void> {
     const response = await fetch(`${this.baseUrl}workorder`, {
       method: 'POST',
       headers: {
@@ -20,9 +36,11 @@ class WorkOrderService {
     }
   }
 
-  async addWorkOrderOperatorTimes(AddWorkOrderOperatorTimesValues: AddWorkOrderOperatorTimes): Promise<AddWorkOrderOperatorTimes> {
+  async addWorkOrderOperatorTimes(
+    AddWorkOrderOperatorTimesValues: AddWorkOrderOperatorTimes
+  ): Promise<AddWorkOrderOperatorTimes> {
     try {
-      const url = `${this.baseUrl}AddWorkOrderOperatorTimes`
+      const url = `${this.baseUrl}AddWorkOrderOperatorTimes`;
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -43,9 +61,11 @@ class WorkOrderService {
     }
   }
 
-  async finishWorkOrderOperatorTimes(FinishWorkOrderOperatorTimes: FinishWorkOrderOperatorTimes): Promise<boolean> {
+  async finishWorkOrderOperatorTimes(
+    FinishWorkOrderOperatorTimes: FinishWorkOrderOperatorTimes
+  ): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}FinishWorkOrderOperatorTimes`
+      const url = `${this.baseUrl}FinishWorkOrderOperatorTimes`;
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -66,9 +86,11 @@ class WorkOrderService {
     }
   }
 
-  async updateWorkOrderOperatorTimes(updateWorkOrderOperatorTimes: UpdateWorkOrderOperatorTimes): Promise<boolean> {
+  async updateWorkOrderOperatorTimes(
+    updateWorkOrderOperatorTimes: UpdateWorkOrderOperatorTimes
+  ): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}UpdateWorkOrderOperatorTimes`
+      const url = `${this.baseUrl}UpdateWorkOrderOperatorTimes`;
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -89,9 +111,11 @@ class WorkOrderService {
     }
   }
 
-   async deleteWorkOrderOperatorTimes(deleteWorkOrderOperatorTimes: DeleteWorkOrderOperatorTimes): Promise<boolean> {
+  async deleteWorkOrderOperatorTimes(
+    deleteWorkOrderOperatorTimes: DeleteWorkOrderOperatorTimes
+  ): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}DeleteWorkOrderOperatorTimes`
+      const url = `${this.baseUrl}DeleteWorkOrderOperatorTimes`;
       const response = await fetch(url, {
         method: 'DELETE',
         headers: {
@@ -112,10 +136,9 @@ class WorkOrderService {
     }
   }
 
-
   async getWorkOrdersByMachine(Id: string): Promise<WorkOrder[]> {
     try {
-      const url = `${this.baseUrl}workorder?MachineId=${Id}`
+      const url = `${this.baseUrl}workorder?MachineId=${Id}`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch WorkOrders-machines');
@@ -130,10 +153,9 @@ class WorkOrderService {
     }
   }
 
-
   async getWorkOrdersById(Id: string): Promise<WorkOrder[]> {
     try {
-      const url = `${this.baseUrl}workorder?MachineId=${Id}`
+      const url = `${this.baseUrl}workorder?MachineId=${Id}`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch WorkOrders-machines');
@@ -147,7 +169,7 @@ class WorkOrderService {
 
   async getWorkOrderById(Id: string): Promise<WorkOrder | undefined> {
     try {
-      const url = `${this.baseUrl}workorder/${Id}`
+      const url = `${this.baseUrl}workorder/${Id}`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch WorkOrders');
@@ -159,7 +181,9 @@ class WorkOrderService {
     }
   }
 
-  async updateWorkOrder(updateWorkOrder: CreateWorkOrderRequest): Promise<boolean> {
+  async updateWorkOrder(
+    updateWorkOrder: CreateWorkOrderRequest
+  ): Promise<boolean> {
     try {
       const url = `${this.baseUrl}workorder`;
       const response = await fetch(url, {
@@ -185,8 +209,9 @@ class WorkOrderService {
     }
   }
 
-
-  async getWorkOrdersWithFilters(searchWorkOrderFilters: SearchWorkOrderFilters): Promise<WorkOrder[]> {
+  async getWorkOrdersWithFilters(
+    searchWorkOrderFilters: SearchWorkOrderFilters
+  ): Promise<WorkOrder[]> {
     try {
       const url = `${this.baseUrl}GetWorkOrderWithFilters`;
 
@@ -197,7 +222,7 @@ class WorkOrderService {
         },
         body: JSON.stringify(searchWorkOrderFilters),
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch WorkOrders-machines');
       }
@@ -211,7 +236,7 @@ class WorkOrderService {
     }
   }
 
-  async deleteWorkOrder(id : string ): Promise<boolean> {
+  async deleteWorkOrder(id: string): Promise<boolean> {
     try {
       const url = `${this.baseUrl}workorder/${id}`;
       const response = await fetch(url, {
@@ -232,8 +257,7 @@ class WorkOrderService {
     }
   }
 
-
-  async countByWorkOrderType(workOrderType : WorkOrderType ): Promise<number> {
+  async countByWorkOrderType(workOrderType: WorkOrderType): Promise<number> {
     try {
       const url = `${this.baseUrl}CountByWorkOrderType?type=${workOrderType}`;
       const response = await fetch(url, {
@@ -254,7 +278,9 @@ class WorkOrderService {
     }
   }
 
-  async saveInspectionPointResult(saveInspectionPointResul: SaveInspectionResultPointRequest): Promise<WorkOrder[]> {
+  async saveInspectionPointResult(
+    saveInspectionPointResul: SaveInspectionResultPointRequest
+  ): Promise<WorkOrder[]> {
     try {
       const url = `${this.baseUrl}SaveInsepctionPointResult`;
 
@@ -263,9 +289,9 @@ class WorkOrderService {
         headers: {
           'Content-Type': 'application/json',
         },
-          body: JSON.stringify(saveInspectionPointResul),
+        body: JSON.stringify(saveInspectionPointResul),
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch WorkOrders-machines');
       }
@@ -279,12 +305,12 @@ class WorkOrderService {
     }
   }
 
-  
-  async updateStateWorkOrder(updateStateWorkOrder: UpdateStateWorkOrder[]): Promise<boolean> {
+  async updateStateWorkOrder(
+    updateStateWorkOrder: UpdateStateWorkOrder[]
+  ): Promise<boolean> {
     try {
       const url = `${this.baseUrl}workorder/state`;
 
-      
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -302,9 +328,11 @@ class WorkOrderService {
       throw error;
     }
   }
-  async addCommentToWorkOrder(addCommentToWorkOrder: AddCommentToWorkOrderRequest): Promise<WorkOrderComment> {
+  async addCommentToWorkOrder(
+    addCommentToWorkOrder: AddCommentToWorkOrderRequest
+  ): Promise<WorkOrderComment> {
     try {
-      const url = `${this.baseUrl}AddCommentToWorkOrder`
+      const url = `${this.baseUrl}AddCommentToWorkOrder`;
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -325,9 +353,12 @@ class WorkOrderService {
     }
   }
 
-  async deleteCommentToWorkOrder(workOrderId : string, commentId : string): Promise<boolean> {
+  async deleteCommentToWorkOrder(
+    workOrderId: string,
+    commentId: string
+  ): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}CommentToWorkOrder?workOrderId=${workOrderId}&commentId=${commentId}`
+      const url = `${this.baseUrl}CommentToWorkOrder?workOrderId=${workOrderId}&commentId=${commentId}`;
       const response = await fetch(url, {
         method: 'DELETE',
         headers: {
@@ -385,15 +416,36 @@ class WorkOrderService {
         return false;
       }
       return true;
-
     } catch (error) {
       console.error('Error updating WorkOrder:', error);
       throw error;
     }
   }
+
+  async UpdateDowntime(request: UpdateDowntimesRequest): Promise<boolean> {
+    try {
+      const url = `${this.baseUrl}workOrder/UpdateDowntimes`;
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update WorkOrder');
+      }
+
+      if (response.status === 204) {
+        return true;
+      }
+    } catch (error) {
+      console.error('Error updating Downtime:', error);
+      throw error;
+    }
+    return false;
+  }
 }
-
-
-
 
 export default WorkOrderService;
