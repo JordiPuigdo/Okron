@@ -21,9 +21,9 @@ export default function Downtimes({
   machineId = '',
 }: DowntimesReasonsProps) {
   return (
-    <div className="w-full bg-white shadow-lg rounded-lg p-4">
-      <div className="flex flex-col gap-2">
-        <div className="w-full">
+    <div className="w-full bg-white shadow-lg rounded-lg p-4 h-full">
+      <div className="flex flex-col gap-2 h-full">
+        <div className="w-full h-full">
           <span className="font-bold">Nou Motiu Aturada </span>
           <CreateDowntimeReasons assetId={assetId} machineId={machineId} />
         </div>
@@ -107,7 +107,7 @@ const CreateDowntimeReasons: React.FC<DowntimesReasonsProps> = ({
         </div>
       </form>
       <div className="w-full py-4 border-t-2 border-gray-200">
-        <span className="font-bold py-4">Motius Aturada Configurats</span>
+        <span className="font-bold py-4 ">Motius Aturada Configurats</span>
         <DownTimeReasonsConfigured
           machineId={machineId}
           asssetId={assetId}

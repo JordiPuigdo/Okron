@@ -32,10 +32,13 @@ export default function AssetDetailsPage({
   const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
   const [isloading, setIsloading] = useState(true);
   const [currentAsset, setCurrentAsset] = useState<Asset | null>(null);
+  const [parentAsset, setParentAsset] = useState<Asset | null>(null);
   const [parentId, setParentId] = useState<string | null>(null);
   const [levelGetted, setLevelGetted] = useState<number | null>(null);
   const [message, setMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [code, setCode] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
 
   const { loginUser } = useSessionStore();
 
@@ -46,6 +49,8 @@ export default function AssetDetailsPage({
         .getAssetById(id as string)
         .then((asset: Asset) => {
           setCurrentAsset(asset);
+          setDescription(asset.description);
+          setCode(asset.code);
           setLoading(false);
         })
         .catch(error => {
@@ -53,8 +58,13 @@ export default function AssetDetailsPage({
           setLoading(false);
         });
     }
+    if (parentId) {
+      assetService.getAssetById(parentId as string).then((asset: Asset) => {
+        setParentAsset(asset);
+      });
+    }
     setIsloading(false);
-  }, [id]);
+  }, [id, parentId]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -126,14 +136,27 @@ export default function AssetDetailsPage({
         <div className="w-full flex flex-col gap-2 items">
           <h2 className="text-2xl font-bold text-black flex gap-2">
             <SvgMachines />
-            {currentAsset?.path}
+            {currentAsset
+              ? currentAsset?.path
+              : parentAsset?.path + '/' + description}
           </h2>
           <span className="text-l">
-            Equip: {currentAsset?.code} - {currentAsset?.description}
+            Equip: {code} - {description}
           </span>
         </div>
       </div>
     );
+  };
+
+  const handleOnChange = async (header: string, value: string) => {
+    if (header === 'code') {
+      setCode(value);
+    }
+    if (header === 'description') {
+      setDescription(value);
+    }
+    // setDescription(data.description);
+    // setCode(data.code);
   };
 
   return (
@@ -146,7 +169,7 @@ export default function AssetDetailsPage({
             {renderHeader()}
             <div className="flex flex-row gap-5">
               <div className="w-full flex flex-col gap-5">
-                <div className="flex justify-start gap-12 bg-white shadow-md rounded-md w-full p-4">
+                <div className="flex justify-start gap-12 bg-white shadow-md rounded-md w-full p-2">
                   <AssetForm
                     id={id}
                     loading={loading}
@@ -154,6 +177,7 @@ export default function AssetDetailsPage({
                     level={levelGetted!}
                     parentId={parentId != null ? parentId : ''}
                     onSubmit={onSubmit}
+                    onChange={handleOnChange}
                   />
                 </div>
                 <div className="w-full flex flex-col gap-5 bg-white shadow-md rounded-md p-4">
