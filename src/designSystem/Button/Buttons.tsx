@@ -1,17 +1,17 @@
-import { ReactNode } from "react";
-import Link from "next/link";
-import { twMerge } from "tailwind-merge";
+import { ReactNode } from 'react';
+import Link from 'next/link';
+import { twMerge } from 'tailwind-merge';
 
 type ButtonTypes =
-  | "create"
-  | "edit"
-  | "delete"
-  | "cancel"
-  | "detail"
-  | "save"
-  | "others"
-  | "none";
-type ButtonSizes = "sm" | "md" | "lg" | "xl";
+  | 'create'
+  | 'edit'
+  | 'delete'
+  | 'cancel'
+  | 'detail'
+  | 'save'
+  | 'others'
+  | 'none';
+type ButtonSizes = 'sm' | 'md' | 'lg' | 'xl';
 
 type ButtonProps = {
   type?: ButtonTypes;
@@ -24,23 +24,24 @@ type ButtonProps = {
   children: ReactNode;
   disabled?: boolean;
   isAnimated?: boolean;
-  origin?: "top" | "right" | "bottom" | "left";
+  origin?: 'top' | 'right' | 'bottom' | 'left';
   [key: string]: any;
 };
 
 export const Button = ({
-  type = "create",
-  size = "md",
-  href = "",
-  className = "",
-  customStyles = "",
-  wrapperClassName = "",
+  type = 'create',
+  size = 'md',
+  href = '',
+  className = '',
+  customStyles = '',
+  wrapperClassName = '',
   onClick = undefined,
   children,
   disabled = false,
   isAnimated = false,
-  origin = "bottom",
-  id = "",
+  origin = 'bottom',
+  id = '',
+  tooltip = '',
   ...rest
 }: ButtonProps) => {
   const handleClick = () => {
@@ -53,7 +54,7 @@ export const Button = ({
       <Link
         href={href}
         className={twMerge(
-          `relative overflow-visible inline-block ${disabled ? "" : className}`
+          `relative overflow-visible inline-block ${disabled ? '' : className}`
         )}
         onClick={handleClick}
       >
@@ -75,7 +76,8 @@ export const Button = ({
         `transition-all relative group overflow-visible ${className}`
       )}
       onClick={handleClick}
-      type={rest?.isSubmit ? "submit" : "button"}
+      type={rest?.isSubmit ? 'submit' : 'button'}
+      data-tooltip={tooltip}
     >
       <ButtonBody
         id={id}
@@ -108,33 +110,33 @@ const ButtonBody = ({
   id?: string;
 }) => {
   const DISABLED_STYLES =
-    "bg-gray-200 text-gray-500 hover:bg-gray-200 hover:text-gray-500 cursor:default w-full text-center justify-center rounded-none";
+    'bg-gray-200 text-gray-500 hover:bg-gray-200 hover:text-gray-500 cursor:default w-full text-center justify-center rounded-none';
 
   const STYLES: any = {
-    common: "transition-all relative text-center rounded-full",
-    none: " ",
+    common: 'transition-all relative text-center rounded-full',
+    none: ' ',
     create:
-      "bg-okron-btCreate text-white px-4 py-2 rounded-md hover:bg-okron-btCreateHover focus:outline-none focus:ring focus:border-blue-300",
-    edit: "bg-okron-btEdit text-white px-4 py-2 rounded-md hover:bg-okron-btEditHover focus:outline-none focus:ring focus:border-blue-300",
+      'bg-okron-btCreate text-white px-4 py-2 rounded-md hover:bg-okron-btCreateHover focus:outline-none focus:ring focus:border-blue-300',
+    edit: 'bg-okron-btEdit text-white px-4 py-2 rounded-md hover:bg-okron-btEditHover focus:outline-none focus:ring focus:border-blue-300',
     delete:
-      "bg-okron-btDelete text-white px-4 py-2 rounded-md hover:bg-okron-btDeleteHover focus:outline-none focus:ring focus:border-blue-300",
+      'bg-okron-btDelete text-white px-4 py-2 rounded-md hover:bg-okron-btDeleteHover focus:outline-none focus:ring focus:border-blue-300',
     cancel:
-      "bg-okron-btnCancel text-white px-4 py-2 rounded-md hover:bg-okron-btnCancelHover focus:outline-none focus:ring focus:border-blue-300",
+      'bg-okron-btnCancel text-white px-4 py-2 rounded-md hover:bg-okron-btnCancelHover focus:outline-none focus:ring focus:border-blue-300',
     others:
-      "bg-orange-500 text-white p-2 rounded-md hover:bg-orange-600 items-center gap-2",
+      'bg-orange-500 text-white p-2 rounded-md hover:bg-orange-600 items-center gap-2',
     detail:
-      "text-center text-white bg-okron-btDetail hover:bg-okron-btnDetailHover",
-    sm: "items-center text-xs font-medium h-[32px] px-4",
-    md: "items-center font-medium h-[40px] px-4",
-    lg: "items-center text-md font-semibold h-[48px] px-6",
+      'text-center text-white bg-okron-btDetail hover:bg-okron-btnDetailHover',
+    sm: 'items-center text-xs font-medium h-[32px] px-4',
+    md: 'items-center font-medium h-[40px] px-4',
+    lg: 'items-center text-md font-semibold h-[48px] px-6',
     xl: `${
-      type === "create" ? "h-[64px] text-lg" : "h-[60px] text-md"
+      type === 'create' ? 'h-[64px] text-lg' : 'h-[60px] text-md'
     } font-semibold px-6`,
   };
 
   const styles = twMerge(
     `${STYLES.common} ${STYLES[type]} ${STYLES[size]} ${customStyles} ${
-      disabled ? DISABLED_STYLES : ""
+      disabled ? DISABLED_STYLES : ''
     }`
   );
   return (

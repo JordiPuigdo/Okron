@@ -13,6 +13,8 @@ import dayjs from 'dayjs';
 import { useState } from 'react';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import utc from 'dayjs/plugin/utc';
+import { useSessionStore } from 'app/stores/globalStore';
+import WorkOrder, { StateWorkOrder } from 'app/interfaces/workOrder';
 
 dayjs.extend(utc);
 dayjs.extend(customParseFormat);
@@ -20,11 +22,13 @@ dayjs.extend(customParseFormat);
 interface DowntimesProps {
   downtimes: Downtimes[];
   workOrderId: string;
+  currentWorkOrder: WorkOrder;
 }
 
 export default function DowntimesComponent({
   downtimes,
   workOrderId,
+  currentWorkOrder,
 }: DowntimesProps) {
   const workOrderService = new WorkOrderService(
     process.env.NEXT_PUBLIC_API_BASE_URL || ''
@@ -32,6 +36,7 @@ export default function DowntimesComponent({
 
   const [downtimesWorkorder, setDowntimesWorkorder] =
     useState<Downtimes[]>(downtimes);
+  const { loginUser } = useSessionStore(state => state);
 
   function handleUpdate(
     id: string,
@@ -111,20 +116,28 @@ export default function DowntimesComponent({
           {downtimesWorkorder.map((downtime, index) => (
             <tr key={index}>
               <td className="p-2 whitespace-nowrap w-1/4">
-                <EditableCell
-                  value={formatDate(downtime.startTime)}
-                  onUpdate={newValue =>
-                    handleUpdate(downtime.id, newValue, true)
-                  }
-                />
+                {currentWorkOrder.stateWorkOrder != StateWorkOrder.Closed ? (
+                  <EditableCell
+                    value={formatDate(downtime.startTime)}
+                    onUpdate={newValue =>
+                      handleUpdate(downtime.id, newValue, true)
+                    }
+                  />
+                ) : (
+                  <label>{formatDate(downtime.startTime)}</label>
+                )}
               </td>
               <td className="p-2 whitespace-nowrap w-1/4">
-                <EditableCell
-                  value={formatDate(downtime.endTime)}
-                  onUpdate={newValue =>
-                    handleUpdate(downtime.id, newValue, false)
-                  }
-                />
+                {currentWorkOrder.stateWorkOrder != StateWorkOrder.Closed ? (
+                  <EditableCell
+                    value={formatDate(downtime.endTime)}
+                    onUpdate={newValue =>
+                      handleUpdate(downtime.id, newValue, false)
+                    }
+                  />
+                ) : (
+                  <label>{formatDate(downtime.endTime)}</label>
+                )}
               </td>
               <td className="p-2 whitespace-nowrap w-1/4">
                 {downtime.totalTime

@@ -12,6 +12,7 @@ import WorkOrder, {
 } from 'app/interfaces/workOrder';
 import OperatorService from 'app/services/operatorService';
 import {
+  formatDate,
   translateStateWorkOrder,
   translateWorkOrderType,
 } from 'app/utils/utils';
@@ -106,14 +107,8 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
   const [totalMinutes, setTotalMinutes] = useState<number>(0);
   const [totalCosts, setTotalCosts] = useState<number>(0);
 
-  const firstDayOfMonth = dayjs
-    .utc(dayjs(), 'Europe/Madrid')
-    .startOf('month')
-    .toDate();
-  const firstDayOfWeek = dayjs
-    .utc(dayjs(), 'Europe/Madrid')
-    .startOf('isoWeek')
-    .toDate();
+  const firstDayOfMonth = dayjs.utc().startOf('month').toDate();
+  const firstDayOfWeek = dayjs.utc().startOf('isoWeek').toDate();
 
   const { fetchWithFilters } = useWorkOrders();
 
@@ -407,9 +402,9 @@ export const DashboardMM: React.FC<DashboardMM> = ({ loginUser }) => {
               <span className="text-gray-500 font-semibold">Data:</span>
               <span className="font-bold ml-2">
                 {selectedFilter === 0
-                  ? firstDayOfMonth.toLocaleDateString('en-GB')
+                  ? formatDate(firstDayOfMonth, false)
                   : selectedFilter === 1
-                  ? firstDayOfWeek.toLocaleDateString('en-GB')
+                  ? formatDate(firstDayOfWeek, false)
                   : currentDate.toLocaleDateString('en-GB')}{' '}
                 {' - '} {currentDate.toLocaleDateString('en-GB')}
               </span>

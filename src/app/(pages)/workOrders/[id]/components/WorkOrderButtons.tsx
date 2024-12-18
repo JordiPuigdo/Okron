@@ -44,7 +44,12 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
       alert('Has de tenir un operari fitxat per fer aquesta acció');
       return;
     }
-    if (hasDefaultReason && state == StateWorkOrder.PendingToValidate) {
+
+    if (
+      hasDefaultReason &&
+      (state == StateWorkOrder.PendingToValidate ||
+        state == StateWorkOrder.Closed)
+    ) {
       alert("Tens el motiu per defecte, no pots canviar l'estat");
       return;
     }
@@ -73,7 +78,7 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
 
   const hasDefaultReason =
     workOrder?.downtimeReason != undefined &&
-    workOrder.downtimeReason.machineId == '';
+    workOrder.downtimeReason.assetId == '';
 
   return (
     <div className="flex gap-2">
@@ -137,29 +142,53 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
               )}
             </Button>
           )}
-          <Button
-            disabled={
-              workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
-            }
-            onClick={() =>
-              handleChangeStateWorkOrder(StateWorkOrder.PendingToValidate)
-            }
-            type="none"
-            className="w-full"
-            customStyles="flex justify-center items-center bg-okron-finished h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverPendingToValidate w-full"
-          >
-            {isLoading[StateWorkOrder.PendingToValidate] ? (
-              <SvgSpinner className="text-white" />
-            ) : (
-              <SvgCheck />
-            )}
-          </Button>
+          {loginUser?.userType == UserType.Maintenance && (
+            <Button
+              disabled={
+                workOrder.stateWorkOrder == StateWorkOrder.PendingToValidate
+              }
+              onClick={() =>
+                handleChangeStateWorkOrder(StateWorkOrder.PendingToValidate)
+              }
+              type="none"
+              className="w-full"
+              customStyles="flex justify-center items-center bg-okron-finished h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverPendingToValidate w-full"
+            >
+              {isLoading[StateWorkOrder.PendingToValidate] ? (
+                <SvgSpinner className="text-white" />
+              ) : (
+                <SvgCheck />
+              )}
+            </Button>
+          )}
+          {loginUser?.userType == UserType.Production && (
+            <Button
+              disabled={workOrder.stateWorkOrder == StateWorkOrder.Closed}
+              onClick={() => handleChangeStateWorkOrder(StateWorkOrder.Closed)}
+              type="none"
+              className="w-full"
+              customStyles="flex justify-center items-center bg-okron-finished h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverPendingToValidate w-full"
+            >
+              {isLoading[StateWorkOrder.Closed] ? (
+                <SvgSpinner className="text-white" />
+              ) : (
+                <SvgCheck />
+              )}
+            </Button>
+          )}
         </>
       )}
-      {workOrder.stateWorkOrder == StateWorkOrder.Finished &&
+      {(workOrder.stateWorkOrder == StateWorkOrder.Finished ||
+        workOrder.stateWorkOrder == StateWorkOrder.Closed) &&
         loginUser?.permission == UserPermission.Administrator && (
           <Button
-            onClick={() => handleChangeStateWorkOrder(StateWorkOrder.Waiting)}
+            onClick={() =>
+              handleChangeStateWorkOrder(
+                loginUser.userType == UserType.Maintenance
+                  ? StateWorkOrder.Waiting
+                  : StateWorkOrder.Open
+              )
+            }
             type="none"
             customStyles="flex justify-center items-center bg-orange-500 h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-orange-600 "
           >

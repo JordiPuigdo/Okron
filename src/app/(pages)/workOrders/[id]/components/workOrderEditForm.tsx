@@ -138,6 +138,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   useEffect(() => {
     if (!isModalOpen) {
       setShowModal(false);
+      setShowDowntimeReasonsModal(false);
     }
   }, [isModalOpen]);
 
@@ -430,7 +431,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     }
     setTimeout(() => {
       toggleLoading('SAVE');
-      window.location.reload();
+      fetchWorkOrder();
     }, 2000);
   };
 
@@ -792,12 +793,13 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   function onSelectedDowntimeReasons(downtimeReasons: DowntimesReasons) {
     setValue('downtimeReason', downtimeReasons);
     currentWorkOrder!.downtimeReason = downtimeReasons;
+    handleSubmitForm();
     setShowDowntimeReasonsModal(false);
   }
 
   if (!currentWorkOrder) return <>Carregant Dades</>;
   return (
-    <>
+    <div className="pt-4">
       {renderHeader()}
       <div className="flex gap-2 rounded bg-blue-900 my-2 p-2">
         <div className=" w-full">
@@ -823,15 +825,12 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         <div className="p-2 bg-white rounded-lg shadow-md  w-full  flex flex-col">
           {currentWorkOrder && (
             <>
-              {currentWorkOrder.workOrderType != WorkOrderType.Ticket && (
-                <div>
-                  <WorkOrderButtons
-                    workOrder={currentWorkOrder}
-                    handleReload={fetchWorkOrder}
-                  />
-                </div>
-              )}
-
+              <div>
+                <WorkOrderButtons
+                  workOrder={currentWorkOrder}
+                  handleReload={fetchWorkOrder}
+                />
+              </div>
               <div className="py-2">
                 <WorkOrderOperatorComments
                   workOrderComments={workOrderComments}
@@ -857,6 +856,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             <DowntimesComponent
               downtimes={currentWorkOrder.downtimes}
               workOrderId={currentWorkOrder.id}
+              currentWorkOrder={currentWorkOrder}
             />
           )}
         {currentWorkOrder?.workOrderType != WorkOrderType.Ticket && (
@@ -974,7 +974,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           originalWorkOrderCode={currentWorkOrder.code}
         />
       )}
-    </>
+    </div>
   );
 };
 

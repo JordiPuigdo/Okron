@@ -29,27 +29,24 @@ const ModalDowntimeReasons: React.FC<ModalDowntimeReasonsProps> = ({
     <Modal
       isVisible={true}
       type="center"
-      height="h-auto"
+      height="h-96"
       width="w-full"
       className="max-w-sm mx-auto border border-black"
       avoidClosing={true}
     >
-      <div>
-        <div className="relative bg-white">
-          <div className="absolute p-2 top-0 right-0 justify-end hover:cursor-pointer">
-            <SvgClose
-              onClick={() => {
-                setIsModalOpen(false);
-              }}
-            />
-          </div>
+      <div className="relative bg-white">
+        <div className="absolute p-2 top-0 right-0 justify-end hover:cursor-pointer">
+          <SvgClose
+            onClick={() => {
+              setIsModalOpen(false);
+            }}
+          />
         </div>
-        <DowntimeReasonsModal
-          selectedId={selectedId}
-          onSelectedDowntimeReasons={selectedDowntime}
-        />
       </div>
-      <div></div>
+      <DowntimeReasonsModal
+        selectedId={selectedId}
+        onSelectedDowntimeReasons={selectedDowntime}
+      />
     </Modal>
   );
 };
@@ -107,12 +104,14 @@ const DowntimeReasonsModal: React.FC<DowntimeReasonsModalProps> = ({
   const totalPages = Math.ceil(filteredDowntimeReasons.length / itemsPerPage);
 
   return (
-    <div className="p-8 mx-8">
-      <div className="flex flex-row justify-between items-center">
+    <div className="p-8 mx-8 flex flex-col gap-4 h-96">
+      <div className="flex flex-row justify-center gap-4 mb-4">
         <div
-          className={`p-4 w-full bg-blue-100 hover:cursor-pointer mx-2 rounded-sm className
-          text-center      ${
-            selectedFilter == DowntimesReasonsType.Production && 'bg-blue-300'
+          className={`p-4 w-full max-w-xs text-center font-bold rounded-md cursor-pointer border-2 transition-all
+          ${
+            selectedFilter === DowntimesReasonsType.Production
+              ? 'bg-yellow-500 border-gray-500'
+              : 'bg-yellow-200 border-gray-200 hover:bg-yellow-400'
           }`}
           onClick={() =>
             handleFilterTypeChange(DowntimesReasonsType.Production)
@@ -121,11 +120,12 @@ const DowntimeReasonsModal: React.FC<DowntimeReasonsModalProps> = ({
           Producció
         </div>
         <div
-          className={`p-4 w-full bg-blue-100 text-center hover:cursor-pointer mx-2
-            ${
-              selectedFilter == DowntimesReasonsType.Maintanance &&
-              'bg-blue-300'
-            }`}
+          className={`p-4 w-full max-w-xs text-center font-bold rounded-md cursor-pointer border-2 transition-all
+          ${
+            selectedFilter === DowntimesReasonsType.Maintanance
+              ? 'bg-blue-500 border-gray-500'
+              : 'bg-blue-200 border-gray-200 hover:bg-blue-400'
+          }`}
           onClick={() =>
             handleFilterTypeChange(DowntimesReasonsType.Maintanance)
           }
@@ -133,24 +133,30 @@ const DowntimeReasonsModal: React.FC<DowntimeReasonsModalProps> = ({
           Manteniment
         </div>
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        {paginatedDowntimeReasons.map((reason, index) => (
-          <div key={reason.id} className="p-2">
-            <div
-              className="p-4 border bg-gray-200 hover:cursor-pointer shadow-sm rounded-sm border-black"
-              onClick={() => onSelectedDowntimeReasons(reason)}
-            >
-              {reason.description} - {reason.downTimeType}
-            </div>
+
+      {/* Tarjetas */}
+      <div className="grid grid-cols-2 gap-2">
+        {paginatedDowntimeReasons.map(reason => (
+          <div
+            key={reason.id}
+            className={`p-3 border-2 ${
+              reason.downTimeType === DowntimesReasonsType.Maintanance
+                ? 'bg-blue-200 hover:bg-blue-400'
+                : 'bg-yellow-200 hover:bg-yellow-400'
+            } rounded-lg shadow-sm text-center font-medium cursor-pointer`}
+            onClick={() => onSelectedDowntimeReasons(reason)}
+          >
+            {reason.description}
           </div>
         ))}
       </div>
 
-      <div className="flex justify-center mt-4 space-x-2">
+      {/* Botones de paginación */}
+      <div className="flex justify-center items-end mt-auto gap-6">
         <button
           onClick={() => setCurrentPage(prev => Math.max(prev - 1, 0))}
           disabled={currentPage === 0}
-          className={`px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50`}
+          className="px-6 py-3 bg-gray-300 text-gray-800 font-semibold rounded disabled:opacity-50"
         >
           Anterior
         </button>
@@ -159,7 +165,7 @@ const DowntimeReasonsModal: React.FC<DowntimeReasonsModalProps> = ({
             setCurrentPage(prev => Math.min(prev + 1, totalPages - 1))
           }
           disabled={currentPage === totalPages - 1}
-          className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+          className="px-6 py-3 bg-gray-300 text-gray-800 font-semibold rounded disabled:opacity-50"
         >
           Següent
         </button>
