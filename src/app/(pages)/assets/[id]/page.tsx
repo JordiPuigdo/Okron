@@ -43,6 +43,10 @@ export default function AssetDetailsPage({
   const { loginUser } = useSessionStore();
 
   useEffect(() => {
+    fetch();
+  }, [id, parentId]);
+
+  async function fetch() {
     if (id !== '0') {
       setLoading(true);
       assetService
@@ -64,7 +68,7 @@ export default function AssetDetailsPage({
       });
     }
     setIsloading(false);
-  }, [id, parentId]);
+  }
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -178,6 +182,7 @@ export default function AssetDetailsPage({
                     parentId={parentId != null ? parentId : ''}
                     onSubmit={onSubmit}
                     onChange={handleOnChange}
+                    onReload={fetch}
                   />
                 </div>
                 <div className="w-full flex flex-col gap-5 bg-white shadow-md rounded-md p-4">

@@ -45,6 +45,7 @@ const GeneratePreventive = () => {
       alert('Has de tenir un operari fitxat per fer aquesta acció');
       return;
     }
+    if (isLoading) return;
     setIsLoading(true);
     const preventives = await preventiveService.CreateWorkOrderPreventivePerDay(
       loginUser!.agentId,
@@ -118,10 +119,10 @@ const GeneratePreventive = () => {
         <div className="flex items-center">
           <Button
             onClick={generateWorkOrders}
-            customStyles="bg-white border-okron-main text-okron-main text-sm sm:text-xs md:text-sm lg:text-base rounded-md font-semibold hover:bg-[#E7DDFC] hover:border-okron-main border-2 w-full overflow-hidden text-ellipsis whitespace-nowrap"
+            customStyles="flex bg-white border-okron-main text-okron-main text-sm sm:text-xs md:text-sm lg:text-base rounded-md font-semibold hover:bg-[#E7DDFC] hover:border-okron-main border-2 w-full overflow-hidden text-ellipsis whitespace-nowrap"
           >
             Generar Revisions {formatDate(new Date(), false, false)}
-            {isLoading && <SvgSpinner className="w-6 h-6" />}
+            {isLoading && <SvgSpinner className=" w-6 h-6" />}
           </Button>
         </div>
       </>

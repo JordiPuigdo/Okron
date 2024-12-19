@@ -17,6 +17,7 @@ interface AssetFormProps {
   onChange: (header: string, value: string) => Promise<void>;
   parentId?: string;
   level?: number;
+  onReload?: () => void;
 }
 
 const AssetForm: React.FC<AssetFormProps> = ({
@@ -27,6 +28,7 @@ const AssetForm: React.FC<AssetFormProps> = ({
   onChange,
   parentId,
   level,
+  onReload,
 }) => {
   const { register, handleSubmit, setValue } = useForm();
   const router = useRouter();
@@ -43,6 +45,10 @@ const AssetForm: React.FC<AssetFormProps> = ({
   const handleFormSubmit = async (data: any) => {
     await onSubmit(data);
   };
+
+  function fetch() {
+    onReload && onReload();
+  }
 
   return (
     <form
@@ -115,7 +121,10 @@ const AssetForm: React.FC<AssetFormProps> = ({
           </div>
         </div>
         <div className="w-full p-2">
-          Equip Pare<div>{ParentAsset('')}</div>
+          Equip Pare
+          <div>
+            <ParentAsset currentId={id} onReload={fetch} />
+          </div>
         </div>
       </div>
     </form>
@@ -124,13 +133,17 @@ const AssetForm: React.FC<AssetFormProps> = ({
 
 export default AssetForm;
 
-interface ParentAssetProps {}
+interface ParentAssetProps {
+  currentId: string;
+  onReload?: () => void;
+}
 
-const ParentAsset: React.FC<ParentAssetProps> = ({}) => {
+const ParentAsset: React.FC<ParentAssetProps> = ({ currentId, onReload }) => {
   const [assets, setAssets] = useState<ElementList[]>([]);
   const [filteredAssets, setFilteredAssets] = useState<ElementList[]>([]);
   const [selectedId, setSelectedId] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [isloading, setIsloading] = useState(false);
 
   const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
   const fetchAllAssets = async () => {
@@ -159,8 +172,11 @@ const ParentAsset: React.FC<ParentAssetProps> = ({}) => {
       console.error('Error fetching assets:', error);
     }
   };
-  function handleConfirmSelection() {
-    console.log('ID seleccionado:', selectedId);
+  async function handleConfirmSelection() {
+    setIsloading(true);
+    await assetService.updateParentId(currentId, selectedId);
+    onReload && onReload();
+    setIsloading(false);
   }
   useEffect(() => {
     fetchAllAssets();
@@ -209,7 +225,7 @@ const ParentAsset: React.FC<ParentAssetProps> = ({}) => {
           disabled={!selectedId}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
         >
-          Confirmar
+          {isloading ? <SvgSpinner /> : 'Confirmar'}
         </button>
       </div>
     </div>

@@ -77,7 +77,6 @@ export const Button = ({
       )}
       onClick={handleClick}
       type={rest?.isSubmit ? 'submit' : 'button'}
-      data-tooltip={tooltip}
     >
       <ButtonBody
         id={id}
