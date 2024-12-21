@@ -508,9 +508,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   };
 
   const isDisabledField =
-    isFinished ||
-    currentWorkOrder?.stateWorkOrder == StateWorkOrder.Closed ||
-    loginUser?.permission != UserPermission.Administrator;
+    isFinished || currentWorkOrder?.stateWorkOrder == StateWorkOrder.Closed;
 
   const renderForm = () => {
     function handleSelectedAsset(id: string): void {
