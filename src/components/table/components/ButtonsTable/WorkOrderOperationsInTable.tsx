@@ -92,25 +92,41 @@ export default function WorkOrderOperationsInTable({
   async function handleChangeStateWorkOrder(state: StateWorkOrder) {
     toggleLoading(
       workOrderId +
-        (state === StateWorkOrder.PendingToValidate ? '_Validate' : '_Sign')
+        (state === StateWorkOrder.PendingToValidate ||
+        state === StateWorkOrder.Closed
+          ? '_Validate'
+          : '_Sign')
     );
 
     if (!operatorLogged) {
       alert('Has de tenir un operari fitxat per fer aquesta acció');
       toggleLoading(
         workOrderId +
-          (state === StateWorkOrder.PendingToValidate ? '_Validate' : '_Sign')
+          (state === StateWorkOrder.PendingToValidate ||
+          state === StateWorkOrder.Closed
+            ? '_Validate'
+            : '_Sign')
       );
       return;
     }
     if (hasDefaultReason) {
       alert("Tens el motiu per defecte, no pots canviar l'estat");
+      toggleLoading(
+        workOrderId +
+          (state === StateWorkOrder.PendingToValidate ||
+          state === StateWorkOrder.Closed
+            ? '_Validate'
+            : '_Sign')
+      );
       return;
     }
     if (workOrder.stateWorkOrder == state) {
       toggleLoading(
         workOrderId +
-          (state === StateWorkOrder.PendingToValidate ? '_Validate' : '_Sign')
+          (state === StateWorkOrder.PendingToValidate ||
+          state === StateWorkOrder.Closed
+            ? '_Validate'
+            : '_Sign')
       );
       return;
     }
@@ -133,7 +149,10 @@ export default function WorkOrderOperationsInTable({
     });
     toggleLoading(
       workOrderId +
-        (state === StateWorkOrder.PendingToValidate ? '_Validate' : '_Sign')
+        (state === StateWorkOrder.PendingToValidate ||
+        state === StateWorkOrder.Closed
+          ? '_Validate'
+          : '_Sign')
     );
   }
 
@@ -244,8 +263,9 @@ export default function WorkOrderOperationsInTable({
             className={`${classNameValidate}`}
             onClick={() => {
               if (
-                !validStates.includes(workOrder.stateWorkOrder) &&
-                workOrder.workOrderType != WorkOrderType.Ticket
+                (!validStates.includes(workOrder.stateWorkOrder) &&
+                  workOrder.workOrderType != WorkOrderType.Ticket) ||
+                isLoading[workOrderId + '_Validate']
               )
                 return;
 

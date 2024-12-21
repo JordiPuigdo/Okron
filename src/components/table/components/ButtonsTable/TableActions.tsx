@@ -73,7 +73,7 @@ export const TableButtonsComponent = ({
         {EntityTable.WORKORDER == entity && (
           <>
             <WorkOrderOperationsInTable
-              workOrderId={item.key}
+              workOrderId={item.id}
               workOrder={item}
               onChangeStateWorkOrder={() => {}}
               enableActions={tableButtons.edit || tableButtons.delete}
