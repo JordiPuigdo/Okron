@@ -15,7 +15,7 @@ dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export const translateStateWorkOrder = (state: StateWorkOrder): string => {
+export const translateStateWorkOrder = (state: any): string => {
   switch (state) {
     case StateWorkOrder.Waiting:
       return 'Pendent';
