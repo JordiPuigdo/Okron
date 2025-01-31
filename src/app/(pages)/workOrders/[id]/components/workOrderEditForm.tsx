@@ -5,9 +5,12 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import ModalDowntimeReasons from 'app/(pages)/corrective/components/ModalDowntimeReasons';
 import ModalGenerateCorrective from 'app/(pages)/corrective/components/ModalGenerateCorrective';
+import { useAssetHook } from 'app/hooks/useAssetHook';
 import { SvgSpinner } from 'app/icons/icons';
 import Operator, { OperatorType } from 'app/interfaces/Operator';
+import { DowntimesReasons } from 'app/interfaces/Production/Downtimes';
 import SparePart from 'app/interfaces/SparePart';
 import { UserPermission, UserType } from 'app/interfaces/User';
 import WorkOrder, {
@@ -34,24 +37,20 @@ import {
   translateWorkOrderEventType,
 } from 'app/utils/utils';
 import ChooseElement from 'components/ChooseElement';
-
 import CompleteInspectionPoints from 'components/inspectionPoint/CompleteInspectionPoint';
 import WorkOrderOperatorComments from 'components/operator/WorkOrderCommentOperator';
 import WorkOrderOperatorTimesComponent from 'components/operator/WorkOrderOperatorTimes';
+import AutocompleteSearchBar from 'components/selector/AutocompleteSearchBar';
 import ChooseSpareParts from 'components/sparePart/ChooseSpareParts';
+import { log } from 'console';
+import { da, is } from 'date-fns/locale';
 import ca from 'date-fns/locale/ca';
 import { Button } from 'designSystem/Button/Buttons';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import WorkOrderButtons from './WorkOrderButtons';
-import { da, is } from 'date-fns/locale';
 import DowntimesComponent from './Downtimes';
-import ModalDowntimeReasons from 'app/(pages)/corrective/components/ModalDowntimeReasons';
-import { DowntimesReasons } from 'app/interfaces/Production/Downtimes';
-import { useAssetHook } from 'app/hooks/useAssetHook';
-import AutocompleteSearchBar from 'components/selector/AutocompleteSearchBar';
-import { log } from 'console';
-import Link from 'next/link';
+import WorkOrderButtons from './WorkOrderButtons';
 
 type WorkOrdeEditFormProps = {
   id: string;

@@ -1,10 +1,56 @@
 module.exports = {
-  parser: '@typescript-eslint/parser', // Use the TypeScript parser
+  root: true,
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 2021, // Allows modern ECMAScript features
-    sourceType: 'module', // Allows `import` and `export`
+    ecmaVersion: 2021,
+    sourceType: 'module',
   },
-  // other configurations
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'next',
+  ],
+  plugins: ['simple-import-sort', '@typescript-eslint', 'unused-imports'],
+  rules: {
+    '@typescript-eslint/no-unused-vars': [
+      'warn', 
+      {
+        vars: 'all',
+        args: 'after-used',
+        ignoreRestSiblings: true,
+      },
+    ],
+    '@typescript-eslint/no-explicit-any': 'warn',
+    'no-prototype-builtins': [
+      'warn', 
+    ],
+    '@typescript-eslint/no-unused-expressions': 'off',
+    '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
+    'react/jsx-key': 'off',  
+    'no-useless-escape': 'off',  
+    'react/no-unescaped-entities': 'off',
+    '@typescript-eslint/no-empty-object-type': 'off',  
+    'simple-import-sort/imports': [
+      'error',
+      {
+        groups: [
+          ['^\\u0000'],
+          ['^react', '^@?\\w'],
+          ['^(src|server|config|libs|public|locales)(/.*|$)'],
+          ['^\\.'],
+        ],
+      },
+    ],
+    'simple-import-sort/exports': 'error',
+    'import/first': 'error',
+    'import/newline-after-import': 'error',
+    'import/no-duplicates': 'error',
+    'import/no-anonymous-default-export': 'error',
+    // HOOKS
+    'react-hooks/rules-of-hooks': 'off',
+    'react-hooks/exhaustive-deps': 'off',
+    'react/display-name': 'off',
+  },
 };
 
 

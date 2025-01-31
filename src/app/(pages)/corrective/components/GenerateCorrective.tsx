@@ -7,21 +7,22 @@ import { useOperatorHook } from 'app/hooks/useOperatorsHook';
 import { SvgMachines, SvgSpinner } from 'app/icons/icons';
 import { Asset } from 'app/interfaces/Asset';
 import { Corrective } from 'app/interfaces/Corrective';
+import { DowntimesReasons } from 'app/interfaces/Production/Downtimes';
 import { UserType } from 'app/interfaces/User';
 import { StateWorkOrder, WorkOrderType } from 'app/interfaces/workOrder';
 import AssetService from 'app/services/assetService';
 import WorkOrderService from 'app/services/workOrderService';
 import { useGlobalStore, useSessionStore } from 'app/stores/globalStore';
 import { translateStateWorkOrder } from 'app/utils/utils';
+import { ErrorMessage } from 'components/Alerts/ErrorMessage';
+import { SuccessfulMessage } from 'components/Alerts/SuccesfullMessage';
 import ChooseElement from 'components/ChooseElement';
 import AutocompleteSearchBar from 'components/selector/AutocompleteSearchBar';
 import { ElementList } from 'components/selector/ElementList';
 import { ca } from 'date-fns/locale';
 import { useRouter } from 'next/navigation';
+
 import ModalDowntimeReasons from './ModalDowntimeReasons';
-import { DowntimesReasons } from 'app/interfaces/Production/Downtimes';
-import { SuccessfulMessage } from 'components/Alerts/SuccesfullMessage';
-import { ErrorMessage } from 'components/Alerts/ErrorMessage';
 import {
   convertToCreateWorkOrderRequest,
   isValidData,

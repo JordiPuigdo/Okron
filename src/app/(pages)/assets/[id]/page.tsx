@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@tremor/react';
+import Downtimes from 'app/(pages)/machines/downtimes/downtime';
 import PreventiveTable from 'app/(pages)/preventive/preventiveTable/preventiveTable';
 import SparePartTable from 'app/(pages)/spareParts/components/SparePartTable';
 import WorkOrderTable from 'app/(pages)/workOrders/components/WorkOrderTable';
@@ -13,14 +13,12 @@ import {
   UpdateAssetRequest,
 } from 'app/interfaces/Asset';
 import AssetService from 'app/services/assetService';
-
+import { useSessionStore } from 'app/stores/globalStore';
+import { CostsObjectComponent } from 'components/Costs/CostsObject';
 import Container from 'components/layout/Container';
 import MainLayout from 'components/layout/MainLayout';
 
 import AssetForm from '../components/assetForm';
-import { useSessionStore } from 'app/stores/globalStore';
-import { CostsObjectComponent } from 'components/Costs/CostsObject';
-import Downtimes from 'app/(pages)/machines/downtimes/downtime';
 
 export default function AssetDetailsPage({
   params,

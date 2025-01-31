@@ -4,7 +4,10 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "eslint:clean": "rm .eslintcache",
+    "lint": "eslint .",
+    "lint:clean": "npm run eslint:clean && npm run lint"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.18",
@@ -33,6 +36,7 @@
     "@types/react-datepicker": "^4.19.5",
     "@types/react-dom": "^17.0.1",
     "autoprefixer": "^10.4.16",
+    "eslint": "^8.57.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-unused-imports": "^4.1.4",
     "postcss": "^8.4.32",

@@ -1,5 +1,8 @@
 import { OperatorType } from 'app/interfaces/Operator';
-import { DowntimesReasonsType } from 'app/interfaces/Production/Downtimes';
+import {
+  DowntimesReasonsType,
+  OriginDowntime,
+} from 'app/interfaces/Production/Downtimes';
 import {
   StateWorkOrder,
   WorkOrderEventType,
@@ -7,9 +10,9 @@ import {
 } from 'app/interfaces/workOrder';
 import { useSessionStore } from 'app/stores/globalStore';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
@@ -332,4 +335,15 @@ export function isValidDateTimeFormat(dateTime: string): boolean {
   }
 
   return true; // String is a valid "DD/MM/YYYY HH:mm:ss" format
+}
+
+export function translateOriginDowntime(originDowntime: OriginDowntime) {
+  switch (originDowntime) {
+    case 0:
+      return 'Manteniment';
+    case 1:
+      return 'Producció';
+    default:
+      return originDowntime;
+  }
 }

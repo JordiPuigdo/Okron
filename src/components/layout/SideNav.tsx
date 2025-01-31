@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { usePathname } from 'next/navigation';
 import { SvgArrowDown, SvgArrowRight, SvgSpinner } from 'app/icons/icons';
 import { UserType } from 'app/interfaces/User';
 import { useSessionStore } from 'app/stores/globalStore';
 import { SideNavItem } from 'app/types/SideNavItem';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import { SIDENAV_ITEMS } from './SideNavItems';
 

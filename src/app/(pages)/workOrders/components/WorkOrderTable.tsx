@@ -7,6 +7,7 @@ import DatePicker from 'react-datepicker';
 import { SvgSpinner } from 'app/icons/icons';
 import { Asset } from 'app/interfaces/Asset';
 import { OperatorType } from 'app/interfaces/Operator';
+import { UserType } from 'app/interfaces/User';
 import WorkOrder, {
   OriginWorkOrder,
   SearchWorkOrderFilters,
@@ -30,7 +31,6 @@ import ca from 'date-fns/locale/ca';
 import { Button } from 'designSystem/Button/Buttons';
 
 import FinalizeWorkOrdersDaysBefore from './FinalizeWorkOrdersDaysBefore';
-import { UserType } from 'app/interfaces/User';
 import { baseColumns, columnsTicket } from './utilsWorkOrderTable';
 
 interface WorkOrderTableProps {

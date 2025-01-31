@@ -1,226 +1,255 @@
 'use client';
 import React, { useState } from 'react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import DatePicker from 'react-datepicker';
+import {
+  DowntimesReasonsType,
+  OriginDowntime,
+} from 'app/interfaces/Production/Downtimes';
+import { DowntimesTicketReport } from 'app/interfaces/Production/DowntimesTicketReport';
+import {
+  calculateTimeDifference,
+  formatDate,
+  translateDowntimeReasonType,
+} from 'app/utils/utils';
+import ca from 'date-fns/locale/ca';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import { Button } from 'designSystem/Button/Buttons';
+import Link from 'next/link';
 
-interface Downtime {
-  originalType: string; // 'Maintenance' or 'Production'
-  start: string;
-  end: string;
-}
+import {
+  calculateDowntimeCount,
+  calculateTotalDowntimes,
+  filterAssets,
+} from './downtimeUtils';
 
-interface Ticket {
-  workOrder: string;
-  asset: string;
-  downtimeReason: string;
-  downtimes: Downtime[];
-}
-
+dayjs.extend(utc);
+dayjs.extend(timezone);
 interface DowntimeReportProps {
-  tickets: Ticket[];
+  downtimesTicketReport: DowntimesTicketReport[];
+  from: Date;
+  to: Date;
+  setFrom: (date: Date) => void;
+  setTo: (date: Date) => void;
+  reloadData: () => void;
 }
 
-// Helper: Group downtimes by asset or downtime reason
-const groupDowntimes = (
-  tickets: Ticket[],
-  groupBy: 'asset' | 'downtimeReason'
-) => {
-  const grouped: Record<string, Record<string, number>> = {}; // Nested object to store downtime reasons dynamically
+const DowntimeReport: React.FC<DowntimeReportProps> = ({
+  downtimesTicketReport,
+  from,
+  to,
+  setFrom,
+  setTo,
+  reloadData,
+}) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [expandedAssets, setExpandedAssets] = useState<Set<string>>(new Set());
+  const [onlyTickets, setOnlyTickets] = useState(false);
 
-  tickets.forEach(ticket => {
-    const groupKey = ticket['asset']; // Dynamically group by asset or downtimeReason
-    if (groupBy === 'asset') {
-      if (!grouped[groupKey]) {
-        grouped[groupKey] = { maintenance: 0, production: 0 };
+  const toggleExpand = (assetCode: string) => {
+    setExpandedAssets(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(assetCode)) {
+        newSet.delete(assetCode);
+      } else {
+        newSet.add(assetCode);
       }
-      ticket.downtimes.forEach(downtime => {
-        const start = new Date(downtime.start).getTime();
-        const end = new Date(downtime.end).getTime();
-        const duration = (end - start) / 60000; // Convert to minutes
+      return newSet;
+    });
+  };
 
-        if (downtime.originalType === 'Maintenance') {
-          grouped[groupKey].maintenance += duration;
-        } else if (downtime.originalType === 'Production') {
-          grouped[groupKey].production += duration;
-        }
-      });
-    } else {
-      // Initialize the group if it doesn't exist
-      if (!grouped[groupKey]) {
-        grouped[groupKey] = {};
-      }
+  const renderDowntimeTree = (
+    report: DowntimesTicketReport[],
+    level: number = 0
+  ) => {
+    return report.map((asset, assetIndex) => {
+      const isExpanded = expandedAssets.has(asset.assetCode);
+      const downtimeCount = calculateDowntimeCount([asset]);
+      const totalTime = calculateTotalDowntimes([asset]);
+      const hasChildren = asset.assetChild && asset.assetChild.length > 0;
 
-      const downtimeReason = ticket.downtimeReason;
-      ticket.downtimes.forEach(downtime => {
-        const start = new Date(downtime.start).getTime();
-        const end = new Date(downtime.end).getTime();
-        const duration = (end - start) / 60000; // Convert to minutes
+      return (
+        <div
+          key={assetIndex}
+          className={`bg-white shadow-md rounded-lg p-4 border border-gray-200 mb-4 ${
+            level > 0 ? 'ml-6' : ''
+          }`}
+        >
+          <div
+            className={`mb-4 flex items-center justify-between ${
+              (hasChildren || downtimeCount > 0) && 'cursor-pointer'
+            } ${downtimeCount > 0 && 'bg-green-200 p-2 rounded-lg'}`}
+            onClick={() =>
+              (hasChildren || downtimeCount > 0) &&
+              toggleExpand(asset.assetCode)
+            }
+          >
+            <h2 className="text-xl font-semibold text-gray-700">
+              {asset.assetCode} - {asset.assetDescription} ({downtimeCount}{' '}
+              Tickets) {totalTime}
+            </h2>
+            {(hasChildren || downtimeCount > 0) && (
+              <span
+                className="text-gray-500 cursor-pointer"
+                onClick={() => toggleExpand(asset.assetCode)}
+              >
+                {isExpanded ? '▲' : '▼'}
+              </span>
+            )}
+          </div>
 
-        const reasonKey = downtimeReason; // Use the downtime reason as a key
+          {isExpanded && (
+            <>
+              <div className="space-y-4">
+                {asset.downtimesTicketReportList.map((workOrder, workIndex) => (
+                  <div
+                    key={workIndex}
+                    className="bg-gray-100 rounded-lg p-3 shadow-inner"
+                  >
+                    <h3 className="text-lg font-medium text-gray-800 mb-2 bg-gray-300 p-2 rounded-lg">
+                      <Link href={`/workOrders/${workOrder.workOrderId}`}>
+                        {workOrder.workOrderCode} -{' '}
+                        {workOrder.workOrderDescription} -{' '}
+                        {workOrder.downtimeReason}
+                      </Link>
+                    </h3>
+                    <div className={`flex flex-col gap-2`}>
+                      {workOrder.downtimesWorkOrder.map(
+                        (downtime, downtimeIndex) => (
+                          <div
+                            key={downtimeIndex}
+                            className={`flex flex-row gap-4 text-sm p-2 rounded shadow-sm ${
+                              downtime.originDownTime ===
+                              OriginDowntime.Production
+                                ? 'bg-red-700'
+                                : 'bg-blue-700'
+                            }`}
+                          >
+                            <div className="flex flex-col w-full gap-2">
+                              <div className="flex gap-2">
+                                <div className="flex flex-row gap-1">
+                                  <span className="text-white font-bold">
+                                    Inici:
+                                  </span>
+                                  <span className="text-white">
+                                    {formatDate(downtime.startTime)}
+                                  </span>
+                                  <span className="text-white"> - </span>
+                                  <span className="text-white font-bold">
+                                    Final:
+                                  </span>
+                                  <span className="text-white">
+                                    {formatDate(downtime.endTime)}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex items-start gap-1">
+                                <span className="text-white font-semibold">
+                                  Total:
+                                </span>
+                                <span className="text-white">
+                                  {calculateTimeDifference(
+                                    downtime.startTime,
+                                    downtime.endTime
+                                  )}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex w-full justify-end">
+                              <div className="flex flex-col gap-2 items-end">
+                                <span className="text-white font-semibold">
+                                  {translateDowntimeReasonType(
+                                    downtime.originDownTime as unknown as DowntimesReasonsType
+                                  )}
+                                </span>
+                                <span className="text-white">
+                                  {downtime.operator.name}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-        // Initialize downtime reason if it doesn't exist for the current group
-        if (!grouped[groupKey][reasonKey]) {
-          grouped[groupKey][reasonKey] = 0;
-        }
+              {(hasChildren || asset.downtimesTicketReportList.length > 0) && (
+                <div className="mt-4">
+                  {renderDowntimeTree(asset.assetChild, level + 1)}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      );
+    });
+  };
 
-        // Add the downtime duration for the reason
-        grouped[groupKey][reasonKey] += duration;
-      });
-    }
-  });
-
-  return grouped;
-};
-
-const DowntimeReport: React.FC<DowntimeReportProps> = ({ tickets }) => {
-  const [groupBy, setGroupBy] = useState<'asset' | 'downtimeReason'>('asset');
-  const groupedData = groupDowntimes(tickets, groupBy);
-
-  const handleGroupByAsset = () => setGroupBy('asset');
-  const handleGroupByDowntimeReason = () => setGroupBy('downtimeReason');
+  const filteredData = filterAssets(
+    downtimesTicketReport,
+    searchQuery.toLowerCase(),
+    onlyTickets
+  );
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
+      <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
         Report Aturades
       </h1>
+      <div className="mb-6 ">
+        <div className="flex gap-4 mb-4">
+          <DatePicker
+            selected={from}
+            onChange={e => (e ? setFrom(e) : setFrom(new Date()))}
+            locale={ca}
+            dateFormat="dd/MM/yyyy"
+            className="border border-gray-300 p-2 rounded-md mr-4 w-full"
+          />
+          <DatePicker
+            selected={to}
+            onChange={e => (e ? setTo(e) : setTo(new Date()))}
+            dateFormat="dd/MM/yyyy"
+            locale={ca}
+            className="border border-gray-300 p-2 rounded-md mr-4 w-full"
+          />
 
-      {/* Filter Buttons */}
-      <div className="mb-6 flex justify-center gap-4">
-        <button
-          onClick={handleGroupByAsset}
-          className={`px-6 py-2 rounded-lg text-white font-semibold ${
-            groupBy === 'asset' ? 'bg-blue-600' : 'bg-gray-400'
-          } hover:bg-blue-500 transition`}
-        >
-          Equip
-        </button>
-        <button
-          onClick={handleGroupByDowntimeReason}
-          className={`px-6 py-2 rounded-lg text-white font-semibold ${
-            groupBy === 'downtimeReason' ? 'bg-blue-600' : 'bg-gray-400'
-          } hover:bg-blue-500 transition`}
-        >
-          Motiu Aturada
-        </button>
+          <Button type="create" onClick={() => reloadData}>
+            Buscar
+          </Button>
+          <div
+            className="flex items-center gap-4 cursor-pointer"
+            onClick={() => setOnlyTickets(!onlyTickets)}
+          >
+            <div className="flex flex-col">
+              <span>Només</span>
+              <span>Tickets</span>
+            </div>
+            <input
+              type="checkbox"
+              className="flex cursor-pointer"
+              checked={onlyTickets}
+              onChange={e => setOnlyTickets(e.target.checked)}
+            />
+          </div>
+        </div>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          placeholder="Buscar per equip, codi d'operació o motiu"
+          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
+        />
       </div>
-
-      {Object.keys(groupedData).length === 0 ? (
-        <p className="text-center text-gray-500">No downtime data available.</p>
+      {downtimesTicketReport.length === 0 ? (
+        <p className="text-center text-gray-500">
+          No hi ha registres amb aquest filtre.
+        </p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {Object.entries(groupedData).map(([key, data], index) => {
-            let totalDowntime = 0;
-            let chartData: any[] = [];
-
-            if (groupBy === 'asset') {
-              totalDowntime = data.maintenance + data.production;
-            } else {
-              if (data) {
-                Object.entries(data).forEach(([type, downtime]) => {
-                  totalDowntime += downtime;
-                  chartData.push({
-                    name: type,
-                    value: downtime,
-                  });
-                });
-              }
-            }
-
-            const generateRandomColor = () => {
-              const randomColor = Math.floor(Math.random() * 16777215).toString(
-                16
-              ); // Generates a random integer and converts it to hex
-              return `#${randomColor.padStart(6, '0')}`; // Ensure the hex code is 6 digits long
-            };
-
-            // Existing COLORS array
-            const COLORS = ['#4C97FF', '#FF4C6D'];
-
-            // Generate 15 random colors and add to the COLORS array
-            const randomColors = Array.from(
-              { length: chartData.length },
-              generateRandomColor
-            );
-
-            // Combine the existing colors with the random ones
-            const allColors = [...COLORS, ...randomColors];
-
-            if (groupBy === 'asset') {
-              chartData = [
-                {
-                  category: 'Maintenance',
-                  value: data.maintenance,
-                },
-                {
-                  category: 'Production',
-                  value: data.production,
-                },
-              ];
-            }
-
-            return (
-              <div
-                key={index}
-                className="border-2 border-gray-200 rounded-xl shadow-xl p-6 bg-white hover:bg-gray-50 transition-all duration-300 ease-in-out"
-              >
-                <h2 className="text-xl font-semibold text-center text-gray-700 mb-4">
-                  {key}
-                </h2>
-                <div className="space-y-4">
-                  {/* Donut Chart with Gradient Styling */}
-                  <ResponsiveContainer width="100%" height={250}>
-                    <PieChart>
-                      <Pie
-                        data={chartData}
-                        innerRadius={60} // Creates the donut effect
-                        outerRadius={80}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        paddingAngle={5}
-                        label={({ percent }) =>
-                          `${(percent * 100).toFixed(0)}%`
-                        }
-                      >
-                        {chartData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={allColors[index % allColors.length]}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  {/* Downtime Summary */}
-                  <div className="text-center text-gray-700 mt-4">
-                    <p className="text-lg font-semibold">
-                      <strong>Total:</strong> {totalDowntime.toFixed(2)} minuts
-                    </p>
-                    {groupBy === 'asset' ? (
-                      <p className="text-sm text-gray-500">
-                        ({((data.maintenance / totalDowntime) * 100).toFixed(1)}
-                        % Manteniment,{' '}
-                        {((data.production / totalDowntime) * 100).toFixed(1)}%
-                        Producció)
-                      </p>
-                    ) : (
-                      <>
-                        {chartData.length > 0 &&
-                          chartData.map((data, index) => (
-                            <p key={index} className="text-sm text-gray-500">
-                              {((data.value / totalDowntime) * 100).toFixed(1)}%
-                              - {data.name}
-                            </p>
-                          ))}
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+          {renderDowntimeTree(filteredData)}
         </div>
       )}
     </div>

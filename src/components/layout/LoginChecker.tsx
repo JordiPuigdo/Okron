@@ -1,6 +1,5 @@
 'use client';
 import { ReactNode, useEffect, useState } from 'react';
-import { SvgSpinner } from 'app/icons/icons';
 import { useSessionStore } from 'app/stores/globalStore';
 import { useToken } from 'app/utils/token';
 import useRoutes from 'app/utils/useRoutes';

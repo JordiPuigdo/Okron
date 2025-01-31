@@ -18,12 +18,10 @@ import {
 } from 'app/utils/utils';
 import dayjs from 'dayjs';
 import { BarChartComponent } from 'designSystem/BarChart/BarChartComponent';
-import { Button } from 'designSystem/Button/Buttons';
 import { DonutChartComponent } from 'designSystem/DonutChart/DonutChartComponent';
 
-import CostXAsset from '../components/CostXAsset';
-import OTsXAsset from '../components/OTsXAsset';
 import ButtonsSections from '../components/ButtonsSections';
+import CostXAsset from '../components/CostXAsset';
 import WorkOrdersDashboard from '../components/WorkOrdersDashboard';
 
 interface WorkOrdersChartProps {

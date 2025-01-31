@@ -8,6 +8,7 @@ import {
 } from 'app/interfaces/Production/Downtimes';
 import DowntimesService from 'app/services/downtimesService';
 import { translateDowntimeReasonType } from 'app/utils/utils';
+
 import { EditableCell } from './EditingCell';
 
 interface DownTimeReasonsConfiguredProps {
@@ -61,7 +62,7 @@ const DownTimeReasonsConfigured: React.FC<DownTimeReasonsConfiguredProps> = ({
   }, [addDowntimeReason]);
 
   const handleUpdate = async (id: string, updatedDescription: string) => {
-    let reason = downtimeReasons.find(x => x.id == id);
+    const reason = downtimeReasons.find(x => x.id == id);
     downtimeReasonsService.updateDowntimesReason({
       description: updatedDescription,
       id: id,

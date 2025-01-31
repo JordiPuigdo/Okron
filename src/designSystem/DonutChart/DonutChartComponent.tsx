@@ -1,6 +1,8 @@
 import { WorkOrderType } from 'app/interfaces/workOrder';
 import { translateWorkOrderType } from 'app/utils/utils';
+
 import DonutChart from './DonutChart';
+
 export interface DonutChartComponentProps {
   chartData: any[];
   title: string;

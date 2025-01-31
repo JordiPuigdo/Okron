@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { SvgSpinner } from 'app/icons/icons';
 import { Asset } from 'app/interfaces/Asset';
-import useRoutes from 'app/utils/useRoutes';
-import { useRouter } from 'next/navigation';
-import { ElementList } from 'components/selector/ElementList';
 import AssetService from 'app/services/assetService';
+import useRoutes from 'app/utils/useRoutes';
+import { ElementList } from 'components/selector/ElementList';
+import { useRouter } from 'next/navigation';
 
 interface AssetFormProps {
   id: string;

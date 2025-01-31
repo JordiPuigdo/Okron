@@ -1,13 +1,12 @@
-import { SvgClose } from 'app/icons/icons';
-import { useGlobalStore } from 'app/stores/globalStore';
-import { Modal } from 'designSystem/Modals/Modal';
-
-import DowntimesService from 'app/services/downtimesService';
 import { useEffect, useState } from 'react';
+import { SvgClose } from 'app/icons/icons';
 import {
   DowntimesReasons,
   DowntimesReasonsType,
 } from 'app/interfaces/Production/Downtimes';
+import DowntimesService from 'app/services/downtimesService';
+import { useGlobalStore } from 'app/stores/globalStore';
+import { Modal } from 'designSystem/Modals/Modal';
 
 interface ModalDowntimeReasonsProps {
   selectedId: string;

@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { EditableCell } from 'app/(pages)/machines/downtimes/components/EditingCell';
 import { Downtimes } from 'app/interfaces/Production/Downtimes';
+import WorkOrder, { StateWorkOrder } from 'app/interfaces/workOrder';
 import WorkOrderService from 'app/services/workOrderService';
+import { useSessionStore } from 'app/stores/globalStore';
 import {
   calculateTimeDifference,
   formatDate,
@@ -10,11 +13,8 @@ import {
   validateFormattedDateTime,
 } from 'app/utils/utils';
 import dayjs from 'dayjs';
-import { useState } from 'react';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import utc from 'dayjs/plugin/utc';
-import { useSessionStore } from 'app/stores/globalStore';
-import WorkOrder, { StateWorkOrder } from 'app/interfaces/workOrder';
 
 dayjs.extend(utc);
 dayjs.extend(customParseFormat);

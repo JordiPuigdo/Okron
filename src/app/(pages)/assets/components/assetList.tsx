@@ -5,8 +5,8 @@ import { Asset } from 'app/interfaces/Asset';
 import AssetService from 'app/services/assetService';
 import { LoadingState } from 'app/types/loadingState';
 import { ButtonTypesTable } from 'components/table/DataTable';
-import Link from 'next/link';
 import { Button } from 'designSystem/Button/Buttons';
+import Link from 'next/link';
 
 interface Props {
   asset: Asset;

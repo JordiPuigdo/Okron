@@ -1,4 +1,8 @@
 import { UpdateDowntimesRequest } from 'app/interfaces/Production/Downtimes';
+import {
+  DowntimesTicketReport,
+  DowntimesTicketRequest,
+} from 'app/interfaces/Production/DowntimesTicketReport';
 import WorkOrder, {
   AddCommentToWorkOrderRequest,
   AddWorkOrderOperatorTimes,
@@ -445,6 +449,31 @@ class WorkOrderService {
       throw error;
     }
     return false;
+  }
+
+  async getDowntimesTicketReport(
+    request: DowntimesTicketRequest
+  ): Promise<DowntimesTicketReport[]> {
+    try {
+      const url = `${this.baseUrl}workOrder/DowntimesTicketReport?from=${request.from}&to=${request.to}`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch GetDowntimesTicketReport');
+      }
+      if (response.status === 204) {
+        return [];
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching GetDowntimesTicketReport:', error);
+      throw error;
+    }
   }
 }
 

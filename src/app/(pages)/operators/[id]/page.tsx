@@ -1,6 +1,7 @@
 'use client';
 
 import { BaseSyntheticEvent, useEffect, useState } from 'react';
+import { SvgMachines } from 'app/icons/icons';
 import Operator, { OperatorType } from 'app/interfaces/Operator';
 import { Preventive } from 'app/interfaces/Preventive';
 import OperatorService from 'app/services/operatorService';
@@ -10,7 +11,6 @@ import MainLayout from 'components/layout/MainLayout';
 import OperatorForm from 'components/OperatorForm';
 
 import PreventiveAssignment from './PreventiveAssignament';
-import { SvgMachines } from 'app/icons/icons';
 
 export default function EditOperatorPage({
   params,

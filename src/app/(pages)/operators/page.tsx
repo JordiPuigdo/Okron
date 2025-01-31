@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { SvgCreate, SvgMachines } from 'app/icons/icons';
 import Operator, { OperatorType } from 'app/interfaces/Operator';
 import OperatorService from 'app/services/operatorService';
 import Container from 'components/layout/Container';
@@ -17,7 +18,6 @@ import { EntityTable } from 'components/table/interface/tableEntitys';
 import { Button } from 'designSystem/Button/Buttons';
 
 import OperatorForm from '../../../components/OperatorForm';
-import { SvgCreate, SvgMachines } from 'app/icons/icons';
 
 function OperatorsPage() {
   const [operators, setOperators] = useState<Operator[]>([]);

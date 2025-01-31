@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { SvgCreate, SvgMachines } from 'app/icons/icons';
 import InspectionPointService from 'app/services/inspectionPointService';
 import Container from 'components/layout/Container';
 import MainLayout from 'components/layout/MainLayout';
@@ -15,7 +16,6 @@ import {
 import { EntityTable } from 'components/table/interface/tableEntitys';
 
 import InspectionPoint from '../../interfaces/inspectionPoint';
-import { SvgCreate, SvgMachines } from 'app/icons/icons';
 
 export default function InspectionPointsPage() {
   const [inspectionPoints, setInspectionPoints] = useState<InspectionPoint[]>(

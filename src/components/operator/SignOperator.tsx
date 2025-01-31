@@ -1,9 +1,9 @@
 'use client';
 import { useState } from 'react';
+import { SvgSearch } from 'app/icons/icons';
 import { OperatorLogged } from 'app/interfaces/User';
 import AuthenticationService from 'app/services/authentication';
 import { useSessionStore } from 'app/stores/globalStore';
-import { SvgSearch } from 'app/icons/icons';
 
 export default function SignOperator() {
   const { setOperatorLogged, operatorLogged } = useSessionStore(state => state);

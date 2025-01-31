@@ -6,7 +6,7 @@ export interface Downtimes extends BaseModel {
   endTime: string;
   totalTime: string;
   operator: Operator;
-  originDowntime: OriginDowntime;
+  originDownTime: OriginDowntime;
   id: string;
 }
 

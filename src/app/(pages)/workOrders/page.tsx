@@ -1,12 +1,12 @@
 'use client';
 
+import { SvgMachines } from 'app/icons/icons';
+import { UserType } from 'app/interfaces/User';
+import { useSessionStore } from 'app/stores/globalStore';
 import Container from 'components/layout/Container';
 import MainLayout from 'components/layout/MainLayout';
 
 import WorkOrderTable from './components/WorkOrderTable';
-import { SvgMachines } from 'app/icons/icons';
-import { useSessionStore } from 'app/stores/globalStore';
-import { UserType } from 'app/interfaces/User';
 
 export default function WorkOrdersPage() {
   const { loginUser } = useSessionStore(state => state);

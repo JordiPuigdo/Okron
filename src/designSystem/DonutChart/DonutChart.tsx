@@ -1,6 +1,6 @@
-import { WorkOrderTypeChartProps } from 'app/(pages)/menu/dashboard/DashboardMM/DashboardMM';
 import React from 'react';
-import { PieChart, Pie, Cell } from 'recharts';
+import { WorkOrderTypeChartProps } from 'app/(pages)/menu/dashboard/DashboardMM/DashboardMM';
+import { Cell, Pie, PieChart } from 'recharts';
 
 export interface DonutChartComponentProps {
   chartData: WorkOrderTypeChartProps[];

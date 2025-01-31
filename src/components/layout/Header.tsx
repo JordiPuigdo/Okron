@@ -1,13 +1,12 @@
+import GeneratePreventive from 'app/(pages)/preventive/components/GeneratePreventive';
+import FinalizeWorkOrdersDaysBefore from 'app/(pages)/workOrders/components/FinalizeWorkOrdersDaysBefore';
+import { SvgAccount, SvgLogo, SvgLogOut, SvgMenu } from 'app/icons/icons';
+import { UserPermission, UserType } from 'app/interfaces/User';
 import { useSessionStore } from 'app/stores/globalStore';
 import useRoutes from 'app/utils/useRoutes';
-import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
-
-import { SvgAccount, SvgLogo, SvgLogOut, SvgMenu } from 'app/icons/icons';
 import SignOperator from 'components/operator/SignOperator';
-import { UserPermission, UserType } from 'app/interfaces/User';
-import FinalizeWorkOrdersDaysBefore from 'app/(pages)/workOrders/components/FinalizeWorkOrdersDaysBefore';
-import GeneratePreventive from 'app/(pages)/preventive/components/GeneratePreventive';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 
 const Header: React.FC = () => {
   const {

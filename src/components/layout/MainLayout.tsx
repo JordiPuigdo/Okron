@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useSessionStore } from 'app/stores/globalStore';
 import Loader from 'components/Loader/loader';
 import Link from 'next/link';
 
 import Header from './Header';
 import SideNav from './SideNav';
-import { useSessionStore } from 'app/stores/globalStore';
 
 export default function MainLayout({
   children,

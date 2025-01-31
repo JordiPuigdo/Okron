@@ -10,6 +10,7 @@ import {
   SvgSpinner,
   SvgStart,
 } from 'app/icons/icons';
+import { UserType } from 'app/interfaces/User';
 import WorkOrder, {
   StateWorkOrder,
   UpdateStateWorkOrder,
@@ -23,7 +24,6 @@ import { checkAllInspectionPoints } from 'app/utils/utilsInspectionPoints';
 import ChooseSpareParts from 'components/sparePart/ChooseSpareParts';
 import { Button } from 'designSystem/Button/Buttons';
 import { Modal } from 'designSystem/Modals/Modal';
-import { UserType } from 'app/interfaces/User';
 import { current } from 'tailwindcss/colors';
 
 interface WorkOrderOperationsInTableProps {

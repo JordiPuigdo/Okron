@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import ca from 'date-fns/locale/ca';
 import DatePicker from 'react-datepicker';
-import { OriginWorkOrder } from 'app/interfaces/workOrder';
 import { useWorkOrders } from 'app/hooks/useWorkOrders';
-import { LoginUser, UserType } from 'app/interfaces/User';
 import { SvgSpinner } from 'app/icons/icons';
+import { LoginUser, UserType } from 'app/interfaces/User';
+import { OriginWorkOrder } from 'app/interfaces/workOrder';
+import ca from 'date-fns/locale/ca';
 
 interface CostsProps {
   operatorCosts: number;
