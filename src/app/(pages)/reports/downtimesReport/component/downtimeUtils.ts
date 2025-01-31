@@ -1,4 +1,8 @@
-import { DowntimesTicketReport } from 'app/interfaces/Production/DowntimesTicketReport';
+import { Downtimes } from 'app/interfaces/Production/Downtimes';
+import {
+  DowntimesTicketReport,
+  DowntimesTicketReportModel,
+} from 'app/interfaces/Production/DowntimesTicketReport';
 
 export const calculateDowntimeCount = (
   report: DowntimesTicketReport[]
@@ -43,6 +47,30 @@ export const calculateTotalDowntimes = (
   };
 
   const totalSeconds = sumDowntimes(report);
+
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+    2,
+    '0'
+  )}:${String(Math.floor(seconds)).padStart(2, '0')}`;
+};
+
+export const calculateTotalDowntimeMWO = (
+  downtimes: DowntimesTicketReportModel[]
+): string => {
+  const timeToSeconds = (time: string): number => {
+    const [hours, minutes, seconds] = time.split(':').map(Number);
+    return hours * 3600 + minutes * 60 + seconds;
+  };
+  let totalSeconds = 0;
+  downtimes.forEach(downtime => {
+    if (downtime.totalTime) {
+      totalSeconds += timeToSeconds(downtime.totalTime);
+    }
+  });
 
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);

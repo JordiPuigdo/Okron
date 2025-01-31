@@ -20,6 +20,7 @@ import Link from 'next/link';
 
 import {
   calculateDowntimeCount,
+  calculateTotalDowntimeMWO,
   calculateTotalDowntimes,
   filterAssets,
 } from './downtimeUtils';
@@ -45,7 +46,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedAssets, setExpandedAssets] = useState<Set<string>>(new Set());
-  const [onlyTickets, setOnlyTickets] = useState(false);
+  const [onlyTickets, setOnlyTickets] = useState(true);
 
   const toggleExpand = (assetCode: string) => {
     setExpandedAssets(prev => {
@@ -107,13 +108,24 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
                     key={workIndex}
                     className="bg-gray-100 rounded-lg p-3 shadow-inner"
                   >
-                    <h3 className="text-lg font-medium text-gray-800 mb-2 bg-gray-300 p-2 rounded-lg">
-                      <Link href={`/workOrders/${workOrder.workOrderId}`}>
-                        {workOrder.workOrderCode} -{' '}
-                        {workOrder.workOrderDescription} -{' '}
-                        {workOrder.downtimeReason}
-                      </Link>
-                    </h3>
+                    <Link href={`/workOrders/${workOrder.workOrderId}`}>
+                      <div className="flex flex-row gap-2 w-full items-center text-lg font-medium text-gray-800 mb-2 bg-gray-300 p-2 rounded-lg">
+                        <span className="flex-1">
+                          {workOrder.workOrderCode}
+                        </span>
+                        <span className="flex-1">
+                          {workOrder.workOrderDescription}
+                        </span>
+                        <span className="flex-1">
+                          {workOrder.downtimeReason}
+                        </span>
+                        <span className="flex-1 text-right">
+                          {calculateTotalDowntimeMWO(
+                            workOrder.downtimesWorkOrder
+                          )}
+                        </span>
+                      </div>
+                    </Link>
                     <div className={`flex flex-col gap-2`}>
                       {workOrder.downtimesWorkOrder.map(
                         (downtime, downtimeIndex) => (
