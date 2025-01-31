@@ -1,4 +1,4 @@
-import { Downtimes } from 'app/interfaces/Production/Downtimes';
+import { OriginDowntime } from 'app/interfaces/Production/Downtimes';
 import {
   DowntimesTicketReport,
   DowntimesTicketReportModel,
@@ -15,13 +15,13 @@ export const calculateDowntimeCount = (
 };
 
 export const calculateTotalDowntimes = (
-  report: DowntimesTicketReport[]
+  report: DowntimesTicketReport[],
+  downtimeFilter: 'M' | 'P' | '' = ''
 ): string => {
-  const timeToSeconds = (time: string): number => {
-    const [hours, minutes, seconds] = time.split(':').map(Number);
-    return hours * 3600 + minutes * 60 + seconds;
+  const filterMap = {
+    M: OriginDowntime.Maintenance,
+    P: OriginDowntime.Production,
   };
-
   const sumDowntimes = (assets: DowntimesTicketReport[]): number => {
     return assets.reduce((total, asset) => {
       const childCount = sumDowntimes(asset.assetChild || []);
@@ -30,13 +30,19 @@ export const calculateTotalDowntimes = (
         (acc, ticket) => {
           const ticketTime = ticket.downtimesWorkOrder.reduce(
             (workOrderAcc, workOrder) => {
-              if (workOrder.totalTime) {
-                return workOrderAcc + timeToSeconds(workOrder.totalTime);
+              if (!workOrder.totalTime) return workOrderAcc;
+              if (
+                downtimeFilter &&
+                workOrder.originDownTime !== filterMap[downtimeFilter]
+              ) {
+                return workOrderAcc;
               }
-              return workOrderAcc;
+
+              return workOrderAcc + timeToSeconds(workOrder.totalTime);
             },
             0
           );
+
           return acc + ticketTime;
         },
         0
@@ -59,19 +65,23 @@ export const calculateTotalDowntimes = (
 };
 
 export const calculateTotalDowntimeMWO = (
-  downtimes: DowntimesTicketReportModel[]
+  downtimes: DowntimesTicketReportModel[],
+  downtimeFilter: 'M' | 'P' | '' = ''
 ): string => {
-  const timeToSeconds = (time: string): number => {
-    const [hours, minutes, seconds] = time.split(':').map(Number);
-    return hours * 3600 + minutes * 60 + seconds;
+  const filterMap = {
+    M: OriginDowntime.Maintenance,
+    P: OriginDowntime.Production,
   };
-  let totalSeconds = 0;
-  downtimes.forEach(downtime => {
-    if (downtime.totalTime) {
-      totalSeconds += timeToSeconds(downtime.totalTime);
-    }
-  });
 
+  const totalSeconds = downtimes.reduce(
+    (acc, { totalTime, originDownTime }) => {
+      if (!totalTime) return acc;
+      if (downtimeFilter && originDownTime !== filterMap[downtimeFilter])
+        return acc;
+      return acc + timeToSeconds(totalTime);
+    },
+    0
+  );
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
@@ -80,6 +90,11 @@ export const calculateTotalDowntimeMWO = (
     2,
     '0'
   )}:${String(Math.floor(seconds)).padStart(2, '0')}`;
+};
+
+const timeToSeconds = (time: string): number => {
+  const [hours, minutes, seconds] = time.split(':').map(Number);
+  return hours * 3600 + minutes * 60 + seconds;
 };
 
 export const filterAssets = (

@@ -1,4 +1,6 @@
 'use client';
+import 'react-datepicker/dist/react-datepicker.css';
+
 import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import {
@@ -68,36 +70,85 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
       const isExpanded = expandedAssets.has(asset.assetCode);
       const downtimeCount = calculateDowntimeCount([asset]);
       const totalTime = calculateTotalDowntimes([asset]);
+      const totalTimeProd = calculateTotalDowntimes([asset], 'P');
+      const totalTimeMaintenance = calculateTotalDowntimes([asset], 'M');
+
       const hasChildren = asset.assetChild && asset.assetChild.length > 0;
 
       return (
         <div
           key={assetIndex}
-          className={`bg-white shadow-md rounded-lg p-4 border border-gray-200 mb-4 ${
+          className={` shadow-md rounded-lg p-4 bg-white border border-gray-200 mb-4 ${
             level > 0 ? 'ml-6' : ''
           }`}
         >
           <div
-            className={`mb-4 flex items-center justify-between ${
+            className={`flex items-center justify-between ${
               (hasChildren || downtimeCount > 0) && 'cursor-pointer'
-            } ${downtimeCount > 0 && 'bg-green-200 p-2 rounded-lg'}`}
+            } ${
+              downtimeCount > 0 &&
+              ' border-2 border-black bg-orange-100 p-2 rounded-lg'
+            }`}
             onClick={() =>
               (hasChildren || downtimeCount > 0) &&
               toggleExpand(asset.assetCode)
             }
           >
-            <h2 className="text-xl font-semibold text-gray-700">
-              {asset.assetCode} - {asset.assetDescription} ({downtimeCount}{' '}
-              Tickets) {totalTime}
-            </h2>
-            {(hasChildren || downtimeCount > 0) && (
-              <span
-                className="text-gray-500 cursor-pointer"
-                onClick={() => toggleExpand(asset.assetCode)}
-              >
-                {isExpanded ? '▲' : '▼'}
-              </span>
-            )}
+            <div className="flex flex-col w-full p-4 bg-gray-100 rounded-md">
+              <div>
+                <div className="flex gap-2">
+                  <span className="text-xl font-bold text-gray-800">
+                    {asset.assetCode} - {asset.assetDescription}
+                  </span>
+                  <span className="text-xl text-gray-800">Nivell: {level}</span>
+                </div>
+
+                <div className="flex flex-wrap gap-4 mt-2">
+                  <div className="flex-1 p-2 text-center bg-gray-200 rounded-md">
+                    <span className="block text-sm text-gray-600">
+                      Total Tickets
+                    </span>
+                    <span className="text-lg font-semibold">
+                      {downtimeCount}
+                    </span>
+                  </div>
+                  <div className="flex-1 p-2 text-center bg-yellow-200 rounded-md">
+                    <span className="block text-sm text-gray-600">Temps</span>
+                    <span className="text-lg font-semibold">{totalTime}</span>
+                  </div>
+                  <div className="flex-1 p-2 text-center bg-red-200 rounded-md">
+                    <span className="block text-sm text-gray-600">
+                      Producció
+                    </span>
+                    <span className="text-lg font-semibold">
+                      {totalTimeProd}
+                    </span>
+                  </div>
+                  <div className="flex-1 p-2 text-center bg-blue-200 rounded-md">
+                    <span className="block text-sm text-gray-600">
+                      Manteniment
+                    </span>
+                    <span className="text-lg font-semibold">
+                      {totalTimeMaintenance}
+                    </span>
+                  </div>
+                  <div
+                    className={`flex p-2 ${
+                      isExpanded ? 'bg-gray-400' : 'bg-gray-200'
+                    } items-center rounded-md`}
+                  >
+                    {(hasChildren || downtimeCount > 0) && (
+                      <span
+                        className="focus:outline-none rounded-full bg-blue-500 text-white px-2 py-1 cursor-pointer"
+                        onClick={() => toggleExpand(asset.assetCode)}
+                      >
+                        {isExpanded ? '▲' : '▼'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {isExpanded && (
@@ -219,6 +270,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
             locale={ca}
             dateFormat="dd/MM/yyyy"
             className="border border-gray-300 p-2 rounded-md mr-4 w-full"
+            popperClassName="z-50"
           />
           <DatePicker
             selected={to}
@@ -226,6 +278,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
             dateFormat="dd/MM/yyyy"
             locale={ca}
             className="border border-gray-300 p-2 rounded-md mr-4 w-full"
+            popperClassName="z-50"
           />
 
           <Button type="create" onClick={() => reloadData}>
