@@ -141,10 +141,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
                     } items-center rounded-md`}
                   >
                     {(hasChildren || downtimeCount > 0) && (
-                      <span
-                        className="focus:outline-none rounded-full bg-blue-500 text-white px-2 py-1 cursor-pointer"
-                        onClick={() => toggleExpand(asset.assetCode)}
-                      >
+                      <span className="focus:outline-none rounded-full bg-blue-500 text-white px-2 py-1 cursor-pointer">
                         {isExpanded ? '▲' : '▼'}
                       </span>
                     )}
