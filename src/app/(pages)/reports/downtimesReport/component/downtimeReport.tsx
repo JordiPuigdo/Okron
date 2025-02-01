@@ -20,6 +20,7 @@ import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { Button } from 'designSystem/Button/Buttons';
 import Link from 'next/link';
+import router from 'next/router';
 
 import {
   calculateDowntimeCount,
@@ -52,6 +53,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedAssets, setExpandedAssets] = useState<Set<string>>(new Set());
   const [onlyTickets, setOnlyTickets] = useState(true);
+  // const [onlyMaintenance, setOnlyMaintenance] = useState(false);
 
   const toggleExpand = (assetCode: string) => {
     setExpandedAssets(prev => {
@@ -259,54 +261,89 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
-        Report Aturades
-      </h1>
-      <div className="mb-6 ">
-        <div className="flex gap-4 mb-4">
-          <DatePicker
-            selected={from}
-            onChange={e => (e ? setFrom(e) : setFrom(new Date()))}
-            locale={ca}
-            dateFormat="dd/MM/yyyy"
-            className="border border-gray-300 p-2 rounded-md mr-4 w-full"
-            popperClassName="z-50"
-          />
-          <DatePicker
-            selected={to}
-            onChange={e => (e ? setTo(e) : setTo(new Date()))}
-            dateFormat="dd/MM/yyyy"
-            locale={ca}
-            className="border border-gray-300 p-2 rounded-md mr-4 w-full"
-            popperClassName="z-50"
-          />
-
-          <Button type="create" onClick={() => reloadData}>
-            Buscar
-          </Button>
-          <div
-            className="flex items-center gap-4 cursor-pointer"
-            onClick={() => setOnlyTickets(!onlyTickets)}
-          >
-            <div className="flex flex-col">
-              <span>Només</span>
-              <span>Tickets</span>
-            </div>
-            <input
-              type="checkbox"
-              className="flex cursor-pointer"
-              checked={onlyTickets}
-              onChange={e => setOnlyTickets(e.target.checked)}
-            />
+      <div className="flex flex-col gap-4 bg-white rounded-xl p-4 shadow-md mb-12">
+        <div className="w-full flex flex-row text-xl font-semibold p-2 items-center border-b-2 border-gray-300">
+          <div className="flex cursor-pointer " onClick={() => router.back()}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-6 h-6 inline-block mr-2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+          </div>
+          <div className="flex w-full text-center justify-center">
+            Report Tickets
           </div>
         </div>
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          placeholder="Buscar per equip, codi d'operació o motiu"
-          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
-        />
+        <div className="mb-6 ">
+          <div className="flex gap-4 mb-4">
+            <DatePicker
+              selected={from}
+              onChange={e => (e ? setFrom(e) : setFrom(new Date()))}
+              locale={ca}
+              dateFormat="dd/MM/yyyy"
+              className="border border-gray-300 p-2 rounded-md mr-4 w-full"
+              popperClassName="z-50"
+            />
+            <DatePicker
+              selected={to}
+              onChange={e => (e ? setTo(e) : setTo(new Date()))}
+              dateFormat="dd/MM/yyyy"
+              locale={ca}
+              className="border border-gray-300 p-2 rounded-md mr-4 w-full"
+              popperClassName="z-50"
+            />
+
+            <Button type="create" onClick={() => reloadData}>
+              Buscar
+            </Button>
+            <div
+              className="flex items-center gap-4 cursor-pointer"
+              onClick={() => setOnlyTickets(!onlyTickets)}
+            >
+              <div className="flex flex-col">
+                <span>Només</span>
+                <span>Tickets</span>
+              </div>
+              <input
+                type="checkbox"
+                className="flex cursor-pointer"
+                checked={onlyTickets}
+                onChange={e => setOnlyTickets(e.target.checked)}
+              />
+            </div>
+            {/*<div
+              className="flex items-center gap-4 cursor-pointer"
+              onClick={() => setOnlyMaintenance(!onlyMaintenance)}
+            >
+              <div className="flex flex-col">
+                <span>Intervenció</span>
+                <span>Manteniment</span>
+              </div>
+              <input
+                type="checkbox"
+                className="flex cursor-pointer"
+                checked={onlyMaintenance}
+                onChange={e => setOnlyMaintenance(e.target.checked)}
+              />
+            </div>*/}
+          </div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Buscar per equip, codi d'operació o motiu"
+            className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
+          />
+        </div>
       </div>
       {isLoading ? (
         <div className="flex container mx-auto p-6 items-center justify-center">

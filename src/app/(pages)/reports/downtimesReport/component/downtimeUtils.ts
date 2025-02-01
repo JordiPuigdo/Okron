@@ -3,6 +3,7 @@ import {
   DowntimesTicketReport,
   DowntimesTicketReportModel,
 } from 'app/interfaces/Production/DowntimesTicketReport';
+import dayjs from 'dayjs';
 
 export const calculateDowntimeCount = (
   report: DowntimesTicketReport[]
@@ -38,7 +39,13 @@ export const calculateTotalDowntimes = (
                 return workOrderAcc;
               }
 
-              return workOrderAcc + timeToSeconds(workOrder.totalTime);
+              return (
+                workOrderAcc +
+                calculateTotalSecondsBetweenDates(
+                  workOrder.startTime,
+                  workOrder.endTime
+                )
+              );
             },
             0
           );
@@ -74,11 +81,10 @@ export const calculateTotalDowntimeMWO = (
   };
 
   const totalSeconds = downtimes.reduce(
-    (acc, { totalTime, originDownTime }) => {
-      if (!totalTime) return acc;
+    (acc, { startTime, endTime, originDownTime }) => {
       if (downtimeFilter && originDownTime !== filterMap[downtimeFilter])
         return acc;
-      return acc + timeToSeconds(totalTime);
+      return acc + calculateTotalSecondsBetweenDates(startTime, endTime);
     },
     0
   );
@@ -97,6 +103,17 @@ const timeToSeconds = (time: string): number => {
   return hours * 3600 + minutes * 60 + seconds;
 };
 
+const calculateTotalSecondsBetweenDates = (
+  startDate: string,
+  endDate: string
+): number => {
+  const start = dayjs(startDate);
+  const end = dayjs(endDate);
+
+  const differenceInMilliseconds = end.diff(start);
+
+  return differenceInMilliseconds / 1000;
+};
 export const filterAssets = (
   assets: DowntimesTicketReport[],
   query: string,
