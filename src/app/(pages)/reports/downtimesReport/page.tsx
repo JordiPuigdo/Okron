@@ -6,7 +6,7 @@ import MainLayout from 'components/layout/MainLayout';
 import DowntimeReport from './component/downtimeReport';
 
 export default function Page() {
-  const { downtimes, from, to, setFrom, setTo, fetchDowntimes } =
+  const { downtimes, from, to, setFrom, setTo, fetchDowntimes, isLoading } =
     useDowntimeReport();
 
   return (
@@ -19,6 +19,7 @@ export default function Page() {
           setFrom={setFrom}
           setTo={setTo}
           reloadData={fetchDowntimes}
+          isLoading={isLoading}
         />
       </Container>
     </MainLayout>

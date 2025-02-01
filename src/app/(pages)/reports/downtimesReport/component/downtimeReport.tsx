@@ -3,6 +3,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
+import { SvgSpinner } from 'app/icons/icons';
 import {
   DowntimesReasonsType,
   OriginDowntime,
@@ -36,6 +37,7 @@ interface DowntimeReportProps {
   setFrom: (date: Date) => void;
   setTo: (date: Date) => void;
   reloadData: () => void;
+  isLoading: boolean;
 }
 
 const DowntimeReport: React.FC<DowntimeReportProps> = ({
@@ -45,6 +47,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
   setFrom,
   setTo,
   reloadData,
+  isLoading,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedAssets, setExpandedAssets] = useState<Set<string>>(new Set());
@@ -160,7 +163,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
                     className="bg-gray-100 rounded-lg p-3 shadow-inner"
                   >
                     <Link href={`/workOrders/${workOrder.workOrderId}`}>
-                      <div className="flex flex-row gap-2 w-full items-center text-lg font-medium text-gray-800 mb-2 bg-gray-300 p-2 rounded-lg">
+                      <div className="flex flex-row gap-2 w-full items-center text-lg font-medium text-gray-800 mb-2 bg-gray-300 p-2 rounded-lg hover:bg-gray-400">
                         <span className="flex-1">
                           {workOrder.workOrderCode}
                         </span>
@@ -308,14 +311,22 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
           className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
         />
       </div>
-      {downtimesTicketReport.length === 0 ? (
-        <p className="text-center text-gray-500">
-          No hi ha registres amb aquest filtre.
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-          {renderDowntimeTree(filteredData)}
+      {isLoading ? (
+        <div className="flex container mx-auto p-6 items-center justify-center">
+          <SvgSpinner className="text-okron-main" />
         </div>
+      ) : (
+        <>
+          {downtimesTicketReport.length === 0 ? (
+            <p className="text-center text-gray-500">
+              No hi ha registres amb aquest filtre.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+              {renderDowntimeTree(filteredData)}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

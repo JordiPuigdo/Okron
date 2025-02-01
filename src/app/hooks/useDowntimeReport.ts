@@ -14,18 +14,21 @@ export function useDowntimeReport() {
     return date;
   });
   const [to, setTo] = useState(new Date());
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchDowntimes = useCallback(async () => {
+    setIsLoading(true);
     const data = await workOrderService.getDowntimesTicketReport({
       from: from.toISOString(),
       to: to.toISOString(),
     });
     setDowntimes(data);
+    setIsLoading(false);
   }, [from, to]);
 
   useEffect(() => {
     fetchDowntimes();
   }, [fetchDowntimes]);
 
-  return { downtimes, from, to, setFrom, setTo, fetchDowntimes };
+  return { downtimes, from, to, setFrom, setTo, fetchDowntimes, isLoading };
 }
