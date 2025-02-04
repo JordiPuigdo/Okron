@@ -573,6 +573,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                 {...register('stateWorkOrder', { valueAsNumber: true })}
                 className="p-3 text-sm border border-gray-300 rounded-md w-full"
                 onChange={handleStateChange}
+                disabled={!isDisabledField}
               >
                 {getAvailableStates().map(state => (
                   <option key={state} value={state}>
