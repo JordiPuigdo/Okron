@@ -37,6 +37,7 @@ import {
   translateWorkOrderEventType,
 } from 'app/utils/utils';
 import ChooseElement from 'components/ChooseElement';
+import { CostsObject } from 'components/Costs/CostsObject';
 import CompleteInspectionPoints from 'components/inspectionPoint/CompleteInspectionPoint';
 import WorkOrderOperatorComments from 'components/operator/WorkOrderCommentOperator';
 import WorkOrderOperatorTimesComponent from 'components/operator/WorkOrderOperatorTimes';
@@ -510,10 +511,22 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     isFinished || currentWorkOrder?.stateWorkOrder == StateWorkOrder.Closed;
 
   const renderForm = () => {
-    function handleSelectedAsset(id: string): void {
-      //throw new Error('Function not implemented.');
-    }
+    const getAvailableStates = () => {
+      if (currentWorkOrder?.workOrderType === WorkOrderType.Ticket) {
+        return [StateWorkOrder.Open, StateWorkOrder.Closed];
+      }
 
+      if (isFinished) {
+        return [currentWorkOrder?.stateWorkOrder];
+      }
+
+      return Object.values(StateWorkOrder).filter(
+        value =>
+          typeof value === 'number' &&
+          value !== StateWorkOrder.Open &&
+          value !== StateWorkOrder.Closed
+      );
+    };
     return (
       <>
         <form
@@ -558,39 +571,14 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               </label>
               <select
                 {...register('stateWorkOrder', { valueAsNumber: true })}
-                id="stateWorkOrder"
-                name="stateWorkOrder"
                 className="p-3 text-sm border border-gray-300 rounded-md w-full"
-                disabled={isDisabledField}
-                onChange={e => {
-                  handleStateChange(e);
-                }}
+                onChange={handleStateChange}
               >
-                {Object.values(StateWorkOrder)
-                  .filter(value => {
-                    if (typeof value !== 'number') return false;
-
-                    if (
-                      currentWorkOrder?.workOrderType === WorkOrderType.Ticket
-                    ) {
-                      return (
-                        value === StateWorkOrder.Open ||
-                        value === StateWorkOrder.Closed
-                      );
-                    }
-
-                    return !isFinished && value !== StateWorkOrder.Finished;
-                  })
-                  .map(state => (
-                    <option
-                      key={state}
-                      value={
-                        typeof state === 'string' ? parseInt(state, 10) : state
-                      }
-                    >
-                      {translateStateWorkOrder(state)}
-                    </option>
-                  ))}
+                {getAvailableStates().map(state => (
+                  <option key={state} value={state}>
+                    {translateStateWorkOrder(state)}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="">
@@ -799,7 +787,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     <div className="pt-4">
       {renderHeader()}
       <div className="flex gap-2 rounded bg-blue-900 my-2 p-2">
-        <div className=" w-full">
+        <div className="flex flex-col w-full gap-2 ">
           {showDowntimeReasonsModal && (
             <ModalDowntimeReasons
               selectedId={currentWorkOrder.asset?.id || ''}
@@ -807,16 +795,16 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             />
           )}
           {renderForm()}
-          {/*totalCosts > 0 &&
+          {totalCosts > 0 &&
             loginUser?.permission == UserPermission.Administrator && (
-              <div className="flex flex-grow pt-2">
+              <div className="flex flex-grow p-2 bg-white rounded-lg">
                 <CostsObject
                   operatorCosts={operatorCosts}
                   sparePartCosts={sparePartCosts}
                   totalCosts={totalCosts}
                 />
               </div>
-            )*/}
+            )}
         </div>
 
         <div className="p-2 bg-white rounded-lg shadow-md  w-full  flex flex-col">

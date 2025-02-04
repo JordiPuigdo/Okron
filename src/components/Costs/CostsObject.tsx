@@ -12,7 +12,7 @@ interface CostsProps {
   totalCosts: number;
 }
 
-function CostsObject({
+export function CostsObject({
   operatorCosts,
   sparePartCosts,
   totalCosts,
