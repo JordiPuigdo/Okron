@@ -12,6 +12,7 @@ import {
   StateWorkOrder,
   UpdateStateWorkOrder,
   WorkOrder,
+  WorkOrderType,
 } from 'app/interfaces/workOrder';
 import WorkOrderService from 'app/services/workOrderService';
 import { useSessionStore } from 'app/stores/globalStore';
@@ -170,21 +171,24 @@ const WorkOrderButtons: React.FC<WorkOrderButtonsProps> = ({
                 )}
               </Button>
             )}
-          {loginUser?.userType == UserType.Production && (
-            <Button
-              disabled={workOrder.stateWorkOrder == StateWorkOrder.Closed}
-              onClick={() => handleChangeStateWorkOrder(StateWorkOrder.Closed)}
-              type="none"
-              className="w-full"
-              customStyles="flex justify-center items-center bg-okron-finished h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverPendingToValidate w-full"
-            >
-              {isLoading[StateWorkOrder.Closed] ? (
-                <SvgSpinner className="text-white" />
-              ) : (
-                <SvgCheck />
-              )}
-            </Button>
-          )}
+          {loginUser?.userType == UserType.Production &&
+            workOrder.workOrderType == WorkOrderType.Ticket && (
+              <Button
+                disabled={workOrder.stateWorkOrder == StateWorkOrder.Closed}
+                onClick={() =>
+                  handleChangeStateWorkOrder(StateWorkOrder.Closed)
+                }
+                type="none"
+                className="w-full"
+                customStyles="flex justify-center items-center bg-okron-finished h-24 w-24 rounded-xl shadow-md text-white font-semibold hover:bg-okron-hoverPendingToValidate w-full"
+              >
+                {isLoading[StateWorkOrder.Closed] ? (
+                  <SvgSpinner className="text-white" />
+                ) : (
+                  <SvgCheck />
+                )}
+              </Button>
+            )}
         </>
       )}
       {(workOrder.stateWorkOrder == StateWorkOrder.Finished ||
