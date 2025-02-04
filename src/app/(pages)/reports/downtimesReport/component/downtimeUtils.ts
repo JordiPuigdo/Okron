@@ -98,12 +98,7 @@ export const calculateTotalDowntimeMWO = (
   )}:${String(Math.floor(seconds)).padStart(2, '0')}`;
 };
 
-const timeToSeconds = (time: string): number => {
-  const [hours, minutes, seconds] = time.split(':').map(Number);
-  return hours * 3600 + minutes * 60 + seconds;
-};
-
-const calculateTotalSecondsBetweenDates = (
+export const calculateTotalSecondsBetweenDates = (
   startDate: string,
   endDate: string
 ): number => {

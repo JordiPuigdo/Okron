@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { EditableCell } from 'app/(pages)/machines/downtimes/components/EditingCell';
+import { calculateTotalSecondsBetweenDates } from 'app/(pages)/reports/downtimesReport/component/downtimeUtils';
 import { Downtimes } from 'app/interfaces/Production/Downtimes';
+import { UserType } from 'app/interfaces/User';
 import WorkOrder, { StateWorkOrder } from 'app/interfaces/workOrder';
 import WorkOrderService from 'app/services/workOrderService';
 import { useSessionStore } from 'app/stores/globalStore';
@@ -8,7 +10,6 @@ import {
   calculateTimeDifference,
   formatDate,
   formatTimeSpan,
-  isValidDateTimeFormat,
   translateOperatorType,
   validateFormattedDateTime,
 } from 'app/utils/utils';
@@ -36,7 +37,22 @@ export default function DowntimesComponent({
 
   const [downtimesWorkorder, setDowntimesWorkorder] =
     useState<Downtimes[]>(downtimes);
-  const { loginUser } = useSessionStore(state => state);
+  const { loginUser } = useSessionStore();
+
+  const totalTime = downtimesWorkorder.reduce((acc, cur) => {
+    return acc + calculateTotalSecondsBetweenDates(cur.startTime, cur.endTime);
+  }, 0);
+
+  function totalTimeString(time: number): string {
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor((time % 3600) / 60);
+    const seconds = time % 60;
+
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+      2,
+      '0'
+    )}:${String(Math.floor(seconds)).padStart(2, '0')}`;
+  }
 
   function handleUpdate(
     id: string,
@@ -116,7 +132,8 @@ export default function DowntimesComponent({
           {downtimesWorkorder.map((downtime, index) => (
             <tr key={index}>
               <td className="p-2 whitespace-nowrap w-1/4">
-                {currentWorkOrder.stateWorkOrder != StateWorkOrder.Closed ? (
+                {currentWorkOrder.stateWorkOrder != StateWorkOrder.Closed &&
+                loginUser?.userType == UserType.Production ? (
                   <EditableCell
                     value={formatDate(downtime.startTime)}
                     onUpdate={newValue =>
@@ -128,7 +145,8 @@ export default function DowntimesComponent({
                 )}
               </td>
               <td className="p-2 whitespace-nowrap w-1/4">
-                {currentWorkOrder.stateWorkOrder != StateWorkOrder.Closed ? (
+                {currentWorkOrder.stateWorkOrder != StateWorkOrder.Closed &&
+                loginUser?.userType == UserType.Production ? (
                   <EditableCell
                     value={formatDate(downtime.endTime)}
                     onUpdate={newValue =>
@@ -151,6 +169,36 @@ export default function DowntimesComponent({
             </tr>
           ))}
         </tbody>
+        {currentWorkOrder.stateWorkOrder === StateWorkOrder.Closed && (
+          <tfoot className="bg-white divide-y divide-gray-200">
+            <tr>
+              <td colSpan={1}></td>
+              <td className=" whitespace-nowrap text-sm text-gray-900 font-bold">
+                Temps Total
+              </td>
+              <td
+                colSpan={2}
+                className="p-2 whitespace-nowrap text-sm text-gray-900 font-bold"
+              >
+                {totalTimeString(totalTime)}
+              </td>
+            </tr>
+            {downtimesWorkorder.map((downtime, index) => (
+              <tr key={index}>
+                <td colSpan={3}></td>
+                <td className="p-2 whitespace-nowrap text-sm text-gray-900 font-bold">
+                  {downtime.operator.name} -{' '}
+                  {totalTimeString(
+                    calculateTotalSecondsBetweenDates(
+                      downtime.startTime,
+                      downtime.endTime
+                    )
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tfoot>
+        )}
       </table>
     </div>
   );

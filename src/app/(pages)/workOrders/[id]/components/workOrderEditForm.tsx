@@ -713,52 +713,51 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                       )}
                     </Button>
                   )}
-                {((currentWorkOrder?.workOrderType == WorkOrderType.Ticket &&
-                  !currentWorkOrder?.workOrderCreatedId &&
-                  loginUser?.userType == UserType.Maintenance) ||
-                  (currentWorkOrder?.workOrderType ==
-                    WorkOrderType.Preventive &&
-                    currentWorkOrder?.preventive?.id != undefined)) && (
-                  <Button
-                    type="none"
-                    className="bg-red-700 hover:bg-red-900 text-white font-semibold p2- rounded-l"
-                    customStyles="flex"
-                    onClick={() => {
-                      setShowModal(true);
-                    }}
-                  >
-                    Crear Avaria
-                  </Button>
-                )}
-                {currentWorkOrder?.originalWorkOrderId && (
-                  <Link
-                    href={`/workOrders/${currentWorkOrder.originalWorkOrderId}`}
-                    passHref
-                  >
-                    <Button
-                      type="none"
-                      className="bg-green-700 hover:bg-green-900 text-white font-semibold p2- rounded-l"
-                      customStyles="flex"
-                    >
-                      Veure Tiquet
-                    </Button>
-                  </Link>
-                )}
-                {currentWorkOrder?.workOrderCreatedId && (
-                  <Link
-                    href={`/workOrders/${currentWorkOrder.workOrderCreatedId}`}
-                    passHref
-                  >
-                    <Button
-                      type="none"
-                      className="bg-green-700 hover:bg-green-900 text-white font-semibold p2- rounded-l"
-                      customStyles="flex"
-                    >
-                      Veure Avaria
-                    </Button>
-                  </Link>
-                )}
               </>
+            )}
+            {((currentWorkOrder?.workOrderType == WorkOrderType.Ticket &&
+              loginUser?.userType == UserType.Maintenance &&
+              !currentWorkOrder?.workOrderCreatedId) ||
+              (currentWorkOrder?.workOrderType == WorkOrderType.Preventive &&
+                currentWorkOrder?.preventive?.id != undefined)) && (
+              <Button
+                type="none"
+                className="bg-red-700 hover:bg-red-900 text-white font-semibold p2- rounded-l"
+                customStyles="flex"
+                onClick={() => {
+                  setShowModal(true);
+                }}
+              >
+                Crear Avaria
+              </Button>
+            )}
+            {currentWorkOrder?.originalWorkOrderId && (
+              <Link
+                href={`/workOrders/${currentWorkOrder.originalWorkOrderId}`}
+                passHref
+              >
+                <Button
+                  type="none"
+                  className="bg-green-700 hover:bg-green-900 text-white font-semibold p2- rounded-l"
+                  customStyles="flex"
+                >
+                  Veure Tiquet
+                </Button>
+              </Link>
+            )}
+            {currentWorkOrder?.workOrderCreatedId && (
+              <Link
+                href={`/workOrders/${currentWorkOrder.workOrderCreatedId}`}
+                passHref
+              >
+                <Button
+                  type="none"
+                  className="bg-green-700 hover:bg-green-900 text-white font-semibold p2- rounded-l"
+                  customStyles="flex"
+                >
+                  Veure Avaria
+                </Button>
+              </Link>
             )}
           </div>
         </form>

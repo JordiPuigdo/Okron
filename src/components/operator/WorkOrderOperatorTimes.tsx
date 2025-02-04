@@ -1,24 +1,24 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   SvgLoginOperator,
   SvgLogoutOperator,
   SvgSpinner,
-} from "app/icons/icons";
-import Operator from "app/interfaces/Operator";
-import { UserPermission } from "app/interfaces/User";
+} from 'app/icons/icons';
+import Operator from 'app/interfaces/Operator';
+import { UserPermission } from 'app/interfaces/User';
 import {
   AddWorkOrderOperatorTimes,
   DeleteWorkOrderOperatorTimes,
   FinishWorkOrderOperatorTimes,
   UpdateWorkOrderOperatorTimes,
   WorkOrderOperatorTimes,
-} from "app/interfaces/workOrder";
-import WorkOrderService from "app/services/workOrderService";
-import { useSessionStore } from "app/stores/globalStore";
-import { formatDate } from "app/utils/utils";
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
+} from 'app/interfaces/workOrder';
+import WorkOrderService from 'app/services/workOrderService';
+import { useSessionStore } from 'app/stores/globalStore';
+import { formatDate } from 'app/utils/utils';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -40,34 +40,37 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
   workOrderId,
   isFinished,
 }) => {
-  const [codeOperator, setCodeOperator] = useState("");
+  const [codeOperator, setCodeOperator] = useState('');
   const workOrderService = new WorkOrderService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+    process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [enterManualTime, setEnterManualTime] = useState(false);
   const [manualTime, setManualTime] = useState(
     formatDate(new Date(), true, false)
   );
-  const { loginUser, operatorLogged } = useSessionStore((state) => state);
+  const { loginUser, operatorLogged } = useSessionStore(state => state);
   const [editingIndex, setEditingIndex] = useState(-1);
-  const [editedStartTime, setEditedStartTime] = useState("");
-  const [editedEndTime, setEditedEndTime] = useState("");
+  const [editedStartTime, setEditedStartTime] = useState('');
+  const [editedEndTime, setEditedEndTime] = useState('');
 
   const addWorkOrderTime = async () => {
     setIsLoading(true);
-    let op = operators.find((x) => x.code === codeOperator);
+
+    let op = operators.find(x => x.code === codeOperator);
     if (!op && operatorLogged == undefined) {
-      alert("Codi Operari Incorrecte");
+      alert('Codi Operari Incorrecte');
       setIsLoading(false);
       return;
     } else {
-      op = operators.find((x) => x.code === operatorLogged?.codeOperatorLogged);
+      if (!op) {
+        op = operators.find(x => x.code === operatorLogged?.codeOperatorLogged);
+      }
     }
 
     const last = workOrderOperatortimes.find(
-      (time) =>
+      time =>
         time.operator.id === op!.id &&
         (time.endTime === undefined || time.endTime === null)
     );
@@ -89,49 +92,47 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
     };
     await workOrderService
       .addWorkOrderOperatorTimes(x)
-      .then((x) => {
+      .then(x => {
         const newworkOrderOperatortimes: WorkOrderOperatorTimes = {
           startTime: startTime,
           endTime: undefined,
           operator: op!,
           id: x.workOrderOperatorTimesId,
         };
-        setWorkOrderOperatortimes((prevSelected) => [
+        setWorkOrderOperatortimes(prevSelected => [
           ...prevSelected,
           newworkOrderOperatortimes,
         ]);
       })
-      .catch((e) => {
+      .catch(e => {
         setIsLoading(false);
-        setErrorMessage("Error fitxant operari " + e);
+        setErrorMessage('Error fitxant operari ' + e);
       })
       .finally(() => {
         setIsLoading(false);
-        setCodeOperator("");
+        setCodeOperator('');
       });
   };
 
   const finishWorkOrderTime = async () => {
     setIsLoading(true);
-    let op = operators.find((x) => x.code === codeOperator);
+    let op = operators.find(x => x.code === codeOperator);
     if (!op && operatorLogged == undefined) {
-      alert("Codi Operari Incorrecte");
+      alert('Codi Operari Incorrecte');
       setIsLoading(false);
       return;
     } else {
       if (!op)
-        op = operators.find(
-          (x) => x.code === operatorLogged?.codeOperatorLogged
-        );
+        op = operators.find(x => x.code === operatorLogged?.codeOperatorLogged);
     }
     const last = workOrderOperatortimes.find(
-      (time) =>
+      time =>
         time.operator.id === op!.id &&
         (time.endTime === undefined || time.endTime === null)
     );
 
     if (!last) {
-      alert("Aquest Operari no està fitxat");
+      alert('Aquest Operari no està fitxat');
       setIsLoading(false);
       return;
     }
@@ -148,7 +149,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
       (totalTimeInSeconds % 3600) / 60
     )}m ${totalTimeInSeconds % 60}s`;
 
-    const updatedTimes = workOrderOperatortimes.map((time) =>
+    const updatedTimes = workOrderOperatortimes.map(time =>
       time.operator.id === last!.operator.id
         ? { ...time, endTime, totalTime }
         : time
@@ -161,25 +162,25 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
     };
     await workOrderService
       .finishWorkOrderOperatorTimes(FinishWorkOrderOperatorTimes)
-      .then((response) => {
+      .then(response => {
         setWorkOrderOperatortimes(updatedTimes);
         setIsLoading(false);
       })
-      .catch((e) => {
+      .catch(e => {
         setIsLoading(false);
-        setErrorMessage("Error fitxant operari " + e);
+        setErrorMessage('Error fitxant operari ' + e);
       })
       .finally(() => {
         setIsLoading(false);
-        setCodeOperator("");
+        setCodeOperator('');
       });
   };
 
   const totalTimeByOperatorId: { [id: string]: number } = {};
-  workOrderOperatortimes.forEach((time) => {
+  workOrderOperatortimes.forEach(time => {
     const operatorId = time.operator.id;
     if (time.totalTime) {
-      const [hours, minutes, seconds] = time.totalTime.split(" ");
+      const [hours, minutes, seconds] = time.totalTime.split(' ');
       const totalTimeInSeconds =
         parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds);
       if (!totalTimeByOperatorId[operatorId]) {
@@ -191,7 +192,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
   });
 
   const totalTimes: { [id: string]: string } = {};
-  Object.keys(totalTimeByOperatorId).forEach((operatorId) => {
+  Object.keys(totalTimeByOperatorId).forEach(operatorId => {
     const totalTimeInSeconds = totalTimeByOperatorId[operatorId];
     const totalHours = Math.floor(totalTimeInSeconds / 3600);
     const totalMinutes = Math.floor((totalTimeInSeconds % 3600) / 60);
@@ -201,7 +202,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
 
   const totalMilliseconds = workOrderOperatortimes.reduce((total, time) => {
     if (time.totalTime) {
-      const [hours, minutes, seconds] = time.totalTime.split(" ");
+      const [hours, minutes, seconds] = time.totalTime.split(' ');
       const totalTimeInSeconds =
         parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds);
       return total + totalTimeInSeconds * 1000; // Convert seconds to milliseconds
@@ -222,7 +223,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
     setManualTime(event.target.value);
   };
 
-  function createDate(newDate = ""): Date | null {
+  function createDate(newDate = ''): Date | null {
     if (enterManualTime) {
       if (manualTime && !enterManualTime) {
         const confirmation = window.confirm(
@@ -231,7 +232,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
         if (!confirmation) return null;
       }
       if (!validateDateTimeFormat(manualTime!)) {
-        alert("Format incorrecte, dia/mes/any hores/minuts");
+        alert('Format incorrecte, dia/mes/any hores/minuts');
         return null;
       }
       const [day, month, year, hour, minute] =
@@ -276,7 +277,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
   ) {
     if (editingIndex === index) {
       if (!validateDateTimeFormat(editedStartTime)) {
-        alert("Format incorrecte, dia/mes/any hores/minuts");
+        alert('Format incorrecte, dia/mes/any hores/minuts');
         return null;
       }
 
@@ -290,8 +291,8 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
         workOrderOperatorTimesId: workOrderOperatorTimesId,
       };
       if (editedEndTime != null) {
-        if (editedEndTime != "" && !validateDateTimeFormat(editedEndTime)) {
-          alert("Format incorrecte, dia/mes/any hores/minuts");
+        if (editedEndTime != '' && !validateDateTimeFormat(editedEndTime)) {
+          alert('Format incorrecte, dia/mes/any hores/minuts');
           return null;
         }
         const newEndTime = createDate(
@@ -302,19 +303,19 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
 
       await workOrderService
         .updateWorkOrderOperatorTimes(updateWorkOrderOperatorTimes)
-        .then((response) => {
+        .then(response => {
           window.location.reload();
         })
-        .catch((e) => {
+        .catch(e => {
           setIsLoading(false);
-          setErrorMessage("Error fitxant operari " + e);
+          setErrorMessage('Error fitxant operari ' + e);
         })
         .finally(() => {
           setIsLoading(false);
-          setCodeOperator("");
+          setCodeOperator('');
         });
-      setEditedEndTime("");
-      setEditedStartTime("");
+      setEditedEndTime('');
+      setEditedStartTime('');
       setEditingIndex(-1);
     } else {
       setEditingIndex(index);
@@ -333,7 +334,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
       workOrderOperatorTimesId: operatorTimesId,
     };
 
-    await workOrderService.deleteWorkOrderOperatorTimes(x).then((response) => {
+    await workOrderService.deleteWorkOrderOperatorTimes(x).then(response => {
       window.location.reload();
     });
   }
@@ -345,12 +346,12 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
           type="text"
           placeholder="Codi Operari"
           value={codeOperator}
-          onChange={(e) => {
+          onChange={e => {
             setCodeOperator(e.target.value);
           }}
           className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:border-blue-500"
-          onKeyPress={(e) => {
-            if (e.key === "Enter") {
+          onKeyPress={e => {
+            if (e.key === 'Enter') {
               e.preventDefault();
             }
           }}
@@ -362,12 +363,12 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
           onClick={addWorkOrderTime}
           className={`${
             isFinished
-              ? "bg-gray-500"
-              : "bg-blue-500  hover:bg-blue-600 focus:bg-blue-600"
+              ? 'bg-gray-500'
+              : 'bg-blue-500  hover:bg-blue-600 focus:bg-blue-600'
           } px-4 py-2 text-white rounded-md focus:outline-none  flex items-center`}
         >
           <SvgLoginOperator className="w-6 h-6" />
-          {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+          {isLoading && <SvgSpinner style={{ marginLeft: '0.5rem' }} />}
         </button>
         <button
           type="button"
@@ -375,21 +376,21 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
           onClick={finishWorkOrderTime}
           className={`${
             isFinished
-              ? "bg-gray-500"
-              : "bg-red-500 hover:bg-red-600 focus:bg-red-600"
+              ? 'bg-gray-500'
+              : 'bg-red-500 hover:bg-red-600 focus:bg-red-600'
           } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
         >
           <SvgLogoutOperator className="w-6 h-6" />
-          {isLoading && <SvgSpinner style={{ marginLeft: "0.5rem" }} />}
+          {isLoading && <SvgSpinner style={{ marginLeft: '0.5rem' }} />}
         </button>
         <button
           type="button"
           className={`${
             isFinished
-              ? "bg-gray-500"
-              : "bg-orange-500 hover:bg-orange-600 focus:bg-orange-600"
+              ? 'bg-gray-500'
+              : 'bg-orange-500 hover:bg-orange-600 focus:bg-orange-600'
           } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
-          onClick={(e) => {
+          onClick={e => {
             !isFinished && setEnterManualTime(!enterManualTime);
           }}
           disabled={isFinished}
@@ -453,8 +454,8 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                 key={time.id}
                 className={` ${
                   time.endTime === undefined || time.endTime === null
-                    ? "bg-green-300"
-                    : "bg-gray-300"
+                    ? 'bg-green-300'
+                    : 'bg-gray-300'
                 }`}
               >
                 <td className="p-2 whitespace-nowrap">
@@ -465,7 +466,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                         type="text"
                         className="text-sm text-gray-900 w-full border-0"
                         value={editedStartTime}
-                        onChange={(e) => {
+                        onChange={e => {
                           setEditedStartTime(e.target.value);
                         }}
                       />
@@ -481,7 +482,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                           type="text"
                           className="text-lg text-gray-900 w-full border-0"
                           value={editedEndTime}
-                          onChange={(e) => {
+                          onChange={e => {
                             setEditedEndTime(e.target.value);
                           }}
                         />
@@ -502,8 +503,8 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                       type="button"
                       className={`${
                         isFinished
-                          ? "bg-gray-500"
-                          : "bg-green-500 hover:bg-green-600 focus:bg-green-600"
+                          ? 'bg-gray-500'
+                          : 'bg-green-500 hover:bg-green-600 focus:bg-green-600'
                       } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
                       onClick={() =>
                         !isFinished &&
@@ -511,12 +512,12 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                           index,
                           time.id!,
                           time.startTime.toString(),
-                          time.endTime != null ? time.endTime?.toString() : ""
+                          time.endTime != null ? time.endTime?.toString() : ''
                         )
                       }
                       disabled={isFinished}
                     >
-                      {editingIndex === index ? "Guardar" : "Editar"}
+                      {editingIndex === index ? 'Guardar' : 'Editar'}
                     </button>
                     {editingIndex === index && (
                       <>
@@ -524,32 +525,32 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                           type="button"
                           className={`${
                             isFinished
-                              ? "bg-gray-500"
-                              : "bg-gray-500 hover:bg-gray-600 focus:bg-gray-600"
+                              ? 'bg-gray-500'
+                              : 'bg-gray-500 hover:bg-gray-600 focus:bg-gray-600'
                           } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
-                          onClick={(e) => {
+                          onClick={e => {
                             setEditingIndex(-1);
-                            setEditedEndTime("");
-                            setEditedStartTime("");
+                            setEditedEndTime('');
+                            setEditedStartTime('');
                           }}
                         >
-                          {"Cancelar"}
+                          {'Cancelar'}
                         </button>
                         <button
                           type="button"
                           className={`${
                             isFinished
-                              ? "bg-gray-500"
-                              : "bg-red-500 hover:bg-red-600 focus:bg-red-600"
+                              ? 'bg-gray-500'
+                              : 'bg-red-500 hover:bg-red-600 focus:bg-red-600'
                           } px-4 py-2  text-white rounded-md focus:outline-none  flex items-center`}
-                          onClick={(e) => {
+                          onClick={e => {
                             setEditingIndex(-1);
-                            setEditedEndTime("");
-                            setEditedStartTime("");
+                            setEditedEndTime('');
+                            setEditedStartTime('');
                             deleteWorkOrderOperatorTimes(time.id!);
                           }}
                         >
-                          {"Eliminar"}
+                          {'Eliminar'}
                         </button>
                       </>
                     )}
@@ -573,7 +574,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                 {totalFormatted}
               </td>
             </tr>
-            {Object.keys(totalTimes).map((operatorId) => (
+            {Object.keys(totalTimes).map(operatorId => (
               <tr key={operatorId}>
                 <td
                   colSpan={
@@ -583,7 +584,7 @@ const WorkOrderOperatorTimesComponent: React.FC<IWorkOrderOperatorTimes> = ({
                   }
                 ></td>
                 <td className="p-2 whitespace-nowrap text-sm text-gray-900 font-bold">
-                  {operators.find((op) => op.id === operatorId)?.name}:{" "}
+                  {operators.find(op => op.id === operatorId)?.name}:{' '}
                   {totalTimes[operatorId]}
                 </td>
               </tr>

@@ -23,7 +23,7 @@ import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { Button } from 'designSystem/Button/Buttons';
 import Link from 'next/link';
-import router from 'next/router';
+import { useRouter } from 'next/navigation';
 
 import {
   calculateDowntimeCount,
@@ -57,6 +57,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
   const [expandedAssets, setExpandedAssets] = useState<Set<string>>(new Set());
   const [onlyTickets, setOnlyTickets] = useState(true);
   // const [onlyMaintenance, setOnlyMaintenance] = useState(false);
+  const router = useRouter();
 
   const toggleExpand = (assetCode: string) => {
     setExpandedAssets(prev => {
