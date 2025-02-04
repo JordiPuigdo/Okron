@@ -50,7 +50,7 @@ import { Button } from 'designSystem/Button/Buttons';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import DowntimesComponent from './Downtimes';
+import DowntimesComponent from './Downtimes/Downtimes';
 import WorkOrderButtons from './WorkOrderButtons';
 
 type WorkOrdeEditFormProps = {
@@ -857,6 +857,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
               downtimes={currentWorkOrder.downtimes}
               workOrderId={currentWorkOrder.id}
               currentWorkOrder={currentWorkOrder}
+              loginUser={loginUser}
             />
           )}
         {currentWorkOrder?.workOrderType != WorkOrderType.Ticket && (
