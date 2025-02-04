@@ -33,6 +33,7 @@ export interface WorkOrder extends BaseModel {
   downtimeReason?: DowntimesReasons;
   downtimes?: Downtimes[];
   originalWorkOrderId?: string;
+  workOrderCreatedId?: string;
 }
 
 export default WorkOrder;
@@ -97,6 +98,7 @@ export interface CreateWorkOrderRequest {
   downtimeReasonId?: string;
   originalWorkOrderId?: string;
   originalWorkOrderCode?: string;
+  workOrderCreatedId?: string;
 }
 
 export interface AddWorkOrderOperatorTimes {

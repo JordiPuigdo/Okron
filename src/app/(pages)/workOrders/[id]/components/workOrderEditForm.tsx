@@ -713,6 +713,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                     </Button>
                   )}
                 {((currentWorkOrder?.workOrderType == WorkOrderType.Ticket &&
+                  !currentWorkOrder?.workOrderCreatedId &&
                   loginUser?.userType == UserType.Maintenance) ||
                   (currentWorkOrder?.workOrderType ==
                     WorkOrderType.Preventive &&
@@ -739,6 +740,20 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                       customStyles="flex"
                     >
                       Veure Tiquet
+                    </Button>
+                  </Link>
+                )}
+                {currentWorkOrder?.workOrderCreatedId && (
+                  <Link
+                    href={`/workOrders/${currentWorkOrder.workOrderCreatedId}`}
+                    passHref
+                  >
+                    <Button
+                      type="none"
+                      className="bg-green-700 hover:bg-green-900 text-white font-semibold p2- rounded-l"
+                      customStyles="flex"
+                    >
+                      Veure Avaria
                     </Button>
                   </Link>
                 )}
