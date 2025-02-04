@@ -1,4 +1,3 @@
-import { calculateTotalSecondsBetweenDates } from 'app/(pages)/reports/downtimesReport/component/downtimeUtils';
 import { useDowntimes } from 'app/hooks/useDowntimeComponent';
 import { Downtimes } from 'app/interfaces/Production/Downtimes';
 import { LoginUser } from 'app/interfaces/User';
