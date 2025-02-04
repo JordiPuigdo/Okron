@@ -8,7 +8,10 @@ import {
   DowntimesReasonsType,
   OriginDowntime,
 } from 'app/interfaces/Production/Downtimes';
-import { DowntimesTicketReport } from 'app/interfaces/Production/DowntimesTicketReport';
+import {
+  DowntimesTicketReport,
+  DowntimesTicketReportList,
+} from 'app/interfaces/Production/DowntimesTicketReport';
 import {
   calculateTimeDifference,
   formatDate,
@@ -83,29 +86,35 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
       return (
         <div
           key={assetIndex}
-          className={` shadow-md rounded-lg p-4 bg-white border border-gray-200 mb-4 ${
-            level > 0 ? 'ml-6' : ''
-          }`}
+          className={`ml-${level * 4} border-l-4 border-gray-300 pl-4`}
         >
           <div
-            className={`flex items-center justify-between ${
-              (hasChildren || downtimeCount > 0) && 'cursor-pointer'
-            } ${
-              downtimeCount > 0 &&
-              ' border-2 border-black bg-orange-100 p-2 rounded-lg'
-            }`}
-            onClick={() =>
-              (hasChildren || downtimeCount > 0) &&
-              toggleExpand(asset.assetCode)
-            }
+            className={`shadow-md rounded-lg p-4 bg-white border border-gray-200 mb-4`}
           >
-            <div className="flex flex-col w-full p-4 bg-gray-100 rounded-md">
-              <div>
-                <div className="flex gap-2">
+            <div
+              className={`flex items-center justify-between ${
+                (hasChildren || downtimeCount > 0) && 'cursor-pointer'
+              } ${
+                downtimeCount > 0
+                  ? 'border-2 border-black bg-orange-100 p-2 rounded-lg'
+                  : ''
+              }`}
+              onClick={() =>
+                (hasChildren || downtimeCount > 0) &&
+                toggleExpand(asset.assetCode)
+              }
+            >
+              <div className="flex flex-col w-full p-4 bg-gray-100 rounded-md">
+                <div className="flex items-center gap-2">
+                  {(hasChildren || downtimeCount > 0) && (
+                    <span className="focus:outline-none rounded-full bg-blue-500 text-white px-2 py-1 cursor-pointer">
+                      {isExpanded ? '▲' : '▼'}
+                    </span>
+                  )}
                   <span className="text-xl font-bold text-gray-800">
                     {asset.assetCode} - {asset.assetDescription}
                   </span>
-                  <span className="text-xl text-gray-800">Nivell: {level}</span>
+                  <span className="text-sm text-gray-500">Nivell: {level}</span>
                 </div>
 
                 <div className="flex flex-wrap gap-4 mt-2">
@@ -137,25 +146,12 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
                       {totalTimeMaintenance}
                     </span>
                   </div>
-                  <div
-                    className={`flex p-2 ${
-                      isExpanded ? 'bg-gray-400' : 'bg-gray-200'
-                    } items-center rounded-md`}
-                  >
-                    {(hasChildren || downtimeCount > 0) && (
-                      <span className="focus:outline-none rounded-full bg-blue-500 text-white px-2 py-1 cursor-pointer">
-                        {isExpanded ? '▲' : '▼'}
-                      </span>
-                    )}
-                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {isExpanded && (
-            <>
-              <div className="space-y-4">
+            {isExpanded && (
+              <div className="pl-4 mt-4">
                 {asset.downtimesTicketReportList.map((workOrder, workIndex) => (
                   <div
                     key={workIndex}
@@ -179,75 +175,14 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
                         </span>
                       </div>
                     </Link>
-                    <div className={`flex flex-col gap-2`}>
-                      {workOrder.downtimesWorkOrder.map(
-                        (downtime, downtimeIndex) => (
-                          <div
-                            key={downtimeIndex}
-                            className={`flex flex-row gap-4 text-sm p-2 rounded shadow-sm ${
-                              downtime.originDownTime ===
-                              OriginDowntime.Production
-                                ? 'bg-red-700'
-                                : 'bg-blue-700'
-                            }`}
-                          >
-                            <div className="flex flex-col w-full gap-2">
-                              <div className="flex gap-2">
-                                <div className="flex flex-row gap-1">
-                                  <span className="text-white font-bold">
-                                    Inici:
-                                  </span>
-                                  <span className="text-white">
-                                    {formatDate(downtime.startTime)}
-                                  </span>
-                                  <span className="text-white"> - </span>
-                                  <span className="text-white font-bold">
-                                    Final:
-                                  </span>
-                                  <span className="text-white">
-                                    {formatDate(downtime.endTime)}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="flex items-start gap-1">
-                                <span className="text-white font-semibold">
-                                  Total:
-                                </span>
-                                <span className="text-white">
-                                  {calculateTimeDifference(
-                                    downtime.startTime,
-                                    downtime.endTime
-                                  )}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="flex w-full justify-end">
-                              <div className="flex flex-col gap-2 items-end">
-                                <span className="text-white font-semibold">
-                                  {translateDowntimeReasonType(
-                                    downtime.originDownTime as unknown as DowntimesReasonsType
-                                  )}
-                                </span>
-                                <span className="text-white">
-                                  {downtime.operator.name}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        )
-                      )}
-                    </div>
+                    {RenderWorkOrderDetail(workOrder)}
                   </div>
                 ))}
-              </div>
 
-              {(hasChildren || asset.downtimesTicketReportList.length > 0) && (
-                <div className="mt-4">
-                  {renderDowntimeTree(asset.assetChild, level + 1)}
-                </div>
-              )}
-            </>
-          )}
+                {hasChildren && renderDowntimeTree(asset.assetChild, level + 1)}
+              </div>
+            )}
+          </div>
         </div>
       );
     });
@@ -258,6 +193,61 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
     searchQuery.toLowerCase(),
     onlyTickets
   );
+
+  function RenderWorkOrderDetail(workOrder: DowntimesTicketReportList) {
+    return (
+      <>
+        {' '}
+        <div className={`flex flex-col gap-2`}>
+          {workOrder.downtimesWorkOrder.map((downtime, downtimeIndex) => (
+            <div
+              key={downtimeIndex}
+              className={`flex flex-row gap-4 text-sm p-2 rounded shadow-sm ${
+                downtime.originDownTime === OriginDowntime.Production
+                  ? 'bg-red-700'
+                  : 'bg-blue-700'
+              }`}
+            >
+              <div className="flex flex-col w-full gap-2">
+                <div className="flex gap-2">
+                  <div className="flex flex-row gap-1">
+                    <span className="text-white font-bold">Inici:</span>
+                    <span className="text-white">
+                      {formatDate(downtime.startTime)}
+                    </span>
+                    <span className="text-white"> - </span>
+                    <span className="text-white font-bold">Final:</span>
+                    <span className="text-white">
+                      {formatDate(downtime.endTime)}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-start gap-1">
+                  <span className="text-white font-semibold">Total:</span>
+                  <span className="text-white">
+                    {calculateTimeDifference(
+                      downtime.startTime,
+                      downtime.endTime
+                    )}
+                  </span>
+                </div>
+              </div>
+              <div className="flex w-full justify-end">
+                <div className="flex flex-col gap-2 items-end">
+                  <span className="text-white font-semibold">
+                    {translateDowntimeReasonType(
+                      downtime.originDownTime as unknown as DowntimesReasonsType
+                    )}
+                  </span>
+                  <span className="text-white">{downtime.operator.name}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6">
