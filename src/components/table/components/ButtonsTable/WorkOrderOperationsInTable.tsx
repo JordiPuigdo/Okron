@@ -24,7 +24,8 @@ import { checkAllInspectionPoints } from 'app/utils/utilsInspectionPoints';
 import ChooseSpareParts from 'components/sparePart/ChooseSpareParts';
 import { Button } from 'designSystem/Button/Buttons';
 import { Modal } from 'designSystem/Modals/Modal';
-import { current } from 'tailwindcss/colors';
+
+import WorkOrderOperationsInTableToolTips from './WorkOrderOperationsInTableToolTips';
 
 interface WorkOrderOperationsInTableProps {
   workOrderId: string;
@@ -237,6 +238,7 @@ export default function WorkOrderOperationsInTable({
         {loginUser?.userType == UserType.Maintenance &&
           workOrder.workOrderType != WorkOrderType.Ticket && (
             <Button
+              data-tooltip-id="my-tooltip-1"
               type="none"
               size="md"
               onClick={() => {
@@ -259,6 +261,7 @@ export default function WorkOrderOperationsInTable({
           workOrder.workOrderType != WorkOrderType.Ticket) ||
           loginUser?.userType == UserType.Production) && (
           <Button
+            data-tooltip-id="my-tooltip-2"
             type="none"
             className={`${classNameValidate}`}
             onClick={() => {
@@ -291,6 +294,7 @@ export default function WorkOrderOperationsInTable({
         {workOrder.workOrderType == WorkOrderType.Corrective &&
           loginUser?.userType == UserType.Maintenance && (
             <Button
+              data-tooltip-id="my-tooltip-3"
               onClick={() => {
                 handleSparePartsModal();
               }}
@@ -307,6 +311,7 @@ export default function WorkOrderOperationsInTable({
         {workOrder.workOrderType == WorkOrderType.Preventive &&
           loginUser?.userType == UserType.Maintenance && (
             <Button
+              data-tooltip-id="InspectionPoints"
               onClick={() => {
                 !isPassInspectionPoints && handleInspectionPoints(workOrderId);
               }}
@@ -325,6 +330,7 @@ export default function WorkOrderOperationsInTable({
           )}
 
         <Button
+          data-tooltip-id="edit"
           type="none"
           onClick={() => {
             toggleLoading(workOrderId + '_Detail');
@@ -335,11 +341,15 @@ export default function WorkOrderOperationsInTable({
         >
           {isLoading[workOrderId + '_Detail'] ? <SvgSpinner /> : <SvgDetail />}
         </Button>
+        <WorkOrderOperationsInTableToolTips
+          pause={workOrder.stateWorkOrder == StateWorkOrder.Paused}
+        />
       </div>
     );
   else
     return (
       <Button
+        data-tooltip-id="my-tooltip-4"
         type="none"
         onClick={() => {
           toggleLoading(workOrderId + '_Detail');

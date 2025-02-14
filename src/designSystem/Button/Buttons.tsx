@@ -57,6 +57,7 @@ export const Button = ({
           `relative overflow-visible inline-block ${disabled ? '' : className}`
         )}
         onClick={handleClick}
+        {...rest}
       >
         <ButtonBody
           type={type}
