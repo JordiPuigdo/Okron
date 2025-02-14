@@ -364,31 +364,23 @@ export const SparePartsModal = ({
 }: SparePartsModalProps) => {
   const { setIsModalOpen } = useGlobalStore(state => state);
 
-  const { spareParts, sparePartsError, fetchSpareParts } = useSparePartsHook();
+  const { spareParts, sparePartsError } = useSparePartsHook(true);
 
   const [selectedSpareParts, setSelectedSpareParts] = useState<
     WorkOrderSparePart[]
   >([]);
 
-  /* useEffect(() => {
-    fetchSpareParts();
+  useEffect(() => {
     if (workOrder.workOrderSpareParts) {
       setSelectedSpareParts(workOrder.workOrderSpareParts);
     }
-    console.log(spareParts);
-  }, []);*/
+  }, []);
 
   useEffect(() => {
     workOrder.workOrderSpareParts?.forEach(x => {
       setSelectedSpareParts(prevSelected => [...prevSelected, x]);
     });
   }, [selectedSpareParts]);
-
-  useEffect(() => {
-    if (spareParts) {
-      console.log(spareParts);
-    }
-  }, [spareParts]);
 
   if (sparePartsError) {
     return <div>Error loading spare parts: {sparePartsError.message}</div>;
