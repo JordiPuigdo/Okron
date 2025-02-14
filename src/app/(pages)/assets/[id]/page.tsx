@@ -237,6 +237,7 @@ export default function AssetDetailsPage({
                           enableDetail={true}
                           enableCreate={false}
                           assetId={id}
+                          enableFilterActive={false}
                         />
                       </TabPanel>
                     </TabPanels>

@@ -274,6 +274,7 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
       .then(response => {
         if (response.length == 0) {
           setMessage('No hi ha recanvis disponibles amb aquests filtres');
+          setSparePartsPerAsset([]);
           setTimeout(() => {
             setMessage('');
           }, 3000);

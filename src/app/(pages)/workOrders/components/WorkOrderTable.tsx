@@ -3,7 +3,6 @@
 import 'react-datepicker/dist/react-datepicker.css';
 
 import { useEffect, useState } from 'react';
-import DatePicker from 'react-datepicker';
 import { SvgSpinner } from 'app/icons/icons';
 import { Asset } from 'app/interfaces/Asset';
 import { OperatorType } from 'app/interfaces/Operator';
@@ -12,26 +11,21 @@ import WorkOrder, {
   OriginWorkOrder,
   SearchWorkOrderFilters,
   StateWorkOrder,
+  WorkOrdersFilters,
   WorkOrderType,
 } from 'app/interfaces/workOrder';
 import AssetService from 'app/services/assetService';
 import WorkOrderService from 'app/services/workOrderService';
 import { useSessionStore } from 'app/stores/globalStore';
-import { translateStateWorkOrder } from 'app/utils/utils';
-import AutocompleteSearchBar from 'components/selector/AutocompleteSearchBar';
 import { ElementList } from 'components/selector/ElementList';
 import DataTable from 'components/table/DataTable';
-import {
-  Column,
-  ColumnFormat,
-  TableButtons,
-} from 'components/table/interface/interfaceTable';
+import { TableButtons } from 'components/table/interface/interfaceTable';
 import { EntityTable } from 'components/table/interface/tableEntitys';
-import ca from 'date-fns/locale/ca';
 import { Button } from 'designSystem/Button/Buttons';
 
-import FinalizeWorkOrdersDaysBefore from './FinalizeWorkOrdersDaysBefore';
 import { baseColumns, columnsTicket } from './utilsWorkOrderTable';
+import { WorkOrdersFiltersTable } from './WorkOrderFiltersTable/WorkOrdersFiltersTable';
+import { WorkOrderTypeCount } from './WorkOrderFiltersTable/WorkOrderTypeCount';
 
 interface WorkOrderTableProps {
   enableFilterAssets?: boolean;
@@ -92,6 +86,33 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
 
+  const [workOrdersFilters, setWorkOrdersFilters] = useState<WorkOrdersFilters>(
+    {
+      dateRange: { startDate: startDate, endDate: endDate },
+      workOrderType: [],
+      workOrderState: [],
+      searchTerm: '',
+      assetId: '',
+    }
+  );
+
+  useEffect(() => {
+    if (
+      !firstLoad &&
+      workOrdersFilters.dateRange.startDate != null &&
+      workOrdersFilters.dateRange.endDate != null
+    ) {
+      setStartDate(workOrdersFilters.dateRange.startDate);
+      setEndDate(workOrdersFilters.dateRange.endDate);
+    }
+  }, [workOrdersFilters]);
+
+  useEffect(() => {
+    if (!firstLoad) {
+      fetchWorkOrders();
+    }
+  }, [startDate, endDate]);
+
   const tableButtons: TableButtons = {
     edit: enableEdit,
     delete: enableDelete,
@@ -114,6 +135,7 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
           StateWorkOrder.OnGoing,
           StateWorkOrder.PendingToValidate,
           StateWorkOrder.Finished,
+          StateWorkOrder.Open,
         ];
   useEffect(() => {
     const fetchAssets = async () => {
@@ -143,17 +165,17 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
       }
     };
 
-    const fetchWorkOrders = async () => {
-      setIsLoading(true);
-      await searchWorkOrders();
-      setIsLoading(false);
-    };
-
     if (assetId == undefined) fetchAssets();
     if (operatorId !== undefined) handleSearch();
     fetchWorkOrders();
     setFirstLoad(false);
   }, []);
+
+  const fetchWorkOrders = async () => {
+    setIsLoading(true);
+    await searchWorkOrders();
+    setIsLoading(false);
+  };
 
   useEffect(() => {
     if (refresh) {
@@ -211,170 +233,6 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     );
   };
 
-  const renderFilterWorkOrders = () => {
-    return (
-      <div className="bg-white  rounded-xl gap-4 p-2 shadow-md">
-        <div className="flex gap-4 my-4 items-center">
-          {
-            <>
-              <div className="flex items-center">
-                <label htmlFor="startDate" className="mr-2">
-                  Inici
-                </label>
-                <DatePicker
-                  id="startDate"
-                  selected={startDate ?? new Date()}
-                  onChange={(date: Date) => setStartDate(date)}
-                  dateFormat="dd/MM/yyyy"
-                  locale={ca}
-                  className="border border-gray-300 p-2 rounded-md mr-4"
-                />
-              </div>
-              <div className="flex items-center">
-                <label htmlFor="endDate" className="mr-2">
-                  Final
-                </label>
-                <DatePicker
-                  id="endDate"
-                  selected={endDate ?? new Date()}
-                  onChange={(date: Date) => setEndDate(date)}
-                  dateFormat="dd/MM/yyyy"
-                  locale={ca}
-                  className="border border-gray-300 p-2 rounded-md mr-4"
-                />
-              </div>
-            </>
-          }
-
-          <button
-            type="button"
-            className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 flex items-center"
-            onClick={() => handleSearch()}
-          >
-            Buscar
-            {isLoading && <SvgSpinner style={{ marginLeft: '0.5rem' }} />}
-          </button>
-          {enableFinalizeWorkOrdersDayBefore && (
-            <FinalizeWorkOrdersDaysBefore
-              onFinalizeWorkOrdersDayBefore={searchWorkOrders}
-            />
-          )}
-          {message != '' && (
-            <span className="text-red-500 ml-4">{message}</span>
-          )}
-        </div>
-
-        {workOrders.length > 0 && (
-          <div className="flex flex-row gap-4 items-center ">
-            {enableFilterAssets && (
-              <AutocompleteSearchBar
-                elements={assets}
-                setCurrentId={setSelectedAssetId}
-                placeholder="Buscar Equips"
-              />
-            )}
-            <input
-              type="text"
-              placeholder="Codi / Descripció"
-              className="p-3 border border-gray-300 rounded-md w-full"
-              onChange={e => setSearchTerm(e.target.value)}
-            />
-            <span>Estat: </span>
-            <select
-              id="stateWorkOrder"
-              name="stateWorkOrder"
-              className="p-3 border border-gray-300 rounded-md w-full "
-              value={
-                selectedStateFilter !== undefined ? selectedStateFilter : ''
-              }
-              onChange={handleStateFilterChange}
-            >
-              <option value="">-</option>
-              {Object.values(validStates)
-                .filter(value => typeof value === 'number' && value !== 4)
-                .map(state => (
-                  <option
-                    key={state}
-                    value={
-                      typeof state === 'string' ? parseInt(state, 10) : state
-                    }
-                  >
-                    {translateStateWorkOrder(state)}
-                  </option>
-                ))}
-            </select>
-            {loginUser?.userType == UserType.Maintenance && (
-              <>
-                <span
-                  className={`text-white rounded-full p-3 w-full text-center bg-okron-corrective font-semibold hover:cursor-pointer`}
-                  onClick={() => {
-                    if (
-                      selectedTypeFilter == WorkOrderType.Corrective ||
-                      filterWorkOrders?.workOrderType ==
-                        WorkOrderType.Corrective
-                    ) {
-                      setSelectedTypeFilter(undefined);
-                      setFilterWorkOrders({
-                        startDateTime: startDate!,
-                        endDateTime: endDate!,
-                        workOrderType: undefined,
-                      });
-                      return;
-                    }
-                    setSelectedTypeFilter(WorkOrderType.Corrective);
-                    setFilterWorkOrders({
-                      startDateTime: startDate!,
-                      endDateTime: endDate!,
-                      workOrderType: WorkOrderType.Corrective,
-                    });
-                  }}
-                >
-                  Correctius:{' '}
-                  {
-                    filteredWorkOrders.filter(
-                      x => x.workOrderType == WorkOrderType.Corrective
-                    ).length
-                  }
-                </span>
-                <span
-                  className="text-white rounded-full p-3 w-full text-center bg-okron-preventive font-semibold hover:cursor-pointer"
-                  onClick={() => {
-                    if (
-                      selectedTypeFilter == WorkOrderType.Preventive ||
-                      filterWorkOrders?.workOrderType ==
-                        WorkOrderType.Preventive
-                    ) {
-                      setSelectedTypeFilter(undefined);
-                      setFilterWorkOrders({
-                        startDateTime: startDate!,
-                        endDateTime: endDate!,
-                        workOrderType: undefined,
-                      });
-                      return;
-                    }
-                    setSelectedTypeFilter(WorkOrderType.Preventive);
-                    setFilterWorkOrders({
-                      startDateTime: startDate!,
-                      endDateTime: endDate!,
-                      workOrderType: WorkOrderType.Preventive,
-                    });
-                  }}
-                >
-                  Preventius:{' '}
-                  {
-                    filteredWorkOrders.filter(
-                      x => x.workOrderType == WorkOrderType.Preventive
-                    ).length
-                  }
-                </span>
-              </>
-            )}
-          </div>
-        )}
-      </div>
-    );
-  };
-
   const handleSearch = async () => {
     setIsLoading(true);
 
@@ -403,52 +261,28 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     }
   };
 
-  const handleStateFilterChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const selectedValue = event.target.value;
-    if (!selectedValue) {
-      setSelectedStateFilter(undefined);
-    } else {
-      setSelectedStateFilter(parseInt(selectedValue));
-    }
+  const applyFilters = (order: WorkOrder) => {
+    const filters = [
+      () =>
+        searchTerm.length === 0 ||
+        order.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.code.toLowerCase().includes(searchTerm.toLowerCase()),
+      () =>
+        selectedAssetId === undefined ||
+        selectedAssetId.length === 0 ||
+        order.asset?.id === selectedAssetId,
+      () =>
+        workOrdersFilters?.workOrderState.length === 0 ||
+        workOrdersFilters?.workOrderState.includes(order.stateWorkOrder),
+      () =>
+        workOrdersFilters?.workOrderType.length === 0 ||
+        workOrdersFilters?.workOrderType.includes(order.workOrderType),
+    ];
+
+    return filters.every(filter => filter());
   };
 
-  const filteredWorkOrders = workOrders.filter(order => {
-    if (
-      selectedStateFilter !== undefined &&
-      order.stateWorkOrder !== selectedStateFilter
-    ) {
-      return false;
-    }
-    if (
-      selectedTypeFilter !== undefined &&
-      order.workOrderType !== selectedTypeFilter
-    ) {
-      return false;
-    }
-    if (
-      searchTerm.length > 0 &&
-      !order.description.toLowerCase().includes(searchTerm.toLowerCase())
-    ) {
-      return false;
-    }
-    if (
-      selectedAssetId != undefined &&
-      selectedAssetId.length > 0 &&
-      order.asset?.id !== selectedAssetId
-    ) {
-      return false;
-    }
-    if (
-      filterWorkOrders?.workOrderType != undefined &&
-      order.workOrderType != filterWorkOrders?.workOrderType
-    ) {
-      return false;
-    }
-
-    return true;
-  });
+  const filteredWorkOrders = workOrders.filter(applyFilters);
 
   const handleOnChecked = (id?: string) => {
     if (id != undefined) {
@@ -519,10 +353,43 @@ const WorkOrderTable: React.FC<WorkOrderTableProps> = ({
     setIsUpdating(false);
   };
 
+  function getWorkOrderTypeCount() {
+    const workOrderTypeCount: WorkOrderTypeCount[] = [];
+    Object.keys(WorkOrderType).forEach(key => {
+      if (!isNaN(Number(key))) {
+        const workOrderType = Number(key) as WorkOrderType;
+        const length = filteredWorkOrders.filter(
+          x => x.workOrderType == workOrderType
+        ).length;
+        if (length == 0) return;
+        workOrderTypeCount.push({
+          count: length,
+          workOrderType: workOrderType,
+        });
+      }
+    });
+    return workOrderTypeCount;
+  }
+
   return (
     <>
       <div className="flex flex-col gap-4">
-        {enableFilters && renderFilterWorkOrders()}
+        {enableFilters && (
+          <WorkOrdersFiltersTable
+            setWorkOrdersFilters={setWorkOrdersFilters}
+            workOrdersFilters={workOrdersFilters}
+            enableFinalizeWorkOrdersDayBefore={
+              enableFinalizeWorkOrdersDayBefore
+            }
+            setSelectedAssetId={setSelectedAssetId}
+            assets={assets}
+            enableFilterAssets={enableFilterAssets}
+            setSearchTerm={setSearchTerm}
+            validStates={validStates}
+            enableFilterType={loginUser?.userType == UserType.Maintenance}
+            workOrderTypeCount={getWorkOrderTypeCount()}
+          />
+        )}
         {filteredWorkOrders.length > 0 && (
           <DataTable
             columns={

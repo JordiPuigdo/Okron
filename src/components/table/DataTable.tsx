@@ -150,6 +150,7 @@ const DataTable: React.FC<DataTableProps> = ({
       record.stock < record.minium;
 
     let filteredRecords = data;
+
     if (enableFilterActive) {
       filteredRecords = filteredRecords.filter(filterByActiveStatus);
     }

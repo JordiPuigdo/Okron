@@ -10,6 +10,7 @@ type AutocompleteSearchBarProps = {
   disabled?: boolean;
   selectedId?: string | null;
   className?: string;
+  parentClassName?: string;
 };
 
 const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
@@ -19,6 +20,7 @@ const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
   disabled = false,
   selectedId,
   className = '',
+  parentClassName = 'w-full',
 }) => {
   const [query, setQuery] = useState('');
   const [selectedElementIndex, setSelectedElementIndex] = useState<number>(-1);
@@ -102,7 +104,7 @@ const AutocompleteSearchBar: React.FC<AutocompleteSearchBarProps> = ({
   }, [selectedElementIndex]);
 
   return (
-    <div ref={dropdownRef} className="w-full">
+    <div ref={dropdownRef} className={`${parentClassName}`}>
       <SearchInput
         value={query}
         onChange={handleQueryChange}

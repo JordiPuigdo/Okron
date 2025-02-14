@@ -193,3 +193,14 @@ export enum WorkOrderEventType {
   Finished,
   Created,
 }
+
+export interface WorkOrdersFilters {
+  workOrderType: WorkOrderType[];
+  workOrderState: StateWorkOrder[];
+  dateRange: {
+    startDate: Date | null;
+    endDate: Date | null;
+  };
+  searchTerm: string;
+  assetId: string;
+}

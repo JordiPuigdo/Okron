@@ -140,6 +140,8 @@ export const formatCellContent = (
   if (column.align === ColumnnAlign.RIGHT) classNametd += ' text-right pr-8';
   if (rowData.colorRow) classNametd += ` ${rowData.colorRow}`;
 
+  if (value && value.length > 100) value = value.substring(0, 50) + '...';
+
   return { value, classNametd, className };
 };
 
