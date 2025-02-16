@@ -11,6 +11,7 @@ import {
 import {
   DowntimesTicketReport,
   DowntimesTicketReportList,
+  DowntimesTicketReportModel,
 } from 'app/interfaces/Production/DowntimesTicketReport';
 import {
   calculateTimeDifference,
@@ -29,6 +30,7 @@ import {
   calculateDowntimeCount,
   calculateTotalDowntimeMWO,
   calculateTotalDowntimes,
+  calculateTotalDowntimesWorkOrder,
   filterAssets,
 } from './downtimeUtils';
 
@@ -177,6 +179,20 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
                       </div>
                     </Link>
                     {RenderWorkOrderDetail(workOrder)}
+                    <div className="flex w-full gap-2">
+                      <div className="w-full p-2 justify-end bg-white rounded-lg font-semibold">
+                        {calculateTotalDowntimesWorkOrder(
+                          workOrder,
+                          OriginDowntime.Production
+                        )}
+                      </div>
+                      <div className="w-full p-2 justify-end font-semibold bg-white rounded-lg">
+                        {calculateTotalDowntimesWorkOrder(
+                          workOrder,
+                          OriginDowntime.Maintenance
+                        )}
+                      </div>
+                    </div>
                   </div>
                 ))}
 
@@ -197,55 +213,77 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
 
   function RenderWorkOrderDetail(workOrder: DowntimesTicketReportList) {
     return (
+      <div className="flex w-full">
+        <div className={`flex flex-row w-full gap-2`}>
+          <div className="w-full">
+            {MapDowntimes(
+              workOrder.downtimesWorkOrder.filter(
+                x => x.originDownTime == OriginDowntime.Production
+              )
+            )}
+          </div>
+          <div className="w-full">
+            {MapDowntimes(
+              workOrder.downtimesWorkOrder.filter(
+                x => x.originDownTime == OriginDowntime.Maintenance
+              )
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function MapDowntimes(downtimes: DowntimesTicketReportModel[]) {
+    return (
       <>
-        {' '}
-        <div className={`flex flex-col gap-2`}>
-          {workOrder.downtimesWorkOrder.map((downtime, downtimeIndex) => (
-            <div
-              key={downtimeIndex}
-              className={`flex flex-row gap-4 text-sm p-2 rounded shadow-sm ${
-                downtime.originDownTime === OriginDowntime.Production
-                  ? 'bg-red-700'
-                  : 'bg-blue-700'
-              }`}
-            >
-              <div className="flex flex-col w-full gap-2">
-                <div className="flex gap-2">
-                  <div className="flex flex-row gap-1">
-                    <span className="text-white font-bold">Inici:</span>
-                    <span className="text-white">
-                      {formatDate(downtime.startTime)}
-                    </span>
-                    <span className="text-white"> - </span>
-                    <span className="text-white font-bold">Final:</span>
-                    <span className="text-white">
-                      {formatDate(downtime.endTime)}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-start gap-1">
-                  <span className="text-white font-semibold">Total:</span>
-                  <span className="text-white">
-                    {calculateTimeDifference(
-                      downtime.startTime,
-                      downtime.endTime
-                    )}
-                  </span>
-                </div>
+        {downtimes.map((downtime, downtimeIndex) => (
+          <div
+            key={downtimeIndex}
+            className={`flex flex-row my-2 text-sm p-2 rounded shadow-sm gap-2 ${
+              downtime.originDownTime === OriginDowntime.Production
+                ? 'bg-red-700'
+                : 'bg-blue-700'
+            }`}
+          >
+            <div className="w-full flex flex-col border-r-2 gap-2">
+              <div className="w-full flex gap-1 ">
+                <span className="text-white font-bold">Inici:</span>
+                <span className="text-white">
+                  {formatDate(downtime.startTime)}
+                </span>
+                <span className="text-white font-bold">Final:</span>
+                <span className="text-white">
+                  {formatDate(downtime.endTime)}
+                </span>
               </div>
-              <div className="flex w-full justify-end">
-                <div className="flex flex-col gap-2 items-end">
-                  <span className="text-white font-semibold">
-                    {translateDowntimeReasonType(
-                      downtime.originDownTime as unknown as DowntimesReasonsType
-                    )}
+
+              <div className="flex items-start gap-1">
+                <span className="text-white font-semibold">Total:</span>
+                <span className="text-white">
+                  {calculateTimeDifference(
+                    downtime.startTime,
+                    downtime.endTime
+                  )}
+                </span>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <div className="flex flex-col gap-2 items-end">
+                <span className="text-white font-semibold">
+                  {translateDowntimeReasonType(
+                    downtime.originDownTime as unknown as DowntimesReasonsType
+                  )}
+                </span>
+                <div className="flex flex-wrap">
+                  <span className="text-white whitespace-nowrap overflow-hidden text-ellipsis max-w-[87px]">
+                    {downtime.operator.name}
                   </span>
-                  <span className="text-white">{downtime.operator.name}</span>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </>
     );
   }

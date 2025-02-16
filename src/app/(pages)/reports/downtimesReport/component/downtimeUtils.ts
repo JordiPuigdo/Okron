@@ -1,8 +1,10 @@
 import { OriginDowntime } from 'app/interfaces/Production/Downtimes';
 import {
   DowntimesTicketReport,
+  DowntimesTicketReportList,
   DowntimesTicketReportModel,
 } from 'app/interfaces/Production/DowntimesTicketReport';
+import WorkOrder from 'app/interfaces/workOrder';
 import dayjs from 'dayjs';
 
 export const calculateDowntimeCount = (
@@ -13,6 +15,28 @@ export const calculateDowntimeCount = (
     const currentCount = asset.downtimesTicketReportList.length;
     return total + currentCount + childCount;
   }, 0);
+};
+
+export const calculateTotalDowntimesWorkOrder = (
+  workOrder: DowntimesTicketReportList,
+  downtimeFilter: OriginDowntime.Maintenance | OriginDowntime.Production
+): string => {
+  let totalSeconds = 0;
+
+  workOrder.downtimesWorkOrder
+    ?.filter(x => x.originDownTime == downtimeFilter)
+    .forEach(x => {
+      totalSeconds = calculateTotalSecondsBetweenDates(x.startTime, x.endTime);
+    });
+
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+    2,
+    '0'
+  )}:${String(Math.floor(seconds)).padStart(2, '0')}`;
 };
 
 export const calculateTotalDowntimes = (
