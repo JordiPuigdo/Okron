@@ -26,7 +26,7 @@ export const calculateTotalDowntimesWorkOrder = (
   workOrder.downtimesWorkOrder
     ?.filter(x => x.originDownTime == downtimeFilter)
     .forEach(x => {
-      totalSeconds = calculateTotalSecondsBetweenDates(x.startTime, x.endTime);
+      totalSeconds += calculateTotalSecondsBetweenDates(x.startTime, x.endTime);
     });
 
   const hours = Math.floor(totalSeconds / 3600);
