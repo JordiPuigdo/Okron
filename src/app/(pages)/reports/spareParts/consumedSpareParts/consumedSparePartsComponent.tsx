@@ -35,7 +35,7 @@ export default function ConsumedSparePartsComponent() {
     );
 
   return (
-    <div className="flex flex-col p-2 my-2">
+    <div className="flex flex-col h-full gap-4">
       <div className="flex flex-col gap-4 bg-white rounded-xl p-4 shadow-md">
         <div className="w-full flex flex-row text-xl font-semibold p-2 items-center border-b-2 border-gray-300">
           <div className="flex cursor-pointer " onClick={() => router.back()}>

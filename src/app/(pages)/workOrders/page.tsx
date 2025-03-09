@@ -31,8 +31,8 @@ export default function WorkOrdersPage() {
   return (
     <MainLayout>
       <Container>
-        {renderHeader()}
-        <div className="mt-4">
+        <div className="flex flex-col h-full">
+          {renderHeader()}
           <WorkOrderTable
             enableFilterAssets={true}
             enableFilters={true}

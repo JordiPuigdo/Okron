@@ -16,7 +16,7 @@ function SparePartsPage() {
   return (
     <MainLayout>
       <Container>
-        <div className="mt-2">
+        <div className="flex flex-col h-full">
           <SparePartTable
             enableFilters={true}
             enableEdit={canEdit}

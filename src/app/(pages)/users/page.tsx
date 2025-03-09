@@ -68,19 +68,17 @@ export default function UsersPage() {
   return (
     <MainLayout>
       <Container>
-        <div>
+        <div className="flex flex-col h-full">
           {renderHeader()}
           {isLoading ? (
             <p>Carregant dades...</p>
           ) : (
-            <div className="flex flex-col gap-4">
-              <DataTable
-                data={users}
-                columns={columns}
-                tableButtons={tableButtons}
-                entity={EntityTable.SECTION}
-              />
-            </div>
+            <DataTable
+              data={users}
+              columns={columns}
+              tableButtons={tableButtons}
+              entity={EntityTable.SECTION}
+            />
           )}
         </div>
       </Container>

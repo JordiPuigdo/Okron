@@ -68,16 +68,17 @@ function PreventivePage() {
   return (
     <MainLayout>
       <Container>
-        {renderHeader()}
-
-        {isLoadingPage && <SvgSpinner className="flex w-full" />}
-        {!isLoadingPage && (
-          <PreventiveTable
-            enableFilters={true}
-            enableDelete={true}
-            enableEdit={true}
-          />
-        )}
+        <div className="flex flex-col h-full">
+          {renderHeader()}
+          {isLoadingPage && <SvgSpinner className="flex w-full" />}
+          {!isLoadingPage && (
+            <PreventiveTable
+              enableFilters={true}
+              enableDelete={true}
+              enableEdit={true}
+            />
+          )}
+        </div>
       </Container>
     </MainLayout>
   );

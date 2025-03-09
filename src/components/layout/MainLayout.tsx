@@ -26,8 +26,8 @@ export default function MainLayout({
   return loading ? (
     <Loader />
   ) : (
-    <div className="min-h-screen flex flex-col">
-      <div className="flex flex-1">
+    <div className="relative flex flex-col h-screen">
+      <div className="flex flex-1 overflow-hidden">
         <div
           className={`fixed mt-2 top-0 left-0 h-full bg-white text-white transition-all duration-400 ease-in-out z-50 pt-6 ${
             isMenuOpen ? 'pl-3 w-60' : !hideHeader && !isMenuOpen && 'w-16'
@@ -37,15 +37,11 @@ export default function MainLayout({
         </div>
 
         <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
-          <div className={`fixed top-0 w-full z-50 ${isMenuOpen ? '' : ''}`}>
+          <div className={`fixed top-0 w-full z-50  ${isMenuOpen ? '' : ''}`}>
             {!hideHeader && <Header />}
           </div>
-          <main className="flex-1 bg-okron-background">
-            <div
-              className={`mx-auto max-w-screen-3xl min-h-screen ${
-                isMenuOpen ? 'ml-60' : 'ml-16'
-              } `}
-            >
+          <main className="flex-1 w-full bg-okron-background">
+            <div className={`mr-12 h-full ${isMenuOpen ? 'ml-60' : 'ml-16'}`}>
               {children}
             </div>
           </main>

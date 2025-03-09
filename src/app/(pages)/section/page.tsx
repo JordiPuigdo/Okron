@@ -75,14 +75,16 @@ export default function AuthenticationPage() {
   return (
     <MainLayout>
       <Container>
-        {renderHeader()}
-        <DataTable
-          data={sections}
-          tableButtons={tableButtons}
-          filters={filters}
-          columns={columns}
-          entity={EntityTable.SECTION}
-        />
+        <div className="flex flex-col h-full">
+          {renderHeader()}
+          <DataTable
+            data={sections}
+            tableButtons={tableButtons}
+            filters={filters}
+            columns={columns}
+            entity={EntityTable.SECTION}
+          />
+        </div>
       </Container>
     </MainLayout>
   );

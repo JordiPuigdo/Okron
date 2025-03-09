@@ -4,7 +4,6 @@ import {
   DowntimesTicketReportList,
   DowntimesTicketReportModel,
 } from 'app/interfaces/Production/DowntimesTicketReport';
-import WorkOrder from 'app/interfaces/workOrder';
 import dayjs from 'dayjs';
 
 export const calculateDowntimeCount = (

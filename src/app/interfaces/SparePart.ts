@@ -1,5 +1,6 @@
-import { Documentation } from "./Documentation";
-import Operator from "./Operator";
+import { Documentation } from './Documentation';
+import Operator from './Operator';
+import { ProviderSpareParts } from './Provider';
 
 interface SparePart {
   id: string;
@@ -20,6 +21,8 @@ interface SparePart {
   lastMovementConsume: Date;
   lastMovement: Date;
   lastRestockDate: Date;
+  providers: ProviderSpareParts[];
+  wareHouseId: string[];
 }
 
 export default SparePart;

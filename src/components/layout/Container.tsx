@@ -1,15 +1,12 @@
 export default function Container({
   children,
+  className = '',
 }: {
   children: React.ReactNode;
   enablePading?: boolean;
   className?: string;
 }) {
   return (
-    <div className="pt-12">
-      <div className="p-6 gap-2">
-        <div>{children}</div>
-      </div>
-    </div>
+    <div className={`pt-20 mx-6 w-full h-full ${className}`}>{children}</div>
   );
 }

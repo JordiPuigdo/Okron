@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface PaginationProps {
   currentPage: number;
@@ -14,7 +14,7 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
 }) => {
   return (
-    <div className="flex justify-end mt-8 gap-4 mr-4 items-center text-sm">
+    <div className="flex justify-end gap-4 mr-4 items-center text-sm">
       <button
         onClick={() => {
           onPageChange(currentPage - 1);
@@ -22,14 +22,14 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === 1}
         className={` p-2 text-white rounded-xl  ${
           currentPage === 1
-            ? "bg-okron-btnDisable text-gray-700"
-            : "bg-okron-btnPagination  hover:bg-okron-btnPaginationHover"
+            ? 'bg-okron-btnDisable text-gray-700'
+            : 'bg-okron-btnPagination  hover:bg-okron-btnPaginationHover'
         } `}
       >
         Anterior
       </button>
       <span className="mr-2 text-center">
-        Pàgina {currentPage}{" "}
+        Pàgina {currentPage}{' '}
         {currentPage === totalPages || totalPages === 0 ? (
           <></>
         ) : (
@@ -43,8 +43,8 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={!hasNextPage}
         className={` p-2 text-white rounded-xl ${
           currentPage === totalPages || totalPages === 0
-            ? "bg-okron-btnDisable text-gray-700"
-            : "bg-okron-btnPagination  hover:bg-okron-btnPaginationHover"
+            ? 'bg-okron-btnDisable text-gray-700'
+            : 'bg-okron-btnPagination  hover:bg-okron-btnPaginationHover'
         } `}
       >
         Següent

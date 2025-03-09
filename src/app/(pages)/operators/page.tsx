@@ -103,8 +103,8 @@ function OperatorsPage() {
   return (
     <MainLayout>
       <Container>
-        {renderHeader(operators)}
-        <div className="overflow-x-auto text-black">
+        <div className="flex flex-col h-full">
+          {renderHeader(operators)}
           <DataTable
             data={operators.sort((a, b) => a.code.localeCompare(b.code))}
             filters={filters}

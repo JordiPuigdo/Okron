@@ -105,6 +105,12 @@ const DataTable: React.FC<DataTableProps> = ({
       case EntityTable.MACHINE:
         setPathDetail(ROUTES.configuration.machines);
         break;
+      case EntityTable.WAREHOUSE:
+        setPathDetail(ROUTES.configuration.warehouse);
+        break;
+      case EntityTable.PROVIDER:
+        setPathDetail(ROUTES.configuration.provider);
+        break;
       default:
         setPathDetail('error');
     }
@@ -237,102 +243,95 @@ const DataTable: React.FC<DataTableProps> = ({
 
   if (filteredData)
     return (
-      <>
-        <div className="bg-white rounded-lg shadow-md">
-          <div className="flex py-2">
-            {filters !== undefined && filters?.length > 0 && (
-              <RenderFilters
-                filters={filters}
-                onFilterChange={handleFilterChange}
-                onFilterActive={setFilterActive}
-                onFilterSparePartsUnderStock={setFilterSparePartsUnderStock}
-                enableFilterActive={enableFilterActive}
-                entity={entity}
-                isReport={isReport}
-              />
-            )}
-            <div className="flex w-full justify-end">
-              <div
-                className="p-2 rounded-lg m-2 items-center bg-green-700 text-white hover:bg-green-900 cursor-pointer"
-                title="Exportar a Excel"
-                onClick={() => exportTableToExcel(data, columns, entity)}
-              >
-                <SvgExportExcel />
-              </div>
-            </div>
-          </div>
-          <div className="p-2">
-            {isLoading ? (
-              <SvgSpinner className="w-full justify-center" />
-            ) : (
-              <div className="flex-grow overflow-auto">
-                <table
-                  className="w-full text-left text-sm"
-                  id={`table${entity}`}
-                >
-                  <TableHeader
-                    columns={columns}
-                    enableCheckbox={enableCheckbox}
-                    handleSelectedAllRows={handleSelectedAllRows}
-                    isAllSelected={isAllSelected}
-                    handleSort={handleSort}
-                    sortColumn={sortColumn}
-                    sortOrder={sortOrder}
-                    tableButtons={tableButtons}
-                    entity={entity}
-                  />
-                  <TableBodyComponent
-                    filteredData={filteredData}
-                    itemsPerPage={itemsPerPage}
-                    handleSelectedRow={handleSelectedRow}
-                    enableCheckbox={enableCheckbox}
-                    selectedRows={selectedRows}
-                    columns={columns}
-                    entity={entity}
-                    isReport={isReport}
-                    tableButtons={tableButtons}
-                    loginUser={loginUser}
-                    pathDetail={pathDetail}
-                    onDelete={onDelete ? onDelete : undefined}
-                    totalCounts={totalCounts}
-                    totalQuantity={totalQuantity}
-                  />
-                </table>
-              </div>
-            )}
-          </div>
-          <div className="p-2 flex flex-row">
-            {data.length > 0 && (
-              <p className="mt-auto text-sm w-full">
-                Total: {totalRecords} registres
-              </p>
-            )}
-            <div className="flex align-bottom items-center mt-auto w-full">
-              <select
-                value={itemsPerPage}
-                onChange={e => handleItemsPerPageChange(Number(e.target.value))}
-                className="text-sm bg-blue-gray-100 rounded-lg border border-gray-500"
-              >
-                {itemsPerPageOptions.map(option => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-              <p className="ml-2 text-sm">registres per pàgina</p>
-            </div>
-
-            <div className="justify-end w-full">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalCount}
-                onPageChange={handlePageChange}
-                hasNextPage={currentPage < totalCount}
-              />
+      <div className="bg-white rounded-lg shadow-md w-full h-full flex flex-col mb-4">
+        <div className="flex py-2">
+          {filters !== undefined && filters?.length > 0 && (
+            <RenderFilters
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onFilterActive={setFilterActive}
+              onFilterSparePartsUnderStock={setFilterSparePartsUnderStock}
+              enableFilterActive={enableFilterActive}
+              entity={entity}
+              isReport={isReport}
+            />
+          )}
+          <div className="flex w-full justify-end">
+            <div
+              className="p-2 rounded-lg m-2 items-center bg-green-700 text-white hover:bg-green-900 cursor-pointer"
+              title="Exportar a Excel"
+              onClick={() => exportTableToExcel(data, columns, entity)}
+            >
+              <SvgExportExcel />
             </div>
           </div>
         </div>
-      </>
+        <div className="p-2 flex-1 overflow-auto">
+          {isLoading ? (
+            <SvgSpinner className="w-full justify-center" />
+          ) : (
+            <div className="flex-grow overflow-auto">
+              <table className="w-full text-left text-sm" id={`table${entity}`}>
+                <TableHeader
+                  columns={columns}
+                  enableCheckbox={enableCheckbox}
+                  handleSelectedAllRows={handleSelectedAllRows}
+                  isAllSelected={isAllSelected}
+                  handleSort={handleSort}
+                  sortColumn={sortColumn}
+                  sortOrder={sortOrder}
+                  tableButtons={tableButtons}
+                  entity={entity}
+                />
+                <TableBodyComponent
+                  filteredData={filteredData}
+                  itemsPerPage={itemsPerPage}
+                  handleSelectedRow={handleSelectedRow}
+                  enableCheckbox={enableCheckbox}
+                  selectedRows={selectedRows}
+                  columns={columns}
+                  entity={entity}
+                  isReport={isReport}
+                  tableButtons={tableButtons}
+                  loginUser={loginUser}
+                  pathDetail={pathDetail}
+                  onDelete={onDelete ? onDelete : undefined}
+                  totalCounts={totalCounts}
+                  totalQuantity={totalQuantity}
+                />
+              </table>
+            </div>
+          )}
+        </div>
+        <div className="p-4 flex flex-row justify-between items-center border-t border-gray-200">
+          {data.length > 0 && (
+            <p className="text-sm w-full">Total: {totalRecords} registres</p>
+          )}
+          <div className="flex align-bottom items-center w-full">
+            <select
+              value={itemsPerPage}
+              onChange={e => handleItemsPerPageChange(Number(e.target.value))}
+              className="text-sm bg-blue-gray-100 rounded-lg border border-gray-500"
+            >
+              {itemsPerPageOptions.map(option => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+            <p className="ml-2 text-sm">registres per pàgina</p>
+          </div>
+
+          <div className="justify-end items-center w-full">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalCount}
+              onPageChange={handlePageChange}
+              hasNextPage={currentPage < totalCount}
+            />
+          </div>
+        </div>
+      </div>
     );
   return <>No results</>;
 };

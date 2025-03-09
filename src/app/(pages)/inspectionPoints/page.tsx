@@ -185,32 +185,34 @@ export default function InspectionPointsPage() {
   return (
     <MainLayout>
       <Container>
-        {renderHeader()}
-        {isFormVisible && (
-          <form onSubmit={handleFormSubmit} className="mb-4">
-            <input
-              type="text"
-              placeholder="Escriu la descripció"
-              value={newDescription}
-              onChange={e => setNewDescription(e.target.value)}
-              className="border rounded py-2 px-3"
-            />
-            <button
-              type="submit"
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 ml-2 rounded"
-            >
-              Crear
-            </button>
-          </form>
-        )}
-        <DataTable
-          data={inspectionPoints}
-          columns={columns}
-          filters={filters}
-          tableButtons={tableButtons}
-          entity={EntityTable.INSPECTIONPOINTS}
-          onDelete={handleDeleteInspectionPoint}
-        />
+        <div className="flex flex-col h-full">
+          {renderHeader()}
+          {isFormVisible && (
+            <form onSubmit={handleFormSubmit} className="mb-4">
+              <input
+                type="text"
+                placeholder="Escriu la descripció"
+                value={newDescription}
+                onChange={e => setNewDescription(e.target.value)}
+                className="border rounded py-2 px-3"
+              />
+              <button
+                type="submit"
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 ml-2 rounded"
+              >
+                Crear
+              </button>
+            </form>
+          )}
+          <DataTable
+            data={inspectionPoints}
+            columns={columns}
+            filters={filters}
+            tableButtons={tableButtons}
+            entity={EntityTable.INSPECTIONPOINTS}
+            onDelete={handleDeleteInspectionPoint}
+          />
+        </div>
       </Container>
     </MainLayout>
   );
