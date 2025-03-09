@@ -662,7 +662,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                   </label>
                   <input
                     type="checkbox"
-                    className={`p-3 border text-sm border-gray-300 rounded-md w-full`}
+                    className={`p-3 border text-sm border-gray-300 rounded-md w-[15px]`}
                     {...register('visibleReport')}
                   />
                 </div>
