@@ -41,10 +41,7 @@ import { CostsObject } from 'components/Costs/CostsObject';
 import CompleteInspectionPoints from 'components/inspectionPoint/CompleteInspectionPoint';
 import WorkOrderOperatorComments from 'components/operator/WorkOrderCommentOperator';
 import WorkOrderOperatorTimesComponent from 'components/operator/WorkOrderOperatorTimes';
-import AutocompleteSearchBar from 'components/selector/AutocompleteSearchBar';
 import ChooseSpareParts from 'components/sparePart/ChooseSpareParts';
-import { log } from 'console';
-import { da, is } from 'date-fns/locale';
 import ca from 'date-fns/locale/ca';
 import { Button } from 'designSystem/Button/Buttons';
 import Link from 'next/link';
@@ -71,9 +68,7 @@ enum Tab {
 const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const { register, handleSubmit, setValue } = useForm<WorkOrder>({});
   const router = useRouter();
-  const [currentWorkOrder, setCurrentWorkOrder] = useState<
-    WorkOrder | undefined
-  >(undefined);
+  const [currentWorkOrder, setCurrentWorkOrder] = useState<WorkOrder>();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -215,6 +210,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       setValue('stateWorkOrder', responseWorkOrder.stateWorkOrder);
       setValue('startTime', responseWorkOrder.startTime);
       setValue('downtimeReason', responseWorkOrder.downtimeReason);
+      setValue('visibleReport', responseWorkOrder.visibleReport);
 
       setSelectedAssetId(responseWorkOrder.asset!.id);
       const finalData = new Date(responseWorkOrder.startTime);
@@ -416,6 +412,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
             ? loginUser.userType
             : UserType.Maintenance,
         downtimeReason: data.downtimeReason,
+        visibleReport: data.visibleReport,
       };
       await workOrderService.updateWorkOrder(updatedWorkOrderData);
 
@@ -654,6 +651,19 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
                     onClick={() =>
                       !isDisabledField && setShowDowntimeReasonsModal(true)
                     }
+                  />
+                </div>
+                <div className="w-full">
+                  <label
+                    htmlFor="operators"
+                    className="block text-sm font-medium text-gray-700 py-2"
+                  >
+                    Visible Report
+                  </label>
+                  <input
+                    type="checkbox"
+                    className={`p-3 border text-sm border-gray-300 rounded-md w-[15px]`}
+                    {...register('visibleReport')}
                   />
                 </div>
               </>

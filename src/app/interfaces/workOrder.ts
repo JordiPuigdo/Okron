@@ -34,6 +34,7 @@ export interface WorkOrder extends BaseModel {
   downtimes?: Downtimes[];
   originalWorkOrderId?: string;
   workOrderCreatedId?: string;
+  visibleReport?: boolean;
 }
 
 export default WorkOrder;
@@ -78,6 +79,7 @@ export interface WorkOrderOperatorTimes {
 export interface UpdateWorkOrderRequest extends CreateWorkOrderRequest {
   downtimeReason?: DowntimesReasons;
   startTime?: Date;
+  visibleReport?: boolean;
 }
 
 export interface CreateWorkOrderRequest {
@@ -99,6 +101,7 @@ export interface CreateWorkOrderRequest {
   originalWorkOrderId?: string;
   originalWorkOrderCode?: string;
   workOrderCreatedId?: string;
+  VisibleReport?: boolean;
 }
 
 export interface AddWorkOrderOperatorTimes {
