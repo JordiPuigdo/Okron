@@ -136,26 +136,42 @@ export const calculateTotalSecondsBetweenDates = (
 export const filterAssets = (
   assets: DowntimesTicketReport[],
   query: string,
-  onlyTickets = false
+  onlyTickets = false,
+  noMaintenanceIntervention = false
 ): DowntimesTicketReport[] => {
   return assets
     .map(asset => {
       const matchingDowntimes = asset.downtimesTicketReportList.filter(
-        workOrder =>
-          [
+        workOrder => {
+          const matchesQuery = [
             workOrder.workOrderCode,
             workOrder.workOrderDescription,
             workOrder.downtimeReason,
-          ].some(field => field.toLowerCase().includes(query))
+          ].some(field => field?.toLowerCase().includes(query.toLowerCase()));
+
+          const hasNoMaintenance = noMaintenanceIntervention
+            ? !workOrder.downtimesWorkOrder.some(
+                downtime =>
+                  downtime.originDownTime === OriginDowntime.Maintenance
+              )
+            : true;
+
+          return matchesQuery && hasNoMaintenance;
+        }
       );
 
       const matchesCurrentAsset =
-        asset.assetCode.toLowerCase().includes(query) ||
-        asset.assetDescription.toLowerCase().includes(query) ||
+        asset.assetCode?.toLowerCase().includes(query.toLowerCase()) ||
+        asset.assetDescription?.toLowerCase().includes(query.toLowerCase()) ||
         matchingDowntimes.length > 0;
 
       const filteredChildren = asset.assetChild
-        ? filterAssets(asset.assetChild, query, onlyTickets)
+        ? filterAssets(
+            asset.assetChild,
+            query,
+            onlyTickets,
+            noMaintenanceIntervention
+          )
         : [];
 
       const hasDowntimes = asset.downtimesTicketReportList.length > 0;
@@ -165,11 +181,27 @@ export const filterAssets = (
         return null;
       }
 
+      const hasNoMaintenanceDowntimes = noMaintenanceIntervention
+        ? asset.downtimesTicketReportList.some(
+            workOrder =>
+              !workOrder.downtimesWorkOrder.some(
+                downtime =>
+                  downtime.originDownTime === OriginDowntime.Maintenance
+              )
+          )
+        : true;
+
       if (
-        matchesCurrentAsset ||
-        (filteredChildren && filteredChildren.length > 0)
+        (matchesCurrentAsset || filteredChildren.length > 0) &&
+        (!noMaintenanceIntervention ||
+          hasNoMaintenanceDowntimes ||
+          filteredChildren.length > 0)
       ) {
-        return { ...asset, assetChild: filteredChildren || [] };
+        return {
+          ...asset,
+          downtimesTicketReportList: matchingDowntimes,
+          assetChild: filteredChildren,
+        };
       }
 
       return null;

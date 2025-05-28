@@ -58,6 +58,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedAssets, setExpandedAssets] = useState<Set<string>>(new Set());
   const [onlyTickets, setOnlyTickets] = useState(true);
+  const [onlyProduction, setOnlyProduction] = useState(false);
   // const [onlyMaintenance, setOnlyMaintenance] = useState(false);
   const router = useRouter();
 
@@ -208,7 +209,8 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
   const filteredData = filterAssets(
     downtimesTicketReport,
     searchQuery.toLowerCase(),
-    onlyTickets
+    onlyTickets,
+    onlyProduction
   );
 
   function RenderWorkOrderDetail(workOrder: DowntimesTicketReportList) {
@@ -347,6 +349,21 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
                 className="flex cursor-pointer"
                 checked={onlyTickets}
                 onChange={e => setOnlyTickets(e.target.checked)}
+              />
+            </div>
+            <div
+              className="flex items-center gap-4 cursor-pointer"
+              onClick={() => setOnlyProduction(!onlyProduction)}
+            >
+              <div className="flex flex-col">
+                <span>Només</span>
+                <span>Tickets Producció</span>
+              </div>
+              <input
+                type="checkbox"
+                className="flex cursor-pointer"
+                checked={onlyProduction}
+                onChange={e => setOnlyProduction(e.target.checked)}
               />
             </div>
             {/*<div
