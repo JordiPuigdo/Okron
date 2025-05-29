@@ -3,6 +3,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
+import Select from 'react-select';
 import { SvgSpinner } from 'app/icons/icons';
 import {
   DowntimesReasonsType,
@@ -46,6 +47,11 @@ interface DowntimeReportProps {
   isLoading: boolean;
 }
 
+type OptionType = {
+  value: string;
+  label: string;
+};
+
 const DowntimeReport: React.FC<DowntimeReportProps> = ({
   downtimesTicketReport,
   from,
@@ -60,6 +66,33 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
   const [onlyTickets, setOnlyTickets] = useState(true);
   const [onlyProduction, setOnlyProduction] = useState(false);
   // const [onlyMaintenance, setOnlyMaintenance] = useState(false);
+
+  const [selectedOptions, setSelectedOptions] = useState<OptionType[]>([]);
+
+  function getAllDowntimeReasons(assets: DowntimesTicketReport[]): string[] {
+    return assets.flatMap(asset => {
+      // Get downtime reasons from the current asset
+      const currentReasons = asset.downtimesTicketReportList
+        .map(workOrder => workOrder.downtimeReason)
+        .filter(Boolean); // Optional: removes null/undefined
+
+      // Get downtime reasons from child assets (recursive)
+      const childReasons = asset.assetChild
+        ? getAllDowntimeReasons(asset.assetChild)
+        : [];
+
+      // Combine current and child reasons
+      return [...currentReasons, ...childReasons];
+    });
+  }
+
+  // Usage:
+  const allReasons = [...new Set(getAllDowntimeReasons(downtimesTicketReport))];
+  const downtimeReasonOptions: OptionType[] = allReasons.map(reason => ({
+    value: reason,
+    label: reason,
+  }));
+
   const router = useRouter();
 
   const toggleExpand = (assetCode: string) => {
@@ -72,6 +105,10 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
       }
       return newSet;
     });
+  };
+
+  const handleChange = (selected: readonly OptionType[]) => {
+    setSelectedOptions(selected ? [...selected] : []);
   };
 
   const renderDowntimeTree = (
@@ -210,7 +247,8 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
     downtimesTicketReport,
     searchQuery.toLowerCase(),
     onlyTickets,
-    onlyProduction
+    onlyProduction,
+    selectedOptions.map(option => option.value)
   );
 
   function RenderWorkOrderDetail(workOrder: DowntimesTicketReportList) {
@@ -315,7 +353,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
           </div>
         </div>
         <div className="mb-6 ">
-          <div className="flex gap-4 mb-4">
+          <div className="flex gap-4 mb-4 items-center justify-between">
             <DatePicker
               selected={from}
               onChange={e => (e ? setFrom(e) : setFrom(new Date()))}
@@ -332,7 +370,6 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
               className="border border-gray-300 p-2 rounded-md mr-4 w-full"
               popperClassName="z-50"
             />
-
             <Button type="create" onClick={() => reloadData}>
               Buscar
             </Button>
@@ -364,6 +401,21 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
                 className="flex cursor-pointer"
                 checked={onlyProduction}
                 onChange={e => setOnlyProduction(e.target.checked)}
+              />
+            </div>
+
+            <div className="flex items-center w-full">
+              <Select
+                isMulti
+                options={downtimeReasonOptions}
+                value={selectedOptions}
+                onChange={handleChange}
+                className="w-full"
+                classNamePrefix="react-select"
+                placeholder="Motiu"
+                noOptionsMessage={() => 'No hi ha motius disponibles'}
+                isClearable={true}
+                isSearchable={true}
               />
             </div>
             {/*<div

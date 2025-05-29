@@ -137,18 +137,22 @@ export const filterAssets = (
   assets: DowntimesTicketReport[],
   query: string,
   onlyTickets = false,
-  noMaintenanceIntervention = false
+  noMaintenanceIntervention = false,
+  downtimeReasons: string[] = []
 ): DowntimesTicketReport[] => {
   return assets
     .map(asset => {
+      // Filter downtimes based on all conditions
       const matchingDowntimes = asset.downtimesTicketReportList.filter(
         workOrder => {
+          // Check text search match
           const matchesQuery = [
             workOrder.workOrderCode,
             workOrder.workOrderDescription,
             workOrder.downtimeReason,
           ].some(field => field?.toLowerCase().includes(query.toLowerCase()));
 
+          // Check maintenance intervention
           const hasNoMaintenance = noMaintenanceIntervention
             ? !workOrder.downtimesWorkOrder.some(
                 downtime =>
@@ -156,24 +160,34 @@ export const filterAssets = (
               )
             : true;
 
-          return matchesQuery && hasNoMaintenance;
+          // Check downtime reason match (if any reasons are selected)
+          const matchesReason =
+            downtimeReasons.length > 0
+              ? downtimeReasons.includes(workOrder.downtimeReason || '')
+              : true;
+
+          return matchesQuery && hasNoMaintenance && matchesReason;
         }
       );
 
+      // Check if asset itself matches search (code/description)
       const matchesCurrentAsset =
         asset.assetCode?.toLowerCase().includes(query.toLowerCase()) ||
         asset.assetDescription?.toLowerCase().includes(query.toLowerCase()) ||
         matchingDowntimes.length > 0;
 
+      // Recursively filter child assets
       const filteredChildren = asset.assetChild
         ? filterAssets(
             asset.assetChild,
             query,
             onlyTickets,
-            noMaintenanceIntervention
+            noMaintenanceIntervention,
+            downtimeReasons
           )
         : [];
 
+      // Check ticket-only filter condition
       const hasDowntimes = asset.downtimesTicketReportList.length > 0;
       const hasChildrenWithDowntimes = filteredChildren.length > 0;
 
@@ -181,6 +195,7 @@ export const filterAssets = (
         return null;
       }
 
+      // Check maintenance intervention condition
       const hasNoMaintenanceDowntimes = noMaintenanceIntervention
         ? asset.downtimesTicketReportList.some(
             workOrder =>
@@ -191,12 +206,22 @@ export const filterAssets = (
           )
         : true;
 
-      if (
+      // Include asset if:
+      // 1. It matches search OR has matching children
+      // AND
+      // 2. If noMaintenanceIntervention is true, it has non-maintenance downtimes OR matching children
+      // AND
+      // 3. If downtimeReasons are specified, it has matching downtimes OR matching children
+      const shouldIncludeAsset =
         (matchesCurrentAsset || filteredChildren.length > 0) &&
         (!noMaintenanceIntervention ||
           hasNoMaintenanceDowntimes ||
-          filteredChildren.length > 0)
-      ) {
+          filteredChildren.length > 0) &&
+        (downtimeReasons.length === 0 ||
+          matchingDowntimes.length > 0 ||
+          filteredChildren.length > 0);
+
+      if (shouldIncludeAsset) {
         return {
           ...asset,
           downtimesTicketReportList: matchingDowntimes,
