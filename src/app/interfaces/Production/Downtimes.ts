@@ -13,6 +13,7 @@ export interface Downtimes extends BaseModel {
 export enum OriginDowntime {
   Maintenance,
   Production,
+  MaintenanceOrders,
 }
 
 export interface DowntimesReasons extends BaseModel {

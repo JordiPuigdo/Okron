@@ -23,7 +23,6 @@ import ca from 'date-fns/locale/ca';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import { Button } from 'designSystem/Button/Buttons';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -65,7 +64,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
   const [expandedAssets, setExpandedAssets] = useState<Set<string>>(new Set());
   const [onlyTickets, setOnlyTickets] = useState(true);
   const [onlyProduction, setOnlyProduction] = useState(false);
-  // const [onlyMaintenance, setOnlyMaintenance] = useState(false);
+  const [onlyMaintenance, setOnlyMaintenance] = useState(false);
 
   const [selectedOptions, setSelectedOptions] = useState<OptionType[]>([]);
 
@@ -120,6 +119,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
       const downtimeCount = calculateDowntimeCount([asset]);
       const totalTime = calculateTotalDowntimes([asset]);
       const totalTimeProd = calculateTotalDowntimes([asset], 'P');
+
       const totalTimeMaintenance = calculateTotalDowntimes([asset], 'M');
 
       const hasChildren = asset.assetChild && asset.assetChild.length > 0;
@@ -248,6 +248,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
     searchQuery.toLowerCase(),
     onlyTickets,
     onlyProduction,
+    onlyMaintenance,
     selectedOptions.map(option => option.value)
   );
 
@@ -265,7 +266,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
           <div className="w-full">
             {MapDowntimes(
               workOrder.downtimesWorkOrder.filter(
-                x => x.originDownTime == OriginDowntime.Maintenance
+                x => x.originDownTime != OriginDowntime.Production
               )
             )}
           </div>
@@ -353,26 +354,26 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
           </div>
         </div>
         <div className="mb-6 ">
-          <div className="flex gap-4 mb-4 items-center justify-between">
-            <DatePicker
-              selected={from}
-              onChange={e => (e ? setFrom(e) : setFrom(new Date()))}
-              locale={ca}
-              dateFormat="dd/MM/yyyy"
-              className="border border-gray-300 p-2 rounded-md mr-4 w-full"
-              popperClassName="z-50"
-            />
-            <DatePicker
-              selected={to}
-              onChange={e => (e ? setTo(e) : setTo(new Date()))}
-              dateFormat="dd/MM/yyyy"
-              locale={ca}
-              className="border border-gray-300 p-2 rounded-md mr-4 w-full"
-              popperClassName="z-50"
-            />
-            <Button type="create" onClick={() => reloadData}>
-              Buscar
-            </Button>
+          <div className="flex gap-4 mb-4 items-center">
+            <div className="flex">
+              <DatePicker
+                selected={from}
+                onChange={e => (e ? setFrom(e) : setFrom(new Date()))}
+                locale={ca}
+                dateFormat="dd/MM/yyyy"
+                className="border border-gray-300 p-2 rounded-md mr-4"
+                popperClassName="z-50"
+              />
+              <DatePicker
+                selected={to}
+                onChange={e => (e ? setTo(e) : setTo(new Date()))}
+                dateFormat="dd/MM/yyyy"
+                locale={ca}
+                className="border border-gray-300 p-2 rounded-md mr-4"
+                popperClassName="z-50"
+              />
+            </div>
+
             <div
               className="flex items-center gap-4 cursor-pointer"
               onClick={() => setOnlyTickets(!onlyTickets)}
@@ -393,7 +394,6 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
               onClick={() => setOnlyProduction(!onlyProduction)}
             >
               <div className="flex flex-col">
-                <span>Només</span>
                 <span>Tickets Producció</span>
               </div>
               <input
@@ -403,7 +403,20 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
                 onChange={e => setOnlyProduction(e.target.checked)}
               />
             </div>
-
+            <div
+              className="flex items-center gap-4 cursor-pointer"
+              onClick={() => setOnlyMaintenance(!onlyMaintenance)}
+            >
+              <div className="flex flex-col">
+                <span>Tickets Manteniment</span>
+              </div>
+              <input
+                type="checkbox"
+                className="flex cursor-pointer"
+                checked={onlyMaintenance}
+                onChange={e => setOnlyMaintenance(e.target.checked)}
+              />
+            </div>
             <div className="flex items-center w-full">
               <Select
                 isMulti

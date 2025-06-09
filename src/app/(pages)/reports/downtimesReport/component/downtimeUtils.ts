@@ -4,7 +4,6 @@ import {
   DowntimesTicketReportList,
   DowntimesTicketReportModel,
 } from 'app/interfaces/Production/DowntimesTicketReport';
-import WorkOrder from 'app/interfaces/workOrder';
 import dayjs from 'dayjs';
 
 export const calculateDowntimeCount = (
@@ -19,12 +18,17 @@ export const calculateDowntimeCount = (
 
 export const calculateTotalDowntimesWorkOrder = (
   workOrder: DowntimesTicketReportList,
-  downtimeFilter: OriginDowntime.Maintenance | OriginDowntime.Production
+  downtimeFilter: OriginDowntime
 ): string => {
   let totalSeconds = 0;
 
+  const validFilters = [downtimeFilter];
+  if (downtimeFilter == OriginDowntime.Maintenance) {
+    validFilters.push(OriginDowntime.MaintenanceOrders);
+  }
+
   workOrder.downtimesWorkOrder
-    ?.filter(x => x.originDownTime == downtimeFilter)
+    ?.filter(x => validFilters.includes(x.originDownTime))
     .forEach(x => {
       totalSeconds += calculateTotalSecondsBetweenDates(x.startTime, x.endTime);
     });
@@ -58,7 +62,9 @@ export const calculateTotalDowntimes = (
               if (!workOrder.totalTime) return workOrderAcc;
               if (
                 downtimeFilter &&
-                workOrder.originDownTime !== filterMap[downtimeFilter]
+                workOrder.originDownTime !== filterMap[downtimeFilter] &&
+                workOrder.originDownTime == OriginDowntime.MaintenanceOrders &&
+                downtimeFilter != 'M'
               ) {
                 return workOrderAcc;
               }
@@ -138,6 +144,7 @@ export const filterAssets = (
   query: string,
   onlyTickets = false,
   noMaintenanceIntervention = false,
+  noProductionIntervention = false,
   downtimeReasons: string[] = []
 ): DowntimesTicketReport[] => {
   return assets
@@ -160,13 +167,23 @@ export const filterAssets = (
               )
             : true;
 
+          const hasNoProduction = noProductionIntervention
+            ? workOrder.downtimesWorkOrder.length === 0 ||
+              workOrder.downtimesWorkOrder.some(
+                downtime =>
+                  downtime.originDownTime === OriginDowntime.MaintenanceOrders
+              )
+            : true;
+
           // Check downtime reason match (if any reasons are selected)
           const matchesReason =
             downtimeReasons.length > 0
               ? downtimeReasons.includes(workOrder.downtimeReason || '')
               : true;
 
-          return matchesQuery && hasNoMaintenance && matchesReason;
+          return (
+            matchesQuery && hasNoMaintenance && hasNoProduction && matchesReason
+          );
         }
       );
 
@@ -183,6 +200,7 @@ export const filterAssets = (
             query,
             onlyTickets,
             noMaintenanceIntervention,
+            noProductionIntervention,
             downtimeReasons
           )
         : [];
@@ -206,6 +224,17 @@ export const filterAssets = (
           )
         : true;
 
+      const hasNoProductionDowntimes = noProductionIntervention
+        ? asset.downtimesTicketReportList.some(
+            workOrder =>
+              workOrder.downtimesWorkOrder.length === 0 ||
+              workOrder.downtimesWorkOrder.some(
+                downtime =>
+                  downtime.originDownTime === OriginDowntime.MaintenanceOrders
+              )
+          )
+        : true;
+
       // Include asset if:
       // 1. It matches search OR has matching children
       // AND
@@ -216,6 +245,9 @@ export const filterAssets = (
         (matchesCurrentAsset || filteredChildren.length > 0) &&
         (!noMaintenanceIntervention ||
           hasNoMaintenanceDowntimes ||
+          filteredChildren.length > 0) &&
+        (!noProductionIntervention ||
+          hasNoProductionDowntimes ||
           filteredChildren.length > 0) &&
         (downtimeReasons.length === 0 ||
           matchingDowntimes.length > 0 ||
