@@ -135,12 +135,18 @@ const DataTable: React.FC<DataTableProps> = ({
     setCurrentPage(1);
   };
 
-  const totalStock = useMemo(() => {
-    return filteredData.reduce((acc, item) => acc + (item.stock || 0), 0);
+  const totalPrice = useMemo(() => {
+    return filteredData.reduce((acc, item) => {
+      const price = Number(item.price) || 0;
+      const stock = Number(item.stock) || 0;
+      return acc + price * stock;
+    }, 0);
   }, [filteredData]);
 
-  const totalPrice = useMemo(() => {
-    return filteredData.reduce((acc, item) => acc + (item.price || 0), 0);
+  const totalStock = useMemo(() => {
+    return filteredData.reduce((acc, item) => {
+      return acc + (Number(item.stock) || 0);
+    }, 0);
   }, [filteredData]);
 
   useEffect(() => {
@@ -332,7 +338,7 @@ const DataTable: React.FC<DataTableProps> = ({
                   {entity === EntityTable.SPAREPART &&
                     columns?.find(x => x.key === 'price') && (
                       <tfoot>
-                        <tr className="bg-gray-200 font-semibold text-sm text-right">
+                        <tr className="bg-gray-200 font-semibold text-2xl text-right">
                           {columns
                             .filter(x => x.key !== 'id')
                             .map(col => {
@@ -352,7 +358,7 @@ const DataTable: React.FC<DataTableProps> = ({
                                     key={col.key}
                                     className="px-4 py-2 text-right"
                                   >
-                                    {totalPrice.toFixed(2)} €
+                                    {totalPrice.toFixed(2)}€
                                   </td>
                                 );
                               }
