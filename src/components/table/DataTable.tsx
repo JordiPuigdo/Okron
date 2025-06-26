@@ -191,7 +191,7 @@ const DataTable: React.FC<DataTableProps> = ({
   ]);
 
   const handleFilterChange = (key: string, value: string | boolean | Date) => {
-    //if (data.length === 0) return;
+    if (!isLoaded || data.length === 0) return;
     console.log('handleFilterChange', key, value);
     const newFilters = {
       ...filtersApplied,
