@@ -69,6 +69,7 @@ const DataTable: React.FC<DataTableProps> = ({
     state => state
   );
   const [filtersApplied, setFiltersApplied] = useState<FilterValue>({});
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const handlePageChange = (page: number) => {
     if (page < 1) return;
@@ -178,6 +179,7 @@ const DataTable: React.FC<DataTableProps> = ({
 
     setTotalCount(Math.ceil(filteredRecords.length / itemsPerPage));
     setIsLoading(false);
+    if (filteredRecords.length > 0) setIsLoaded(true);
   }, [
     data,
     currentPage,
@@ -266,7 +268,7 @@ const DataTable: React.FC<DataTableProps> = ({
       <>
         <div className="bg-white rounded-lg shadow-md">
           <div className="flex py-2">
-            {data.length > 0 &&
+            {isLoaded &&
               filteredData &&
               ((filters !== undefined && filters?.length > 0) ||
                 enableFilterActive) && (
