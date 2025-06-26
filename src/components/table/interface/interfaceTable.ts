@@ -14,9 +14,9 @@ export interface Filters {
 }
 
 export enum FiltersFormat {
-  TEXT = "TEXT",
-  BOOLEAN = "BOOLEAN",
-  DATE = "DATE",
+  TEXT = 'TEXT',
+  BOOLEAN = 'BOOLEAN',
+  DATE = 'DATE',
 }
 
 export interface TableButtons {
@@ -26,20 +26,21 @@ export interface TableButtons {
 }
 
 export enum ColumnFormat {
-  ANY = "ANY",
-  DATE = "DATE",
-  DATETIME = "DATETIME",
-  BOOLEAN = "BOOLEAN",
-  TEXT = "TEXT",
-  NUMBER = "NUMBER",
-  WORKORDERTYPE = "WORKORDERTYPE",
-  STATEWORKORDER = "STATEWORKORDER",
-  KEY = "KEY",
-  OPERATORTYPE = "OPERATORTYPE",
+  ANY = 'ANY',
+  DATE = 'DATE',
+  DATETIME = 'DATETIME',
+  BOOLEAN = 'BOOLEAN',
+  TEXT = 'TEXT',
+  NUMBER = 'NUMBER',
+  WORKORDERTYPE = 'WORKORDERTYPE',
+  STATEWORKORDER = 'STATEWORKORDER',
+  KEY = 'KEY',
+  OPERATORTYPE = 'OPERATORTYPE',
+  PRICE = 'PRICE',
 }
 
 export enum ColumnnAlign {
-  LEFT = "LEFT",
-  CENTER = "CENTER",
-  RIGHT = "RIGHT",
+  LEFT = 'LEFT',
+  CENTER = 'CENTER',
+  RIGHT = 'RIGHT',
 }

@@ -16,7 +16,9 @@ import AssetService from 'app/services/assetService';
 import { useSessionStore } from 'app/stores/globalStore';
 import { CostsObjectComponent } from 'components/Costs/CostsObject';
 import Container from 'components/layout/Container';
+import { HeaderForm } from 'components/layout/HeaderForm';
 import MainLayout from 'components/layout/MainLayout';
+import { EntityTable } from 'components/table/interface/tableEntitys';
 
 import AssetForm from '../components/assetForm';
 
@@ -132,24 +134,6 @@ export default function AssetDetailsPage({
     }
   };
 
-  const renderHeader = () => {
-    return (
-      <div className="flex w-full py-4">
-        <div className="w-full flex flex-col gap-2 items">
-          <h2 className="text-2xl font-bold text-black flex gap-2">
-            <SvgMachines />
-            {currentAsset
-              ? currentAsset?.path
-              : parentAsset?.path + '/' + description}
-          </h2>
-          <span className="text-l">
-            Equip: {code} - {description}
-          </span>
-        </div>
-      </div>
-    );
-  };
-
   const handleOnChange = async (header: string, value: string) => {
     if (header === 'code') {
       setCode(value);
@@ -168,7 +152,18 @@ export default function AssetDetailsPage({
           <SvgSpinner className="items-center justify-center" />
         ) : (
           <>
-            {renderHeader()}
+            <HeaderForm
+              header={
+                currentAsset?.path ??
+                (parentAsset?.path
+                  ? parentAsset.path + '/' + description
+                  : '') ??
+                ''
+              }
+              isCreate={id === '0'}
+              subtitle={`Equip: ${code} - ${description}`}
+              entity={EntityTable.ASSET}
+            />
             <div className="flex flex-row gap-5">
               <div className="w-full flex flex-col gap-5">
                 <div className="flex justify-start gap-12 bg-white shadow-md rounded-md w-full p-2">

@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SvgExportExcel, SvgSpinner } from 'app/icons/icons';
 import { useSessionStore } from 'app/stores/globalStore';
+import { FilterValue } from 'app/types/filters';
 import useRoutes from 'app/utils/useRoutes';
 
 import { RenderFilters } from './components/Filters/RenderFilters';
@@ -46,7 +47,7 @@ const DataTable: React.FC<DataTableProps> = ({
   onChecked,
   isReport = false,
 }: DataTableProps) => {
-  const itemsPerPageOptions = [5, 10, 15, 20, 25, 50];
+  const itemsPerPageOptions = [50, 100, 150, 200, 250, 500, 1000, 2000];
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState('');
   const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('ASC');
@@ -67,6 +68,7 @@ const DataTable: React.FC<DataTableProps> = ({
   const { loginUser, setFilterSpareParts, filterSpareParts } = useSessionStore(
     state => state
   );
+  const [filtersApplied, setFiltersApplied] = useState<FilterValue>({});
 
   const handlePageChange = (page: number) => {
     if (page < 1) return;
@@ -132,7 +134,17 @@ const DataTable: React.FC<DataTableProps> = ({
     setCurrentPage(1);
   };
 
+  const totalStock = useMemo(() => {
+    return filteredData.reduce((acc, item) => acc + (item.stock || 0), 0);
+  }, [filteredData]);
+
+  const totalPrice = useMemo(() => {
+    return filteredData.reduce((acc, item) => acc + (item.price || 0), 0);
+  }, [filteredData]);
+
   useEffect(() => {
+    if (!data || data.length === 0) return;
+    console.log('useEffect DataTable', data.length);
     const indexOfLastRecord = currentPage * itemsPerPage;
     const indexOfFirstRecord = indexOfLastRecord - itemsPerPage;
 
@@ -177,19 +189,33 @@ const DataTable: React.FC<DataTableProps> = ({
   ]);
 
   const handleFilterChange = (key: string, value: string | boolean | Date) => {
-    const keys = key.split('.');
+    //if (data.length === 0) return;
+    console.log('handleFilterChange', key, value);
+    const newFilters = {
+      ...filtersApplied,
+      [key]: value,
+    };
+
+    setFiltersApplied(newFilters);
+    if (currentPage !== 1) setCurrentPage(1);
+
     const filteredData = data.filter(item => {
-      const nestedPropertyValue = keys.reduce(
-        (obj, prop) => obj && obj[prop],
-        item
-      );
-      if (value === '') return true;
-      if (nestedPropertyValue) {
+      return Object.entries(newFilters).every(([filterKey, filterValue]) => {
+        if (filterValue === '') return true;
+
+        const keys = filterKey.split('.');
+        const nestedPropertyValue = keys.reduce(
+          (obj, prop) => obj && obj[prop],
+          item
+        );
+
+        if (!nestedPropertyValue) return false;
+
         const itemValue = String(nestedPropertyValue);
-        const filterValue = String(value);
-        return itemValue.toLowerCase().includes(filterValue.toLowerCase());
-      }
-      return false;
+        const searchValue = String(filterValue);
+
+        return itemValue.toLowerCase().includes(searchValue.toLowerCase());
+      });
     });
 
     const indexOfLastRecord = currentPage * itemsPerPage;
@@ -240,17 +266,20 @@ const DataTable: React.FC<DataTableProps> = ({
       <>
         <div className="bg-white rounded-lg shadow-md">
           <div className="flex py-2">
-            {filters !== undefined && filters?.length > 0 && (
-              <RenderFilters
-                filters={filters}
-                onFilterChange={handleFilterChange}
-                onFilterActive={setFilterActive}
-                onFilterSparePartsUnderStock={setFilterSparePartsUnderStock}
-                enableFilterActive={enableFilterActive}
-                entity={entity}
-                isReport={isReport}
-              />
-            )}
+            {data.length > 0 &&
+              filteredData &&
+              ((filters !== undefined && filters?.length > 0) ||
+                enableFilterActive) && (
+                <RenderFilters
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  onFilterActive={setFilterActive}
+                  onFilterSparePartsUnderStock={setFilterSparePartsUnderStock}
+                  enableFilterActive={enableFilterActive}
+                  entity={entity}
+                  isReport={isReport}
+                />
+              )}
             <div className="flex w-full justify-end">
               <div
                 className="p-2 rounded-lg m-2 items-center bg-green-700 text-white hover:bg-green-900 cursor-pointer"
@@ -296,7 +325,41 @@ const DataTable: React.FC<DataTableProps> = ({
                     onDelete={onDelete ? onDelete : undefined}
                     totalCounts={totalCounts}
                     totalQuantity={totalQuantity}
+                    filtersApplied={filtersApplied}
                   />
+                  {entity === EntityTable.SPAREPART &&
+                    columns?.find(x => x.key === 'price') && (
+                      <tfoot>
+                        <tr className="bg-gray-200 font-semibold text-sm text-right">
+                          {columns
+                            .filter(x => x.key !== 'id')
+                            .map(col => {
+                              if (col.key === 'stock') {
+                                return (
+                                  <td
+                                    key={col.key}
+                                    className="px-4 py-2 text-right"
+                                  >
+                                    {totalStock}
+                                  </td>
+                                );
+                              }
+                              if (col.key === 'price') {
+                                return (
+                                  <td
+                                    key={col.key}
+                                    className="px-4 py-2 text-right"
+                                  >
+                                    {totalPrice.toFixed(2)} €
+                                  </td>
+                                );
+                              }
+                              return <td key={col.key}></td>;
+                            })}
+                          <td className="px-4 py-2 text-right"></td>
+                        </tr>
+                      </tfoot>
+                    )}
                 </table>
               </div>
             )}

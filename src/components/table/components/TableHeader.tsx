@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
-import { Column, ColumnFormat } from "../interface/interfaceTable";
-import { EntityTable } from "../interface/tableEntitys";
-import { HeadTableActions } from "./ButtonsTable/TableActions";
+import { Column, ColumnFormat } from '../interface/interfaceTable';
+import { EntityTable } from '../interface/tableEntitys';
+import { HeadTableActions } from './ButtonsTable/TableActions';
 
 interface TableHeaderProps {
   columns: Column[];
@@ -11,7 +11,7 @@ interface TableHeaderProps {
   isAllSelected: boolean | undefined;
   handleSort: (key: string) => void;
   sortColumn: string;
-  sortOrder: "ASC" | "DESC";
+  sortOrder: 'ASC' | 'DESC';
   tableButtons: {
     detail?: boolean;
     edit?: boolean;
@@ -47,12 +47,16 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
             </div>
           </th>
         )}
-        {columns.map((column) => {
-          if (column.key.toLocaleUpperCase() !== "ID") {
-            let classname = "flex";
-            if (column.format == ColumnFormat.NUMBER) {
-              classname += " justify-end pr-4";
+        {columns.map(column => {
+          if (column.key.toLocaleUpperCase() !== 'ID') {
+            let classname = 'flex';
+            if (
+              column.format == ColumnFormat.NUMBER ||
+              column.format == ColumnFormat.PRICE
+            ) {
+              classname += ' justify-end pr-4';
             }
+
             return (
               <th
                 key={column.key}
@@ -70,7 +74,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                   </label>
                   {sortColumn === column.key && (
                     <span className="ml-2">
-                      {sortOrder === "ASC" ? "↑" : "↓"}
+                      {sortOrder === 'ASC' ? '↑' : '↓'}
                     </span>
                   )}
                 </div>

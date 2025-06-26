@@ -130,6 +130,10 @@ export const formatCellContent = (
     value = translateOperatorType(value);
   }
 
+  if (column.format === ColumnFormat.PRICE) {
+    value = value.toFixed(2) + '€';
+  }
+
   if (column.key === 'active') {
     className += ' w-full';
     className += value

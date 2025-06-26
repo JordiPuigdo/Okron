@@ -9,10 +9,13 @@ import {
   WorkOrderType,
 } from 'app/interfaces/workOrder';
 import { useSessionStore } from 'app/stores/globalStore';
+import { EntityTable } from 'components/table/interface/tableEntitys';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+
+import useRoutes from './useRoutes';
 
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
@@ -347,3 +350,29 @@ export function translateOriginDowntime(originDowntime: OriginDowntime) {
       return originDowntime;
   }
 }
+
+export const getRoute = (entity: EntityTable) => {
+  const ROUTES = useRoutes();
+  switch (entity) {
+    case EntityTable.WORKORDER:
+      return ROUTES.workOrders;
+      break;
+    case EntityTable.PREVENTIVE:
+      return ROUTES.preventive.configuration;
+      break;
+    case EntityTable.SPAREPART:
+      return ROUTES.spareParts;
+      break;
+    case EntityTable.OPERATOR:
+      return ROUTES.configuration.operators;
+      break;
+    case EntityTable.MACHINE:
+      return ROUTES.configuration.machines;
+      break;
+    case EntityTable.ASSET:
+      return ROUTES.configuration.assets;
+      break;
+    default:
+      return 'error';
+  }
+};

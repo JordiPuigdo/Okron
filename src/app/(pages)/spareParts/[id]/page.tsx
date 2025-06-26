@@ -1,34 +1,36 @@
-"use client";
+'use client';
 
-import "react-datepicker/dist/react-datepicker.css";
+import 'react-datepicker/dist/react-datepicker.css';
 
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { SvgSpinner } from "app/icons/icons";
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { SvgSpinner } from 'app/icons/icons';
 import {
   CreateDocumentationRequest,
   DeleteDocumentationRequest,
   ObjectToInsert,
-} from "app/interfaces/Documentation";
+} from 'app/interfaces/Documentation';
 import SparePart, {
   SparePartDetailRequest,
   SparePartPerAssetResponse,
-} from "app/interfaces/SparePart";
-import { UserPermission } from "app/interfaces/User";
-import DocumentationService from "app/services/documentationService";
-import SparePartService from "app/services/sparePartService";
-import { useSessionStore } from "app/stores/globalStore";
-import { formatDateQuery } from "app/utils/utils";
-import Container from "components/layout/Container";
-import MainLayout from "components/layout/MainLayout";
-import { useRouter } from "next/navigation";
+} from 'app/interfaces/SparePart';
+import { UserPermission } from 'app/interfaces/User';
+import DocumentationService from 'app/services/documentationService';
+import SparePartService from 'app/services/sparePartService';
+import { useSessionStore } from 'app/stores/globalStore';
+import { formatDateQuery } from 'app/utils/utils';
+import Container from 'components/layout/Container';
+import { HeaderForm } from 'components/layout/HeaderForm';
+import MainLayout from 'components/layout/MainLayout';
+import { EntityTable } from 'components/table/interface/tableEntitys';
+import { useRouter } from 'next/navigation';
 
-import SparePartTable from "../components/SparePartTable";
+import SparePartTable from '../components/SparePartTable';
 
 export default function EditSparePart({ params }: { params: { id: string } }) {
   const router = useRouter();
   const sparePartService = new SparePartService(
-    process.env.NEXT_PUBLIC_API_BASE_URL || ""
+    process.env.NEXT_PUBLIC_API_BASE_URL || ''
   );
   const documentationService = new DocumentationService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
@@ -53,7 +55,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
 
   const [startDate, setStartDate] = useState<Date | null>(currentDate);
   const [endDate, setEndDate] = useState<Date | null>(new Date());
-  const { loginUser } = useSessionStore((state) => state);
+  const { loginUser } = useSessionStore(state => state);
   const [loadingMap, setLoadingMap] = useState<{ [key: string]: boolean }>({});
 
   const validPermission = [
@@ -76,30 +78,30 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
           const typedKey = key as keyof SparePart;
           setValue(typedKey, value[typedKey]);
         });*/
-        setValue("id", sparePartDetailResponse.sparePart.id);
-        setValue("code", sparePartDetailResponse.sparePart.code);
-        setValue("description", sparePartDetailResponse.sparePart.description);
+        setValue('id', sparePartDetailResponse.sparePart.id);
+        setValue('code', sparePartDetailResponse.sparePart.code);
+        setValue('description', sparePartDetailResponse.sparePart.description);
         setValue(
-          "ubication",
+          'ubication',
           sparePartDetailResponse.sparePart.ubication != null
             ? sparePartDetailResponse.sparePart.ubication
-            : ""
+            : ''
         );
-        setValue("refProvider", sparePartDetailResponse.sparePart.refProvider);
-        setValue("family", sparePartDetailResponse.sparePart.family);
+        setValue('refProvider', sparePartDetailResponse.sparePart.refProvider);
+        setValue('family', sparePartDetailResponse.sparePart.family);
         setValue(
-          "brand",
+          'brand',
           sparePartDetailResponse.sparePart.brand != null
             ? sparePartDetailResponse.sparePart.brand
-            : ""
+            : ''
         );
-        setValue("minium", sparePartDetailResponse.sparePart.minium);
-        setValue("maximum", sparePartDetailResponse.sparePart.maximum);
-        setValue("stock", sparePartDetailResponse.sparePart.stock);
-        setValue("price", sparePartDetailResponse.sparePart.price);
-        setValue("active", sparePartDetailResponse.sparePart.active);
+        setValue('minium', sparePartDetailResponse.sparePart.minium);
+        setValue('maximum', sparePartDetailResponse.sparePart.maximum);
+        setValue('stock', sparePartDetailResponse.sparePart.stock);
+        setValue('price', sparePartDetailResponse.sparePart.price);
+        setValue('active', sparePartDetailResponse.sparePart.active);
         setValue(
-          "documentation",
+          'documentation',
           sparePartDetailResponse.sparePart.documentation
         );
         setSparePartPerMachine(
@@ -115,7 +117,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
   }, [params.id, setValue]);
 
   const toggleLoading = (key: string) => {
-    setLoadingMap((prevLoadingMap) => ({
+    setLoadingMap(prevLoadingMap => ({
       ...prevLoadingMap,
       [key]: !prevLoadingMap[key],
     }));
@@ -124,7 +126,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
   const onSubmit = async (sparePart: SparePart) => {
     await sparePartService
       .updateSparePart(sparePart)
-      .then((spare) => {
+      .then(spare => {
         if (spare) {
           setShowSuccessMessage(true);
           setTimeout(() => {
@@ -132,18 +134,18 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
           }, 2000);
         }
       })
-      .catch((error) => {
+      .catch(error => {
         setShowErrorMessage(true);
       });
   };
 
   function handleBack() {
-    toggleLoading("CANCEL");
+    toggleLoading('CANCEL');
     router.back();
   }
 
   function handleDocumentationAdd() {
-    const fileInput = document.getElementById("fileInput");
+    const fileInput = document.getElementById('fileInput');
     if (fileInput) {
       fileInput.click();
     }
@@ -152,9 +154,9 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (file) {
-      toggleLoading("DOCUMENTATION");
+      toggleLoading('DOCUMENTATION');
       const request: CreateDocumentationRequest = {
-        userId: "65d8cae3567750628478d06b",
+        userId: '65d8cae3567750628478d06b',
         fileName: file.name,
         file: file,
         objectId: sparePart!.id,
@@ -163,78 +165,52 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
 
       documentationService
         .createDocumentation(request)
-        .then((response) => {
+        .then(response => {
           if (response) {
             sparePartService.cleanCache();
-            toggleLoading("DOCUMENTATION");
+            toggleLoading('DOCUMENTATION');
             window.location.reload();
           }
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           setShowErrorMessage(true);
-          toggleLoading("DOCUMENTATION");
+          toggleLoading('DOCUMENTATION');
         });
     }
   }
 
   function handleDeleteDocumentation(id: string, fileName: string) {
-    toggleLoading("DELETEDOCUMENTATION");
+    toggleLoading('DELETEDOCUMENTATION');
     const request: DeleteDocumentationRequest = {
-      userId: loginUser?.agentId || "",
+      userId: loginUser?.agentId || '',
       objectId: sparePart!.id,
       object: ObjectToInsert.SparePart,
       fileId: id,
       fileName: fileName,
     };
 
-    documentationService.deleteDocumentation(request).then((response) => {
+    documentationService.deleteDocumentation(request).then(response => {
       if (response) {
         console.log(response);
         sparePartService.cleanCache();
-        toggleLoading("DOCUMENTATION");
+        toggleLoading('DOCUMENTATION');
         window.location.reload();
       }
     });
   }
 
-  const renderHeader = () => {
-    return (
-      <div className="flex sm:px-12 items-center flex-col sm:flex-row">
-        <div
-          className="cursor-pointer mb-4 sm:mb-0"
-          onClick={() => router.back()}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            className="w-6 h-6 inline-block mr-2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-        </div>
-
-        <h2 className="text-2xl font-bold text-black mx-auto">
-          {sparePart?.code} - {sparePart?.description}
-        </h2>
-      </div>
-    );
-  };
   if (!sparePart) return <>Carregant dades</>;
   if (sparePart)
     return (
       <MainLayout>
         <Container>
-          <div className="bg-white p-6 rounded-md shadow-md my-4">
-            {renderHeader()}
-          </div>
+          <HeaderForm
+            header={'Editar Recanvi'}
+            isCreate={false}
+            entity={EntityTable.SPAREPART}
+          />
+
           <div className="flex flex-row gap-2 w-full">
             <div className="gap-4 p-4 bg-white shadow-md rounded-md">
               <form onSubmit={handleSubmit(onSubmit)}>
@@ -243,7 +219,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                     Codi
                   </label>
                   <input
-                    {...register("code")}
+                    {...register('code')}
                     id="code"
                     type="text"
                     className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
@@ -255,7 +231,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                     Descripció
                   </label>
                   <input
-                    {...register("description")}
+                    {...register('description')}
                     className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                   />
                 </div>
@@ -265,7 +241,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                     Ubicació
                   </label>
                   <input
-                    {...register("ubication")}
+                    {...register('ubication')}
                     className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                   />
                 </div>
@@ -275,7 +251,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                     Ref Proveïdor
                   </label>
                   <input
-                    {...register("refProvider")}
+                    {...register('refProvider')}
                     className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                   />
                 </div>
@@ -285,7 +261,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                     Família
                   </label>
                   <input
-                    {...register("family")}
+                    {...register('family')}
                     className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                   />
                 </div>
@@ -295,7 +271,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                       Stock mínim
                     </label>
                     <input
-                      {...register("minium")}
+                      {...register('minium')}
                       className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     />
                   </div>
@@ -305,7 +281,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                       Stock máxim
                     </label>
                     <input
-                      {...register("maximum")}
+                      {...register('maximum')}
                       className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     />
                   </div>
@@ -316,7 +292,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                       Preu
                     </label>
                     <input
-                      {...register("price")}
+                      {...register('price')}
                       className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     />
                   </div>
@@ -326,7 +302,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                       Stock
                     </label>
                     <input
-                      {...register("stock")}
+                      {...register('stock')}
                       className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     />
                   </div>
@@ -336,7 +312,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                       Actiu
                     </label>
                     <input
-                      {...register("active")}
+                      {...register('active')}
                       type="checkbox"
                       className="mt-1 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     />
@@ -347,10 +323,10 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                     <button
                       type="submit"
                       className="flex bg-okron-btCreate text-white px-4 py-2 rounded-md hover:bg-okron-btCreateHover focus:outline-none focus:ring focus:border-blue-300"
-                      onClick={(e) => toggleLoading("SAVE")}
+                      onClick={e => toggleLoading('SAVE')}
                     >
                       Guardar
-                      {loadingMap["SAVE"] && <SvgSpinner className="2-6 h-6" />}
+                      {loadingMap['SAVE'] && <SvgSpinner className="2-6 h-6" />}
                     </button>
 
                     <button
@@ -359,7 +335,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                       className="flex bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring focus:border-gray-300"
                     >
                       Cancelar
-                      {loadingMap["CANCEL"] && (
+                      {loadingMap['CANCEL'] && (
                         <SvgSpinner className="2-6 h-6" />
                       )}
                     </button>
@@ -396,7 +372,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
           <div className="my-4 p-2 bg-white shadow-md rounded-md">
             <span className="text-xl font-bold">Documentació</span>
             <div className="pt-4">
-              {sparePart?.documentation?.map((document) => (
+              {sparePart?.documentation?.map(document => (
                 <div
                   key={document.id}
                   className="flex py-2 gap-4 items-center border-2 p-2"
@@ -417,7 +393,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                     }
                   >
                     Eliminar
-                    {loadingMap["DELETEDOCUMENTATION"] && (
+                    {loadingMap['DELETEDOCUMENTATION'] && (
                       <SvgSpinner className="2-6 h-6" />
                     )}
                   </button>
@@ -430,7 +406,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                   type="file"
                   id="fileInput"
                   accept=".pdf"
-                  style={{ display: "none" }}
+                  style={{ display: 'none' }}
                   onChange={handleFileChange}
                 />
                 <button
@@ -439,7 +415,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                   onClick={handleDocumentationAdd}
                 >
                   Afegir Documentació
-                  {loadingMap["DOCUMENTATION"] && (
+                  {loadingMap['DOCUMENTATION'] && (
                     <SvgSpinner className="2-6 h-6" />
                   )}
                 </button>

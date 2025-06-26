@@ -7,13 +7,21 @@ import { LoadingState } from 'app/types/loadingState';
 import { ButtonTypesTable } from 'components/table/DataTable';
 import { Button } from 'designSystem/Button/Buttons';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 interface Props {
   asset: Asset;
   onDelete: (id: string) => void;
+  searchTerm?: string;
+  expandedTargetId?: string;
 }
 
-const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
+const AssetListItem: React.FC<Props> = ({
+  asset,
+  onDelete,
+  searchTerm,
+  expandedTargetId,
+}) => {
   const [expanded, setExpanded] = useState<boolean>(false);
 
   const [loadingState, setLoadingState] = useState<LoadingState>({});
@@ -39,8 +47,25 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
     setExpanded(!expanded);
   };
 
+  useEffect(() => {
+    if (expandedTargetId) {
+      const hasDescendantWithId = (asset: Asset): boolean => {
+        if (asset.id === expandedTargetId) return true;
+        return asset.childs?.some(child => hasDescendantWithId(child));
+      };
+
+      if (hasDescendantWithId(asset)) {
+        setExpanded(true);
+      }
+    }
+  }, [expandedTargetId, asset]);
+
   return (
-    <div className="mt-4 bg-white rounded-xl">
+    <div
+      className={`mt-4 bg-white rounded-xl ${
+        asset.id === expandedTargetId ? 'border-4 border-blue-400' : ''
+      }`}
+    >
       <li className=" p-4 flex flex-col border-2 ">
         <div className="flex items-center mb-2">
           {asset.childs.length > 0 && (
@@ -76,7 +101,12 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
                 </button>
               </Link>
             )}
-            <Link href={`/assets/${asset.id}`} passHref>
+            <Link
+              href={`/assets/${asset.id}?search=${encodeURIComponent(
+                searchTerm ?? ''
+              )}&id=${asset.id}`}
+              passHref
+            >
               <button
                 onClick={e => {
                   toggleLoading(asset.id, ButtonTypesTable.Edit, true);
@@ -109,7 +139,13 @@ const AssetListItem: React.FC<Props> = ({ asset, onDelete }) => {
         {expanded && asset.childs.length > 0 && (
           <ul className="pl-4 ">
             {asset.childs.map(child => (
-              <AssetListItem key={child.id} asset={child} onDelete={onDelete} />
+              <AssetListItem
+                key={child.id}
+                asset={child}
+                onDelete={onDelete}
+                searchTerm={searchTerm}
+                expandedTargetId={expandedTargetId || ''}
+              />
             ))}
           </ul>
         )}
@@ -122,7 +158,12 @@ const AssetList: React.FC = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const assetService = new AssetService(process.env.NEXT_PUBLIC_API_BASE_URL!);
   const [message, setMessage] = useState<string>('');
-  const [searchTerm, setSearchTerm] = useState<string>('');
+
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get('search') ?? '';
+  const expandedTargetId = searchParams.get('id');
+
+  const [searchTerm, setSearchTerm] = useState<string>(initialSearch);
 
   useEffect(() => {
     assetService
@@ -211,7 +252,13 @@ const AssetList: React.FC = () => {
 
       <ul>
         {filteredAssets.map(asset => (
-          <AssetListItem key={asset.id} asset={asset} onDelete={handleDelete} />
+          <AssetListItem
+            key={asset.id}
+            asset={asset}
+            onDelete={handleDelete}
+            searchTerm={searchTerm}
+            expandedTargetId={expandedTargetId || ''}
+          />
         ))}
       </ul>
       {message != '' && <span className="text-red-500">{message}</span>}

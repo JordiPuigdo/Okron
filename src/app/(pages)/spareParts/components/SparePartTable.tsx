@@ -79,11 +79,19 @@ const columns: Column[] = [
     label: 'Màx',
     key: 'maximum',
     format: ColumnFormat.NUMBER,
+    align: ColumnnAlign.RIGHT,
   },
   {
     label: 'Stock',
     key: 'stock',
     format: ColumnFormat.NUMBER,
+    align: ColumnnAlign.RIGHT,
+  },
+  {
+    label: 'Preu',
+    key: 'price',
+    format: ColumnFormat.PRICE,
+    align: ColumnnAlign.RIGHT,
   },
   {
     key: 'lastMovementConsume',

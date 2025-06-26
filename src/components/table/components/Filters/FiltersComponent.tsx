@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import { useSessionStore } from 'app/stores/globalStore';
 import { EntityTable } from 'components/table/interface/tableEntitys';
 import ca from 'date-fns/locale/ca';
+import { useSearchParams } from 'next/navigation';
 
 import { Filters, FiltersFormat } from '../../interface/interfaceTable';
 
@@ -22,6 +23,7 @@ const FiltersComponent: React.FC<FiltersComponentProps> = ({
   const { filterSpareParts, setFilterSpareParts } = useSessionStore();
   const currentDate = new Date();
   const [date, setDate] = useState<Date | null>(currentDate);
+  const searchParams = useSearchParams();
 
   const [filterValues, setFilterValues] = useState<{
     [key: string]: string | boolean | Date;
@@ -43,6 +45,25 @@ const FiltersComponent: React.FC<FiltersComponentProps> = ({
       onFilterDateChange(date);
     }
   };
+
+  useEffect(() => {
+    if (Array.from(searchParams.keys()).length === 0) return;
+
+    const initialFilters: { [key: string]: string | boolean | Date } = {};
+
+    searchParams.forEach((value, key) => {
+      if (value === 'true' || value === 'false') {
+        initialFilters[key] = value === 'true';
+      } else if (!isNaN(Date.parse(value))) {
+        initialFilters[key] = new Date(value);
+      } else {
+        initialFilters[key] = value;
+      }
+      handleInputChange(key, value);
+    });
+
+    setFilterValues(initialFilters);
+  }, [searchParams]);
 
   /* if (filterSpareParts !== undefined) {
     handleInputChange("code", filterSpareParts.code as string);
