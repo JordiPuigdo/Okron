@@ -47,10 +47,11 @@ export const calculateTotalDowntimes = (
   report: DowntimesTicketReport[],
   downtimeFilter: 'M' | 'P' | '' = ''
 ): string => {
-  const filterMap = {
-    M: OriginDowntime.Maintenance,
-    P: OriginDowntime.Production,
+  const filterMap: Record<'M' | 'P', OriginDowntime[]> = {
+    M: [OriginDowntime.Maintenance, OriginDowntime.MaintenanceOrders],
+    P: [OriginDowntime.Production],
   };
+
   const sumDowntimes = (assets: DowntimesTicketReport[]): number => {
     return assets.reduce((total, asset) => {
       const childCount = sumDowntimes(asset.assetChild || []);
@@ -62,7 +63,7 @@ export const calculateTotalDowntimes = (
               if (!workOrder.totalTime) return workOrderAcc;
               if (
                 downtimeFilter &&
-                workOrder.originDownTime !== filterMap[downtimeFilter]
+                !filterMap[downtimeFilter].includes(workOrder.originDownTime)
               ) {
                 return workOrderAcc;
               }
@@ -137,6 +138,53 @@ export const calculateTotalSecondsBetweenDates = (
 
   return differenceInMilliseconds / 1000;
 };
+
+const isMaintenance = (origin: OriginDowntime) =>
+  [OriginDowntime.Maintenance, OriginDowntime.MaintenanceOrders].includes(
+    origin
+  );
+
+const isProduction = (origin: OriginDowntime) =>
+  origin === OriginDowntime.Production;
+
+const matchesQuery = (text: string, query: string) =>
+  text?.toLowerCase().includes(query.toLowerCase());
+
+const hasDowntimeWithOrigin = (
+  downtimes: DowntimesTicketReportModel[],
+  predicate: (origin: OriginDowntime) => boolean
+): boolean => {
+  return downtimes.some(d => predicate(d.originDownTime));
+};
+
+const workOrderMatches = (
+  workOrder: DowntimesTicketReportList,
+  query: string,
+  downtimeReasons: string[],
+  noMaintenance: boolean,
+  noProduction: boolean
+): boolean => {
+  const matchesText = [
+    workOrder.workOrderCode,
+    workOrder.workOrderDescription,
+    workOrder.downtimeReason,
+  ].some(field => matchesQuery(field || '', query));
+
+  const maintenanceValid = noMaintenance
+    ? !hasDowntimeWithOrigin(workOrder.downtimesWorkOrder, isMaintenance)
+    : true;
+
+  const productionValid = noProduction
+    ? !hasDowntimeWithOrigin(workOrder.downtimesWorkOrder, isProduction)
+    : true;
+
+  const reasonMatch =
+    downtimeReasons.length === 0 ||
+    downtimeReasons.includes(workOrder.downtimeReason || '');
+
+  return matchesText && maintenanceValid && productionValid && reasonMatch;
+};
+
 export const filterAssets = (
   assets: DowntimesTicketReport[],
   query: string,
@@ -147,51 +195,17 @@ export const filterAssets = (
 ): DowntimesTicketReport[] => {
   return assets
     .map(asset => {
-      // Filter downtimes based on all conditions
-      const matchingDowntimes = asset.downtimesTicketReportList.filter(
-        workOrder => {
-          // Check text search match
-          const matchesQuery = [
-            workOrder.workOrderCode,
-            workOrder.workOrderDescription,
-            workOrder.downtimeReason,
-          ].some(field => field?.toLowerCase().includes(query.toLowerCase()));
-
-          // Check maintenance intervention
-          const hasNoMaintenance = noMaintenanceIntervention
-            ? !workOrder.downtimesWorkOrder.some(
-                downtime =>
-                  downtime.originDownTime === OriginDowntime.Maintenance
-              )
-            : true;
-
-          const hasNoProduction = noProductionIntervention
-            ? workOrder.downtimesWorkOrder.length === 0 ||
-              workOrder.downtimesWorkOrder.some(
-                downtime =>
-                  downtime.originDownTime === OriginDowntime.MaintenanceOrders
-              )
-            : true;
-
-          // Check downtime reason match (if any reasons are selected)
-          const matchesReason =
-            downtimeReasons.length > 0
-              ? downtimeReasons.includes(workOrder.downtimeReason || '')
-              : true;
-
-          return (
-            matchesQuery && hasNoMaintenance && hasNoProduction && matchesReason
-          );
-        }
+      const filteredDowntimes = asset.downtimesTicketReportList.filter(
+        workOrder =>
+          workOrderMatches(
+            workOrder,
+            query,
+            downtimeReasons,
+            noMaintenanceIntervention,
+            noProductionIntervention
+          )
       );
 
-      // Check if asset itself matches search (code/description)
-      const matchesCurrentAsset =
-        asset.assetCode?.toLowerCase().includes(query.toLowerCase()) ||
-        asset.assetDescription?.toLowerCase().includes(query.toLowerCase()) ||
-        matchingDowntimes.length > 0;
-
-      // Recursively filter child assets
       const filteredChildren = asset.assetChild
         ? filterAssets(
             asset.assetChild,
@@ -203,63 +217,25 @@ export const filterAssets = (
           )
         : [];
 
-      // Check ticket-only filter condition
-      const hasDowntimes = asset.downtimesTicketReportList.length > 0;
-      const hasChildrenWithDowntimes = filteredChildren.length > 0;
+      const matchesAsset =
+        matchesQuery(asset.assetCode, query) ||
+        matchesQuery(asset.assetDescription, query) ||
+        filteredDowntimes.length > 0;
 
-      if (onlyTickets && !hasDowntimes && !hasChildrenWithDowntimes) {
-        return null;
-      }
+      const shouldInclude = matchesAsset || filteredChildren.length > 0;
 
-      // Check maintenance intervention condition
-      const hasNoMaintenanceDowntimes = noMaintenanceIntervention
-        ? asset.downtimesTicketReportList.some(
-            workOrder =>
-              !workOrder.downtimesWorkOrder.some(
-                downtime =>
-                  downtime.originDownTime === OriginDowntime.Maintenance
-              )
-          )
-        : true;
+      if (!shouldInclude) return null;
 
-      const hasNoProductionDowntimes = noProductionIntervention
-        ? asset.downtimesTicketReportList.some(
-            workOrder =>
-              workOrder.downtimesWorkOrder.length === 0 ||
-              workOrder.downtimesWorkOrder.some(
-                downtime =>
-                  downtime.originDownTime === OriginDowntime.MaintenanceOrders
-              )
-          )
-        : true;
+      const hasAnyDowntime =
+        filteredDowntimes.length > 0 || filteredChildren.length > 0;
 
-      // Include asset if:
-      // 1. It matches search OR has matching children
-      // AND
-      // 2. If noMaintenanceIntervention is true, it has non-maintenance downtimes OR matching children
-      // AND
-      // 3. If downtimeReasons are specified, it has matching downtimes OR matching children
-      const shouldIncludeAsset =
-        (matchesCurrentAsset || filteredChildren.length > 0) &&
-        (!noMaintenanceIntervention ||
-          hasNoMaintenanceDowntimes ||
-          filteredChildren.length > 0) &&
-        (!noProductionIntervention ||
-          hasNoProductionDowntimes ||
-          filteredChildren.length > 0) &&
-        (downtimeReasons.length === 0 ||
-          matchingDowntimes.length > 0 ||
-          filteredChildren.length > 0);
+      if (onlyTickets && !hasAnyDowntime) return null;
 
-      if (shouldIncludeAsset) {
-        return {
-          ...asset,
-          downtimesTicketReportList: matchingDowntimes,
-          assetChild: filteredChildren,
-        };
-      }
-
-      return null;
+      return {
+        ...asset,
+        downtimesTicketReportList: filteredDowntimes,
+        assetChild: filteredChildren,
+      };
     })
     .filter((asset): asset is DowntimesTicketReport => asset !== null);
 };

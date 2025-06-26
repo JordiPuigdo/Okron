@@ -159,18 +159,6 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
                 </div>
 
                 <div className="flex flex-wrap gap-4 mt-2">
-                  <div className="flex-1 p-2 text-center bg-gray-200 rounded-md">
-                    <span className="block text-sm text-gray-600">
-                      Total Tickets
-                    </span>
-                    <span className="text-lg font-semibold">
-                      {downtimeCount}
-                    </span>
-                  </div>
-                  <div className="flex-1 p-2 text-center bg-yellow-200 rounded-md">
-                    <span className="block text-sm text-gray-600">Temps</span>
-                    <span className="text-lg font-semibold">{totalTime}</span>
-                  </div>
                   <div className="flex-1 p-2 text-center bg-red-200 rounded-md">
                     <span className="block text-sm text-gray-600">
                       Temps Aturat Producció
@@ -408,7 +396,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
               onClick={() => setOnlyMaintenance(!onlyMaintenance)}
             >
               <div className="flex flex-col">
-                <span>Tickets Només amb temps de Manteniment</span>
+                <span>Només Correctius</span>
               </div>
               <input
                 type="checkbox"
