@@ -352,7 +352,7 @@ const DataTable: React.FC<DataTableProps> = ({
                                     key={col.key}
                                     className="px-4 py-2 text-right"
                                   >
-                                    {totalPrice.toFixed(2)} €
+                                    {totalStock * totalPrice.toFixed(2)} €
                                   </td>
                                 );
                               }

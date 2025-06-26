@@ -173,7 +173,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
                   </div>
                   <div className="flex-1 p-2 text-center bg-red-200 rounded-md">
                     <span className="block text-sm text-gray-600">
-                      Producció
+                      Temps Aturat Producció
                     </span>
                     <span className="text-lg font-semibold">
                       {totalTimeProd}
@@ -181,7 +181,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
                   </div>
                   <div className="flex-1 p-2 text-center bg-blue-200 rounded-md">
                     <span className="block text-sm text-gray-600">
-                      Manteniment
+                      Temps Intervingut per Manteniment
                     </span>
                     <span className="text-lg font-semibold">
                       {totalTimeMaintenance}
@@ -394,7 +394,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
               onClick={() => setOnlyProduction(!onlyProduction)}
             >
               <div className="flex flex-col">
-                <span>Tickets Producció</span>
+                <span>Tickets Sense Temps de Manteniment</span>
               </div>
               <input
                 type="checkbox"
@@ -408,7 +408,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
               onClick={() => setOnlyMaintenance(!onlyMaintenance)}
             >
               <div className="flex flex-col">
-                <span>Tickets Manteniment</span>
+                <span>Tickets Només amb temps de Manteniment</span>
               </div>
               <input
                 type="checkbox"

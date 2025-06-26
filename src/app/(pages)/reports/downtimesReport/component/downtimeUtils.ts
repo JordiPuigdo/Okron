@@ -62,9 +62,7 @@ export const calculateTotalDowntimes = (
               if (!workOrder.totalTime) return workOrderAcc;
               if (
                 downtimeFilter &&
-                workOrder.originDownTime !== filterMap[downtimeFilter] &&
-                workOrder.originDownTime == OriginDowntime.MaintenanceOrders &&
-                downtimeFilter != 'M'
+                workOrder.originDownTime !== filterMap[downtimeFilter]
               ) {
                 return workOrderAcc;
               }
