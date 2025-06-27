@@ -1,7 +1,7 @@
 'use client';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import Select from 'react-select';
 import { SvgSpinner } from 'app/icons/icons';
@@ -24,7 +24,7 @@ import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
   calculateDowntimeCount,
@@ -65,8 +65,12 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
   const [onlyTickets, setOnlyTickets] = useState(true);
   const [onlyProduction, setOnlyProduction] = useState(false);
   const [onlyMaintenance, setOnlyMaintenance] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
   const [selectedOptions, setSelectedOptions] = useState<OptionType[]>([]);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const expandedTargetId = searchParams.get('id');
 
   function getAllDowntimeReasons(assets: DowntimesTicketReport[]): string[] {
     return assets.flatMap(asset => {
@@ -85,14 +89,82 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
     });
   }
 
-  // Usage:
   const allReasons = [...new Set(getAllDowntimeReasons(downtimesTicketReport))];
   const downtimeReasonOptions: OptionType[] = allReasons.map(reason => ({
     value: reason,
     label: reason,
   }));
 
-  const router = useRouter();
+  const filteredData = filterAssets(
+    downtimesTicketReport,
+    searchQuery.toLowerCase(),
+    onlyTickets,
+    onlyProduction,
+    onlyMaintenance,
+    selectedOptions.map(option => option.value)
+  );
+
+  const findPathToWorkOrderId = (
+    data: DowntimesTicketReport[],
+    targetId: string,
+    path: string[] = []
+  ): string[] | null => {
+    for (const asset of data) {
+      const newPath = [...path, asset.assetCode];
+
+      if (
+        asset.downtimesTicketReportList.some(w => w.workOrderId === targetId)
+      ) {
+        return newPath;
+      }
+
+      if (asset.assetChild?.length) {
+        const result = findPathToWorkOrderId(
+          asset.assetChild,
+          targetId,
+          newPath
+        );
+        if (result) return result;
+      }
+    }
+    return null;
+  };
+
+  useEffect(() => {
+    if (!expandedTargetId || isLoadingData) return;
+
+    const el = document.getElementById(`workorder-${expandedTargetId}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [expandedTargetId, isLoadingData]);
+
+  useEffect(() => {
+    if (!expandedTargetId) {
+      setIsLoadingData(false);
+      return;
+    }
+
+    const path = findPathToWorkOrderId(filteredData, expandedTargetId);
+
+    if (path) {
+      setExpandedAssets(prev => {
+        const newSet = new Set(prev);
+        let changed = false;
+        path.forEach(code => {
+          if (!newSet.has(code)) {
+            newSet.add(code);
+            changed = true;
+          }
+        });
+
+        // solo actualiza si hay cambios nuevos
+        return changed ? newSet : prev;
+      });
+    }
+
+    setIsLoadingData(false);
+  }, [expandedTargetId, isLoadingData, filteredData]);
 
   const toggleExpand = (assetCode: string) => {
     setExpandedAssets(prev => {
@@ -183,10 +255,18 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
               <div className="pl-4 mt-4">
                 {asset.downtimesTicketReportList.map((workOrder, workIndex) => (
                   <div
-                    key={workIndex}
-                    className="bg-gray-100 rounded-lg p-3 shadow-inner"
+                    key={`workorder-${workOrder.workOrderId}`}
+                    id={`workorder-${workOrder.workOrderId}`}
+                    className={`bg-gray-100 rounded-lg p-3 shadow-inner
+                     ${
+                       workOrder.workOrderId === expandedTargetId
+                         ? 'border-4 border-blue-400'
+                         : ''
+                     }`}
                   >
-                    <Link href={`/workOrders/${workOrder.workOrderId}`}>
+                    <Link
+                      href={`/workOrders/${workOrder.workOrderId}?id=${workOrder.workOrderId}&entity=DowntimesReport`}
+                    >
                       <div className="flex flex-row gap-2 w-full items-center text-lg font-medium text-gray-800 mb-2 bg-gray-300 p-2 rounded-lg hover:bg-gray-400">
                         <span className="flex-1">
                           {workOrder.workOrderCode}
@@ -230,15 +310,6 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
       );
     });
   };
-
-  const filteredData = filterAssets(
-    downtimesTicketReport,
-    searchQuery.toLowerCase(),
-    onlyTickets,
-    onlyProduction,
-    onlyMaintenance,
-    selectedOptions.map(option => option.value)
-  );
 
   function RenderWorkOrderDetail(workOrder: DowntimesTicketReportList) {
     return (
@@ -456,7 +527,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
             </p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-              {renderDowntimeTree(filteredData)}
+              {!isLoadingData && renderDowntimeTree(filteredData)}
             </div>
           )}
         </>

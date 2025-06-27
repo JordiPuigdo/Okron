@@ -372,6 +372,9 @@ export const getRoute = (entity: EntityTable) => {
     case EntityTable.ASSET:
       return ROUTES.configuration.assets;
       break;
+    case EntityTable.DOWNTIMEREPORT:
+      return ROUTES.reports.downtimes;
+      break;
     default:
       return 'error';
   }

@@ -39,13 +39,15 @@ import {
 import ChooseElement from 'components/ChooseElement';
 import { CostsObject } from 'components/Costs/CostsObject';
 import CompleteInspectionPoints from 'components/inspectionPoint/CompleteInspectionPoint';
+import { HeaderForm } from 'components/layout/HeaderForm';
 import WorkOrderOperatorComments from 'components/operator/WorkOrderCommentOperator';
 import WorkOrderOperatorTimesComponent from 'components/operator/WorkOrderOperatorTimes';
 import ChooseSpareParts from 'components/sparePart/ChooseSpareParts';
+import { EntityTable } from 'components/table/interface/tableEntitys';
 import ca from 'date-fns/locale/ca';
 import { Button } from 'designSystem/Button/Buttons';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import DowntimesComponent from './Downtimes/Downtimes';
 import WorkOrderButtons from './WorkOrderButtons';
@@ -53,10 +55,7 @@ import WorkOrderButtons from './WorkOrderButtons';
 type WorkOrdeEditFormProps = {
   id: string;
 };
-interface TabWO {
-  key: string;
-  permission: UserPermission;
-}
+
 enum Tab {
   OPERATORTIMES = 'Temps Operaris',
   COMMENTS = 'Comentaris',
@@ -128,7 +127,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     undefined
   );
 
-  const { assets, assetsError, fetchAllAssets } = useAssetHook();
+  const searchParams = useSearchParams();
+  const entity = searchParams.get('entity') ?? '';
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -460,7 +460,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     }
   };
 
-  const renderHeader = () => {
+  /*const renderHeader = () => {
     return (
       <div className="flex p-4 items-center flex-col sm:flex-row bg-white rounded shadow-md border-2 border-blue-900">
         <div
@@ -502,7 +502,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
         )}
       </div>
     );
-  };
+  };*/
 
   const isDisabledField =
     isFinished || currentWorkOrder?.stateWorkOrder == StateWorkOrder.Closed;
@@ -775,13 +775,12 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     );
   };
 
-  const availableTabs = Object.values(Tab).filter(tab => {
-    if (currentWorkOrder?.workOrderType === WorkOrderType.Corrective) {
-      return tab !== Tab.INSPECTIONPOINTS;
-    } else if (currentWorkOrder?.workOrderType === WorkOrderType.Preventive) {
-      return tab !== Tab.SPAREPARTS;
-    }
-  });
+  const headerName =
+    currentWorkOrder?.workOrderType == WorkOrderType.Ticket
+      ? 'Ticket'
+      : 'Ordre de Treball' + ' - ' + currentWorkOrder?.code;
+
+  const subtitle = 'Equip - ' + currentWorkOrder?.asset?.description;
 
   const [sortOrder, setSortOrder] = useState('asc');
   const toggleSortOrder = () => {
@@ -810,7 +809,16 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   if (!currentWorkOrder) return <>Carregant Dades</>;
   return (
     <div className="pt-4">
-      {renderHeader()}
+      <HeaderForm
+        header={headerName}
+        subtitle={subtitle}
+        isCreate={false}
+        entity={
+          entity == 'DowntimesReport'
+            ? EntityTable.DOWNTIMEREPORT
+            : EntityTable.WORKORDER
+        }
+      />
       <div className="flex gap-2 rounded bg-blue-900 my-2 p-2">
         <div className="flex flex-col w-full gap-2 ">
           {showDowntimeReasonsModal && (

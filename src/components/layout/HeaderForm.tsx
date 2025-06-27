@@ -86,7 +86,11 @@ export const HeaderForm = ({
           </div>
           <div className="flex flex-col gap-2 justify-between w-full items-center">
             <h2 className="text-2xl font-bold text-black mx-auto">{header}</h2>
-            <p>{subtitle}</p>
+            <div>
+              <span className="text-xl font-bold text-black mx-auto">
+                {subtitle}
+              </span>
+            </div>
           </div>
           {canPrint && (
             <div>
