@@ -58,6 +58,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const expandedTargetId = searchParams.get('id');
+  const textSearched = searchParams.get('search');
   const [shouldScroll, setShouldScroll] = useState(true);
 
   useSyncDatesFromURL(setFrom, setTo);
@@ -146,15 +147,17 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
           }
         });
 
-        // solo actualiza si hay cambios nuevos
         return changed ? newSet : prev;
       });
       setTimeout(() => {
         setShouldScroll(false);
       }, 500);
     }
-    //
+
     setIsLoadingData(false);
+    if (textSearched) {
+      setSearchQuery(textSearched);
+    }
   }, [expandedTargetId, isLoadingData, filteredData]);
 
   const toggleExpand = (assetCode: string) => {
@@ -251,6 +254,7 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
                     expandedTargetId={expandedTargetId}
                     from={from}
                     to={to}
+                    search={searchQuery}
                   />
                 ))}
 

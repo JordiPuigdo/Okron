@@ -24,6 +24,7 @@ interface WorkOrderCardProps {
   expandedTargetId: string | null;
   from: Date;
   to: Date;
+  search: string;
 }
 
 const WorkOrderCard: React.FC<WorkOrderCardProps> = ({
@@ -31,6 +32,7 @@ const WorkOrderCard: React.FC<WorkOrderCardProps> = ({
   expandedTargetId,
   from,
   to,
+  search,
 }) => {
   return (
     <div
@@ -43,7 +45,7 @@ const WorkOrderCard: React.FC<WorkOrderCardProps> = ({
        }`}
     >
       <Link
-        href={`/workOrders/${workOrder.workOrderId}?id=${workOrder.workOrderId}&entity=DowntimesReport&from=${from}&to=${to}`}
+        href={`/workOrders/${workOrder.workOrderId}?id=${workOrder.workOrderId}&entity=DowntimesReport&from=${from}&to=${to}&search=${search}`}
       >
         <div className="flex flex-row gap-2 w-full items-center text-lg font-medium text-gray-800 mb-2 bg-gray-300 p-2 rounded-lg hover:bg-gray-400">
           <span className="flex-1">{workOrder.workOrderCode}</span>
