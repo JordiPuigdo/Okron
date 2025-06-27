@@ -4,35 +4,22 @@ import 'react-datepicker/dist/react-datepicker.css';
 import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import Select from 'react-select';
+import { useScrollToElement } from 'app/hooks/useScrollToId';
+import { useSyncDatesFromURL } from 'app/hooks/useSyncDatesFromURL';
 import { SvgSpinner } from 'app/icons/icons';
-import {
-  DowntimesReasonsType,
-  OriginDowntime,
-} from 'app/interfaces/Production/Downtimes';
-import {
-  DowntimesTicketReport,
-  DowntimesTicketReportList,
-  DowntimesTicketReportModel,
-} from 'app/interfaces/Production/DowntimesTicketReport';
-import {
-  calculateTimeDifference,
-  formatDate,
-  translateDowntimeReasonType,
-} from 'app/utils/utils';
+import { DowntimesTicketReport } from 'app/interfaces/Production/DowntimesTicketReport';
 import ca from 'date-fns/locale/ca';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
   calculateDowntimeCount,
-  calculateTotalDowntimeMWO,
   calculateTotalDowntimes,
-  calculateTotalDowntimesWorkOrder,
   filterAssets,
 } from './downtimeUtils';
+import WorkOrderCard from './workOrderCard';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -71,6 +58,16 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const expandedTargetId = searchParams.get('id');
+  const [shouldScroll, setShouldScroll] = useState(true);
+
+  useSyncDatesFromURL(setFrom, setTo);
+
+  useScrollToElement({
+    id: expandedTargetId,
+    isLoading,
+    prefixId: 'workorder-',
+    shouldScroll: shouldScroll,
+  });
 
   function getAllDowntimeReasons(assets: DowntimesTicketReport[]): string[] {
     return assets.flatMap(asset => {
@@ -131,21 +128,12 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
   };
 
   useEffect(() => {
-    if (!expandedTargetId || isLoadingData) return;
-
-    const el = document.getElementById(`workorder-${expandedTargetId}`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }, [expandedTargetId, isLoadingData]);
-
-  useEffect(() => {
-    if (!expandedTargetId) {
+    if (!expandedTargetId || !shouldScroll) {
       setIsLoadingData(false);
       return;
     }
 
-    const path = findPathToWorkOrderId(filteredData, expandedTargetId);
+    const path = findPathToWorkOrderId(filteredData, expandedTargetId!);
 
     if (path) {
       setExpandedAssets(prev => {
@@ -161,8 +149,11 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
         // solo actualiza si hay cambios nuevos
         return changed ? newSet : prev;
       });
+      setTimeout(() => {
+        setShouldScroll(false);
+      }, 500);
     }
-
+    //
     setIsLoadingData(false);
   }, [expandedTargetId, isLoadingData, filteredData]);
 
@@ -254,52 +245,13 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
             {isExpanded && (
               <div className="pl-4 mt-4">
                 {asset.downtimesTicketReportList.map((workOrder, workIndex) => (
-                  <div
+                  <WorkOrderCard
                     key={`workorder-${workOrder.workOrderId}`}
-                    id={`workorder-${workOrder.workOrderId}`}
-                    className={`bg-gray-100 rounded-lg p-3 shadow-inner
-                     ${
-                       workOrder.workOrderId === expandedTargetId
-                         ? 'border-4 border-blue-400'
-                         : ''
-                     }`}
-                  >
-                    <Link
-                      href={`/workOrders/${workOrder.workOrderId}?id=${workOrder.workOrderId}&entity=DowntimesReport`}
-                    >
-                      <div className="flex flex-row gap-2 w-full items-center text-lg font-medium text-gray-800 mb-2 bg-gray-300 p-2 rounded-lg hover:bg-gray-400">
-                        <span className="flex-1">
-                          {workOrder.workOrderCode}
-                        </span>
-                        <span className="flex-1">
-                          {workOrder.workOrderDescription}
-                        </span>
-                        <span className="flex-1">
-                          {workOrder.downtimeReason}
-                        </span>
-                        <span className="flex-1 text-right">
-                          {calculateTotalDowntimeMWO(
-                            workOrder.downtimesWorkOrder
-                          )}
-                        </span>
-                      </div>
-                    </Link>
-                    {RenderWorkOrderDetail(workOrder)}
-                    <div className="flex w-full gap-2">
-                      <div className="w-full p-2 justify-end bg-white rounded-lg font-semibold">
-                        {calculateTotalDowntimesWorkOrder(
-                          workOrder,
-                          OriginDowntime.Production
-                        )}
-                      </div>
-                      <div className="w-full p-2 justify-end font-semibold bg-white rounded-lg">
-                        {calculateTotalDowntimesWorkOrder(
-                          workOrder,
-                          OriginDowntime.Maintenance
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                    workOrder={workOrder}
+                    expandedTargetId={expandedTargetId}
+                    from={from}
+                    to={to}
+                  />
                 ))}
 
                 {hasChildren && renderDowntimeTree(asset.assetChild, level + 1)}
@@ -310,83 +262,6 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
       );
     });
   };
-
-  function RenderWorkOrderDetail(workOrder: DowntimesTicketReportList) {
-    return (
-      <div className="flex w-full">
-        <div className={`flex flex-row w-full gap-2`}>
-          <div className="w-full">
-            {MapDowntimes(
-              workOrder.downtimesWorkOrder.filter(
-                x => x.originDownTime == OriginDowntime.Production
-              )
-            )}
-          </div>
-          <div className="w-full">
-            {MapDowntimes(
-              workOrder.downtimesWorkOrder.filter(
-                x => x.originDownTime != OriginDowntime.Production
-              )
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  function MapDowntimes(downtimes: DowntimesTicketReportModel[]) {
-    return (
-      <>
-        {downtimes.map((downtime, downtimeIndex) => (
-          <div
-            key={downtimeIndex}
-            className={`flex flex-row my-2 text-sm p-2 rounded shadow-sm gap-2 ${
-              downtime.originDownTime === OriginDowntime.Production
-                ? 'bg-red-700'
-                : 'bg-blue-700'
-            }`}
-          >
-            <div className="w-full flex flex-col border-r-2 gap-2">
-              <div className="w-full flex gap-1 ">
-                <span className="text-white font-bold">Inici:</span>
-                <span className="text-white">
-                  {formatDate(downtime.startTime)}
-                </span>
-                <span className="text-white font-bold">Final:</span>
-                <span className="text-white">
-                  {formatDate(downtime.endTime)}
-                </span>
-              </div>
-
-              <div className="flex items-start gap-1">
-                <span className="text-white font-semibold">Total:</span>
-                <span className="text-white">
-                  {calculateTimeDifference(
-                    downtime.startTime,
-                    downtime.endTime
-                  )}
-                </span>
-              </div>
-            </div>
-            <div className="flex justify-end">
-              <div className="flex flex-col gap-2 items-end">
-                <span className="text-white font-semibold">
-                  {translateDowntimeReasonType(
-                    downtime.originDownTime as unknown as DowntimesReasonsType
-                  )}
-                </span>
-                <div className="flex flex-wrap">
-                  <span className="text-white whitespace-nowrap overflow-hidden text-ellipsis max-w-[87px]">
-                    {downtime.operator.name}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </>
-    );
-  }
 
   return (
     <div className="container mx-auto p-6">
@@ -414,24 +289,26 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
         </div>
         <div className="mb-6 ">
           <div className="flex gap-4 mb-4 items-center">
-            <div className="flex">
-              <DatePicker
-                selected={from}
-                onChange={e => (e ? setFrom(e) : setFrom(new Date()))}
-                locale={ca}
-                dateFormat="dd/MM/yyyy"
-                className="border border-gray-300 p-2 rounded-md mr-4"
-                popperClassName="z-50"
-              />
-              <DatePicker
-                selected={to}
-                onChange={e => (e ? setTo(e) : setTo(new Date()))}
-                dateFormat="dd/MM/yyyy"
-                locale={ca}
-                className="border border-gray-300 p-2 rounded-md mr-4"
-                popperClassName="z-50"
-              />
-            </div>
+            {!isLoadingData && (
+              <div className="flex">
+                <DatePicker
+                  selected={from}
+                  onChange={e => (e ? setFrom(e) : setFrom(new Date()))}
+                  locale={ca}
+                  dateFormat="dd/MM/yyyy"
+                  className="border border-gray-300 p-2 rounded-md mr-4"
+                  popperClassName="z-50"
+                />
+                <DatePicker
+                  selected={to}
+                  onChange={e => (e ? setTo(e) : setTo(new Date()))}
+                  dateFormat="dd/MM/yyyy"
+                  locale={ca}
+                  className="border border-gray-300 p-2 rounded-md mr-4"
+                  popperClassName="z-50"
+                />
+              </div>
+            )}
 
             <div
               className="flex items-center gap-4 cursor-pointer"
@@ -490,21 +367,6 @@ const DowntimeReport: React.FC<DowntimeReportProps> = ({
                 isSearchable={true}
               />
             </div>
-            {/*<div
-              className="flex items-center gap-4 cursor-pointer"
-              onClick={() => setOnlyMaintenance(!onlyMaintenance)}
-            >
-              <div className="flex flex-col">
-                <span>Intervenció</span>
-                <span>Manteniment</span>
-              </div>
-              <input
-                type="checkbox"
-                className="flex cursor-pointer"
-                checked={onlyMaintenance}
-                onChange={e => setOnlyMaintenance(e.target.checked)}
-              />
-            </div>*/}
           </div>
           <input
             type="text"

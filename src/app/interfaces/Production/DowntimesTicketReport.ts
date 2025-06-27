@@ -1,6 +1,7 @@
 import { Downtimes } from './Downtimes';
 
 export interface DowntimesTicketReport {
+  assetId: string;
   assetCode: string;
   assetDescription: string;
   downtimesTicketReportList: DowntimesTicketReportList[];
