@@ -92,24 +92,30 @@ const DataTable: React.FC<DataTableProps> = ({
   };
 
   useEffect(() => {
-    switch (entity) {
-      case EntityTable.WORKORDER:
-        setPathDetail(ROUTES.workOrders);
-        break;
-      case EntityTable.PREVENTIVE:
-        setPathDetail(ROUTES.preventive.configuration);
-        break;
-      case EntityTable.SPAREPART:
-        setPathDetail(ROUTES.spareParts);
-        break;
-      case EntityTable.OPERATOR:
-        setPathDetail(ROUTES.configuration.operators);
-        break;
-      case EntityTable.MACHINE:
-        setPathDetail(ROUTES.configuration.machines);
-        break;
-      default:
-        setPathDetail('error');
+    try {
+      switch (entity) {
+        case EntityTable.WORKORDER:
+          setPathDetail(ROUTES.workOrders);
+          break;
+        case EntityTable.PREVENTIVE:
+          setPathDetail(ROUTES.preventive.configuration);
+          break;
+        case EntityTable.SPAREPART:
+          setPathDetail(ROUTES.spareParts);
+          break;
+        case EntityTable.OPERATOR:
+          setPathDetail(ROUTES.configuration.operators);
+          break;
+        case EntityTable.MACHINE:
+          setPathDetail(ROUTES.configuration.machines);
+          break;
+        default:
+          setPathDetail('error');
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -127,12 +133,21 @@ const DataTable: React.FC<DataTableProps> = ({
     handleSortChange(sortText);
   };
 
-  const totalQuantity = 0;
+  const getTotalQuantity = (data: any[]) => {
+    return data.reduce((acc, item) => {
+      const quantity = Number(item.sparePartQuantity) || 0;
+      return acc + quantity;
+    }, 0);
+  };
+
+  const totalQuantity =
+    EntityTable.WORKORDER === entity ? getTotalQuantity(filteredData) : 0;
 
   const handleItemsPerPageChange = (value: number) => {
     setIsLoading(true);
     setItemsPerPage(value);
     setCurrentPage(1);
+    setIsLoading(false);
   };
 
   const totalPrice = useMemo(() => {

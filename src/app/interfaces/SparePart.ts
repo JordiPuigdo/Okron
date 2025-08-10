@@ -1,5 +1,6 @@
-import { Documentation } from "./Documentation";
-import Operator from "./Operator";
+import { Documentation } from './Documentation';
+import Operator from './Operator';
+import { SerialStocks } from './Warehouse';
 
 interface SparePart {
   id: string;
@@ -20,6 +21,8 @@ interface SparePart {
   lastMovementConsume: Date;
   lastMovement: Date;
   lastRestockDate: Date;
+  requireSerialNumber: boolean;
+  serialStocks?: SerialStocks[];
 }
 
 export default SparePart;
@@ -29,8 +32,13 @@ export interface RestoreSparePart extends ConsumeSparePart {}
 export interface ConsumeSparePart {
   workOrderId: string;
   sparePartId: string;
+  sparePartCode: string;
   unitsSparePart: number;
   operatorId: string;
+  warehouseId: string;
+  workOrderCode: string;
+  warehouseName: string;
+  serialNumber?: string;
 }
 
 export interface CreateSparePartRequest {
@@ -57,6 +65,7 @@ export interface SparePartPerAssetResponse {
   workOrderCode: string;
   workOrderDescription: string;
   dateConsume: Date;
+  serialNumber?: string;
 }
 
 interface SparePartsConsumeds {

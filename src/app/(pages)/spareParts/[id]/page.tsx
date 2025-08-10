@@ -15,6 +15,7 @@ import SparePart, {
   SparePartPerAssetResponse,
 } from 'app/interfaces/SparePart';
 import { UserPermission } from 'app/interfaces/User';
+import { SerialStocks } from 'app/interfaces/Warehouse';
 import DocumentationService from 'app/services/documentationService';
 import SparePartService from 'app/services/sparePartService';
 import { useSessionStore } from 'app/stores/globalStore';
@@ -25,6 +26,7 @@ import MainLayout from 'components/layout/MainLayout';
 import { EntityTable } from 'components/table/interface/tableEntitys';
 import { useRouter } from 'next/navigation';
 
+import SerialStockModal from '../components/SerialStockModal';
 import SparePartTable from '../components/SparePartTable';
 
 export default function EditSparePart({ params }: { params: { id: string } }) {
@@ -37,11 +39,14 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
   );
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors, dirtyFields },
+    getValues,
   } = useForm<SparePart>({
     defaultValues: {},
   });
@@ -63,6 +68,25 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
     UserPermission.SpareParts,
   ];
   const canEdit = validPermission.includes(loginUser?.permission!);
+
+  const onSaveSerialStocks = async (serialStocks: SerialStocks[]) => {
+    setSparePart(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        serialStocks: serialStocks,
+        stock: serialStocks.reduce((acc, item) => acc + item.quantity, 0),
+      };
+    });
+    setValue(
+      'stock',
+      serialStocks.reduce(
+        (acc: number, item: { quantity: number }) => acc + item.quantity,
+        0
+      )
+    );
+    setValue('serialStocks', serialStocks);
+  };
 
   useEffect(() => {
     const fetchSparePart = async () => {
@@ -100,6 +124,14 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
         setValue('stock', sparePartDetailResponse.sparePart.stock);
         setValue('price', sparePartDetailResponse.sparePart.price);
         setValue('active', sparePartDetailResponse.sparePart.active);
+        setValue(
+          'serialStocks',
+          sparePartDetailResponse.sparePart.serialStocks
+        );
+        setValue(
+          'requireSerialNumber',
+          sparePartDetailResponse.sparePart.requireSerialNumber
+        );
         setValue(
           'documentation',
           sparePartDetailResponse.sparePart.documentation
@@ -199,6 +231,8 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
       }
     });
   }
+
+  const requireSerialNumberValue = watch('requireSerialNumber');
 
   if (!sparePart) return <>Carregant dades</>;
   if (sparePart)
@@ -304,6 +338,12 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                     <input
                       {...register('stock')}
                       className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                      disabled={
+                        sparePart.serialStocks &&
+                        sparePart.serialStocks.length > 0
+                          ? true
+                          : false
+                      }
                     />
                   </div>
 
@@ -313,6 +353,16 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                     </label>
                     <input
                       {...register('active')}
+                      type="checkbox"
+                      className="mt-1 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-600">
+                      Requereix Num Sèrie
+                    </label>
+                    <input
+                      {...register('requireSerialNumber')}
                       type="checkbox"
                       className="mt-1 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
                     />
@@ -339,8 +389,26 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                         <SvgSpinner className="2-6 h-6" />
                       )}
                     </button>
+                    {requireSerialNumberValue && (
+                      <button
+                        type="button"
+                        onClick={() => setIsOpen(true)}
+                        className="flex bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring focus:border-gray-300"
+                      >
+                        Serial Stock
+                      </button>
+                    )}
                   </div>
                 )}
+                <SerialStockModal
+                  isOpen={isOpen}
+                  onClose={() => setIsOpen(false)}
+                  onSave={e => {
+                    onSaveSerialStocks(e);
+                  }}
+                  title={`${sparePart?.code} - Serial Stock`}
+                  initialSerialStocks={sparePart?.serialStocks}
+                />
                 <div className="py-4">
                   {showSuccessMessage && (
                     <p className="bg-green-200 text-green-800 p-4 rounded mb-4">
@@ -360,7 +428,7 @@ export default function EditSparePart({ params }: { params: { id: string } }) {
                 <p className="text-white font-semibold">Històric de consums</p>
                 <SparePartTable
                   sparePartId={params.id}
-                  enableFilters={false}
+                  enableFilters={true}
                   enableDetail={true}
                   enableDelete={false}
                   enableCreate={false}

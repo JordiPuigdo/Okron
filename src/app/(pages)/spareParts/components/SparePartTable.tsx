@@ -132,19 +132,27 @@ const columnsPerAsset: Column[] = [
     format: ColumnFormat.TEXT,
   },
   {
-    label: 'Codi Recanvi',
-    key: 'sparePartCode',
-    format: ColumnFormat.TEXT,
-  },
-  {
-    label: 'Descripció Recanvi',
-    key: 'sparePartDescription',
+    label: 'Número de sèrie',
+    key: 'serialNumber',
     format: ColumnFormat.TEXT,
   },
   {
     label: 'Quantitat',
     key: 'sparePartQuantity',
     format: ColumnFormat.NUMBER,
+  },
+  {
+    label: 'Màquina',
+    key: 'assetDescription',
+    format: ColumnFormat.TEXT,
+  },
+];
+
+const filterBySerialNumber: Filters[] = [
+  {
+    key: 'serialNumber',
+    label: 'Número de sèrie',
+    format: FiltersFormat.TEXT,
   },
 ];
 
@@ -287,6 +295,20 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
             setMessage('');
           }, 3000);
         } else {
+          if (assetId) {
+            columnsPerAsset.push(
+              {
+                label: 'Codi Recanvi',
+                key: 'sparePartCode',
+                format: ColumnFormat.TEXT,
+              },
+              {
+                label: 'Descripció Recanvi',
+                key: 'sparePartDescription',
+                format: ColumnFormat.TEXT,
+              }
+            );
+          }
           setSparePartsPerAsset(response);
         }
       })
@@ -399,7 +421,13 @@ const SparePartTable: React.FC<SparePartTableProps> = ({
             data={sparePartsPerAsset}
             tableButtons={tableButtons}
             entity={EntityTable.WORKORDER}
-            filters={enableFilters ? filtersPerAsset : undefined}
+            filters={
+              enableFilters
+                ? assetId
+                  ? filtersPerAsset
+                  : filterBySerialNumber
+                : undefined
+            }
             onDelete={handleSparePartActiveChange}
             enableFilterActive={enableFilterActive}
             totalCounts={true}

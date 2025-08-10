@@ -8,11 +8,13 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import ModalDowntimeReasons from 'app/(pages)/corrective/components/ModalDowntimeReasons';
 import ModalGenerateCorrective from 'app/(pages)/corrective/components/ModalGenerateCorrective';
 import { useAssetHook } from 'app/hooks/useAssetHook';
+import { useWareHouses } from 'app/hooks/useWarehouse';
 import { SvgSpinner } from 'app/icons/icons';
 import Operator, { OperatorType } from 'app/interfaces/Operator';
 import { DowntimesReasons } from 'app/interfaces/Production/Downtimes';
 import SparePart from 'app/interfaces/SparePart';
 import { UserPermission, UserType } from 'app/interfaces/User';
+import { WareHouseStockAvailability } from 'app/interfaces/Warehouse';
 import WorkOrder, {
   OriginWorkOrder,
   StateWorkOrder,
@@ -85,9 +87,10 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [aviableOperators, setAviableOperators] = useState<
     Operator[] | undefined
   >(undefined);
-  const [availableSpareParts, setAvailableSpareParts] = useState<SparePart[]>(
-    []
-  );
+  const [availableSpareParts, setAvailableSpareParts] = useState<
+    WareHouseStockAvailability[]
+  >([]);
+
   const [selectedSpareParts, setSelectedSpareParts] = useState<
     WorkOrderSparePart[]
   >([]);
@@ -122,6 +125,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const [showDowntimeReasonsModal, setShowDowntimeReasonsModal] =
     useState(false);
   const [showModal, setShowModal] = useState(false);
+
+  const { getStockAvailability } = useWareHouses(true);
 
   const [selectedAssetId, setSelectedAssetId] = useState<string | undefined>(
     undefined
@@ -160,14 +165,8 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   }
 
   async function fetchSparePart() {
-    await sparePartService
-      .getSpareParts()
-      .then(parts => {
-        setAvailableSpareParts(parts);
-      })
-      .catch(e => {
-        setErrorMessage('Error carregant les dades dels recanvis ' + e.message);
-      });
+    const response = await getStockAvailability();
+    setAvailableSpareParts(response);
   }
   async function fetchOperators() {
     await operatorService
@@ -911,10 +910,9 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
           )}
           {currentWorkOrder.workOrderType === WorkOrderType.Corrective && (
             <ChooseSpareParts
-              availableSpareParts={availableSpareParts}
               selectedSpareParts={selectedSpareParts}
               setSelectedSpareParts={setSelectedSpareParts}
-              WordOrderId={currentWorkOrder.id}
+              workOrder={currentWorkOrder}
               isFinished={isFinished}
             />
           )}

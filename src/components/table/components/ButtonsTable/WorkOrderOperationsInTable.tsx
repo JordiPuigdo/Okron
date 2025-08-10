@@ -416,10 +416,9 @@ export const SparePartsModal = ({
             </div>
             {spareParts != undefined && spareParts.length > 0 ? (
               <ChooseSpareParts
-                availableSpareParts={spareParts}
                 selectedSpareParts={selectedSpareParts!}
                 setSelectedSpareParts={setSelectedSpareParts}
-                WordOrderId={workOrder.id}
+                workOrder={workOrder}
                 isFinished={isFinished}
               />
             ) : (
