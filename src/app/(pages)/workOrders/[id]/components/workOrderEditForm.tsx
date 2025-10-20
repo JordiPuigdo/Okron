@@ -68,7 +68,6 @@ enum Tab {
 
 const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const { register, handleSubmit, setValue } = useForm<WorkOrder>({});
-  const router = useRouter();
   const [currentWorkOrder, setCurrentWorkOrder] = useState<WorkOrder>();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
@@ -81,9 +80,7 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
   const operatorService = new OperatorService(
     process.env.NEXT_PUBLIC_API_BASE_URL!
   );
-  const sparePartService = new SparePartService(
-    process.env.NEXT_PUBLIC_API_BASE_URL!
-  );
+
   const [aviableOperators, setAviableOperators] = useState<
     Operator[] | undefined
   >(undefined);
