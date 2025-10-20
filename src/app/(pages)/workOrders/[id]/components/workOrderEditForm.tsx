@@ -92,9 +92,6 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
     WorkOrderSparePart[]
   >([]);
 
-  const [inspectionPoints, setInspectionPoints] = useState<
-    WorkOrderInspectionPoint[]
-  >([]);
   const [passedInspectionPoints, setPassedInspectionPoints] = useState<
     WorkOrderInspectionPoint[]
   >([]);
@@ -240,12 +237,6 @@ const WorkOrderEditForm: React.FC<WorkOrdeEditFormProps> = ({ id }) => {
       }
 
       setPassedInspectionPoints(responseWorkOrder.workOrderInspectionPoint!);
-      /*const x = responseWorkOrder.workOrderInspectionPoint?.map(
-        (order) => order.inspectionPoint
-      );
-      if (x) setInspectionPoints(x!);*/
-      if (responseWorkOrder.workOrderInspectionPoint?.length! > 0 || 0)
-        setInspectionPoints(responseWorkOrder.workOrderInspectionPoint!);
 
       if (responseWorkOrder.workOrderComments?.length! > 0) {
         setWorkOrderComments(responseWorkOrder.workOrderComments!);
